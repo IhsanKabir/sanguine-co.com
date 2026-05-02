@@ -18,7 +18,7 @@ export default async function TopNav() {
   return (
     <>
       <div className="topbar">
-        {t("topbar.shipping")} <b>{t("topbar.shippingThreshold")}</b> · {t("topbar.cod")}
+        {t("topbar.announcement")}
       </div>
       <nav className="nav" aria-label="Primary">
         <div className="nav-inner">

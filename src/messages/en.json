@@ -13,6 +13,7 @@
     "admin": "Admin"
   },
   "topbar": {
+    "announcement": "Complimentary shipping over ৳3,000 · Cash on Delivery available nationwide",
     "shipping": "Complimentary shipping over",
     "shippingThreshold": "৳3,000",
     "cod": "Cash on Delivery available nationwide"

@@ -365,6 +365,10 @@ export async function bookCourier(input: z.infer<typeof courierSchema>) {
 }
 
 // ─── Editorial / brand ─────────────────────────────────────────────────
+//
+// `brand` row holds non-i18n metadata (currently just the contact email).
+// All consumer-facing copy lives in messages/{en,bn}.json and is overridden
+// per-locale via the `copy` row — see `lib/copy.ts`.
 const brandSchema = z.object({
   name: z.string().min(1).max(80),
   tagline: z.string().max(160).optional(),
@@ -388,6 +392,37 @@ export async function getBrand() {
   // jsonb that doesn't conform to the current `brandSchema`.
   const parsed = brandSchema.safeParse(rows[0].value);
   return parsed.success ? parsed.data : null;
+}
+
+// ─── Copy overrides ────────────────────────────────────────────────────
+//
+// Stores per-locale dotted-path overrides for any string in messages/{en,bn}.json.
+// The Editorial admin form writes here; i18n/request.ts reads it on every
+// render and merges it over the static JSON.
+const copyOverridesSchema = z.object({
+  en: z.record(z.string(), z.string()),
+  bn: z.record(z.string(), z.string()),
+});
+
+export async function updateCopyOverrides(input: z.infer<typeof copyOverridesSchema>) {
+  await requirePermission("editorial");
+  const data = copyOverridesSchema.parse(input);
+  // Empty-string entries mean "fall back to the static default" — drop them so
+  // future re-edits don't surface stale blanks in the form.
+  const clean = {
+    en: Object.fromEntries(Object.entries(data.en).filter(([, v]) => v !== "")),
+    bn: Object.fromEntries(Object.entries(data.bn).filter(([, v]) => v !== "")),
+  };
+  await db
+    .insert(schema.siteSettings)
+    .values({ key: "copy", value: clean })
+    .onConflictDoUpdate({
+      target: schema.siteSettings.key,
+      set: { value: clean, updatedAt: new Date() },
+    });
+  // Storefront reads merged messages from the layout, so revalidate everything.
+  revalidatePath("/", "layout");
+  return { ok: true as const };
 }
 
 // ─── Admin user management (owner only) ───────────────────────────────
