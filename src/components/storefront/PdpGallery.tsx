@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Composition from "./Composition";
+import { usePdpState } from "./PdpStateContext";
 
 type Photo = { url: string; alt: string | null };
 type Fallback = {
@@ -15,32 +16,50 @@ type Fallback = {
 type Props = {
   photos: Photo[];
   fallback: Fallback;
+  activeIndex?: number;
+  onIndexChange?: (i: number) => void;
 };
 
-/**
- * PDP gallery with cross-fade on thumbnail switch.
- *
- * Each main image is keyed on the URL so React swaps the DOM node, which lets
- * the CSS keyframe `pdp-img-in` re-fire on every change. ~340ms feels like a
- * deliberate dissolve — not so slow it gets in the way of comparing variants.
- * Reduced-motion is handled by the keyframe definition itself.
- */
-export default function PdpGallery({ photos, fallback }: Props) {
-  const [active, setActive] = useState(0);
+export default function PdpGallery({ photos, fallback, activeIndex, onIndexChange }: Props) {
+  const { activePhotoIndex, setActivePhotoIndex } = usePdpState();
   const [imgKey, setImgKey] = useState(0);
   const prev = useRef(0);
+  const touchStartX = useRef(0);
+
+  const controlled = activeIndex !== undefined;
+  const active = controlled ? activeIndex : activePhotoIndex;
+
+  const setActive = (i: number) => {
+    if (controlled) {
+      onIndexChange?.(i);
+    } else {
+      setActivePhotoIndex(i);
+    }
+  };
+
   const hasPhotos = photos.length > 0;
   const current = hasPhotos ? photos[active] : null;
 
-  // Bump the imgKey when the active index changes so the <Image> remounts
-  // and replays the fade-in keyframe. Avoids relying on React's diffing
-  // skipping the keyed change.
   useEffect(() => {
     if (prev.current !== active) {
       setImgKey((k) => k + 1);
       prev.current = active;
     }
   }, [active]);
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartX.current = e.changedTouches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    const endX = e.changedTouches[0].clientX;
+    const delta = endX - touchStartX.current;
+    if (delta > 40) {
+      setActive(Math.max(0, active - 1));
+    } else if (delta < -40) {
+      setActive(Math.min(photos.length - 1, active + 1));
+    }
+  };
 
   return (
     <div className="pdp-gallery">
@@ -65,7 +84,11 @@ export default function PdpGallery({ photos, fallback }: Props) {
               </div>
             ))}
       </div>
-      <div className="pdp-main-img pdp-main-img--fade">
+      <div
+        className="pdp-main-img pdp-main-img--fade"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         {hasPhotos && current ? (
           <Image
             key={imgKey}

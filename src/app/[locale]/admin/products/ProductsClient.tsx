@@ -28,6 +28,8 @@ type Editing = {
   preorderOnly: boolean;
   estimatedDelivery: string;
   preorderPriceBdt: string;
+  modelNote: string;
+  lookProductIds: string;
 };
 
 const empty = (segId: string): Editing => ({
@@ -36,6 +38,7 @@ const empty = (segId: string): Editing => ({
   description: "", descriptionBn: "", colors: "", sizes: "",
   preorderEnabled: false, preorderOnly: false,
   estimatedDelivery: "", preorderPriceBdt: "",
+  modelNote: "", lookProductIds: "",
 });
 
 export default function ProductsClient({ segments, products }: Props) {
@@ -70,6 +73,8 @@ export default function ProductsClient({ segments, products }: Props) {
       preorderOnly: editing.preorderOnly,
       estimatedDelivery: editing.estimatedDelivery || null,
       preorderPriceBdt: editing.preorderPriceBdt ? parseInt(editing.preorderPriceBdt) : null,
+      modelNote: editing.modelNote.trim() || null,
+      lookProductIds: editing.lookProductIds.split(",").map((s) => s.trim()).filter(Boolean),
     };
     startTransition(async () => {
       if (editing.id) await updateProduct(editing.id, payload);
@@ -139,6 +144,8 @@ export default function ProductsClient({ segments, products }: Props) {
                       preorderOnly: p.preorderOnly,
                       estimatedDelivery: p.estimatedDelivery || "",
                       preorderPriceBdt: p.preorderPriceBdt ? String(p.preorderPriceBdt) : "",
+                      modelNote: p.modelNote ?? "",
+                      lookProductIds: (p.lookProductIds as string[] ?? []).join(", "),
                     })}><Icon name="feather" size={14}/></button>
                     <button className="icon-btn" onClick={() => setPendingDel(p)}><Icon name="x" size={14}/></button>
                   </td>
@@ -191,6 +198,24 @@ export default function ProductsClient({ segments, products }: Props) {
             <div className="row">
               <div className="field"><label>Colours (comma-separated)</label><input value={editing.colors} onChange={(e) => setEditing({ ...editing, colors: e.target.value })} placeholder="Aubergine, Obsidian, Rose"/></div>
               <div className="field"><label>Sizes (comma-separated)</label><input value={editing.sizes} onChange={(e) => setEditing({ ...editing, sizes: e.target.value })} placeholder="XS, S, M, L, XL"/></div>
+            </div>
+
+            <div className="field" style={{ marginTop: 8 }}>
+              <label>Model note (optional)</label>
+              <input
+                value={editing.modelNote}
+                onChange={(e) => setEditing({ ...editing, modelNote: e.target.value })}
+                placeholder="Model is 165 cm, wearing size S"
+                maxLength={300}
+              />
+            </div>
+            <div className="field" style={{ marginTop: 8 }}>
+              <label>Complete the look — product IDs (comma-separated)</label>
+              <input
+                value={editing.lookProductIds}
+                onChange={(e) => setEditing({ ...editing, lookProductIds: e.target.value })}
+                placeholder="prod_abc123, prod_def456"
+              />
             </div>
 
             <div style={{ borderTop: "1px solid var(--line)", paddingTop: 16, marginTop: 4 }}>

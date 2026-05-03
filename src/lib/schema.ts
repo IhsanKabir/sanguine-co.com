@@ -43,6 +43,8 @@ export const products = pgTable("products", {
   preorderOnly: boolean("preorder_only").default(false).notNull(),
   estimatedDelivery: text("estimated_delivery"),   // e.g. "4–6 weeks"
   preorderPriceBdt: integer("preorder_price_bdt"), // null = use priceBdt
+  modelNote: text("model_note"),
+  lookProductIds: jsonb("look_product_ids").$type<string[]>().default([]),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

@@ -73,6 +73,7 @@ export async function listApprovedReviews(productId: string) {
     body: schema.reviews.body,
     createdAt: schema.reviews.createdAt,
     helpfulCount: schema.reviews.helpfulCount,
+    photoUrls: schema.reviews.photoUrls,
   })
     .from(schema.reviews)
     .where(and(eq(schema.reviews.productId, productId), eq(schema.reviews.status, "approved")))

@@ -90,6 +90,9 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .grid{display:grid;gap:20px}.grid-4{grid-template-columns:repeat(4,1fr)}.grid-3{grid-template-columns:repeat(3,1fr)}.grid-2{grid-template-columns:repeat(2,1fr)}
 .card{background:#fff;border:1px solid var(--line);border-radius:2px;overflow:hidden;transition:all .2s;display:flex;flex-direction:column;cursor:pointer}
 .card:hover{box-shadow:var(--shadow-md);border-color:var(--purple-200);transform:translateY(-2px)}
+.card-img-primary{transition:opacity .38s ease}
+.card-img-hover{opacity:0;transition:opacity .38s ease}
+@media(hover:hover){.card:hover .card-img-hover{opacity:1}.card:hover .card-img-primary{opacity:0}}
 .prod-img{aspect-ratio:3/4;width:100%}.prod-body{padding:14px 16px 18px}
 .prod-meta{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft)}
 .prod-name{font-family:var(--serif);font-size:19px;margin:4px 0 6px;color:var(--purple-900)}
@@ -170,6 +173,37 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .pdp-feats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;padding-top:24px;border-top:1px solid var(--line)}
 .pdp-feat{display:flex;gap:10px;align-items:start;font-size:12px;color:var(--ink-soft)}
 .pdp-feat b{color:var(--purple-900);display:block;font-size:13px;margin-bottom:2px;font-weight:600}
+/* Scarcity + shipping note */
+.pdp-scarcity{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:oklch(0.50 0.15 25);margin-bottom:10px;letter-spacing:.02em}
+.pdp-scarcity__dot{width:6px;height:6px;border-radius:50%;background:oklch(0.55 0.18 25);flex-shrink:0;animation:pdp-pulse 1.6s ease-in-out infinite}
+@keyframes pdp-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.pdp-shipping-note{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);margin:6px 0 18px}
+.pdp-velocity{font-size:11px;letter-spacing:.06em;color:var(--gold-deep);margin-bottom:10px;text-transform:uppercase}
+/* Sticky Add-to-Bag bar */
+.pdp-sticky-bar{position:fixed;bottom:0;left:0;right:0;z-index:90;display:flex;align-items:center;gap:14px;padding:12px 20px;background:var(--purple-950);border-top:1px solid var(--purple-800);transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);pointer-events:none}
+.pdp-sticky-bar--visible{transform:translateY(0);pointer-events:auto}
+.pdp-sticky-bar__info{flex:1;min-width:0}
+.pdp-sticky-bar__name{display:block;font-family:var(--serif);font-size:15px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pdp-sticky-bar__variant{display:block;font-size:11px;color:var(--purple-200);letter-spacing:.08em;margin-top:2px}
+/* Only show on mobile — desktops have the inline button visible */
+@media(min-width:768px){.pdp-sticky-bar{display:none}}
+.fly-dot{
+  position:fixed;
+  left:var(--fly-x);
+  top:var(--fly-y);
+  width:10px;height:10px;
+  border-radius:50%;
+  background:var(--gold);
+  pointer-events:none;
+  z-index:999;
+  animation:fly-to-cart .55s cubic-bezier(.4,0,.6,1) forwards
+}
+@keyframes fly-to-cart{
+  0%{transform:translate(-50%,-50%) scale(1);opacity:1}
+  60%{opacity:1}
+  100%{transform:translate(calc(100vw - var(--fly-x) - 48px),calc(0px - var(--fly-y) + 14px)) scale(.3);opacity:0}
+}
+@media(prefers-reduced-motion:reduce){.fly-dot{display:none}}
 
 .panel{background:#fff;border:1px solid var(--line);padding:28px}
 .panel h3{font-family:var(--serif);font-size:24px;margin:0 0 16px;color:var(--purple-900);font-weight:500}
@@ -178,6 +212,8 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .field label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft)}
 .field input,.field select,.field textarea{padding:11px 12px;border:1px solid var(--line);border-radius:2px;font-size:14px;outline:none;background:#fff}
 .field input:focus,.field select:focus{border-color:var(--purple-800)}
+.field input[aria-invalid=true],.field input[aria-invalid=true]:focus{border-color:var(--err)}
+.field-err{font-size:11px;color:var(--err);margin-top:-2px}
 
 .cart-line{display:grid;grid-template-columns:88px 1fr auto;gap:16px;padding:18px 0;border-bottom:1px solid var(--line);align-items:start}
 .cart-line:last-child{border-bottom:none}

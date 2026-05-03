@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { segments, products, productImages } from "./schema";
+import { segments, products, productImages, orders, orderLines } from "./schema";
 import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 
 // Reusable subquery: ids of segments that are NOT hidden.
@@ -101,18 +101,23 @@ export async function getProductsByIds(ids: string[]) {
 }
 
 /**
- * Batch-fetch hero (first) image for a list of products. Returns a map
- * keyed by productId. Use on listing pages so we can render real photos
- * with one query instead of N.
+ * Batch-fetch up to two images (hero + hover) for a list of products.
+ * Returns a map keyed by productId. `hoverUrl` is the second image by
+ * sortOrder — undefined when the product has only one image.
  */
-export async function getHeroImagesFor(productIds: string[]): Promise<Map<string, { url: string; alt: string | null }>> {
+export async function getHeroImagesFor(productIds: string[]): Promise<Map<string, { url: string; alt: string | null; hoverUrl?: string }>> {
   if (productIds.length === 0) return new Map();
   const rows = await db.select().from(productImages)
     .where(inArray(productImages.productId, productIds))
     .orderBy(asc(productImages.sortOrder));
-  const out = new Map<string, { url: string; alt: string | null }>();
+  const out = new Map<string, { url: string; alt: string | null; hoverUrl?: string }>();
   for (const r of rows) {
-    if (!out.has(r.productId)) out.set(r.productId, { url: r.url, alt: r.alt });
+    const existing = out.get(r.productId);
+    if (!existing) {
+      out.set(r.productId, { url: r.url, alt: r.alt });
+    } else if (!existing.hoverUrl) {
+      existing.hoverUrl = r.url;
+    }
   }
   return out;
 }
@@ -121,6 +126,22 @@ export async function getRelatedProducts(productId: string, segmentId: string, l
   return db.select().from(products)
     .where(and(eq(products.status, "live"), eq(products.segmentId, segmentId), sql`${products.id} != ${productId}`))
     .limit(limit);
+}
+
+/**
+ * Count units of a product sold (via confirmed orders) in the last 30 days.
+ * Drives the "X+ ordered this month" social-proof badge on the PDP.
+ */
+export async function getProductSalesVelocity(productId: string): Promise<number> {
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const [row] = await db.execute<{ count: number }>(sql`
+    select count(*)::int as count
+    from ${orderLines}
+    join ${orders} on ${orderLines.orderId} = ${orders.id}
+    where ${orderLines.productId} = ${productId}
+      and ${orders.createdAt} >= ${since.toISOString()}
+  `);
+  return row?.count ?? 0;
 }
 
 // ─── Search (Postgres full-text) ───────────────────────────────────────

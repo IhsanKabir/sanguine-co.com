@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { getProductBySlug, getSegmentBySlug, getRelatedProducts, getProductImages } from "@/lib/queries";
+import { getProductBySlug, getSegmentBySlug, getRelatedProducts, getProductImages, getProductSalesVelocity, getHeroImagesFor, getProductsByIds } from "@/lib/queries";
 import { Link } from "@/i18n/routing";
 import { formatBdt } from "@/lib/utils";
 import Icon from "@/components/storefront/Icon";
 import ProductCard from "@/components/storefront/ProductCard";
-import AddToBagButton from "@/components/storefront/AddToBagButton";
+import PdpActionsClient from "@/components/storefront/PdpActionsClient";
 import PdpGallery from "@/components/storefront/PdpGallery";
+import { PdpStateProvider } from "@/components/storefront/PdpStateContext";
 import JsonLd from "@/components/seo/JsonLd";
 import ReviewsSection from "@/components/storefront/ReviewsSection";
 import NotifyMeButton from "@/components/storefront/NotifyMeButton";
@@ -81,12 +82,18 @@ export default async function ProductPage({ params }: Props) {
   const p = await getProductBySlug(slug).catch(() => null);
   if (!p) notFound();
   const seg = p.segmentId ? await getSegmentBySlug(p.segmentId).catch(() => null) : null;
-  const [related, photos, approvedReviews, currentUser] = await Promise.all([
+  const lookIds = (p.lookProductIds as string[] | null) ?? [];
+  const [related, photos, approvedReviews, currentUser, lookItems, velocity] = await Promise.all([
     p.segmentId ? getRelatedProducts(p.id, p.segmentId).catch(() => []) : Promise.resolve([]),
     getProductImages(p.id).catch(() => []),
     listApprovedReviews(p.id).catch(() => []),
     getCurrentUser().catch(() => null),
+    lookIds.length > 0 ? getProductsByIds(lookIds).catch(() => []) : Promise.resolve([]),
+    getProductSalesVelocity(p.id).catch(() => 0),
   ]);
+  const lookHeroImages = lookItems.length > 0
+    ? await getHeroImagesFor(lookItems.map((i) => i.id)).catch(() => new Map())
+    : new Map();
 
   // Eligibility for writing a review: signed-in customer with a delivered order
   // of this product, who has not already written one.
@@ -205,6 +212,7 @@ export default async function ProductPage({ params }: Props) {
         )}
         <span className="current">{name}</span>
       </div>
+      <PdpStateProvider>
       <section className="pdp" data-cursor="loupe">
         <PdpGallery
           photos={photos.map((ph) => ({ url: ph.url, alt: ph.alt }))}
@@ -224,6 +232,9 @@ export default async function ProductPage({ params }: Props) {
             <span>·</span>
             <span>{p.reviewCount} {p.reviewCount === 1 ? t("pdp.review") : t("pdp.reviews")}</span>
           </div>
+          {velocity > 10 && (
+            <div className="pdp-velocity">{velocity}+ ordered in the past 30 days</div>
+          )}
           <div className="pdp-price">
             <span className="now">{formatBdt(p.priceBdt, locale as "en" | "bn")}</span>
             {p.wasBdt && <span className="was">{formatBdt(p.wasBdt, locale as "en" | "bn")}</span>}
@@ -233,9 +244,14 @@ export default async function ProductPage({ params }: Props) {
               </span>
             )}
           </div>
-          <div style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>
+          <div style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.7, marginBottom: p.modelNote ? 12 : 24 }}>
             {description}
           </div>
+          {p.modelNote && (
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", fontStyle: "italic", marginBottom: 24 }}>
+              {p.modelNote}
+            </div>
+          )}
           {p.preorderOnly ? (
             <PreorderButton
               slug={p.slug}
@@ -246,7 +262,7 @@ export default async function ProductPage({ params }: Props) {
             />
           ) : p.stock > 0 ? (
             <>
-              <AddToBagButton
+              <PdpActionsClient
                 product={{
                   productId: p.id,
                   slug: p.slug,
@@ -284,25 +300,54 @@ export default async function ProductPage({ params }: Props) {
               defaultEmail={currentUser?.email ?? ""}
             />
           )}
-          <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>
-            {p.preorderOnly
-              ? "Available by preorder only"
-              : p.stock === 0 && !p.preorderEnabled
-                ? "Currently out of stock"
-                : p.stock === 0
-                  ? "Out of stock — preorder available"
-                  : p.stock < 10
-                    ? t("pdp.remaining", { count: p.stock })
-                    : t("pdp.inStock")}
+
+          {/* Scarcity signal — only when stock is genuinely low */}
+          {p.stock > 0 && p.stock <= 5 && (
+            <div className="pdp-scarcity">
+              <span className="pdp-scarcity__dot" />
+              Only {p.stock} left — order soon
+            </div>
+          )}
+          {p.stock > 5 && p.stock < 10 && (
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>
+              {t("pdp.remaining", { count: p.stock })}
+            </div>
+          )}
+          {p.stock === 0 && !p.preorderEnabled && (
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>Currently out of stock</div>
+          )}
+          {p.stock === 0 && p.preorderEnabled && (
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>Out of stock — preorder available</div>
+          )}
+          {p.preorderOnly && (
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>Available by preorder only</div>
+          )}
+
+          {/* Shipping estimate */}
+          <div className="pdp-shipping-note">
+            <Icon name="arrow" size={13} />
+            Free delivery on orders over ৳3,000 · Standard ৳80–150
           </div>
+
           <div className="pdp-feats">
-            <div className="pdp-feat"><Icon name="arrow" size={18} /><div><b>{t("pdp.freeShipping")}</b>{t("pdp.freeShippingNote")}</div></div>
+            <div className="pdp-feat"><Icon name="check" size={18} /><div><b>7-day returns</b> Free courier pickup within 7 days of delivery</div></div>
             <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.codTitle")}</b>{t("pdp.codNote")}</div></div>
             <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.authentic")}</b>{t("pdp.authenticNote")}</div></div>
             <div className="pdp-feat"><Icon name="feather" size={18} /><div><b>{t("pdp.giftService")}</b>{t("pdp.giftServiceNote")}</div></div>
           </div>
+          {process.env.NEXT_PUBLIC_WHATSAPP_NUMBER && (
+            <a
+              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hello, I'm interested in ${name} — ${BASE}/${locale}/product/${p.slug}`)}`}
+              style={{ display: "inline-block", fontSize: 12, color: "var(--ink-soft)", marginTop: 14, textDecoration: "none" }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Questions about this piece? Chat on WhatsApp →
+            </a>
+          )}
         </div>
       </section>
+      </PdpStateProvider>
       <ReviewsSection
         productId={p.id}
         reviews={approvedReviews}
@@ -310,6 +355,21 @@ export default async function ProductPage({ params }: Props) {
         signedInButIneligible={signedInButIneligible}
         signInHref={`/${locale}/sign-in?next=${encodeURIComponent(`/${locale}/product/${p.slug}`)}`}
       />
+      {lookItems.length > 0 && (
+        <section className="section">
+          <div className="section-hd">
+            <div>
+              <div className="kicker">STYLE IT WITH</div>
+              <h2>Complete the look</h2>
+            </div>
+          </div>
+          <div className="grid grid-4">
+            {lookItems.map((item) => (
+              <ProductCard key={item.id} product={item} segmentTag="" heroImage={lookHeroImages.get(item.id) ?? null} quickView={false} />
+            ))}
+          </div>
+        </section>
+      )}
       <RecentlyViewedStrip excludeId={p.id} />
       {related.length > 0 && (
         <section className="section">

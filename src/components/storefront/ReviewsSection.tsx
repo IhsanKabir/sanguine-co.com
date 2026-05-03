@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
+import Image from "next/image";
 import { submitReview } from "@/lib/actions/reviews";
 
 type Review = {
@@ -10,6 +11,7 @@ type Review = {
   body: string | null;
   createdAt: Date;
   helpfulCount: number;
+  photoUrls: string[] | null;
 };
 
 type Props = {
@@ -78,6 +80,22 @@ export default function ReviewsSection({ productId, reviews, canWrite, signedInB
                 <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--ink)", margin: 0, whiteSpace: "pre-wrap" }}>
                   {r.body}
                 </p>
+              )}
+              {r.photoUrls && r.photoUrls.length > 0 && (
+                <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+                  {r.photoUrls.map((url, i) => (
+                    <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                      style={{ display: "block", width: 72, height: 72, flexShrink: 0, overflow: "hidden", border: "1px solid var(--line)", borderRadius: 2 }}>
+                      <Image
+                        src={url}
+                        alt={`Customer photo ${i + 1}`}
+                        width={72}
+                        height={72}
+                        style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                      />
+                    </a>
+                  ))}
+                </div>
               )}
             </article>
           ))}

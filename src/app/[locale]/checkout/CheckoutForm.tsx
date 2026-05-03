@@ -23,6 +23,7 @@ export default function CheckoutForm() {
   const [step, setStep] = useState<1 | 2>(1);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [c, setC] = useState({ fullName: "", email: "", phone: "" });
   const [s, setS] = useState({
@@ -30,8 +31,16 @@ export default function CheckoutForm() {
   });
   const [notes, setNotes] = useState("");
 
-  const baseShipping = subtotalBdt >= FREE_THRESHOLD ? 0 : (s.city.toLowerCase().includes("dhaka") ? FLAT_DHAKA : FLAT_OUTSIDE);
+  const isDhaka = s.city.toLowerCase().includes("dhaka");
+  const baseShipping = subtotalBdt >= FREE_THRESHOLD ? 0 : (isDhaka ? FLAT_DHAKA : FLAT_OUTSIDE);
   const shipping = coupon?.freeShipping ? 0 : baseShipping;
+
+  // Estimated arrival: 1–2 days handling + 1–3 transit inside Dhaka, 3–5 outside.
+  const estArrival = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + (isDhaka ? 4 : 7));
+    return d.toLocaleDateString("en-BD", { weekday: "short", day: "numeric", month: "short" });
+  })();
   const discount = coupon?.discountBdt ?? 0;
   const total = Math.max(0, subtotalBdt - discount) + shipping;
 
@@ -58,12 +67,15 @@ export default function CheckoutForm() {
   }
 
   const validateStep1 = () => {
-    if (c.fullName.trim().length < 2) return "Please provide your full name.";
-    if (!c.email.includes("@")) return "Please provide a valid email.";
-    if (c.phone.replace(/\D/g, "").length < 10) return "Please provide a valid phone number.";
-    if (s.line1.trim().length < 2) return "Please provide a street address.";
-    if (s.city.trim().length < 2) return "Please provide a city.";
-    return null;
+    const errs: Record<string, string> = {};
+    if (c.fullName.trim().length < 2) errs.fullName = "Please enter your full name.";
+    if (!c.email.includes("@") || !c.email.includes(".")) errs.email = "Enter a valid email address — e.g. you@mail.com";
+    const digits = c.phone.replace(/\D/g, "");
+    if (digits.length < 10) errs.phone = "Enter a valid phone number (used for delivery updates only).";
+    if (s.line1.trim().length < 2) errs.line1 = "Enter your street address.";
+    if (s.city.trim().length < 2) errs.city = "Enter your city.";
+    setFieldErrors(errs);
+    return Object.keys(errs).length === 0 ? null : "Please correct the fields above.";
   };
 
   const onPlace = () => {
@@ -102,22 +114,45 @@ export default function CheckoutForm() {
           <div className="panel">
             <h3>{t("checkout.stepAddress")}</h3>
             <div className="row">
-              <div className="field"><label>{t("checkout.fullName")}</label>
-                <input value={c.fullName} onChange={(e) => setC({ ...c, fullName: e.target.value })} placeholder="Adelaide Voss"/></div>
-              <div className="field"><label>{t("checkout.email")}</label>
-                <input type="email" value={c.email} onChange={(e) => setC({ ...c, email: e.target.value })} placeholder="you@mail.co"/></div>
+              <div className="field">
+                <label>{t("checkout.fullName")}</label>
+                <input value={c.fullName} onChange={(e) => { setC({ ...c, fullName: e.target.value }); setFieldErrors((fe) => ({ ...fe, fullName: "" })); }} placeholder="Adelaide Voss" aria-invalid={!!fieldErrors.fullName} />
+                {fieldErrors.fullName && <span className="field-err">{fieldErrors.fullName}</span>}
+              </div>
+              <div className="field">
+                <label>{t("checkout.email")}</label>
+                <input type="email" value={c.email} onChange={(e) => { setC({ ...c, email: e.target.value }); setFieldErrors((fe) => ({ ...fe, email: "" })); }} placeholder="you@mail.co" aria-invalid={!!fieldErrors.email} />
+                {fieldErrors.email && <span className="field-err">{fieldErrors.email}</span>}
+              </div>
             </div>
-            <div className="row"><div className="field" style={{ gridColumn: "1/-1" }}><label>{t("checkout.phone")}</label>
-              <input value={c.phone} onChange={(e) => setC({ ...c, phone: e.target.value })} placeholder="+8801XXXXXXXXX"/></div></div>
-            <div className="row"><div className="field" style={{ gridColumn: "1/-1" }}><label>{t("checkout.address")}</label>
-              <input value={s.line1} onChange={(e) => setS({ ...s, line1: e.target.value })} placeholder="House 12, Road 5, Gulshan"/></div></div>
+            <div className="row">
+              <div className="field" style={{ gridColumn: "1/-1" }}>
+                <label>{t("checkout.phone")}</label>
+                <input value={c.phone} onChange={(e) => { setC({ ...c, phone: e.target.value }); setFieldErrors((fe) => ({ ...fe, phone: "" })); }} placeholder="+8801XXXXXXXXX" aria-invalid={!!fieldErrors.phone} />
+                {fieldErrors.phone && <span className="field-err">{fieldErrors.phone}</span>}
+              </div>
+            </div>
+            <div className="row">
+              <div className="field" style={{ gridColumn: "1/-1" }}>
+                <label>{t("checkout.address")}</label>
+                <input value={s.line1} onChange={(e) => { setS({ ...s, line1: e.target.value }); setFieldErrors((fe) => ({ ...fe, line1: "" })); }} placeholder="House 12, Road 5, Gulshan" aria-invalid={!!fieldErrors.line1} />
+                {fieldErrors.line1 && <span className="field-err">{fieldErrors.line1}</span>}
+              </div>
+            </div>
             <div className="row" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
-              <div className="field"><label>{t("checkout.area")}</label>
-                <input value={s.area} onChange={(e) => setS({ ...s, area: e.target.value })} placeholder="Gulshan"/></div>
-              <div className="field"><label>{t("checkout.city")}</label>
-                <input value={s.city} onChange={(e) => setS({ ...s, city: e.target.value })} placeholder="Dhaka"/></div>
-              <div className="field"><label>{t("checkout.postcode")}</label>
-                <input value={s.postcode} onChange={(e) => setS({ ...s, postcode: e.target.value })} placeholder="1212"/></div>
+              <div className="field">
+                <label>{t("checkout.area")}</label>
+                <input value={s.area} onChange={(e) => setS({ ...s, area: e.target.value })} placeholder="Gulshan" />
+              </div>
+              <div className="field">
+                <label>{t("checkout.city")}</label>
+                <input value={s.city} onChange={(e) => { setS({ ...s, city: e.target.value }); setFieldErrors((fe) => ({ ...fe, city: "" })); }} placeholder="Dhaka" aria-invalid={!!fieldErrors.city} />
+                {fieldErrors.city && <span className="field-err">{fieldErrors.city}</span>}
+              </div>
+              <div className="field">
+                <label>{t("checkout.postcode")}</label>
+                <input value={s.postcode} onChange={(e) => setS({ ...s, postcode: e.target.value })} placeholder="1212" />
+              </div>
             </div>
             <div className="row"><div className="field" style={{ gridColumn: "1/-1" }}><label>Order notes (optional)</label>
               <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything our courier should know"/></div></div>
@@ -192,6 +227,10 @@ export default function CheckoutForm() {
               )}
               <div className="r"><span className="muted">Shipping</span><span>{shipping === 0 ? t("cart.shippingFree") : formatBdt(shipping, locale)}</span></div>
               <div className="r grand"><span>{t("cart.total")}</span><span>{formatBdt(total, locale)}</span></div>
+              <div className="r" style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line)" }}>
+                <span className="muted" style={{ fontSize: 11, letterSpacing: ".06em", textTransform: "uppercase" }}>Est. arrival</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--purple-900)" }}>{estArrival}</span>
+              </div>
             </div>
           </div>
         </div>

@@ -13,7 +13,7 @@ type Props = {
   product: Product;
   segmentTag?: string | null;
   /** Optional hero image (real photograph) — falls back to Composition art if omitted. */
-  heroImage?: { url: string; alt: string | null } | null;
+  heroImage?: { url: string; alt: string | null; hoverUrl?: string } | null;
   /** Show the quick-view trigger (defaults true). Disable on tight grids. */
   quickView?: boolean;
 };
@@ -29,13 +29,26 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
       <Link href={`/product/${p.slug}`}>
         <div style={{ position: "relative", aspectRatio: "3/4", overflow: "hidden" }} className="card-cover">
           {heroImage ? (
-            <Image
-              src={heroImage.url}
-              alt={heroImage.alt ?? name}
-              fill
-              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              style={{ objectFit: "cover" }}
-            />
+            <>
+              <Image
+                src={heroImage.url}
+                alt={heroImage.alt ?? name}
+                fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                style={{ objectFit: "cover" }}
+                className="card-img-primary"
+              />
+              {heroImage.hoverUrl && (
+                <Image
+                  src={heroImage.hoverUrl}
+                  alt={heroImage.alt ?? name}
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  style={{ objectFit: "cover" }}
+                  className="card-img-hover"
+                />
+              )}
+            </>
           ) : (
             <Composition
               cat={p.segmentId || "clothing"}

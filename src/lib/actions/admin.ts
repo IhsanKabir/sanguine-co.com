@@ -134,6 +134,8 @@ const prodSchema = z.object({
   preorderOnly: z.boolean().optional(),
   estimatedDelivery: z.string().max(100).optional().nullable(),
   preorderPriceBdt: z.number().int().min(0).optional().nullable(),
+  modelNote: z.string().max(300).optional().nullable(),
+  lookProductIds: z.array(z.string()).optional(),
 });
 
 export async function createProduct(input: z.infer<typeof prodSchema>) {
@@ -160,6 +162,8 @@ export async function createProduct(input: z.infer<typeof prodSchema>) {
     preorderOnly: data.preorderOnly ?? false,
     estimatedDelivery: data.estimatedDelivery || null,
     preorderPriceBdt: data.preorderPriceBdt ?? null,
+    modelNote: data.modelNote || null,
+    lookProductIds: data.lookProductIds || [],
   });
   revalidatePath("/", "layout");
   return { ok: true as const, id, slug };
@@ -168,7 +172,7 @@ export async function createProduct(input: z.infer<typeof prodSchema>) {
 export async function updateProduct(id: string, patch: Partial<z.infer<typeof prodSchema>>) {
   await requireAdmin();
   const update: Record<string, unknown> = {};
-  for (const k of ["name","nameBn","sku","segmentId","priceBdt","wasBdt","stock","tag","description","descriptionBn","colors","sizes","preorderEnabled","preorderOnly","estimatedDelivery","preorderPriceBdt"] as const) {
+  for (const k of ["name","nameBn","sku","segmentId","priceBdt","wasBdt","stock","tag","description","descriptionBn","colors","sizes","preorderEnabled","preorderOnly","estimatedDelivery","preorderPriceBdt","modelNote","lookProductIds"] as const) {
     if (patch[k] !== undefined) (update as Record<string, unknown>)[k] = patch[k];
   }
   if (typeof patch.sku === "string") update.sku = patch.sku.toUpperCase();
