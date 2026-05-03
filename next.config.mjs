@@ -32,4 +32,26 @@ const sentryBuildOptions = {
   automaticVercelMonitors: false,
 };
 
+// One-line build-time signal so we can confirm in Vercel logs whether source
+// maps are being uploaded. Silent failure here was costing us symbolicated
+// stack traces — explicit log makes the misconfiguration visible.
+if (process.env.NODE_ENV !== "test") {
+  const hasToken = Boolean(process.env.SENTRY_AUTH_TOKEN);
+  const hasOrg = Boolean(process.env.SENTRY_ORG);
+  const hasProject = Boolean(process.env.SENTRY_PROJECT);
+  if (hasToken && hasOrg && hasProject) {
+    // eslint-disable-next-line no-console
+    console.log(`[sentry] Source maps will be uploaded for ${process.env.SENTRY_ORG}/${process.env.SENTRY_PROJECT}.`);
+  } else {
+    // eslint-disable-next-line no-console
+    console.log(
+      `[sentry] Source maps skipped — missing: ${[
+        !hasToken && "SENTRY_AUTH_TOKEN",
+        !hasOrg && "SENTRY_ORG",
+        !hasProject && "SENTRY_PROJECT",
+      ].filter(Boolean).join(", ")}.`,
+    );
+  }
+}
+
 export default withSentryConfig(withNextIntl(nextConfig), sentryBuildOptions);

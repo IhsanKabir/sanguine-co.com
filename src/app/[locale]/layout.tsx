@@ -12,7 +12,6 @@ import RouteTransition from "@/components/storefront/RouteTransition";
 import SessionTracker from "@/components/storefront/SessionTracker";
 import FloatingChat from "@/components/storefront/FloatingChat";
 import CookieConsent from "@/components/storefront/CookieConsent";
-import CloudflareAnalytics from "@/components/storefront/CloudflareAnalytics";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -50,7 +49,9 @@ export default async function LocaleLayout({
       <Script src="/cursor.js" strategy="afterInteractive" />
       <Script src="/moments.js" strategy="afterInteractive" />
       <Script src="/atier.js" strategy="afterInteractive" />
-      <CloudflareAnalytics />
+      {/* Cloudflare Analytics removed 2026-05-03 — Vercel Analytics +
+       *   Speed Insights are now the canonical telemetry stack. Two
+       *   beacons per pageview is wasteful at our scale. */}
     </NextIntlClientProvider>
   );
 }

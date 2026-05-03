@@ -48,36 +48,41 @@ export const metadata: Metadata = {
   formatDetection: { email: false, address: false, telephone: false },
 };
 
+// Canonical entity name is "Saanguine Maison" everywhere — JSON-LD, OG,
+// manifest, brand copy. Inconsistent naming delays Google Knowledge Panel
+// disambiguation. `sameAs` lists external authoritative profiles for the
+// brand (filled with placeholders for surfaces we'll publish on).
 const organizationLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Maison Saanguine",
+  name: "Saanguine Maison",
   alternateName: "Saanguine",
   url: BASE,
   logo: `${BASE}/logo.png`,
-  description: "Garments, flora & small ceremonies for the violet hour. A Bangladeshi maison, slowly assembled.",
+  description: "A Bangladeshi maison for perfume, flora, books and small ceremonies — slowly assembled with the patience of a florist.",
   email: "concierge@saanguine.com",
   address: {
     "@type": "PostalAddress",
     addressLocality: "Dhaka",
     addressCountry: "BD",
   },
+  sameAs: [
+    "https://www.facebook.com/saanguine",
+    "https://www.instagram.com/saanguine",
+    "https://wa.me/8801XXXXXXXXX",
+  ].filter((u) => !u.includes("XXXXXXXXX")), // drop placeholders until real handles
 };
 
+// SearchAction removed 2026-05-03 — the query-string URL template
+// (`/en/shop?q=`) is disallowed by robots.txt's `/*?*` rule, so emitting
+// it as a SearchAction was inaccurate. Restore once we have a stable
+// crawlable search results URL.
 const websiteLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Saanguine Maison",
   url: BASE,
   inLanguage: ["en-BD", "bn-BD"],
-  potentialAction: {
-    "@type": "SearchAction",
-    target: {
-      "@type": "EntryPoint",
-      urlTemplate: `${BASE}/en/shop?q={search_term_string}`,
-    },
-    "query-input": "required name=search_term_string",
-  },
 };
 
 // `lang` is sourced from next-intl's `getLocale()` so SSR / SSG / Googlebot
