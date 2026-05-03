@@ -491,4 +491,160 @@
     const drawerMo = new MutationObserver(attachDrawerSwipe);
     drawerMo.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
   }
+
+  // ============ 10. ORRERY + CELESTIAL ARCH ANIMATION ============
+  function mountOrrery() {
+    if (reduced) return;
+    const frame = document.querySelector('.hs-frame');
+    if (!frame || frame.querySelector('.ssg-orrery')) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.className = 'ssg-orrery';
+    canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;';
+    frame.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    let W, H, CX, CY, OR;
+
+    const STARS = Array.from({ length: 90 }, () => ({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() * 1.3 + 0.3,
+      a: Math.random() * 0.5 + 0.2,
+      phase: Math.random() * 6.28,
+    }));
+
+    // Planets: [radius_fraction, inclination, angular_speed, color, dot_size, starting_angle]
+    const PLANETS = [
+      { rf: 0.22, inc: 0.38, spd: 0.00090, col: 'rgba(201,168,76,1)',   sz: 4.5, ph: 0 },
+      { rf: 0.38, inc: 0.36, spd: 0.00055, col: 'rgba(160,195,255,0.9)',sz: 3.5, ph: 1.3 },
+      { rf: 0.54, inc: 0.40, spd: 0.00032, col: 'rgba(240,200,120,0.9)',sz: 4.0, ph: 2.5 },
+      { rf: 0.72, inc: 0.34, spd: 0.00019, col: 'rgba(200,155,210,0.9)',sz: 3.0, ph: 4.1 },
+      { rf: 1.00, inc: 0.37, spd: 0.00011, col: 'rgba(140,210,185,0.9)',sz: 3.5, ph: 0.8 },
+    ];
+
+    // Armillary sphere rings: radius multiplier, ry/rx ratio, base rotation, drift speed
+    const SPHERE = [
+      { rf: 1.22, inc: 0.20, rot: 0.0,  spd: 0.000038 },
+      { rf: 1.10, inc: 0.62, rot: 0.5,  spd: 0.000055 },
+      { rf: 1.16, inc: 0.38, rot: 1.0,  spd: 0.000047 },
+      { rf: 1.05, inc: 0.82, rot: 1.5,  spd: 0.000065 },
+      { rf: 0.96, inc: 0.48, rot: 2.0,  spd: 0.000042 },
+      { rf: 1.28, inc: 0.30, rot: 2.6,  spd: 0.000033 },
+    ];
+
+    // Constellation reference points and edges (normalized 0–1)
+    const CPTS = [
+      [0.28,0.14],[0.52,0.09],[0.74,0.20],[0.82,0.38],
+      [0.18,0.30],[0.42,0.38],[0.62,0.44],[0.22,0.58],
+      [0.72,0.62],[0.46,0.67],[0.14,0.75],[0.84,0.72],
+    ];
+    const CLINES = [[0,1],[1,2],[2,3],[0,4],[4,5],[5,6],[7,8],[8,9],[9,10],[6,8],[5,9]];
+
+    const G = (a) => `rgba(201,168,76,${a})`;
+
+    function resize() {
+      const r = frame.getBoundingClientRect();
+      W = r.width * dpr; H = r.height * dpr;
+      canvas.width = W; canvas.height = H;
+      CX = W / 2; CY = H * 0.44;
+      OR = W * 0.22;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    let alive = true;
+    function draw(t) {
+      if (!alive || !document.body.contains(canvas)) return;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Space background
+      const bg = ctx.createRadialGradient(CX, CY * 0.9, 0, CX, CY, W * 0.9);
+      bg.addColorStop(0, 'rgba(14,9,38,1)');
+      bg.addColorStop(0.55, 'rgba(5,12,28,1)');
+      bg.addColorStop(1, 'rgba(2,7,18,1)');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+      // Nebula glow
+      const neb = ctx.createRadialGradient(CX, CY, 0, CX, CY, OR * 1.4);
+      neb.addColorStop(0, 'rgba(55,22,95,0.28)');
+      neb.addColorStop(0.55, 'rgba(28,16,72,0.12)');
+      neb.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = neb; ctx.fillRect(0, 0, W, H);
+
+      // Stars with subtle twinkle
+      for (const s of STARS) {
+        const tw = s.a * (0.65 + 0.35 * Math.sin(t * 0.00085 + s.phase));
+        ctx.globalAlpha = tw;
+        ctx.fillStyle = s.r > 1.1 ? 'rgba(255,252,228,1)' : 'rgba(195,218,255,1)';
+        ctx.beginPath(); ctx.arc(s.x * W, s.y * H, s.r * dpr, 0, 6.28); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      // Constellation lines
+      ctx.strokeStyle = G(0.09); ctx.lineWidth = 0.5 * dpr;
+      for (const [a, b] of CLINES) {
+        ctx.beginPath();
+        ctx.moveTo(CPTS[a][0] * W, CPTS[a][1] * H);
+        ctx.lineTo(CPTS[b][0] * W, CPTS[b][1] * H);
+        ctx.stroke();
+      }
+      for (const [x, y] of CPTS) {
+        ctx.fillStyle = G(0.18);
+        ctx.beginPath(); ctx.arc(x * W, y * H, 1.4 * dpr, 0, 6.28); ctx.fill();
+      }
+
+      // Armillary sphere rings (slowly rotating, behind orrery)
+      for (const ring of SPHERE) {
+        const rx = OR * ring.rf, ry = rx * ring.inc;
+        const angle = ring.rot + t * ring.spd;
+        ctx.save(); ctx.translate(CX, CY); ctx.rotate(angle);
+        ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = G(0.17); ctx.lineWidth = 0.65 * dpr; ctx.stroke();
+        ctx.restore();
+      }
+
+      // Orbital ring guides (orrery)
+      const INC = 0.40;
+      ctx.strokeStyle = G(0.22); ctx.lineWidth = 0.55 * dpr;
+      for (const p of PLANETS) {
+        ctx.beginPath();
+        ctx.ellipse(CX, CY, OR * p.rf, OR * p.rf * INC, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Planets + glow
+      for (const p of PLANETS) {
+        const rx = OR * p.rf, ry = rx * INC;
+        const angle = p.ph + t * p.spd;
+        const px = CX + rx * Math.cos(angle);
+        const py = CY + ry * Math.sin(angle);
+        const glow = ctx.createRadialGradient(px, py, 0, px, py, p.sz * 2.2 * dpr);
+        glow.addColorStop(0, p.col); glow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath(); ctx.arc(px, py, p.sz * 2.2 * dpr, 0, 6.28); ctx.fill();
+        ctx.fillStyle = p.col;
+        ctx.beginPath(); ctx.arc(px, py, p.sz * 0.52 * dpr, 0, 6.28); ctx.fill();
+      }
+
+      // Central sun
+      const sun = ctx.createRadialGradient(CX, CY, 0, CX, CY, OR * 0.14);
+      sun.addColorStop(0, G(1)); sun.addColorStop(0.45, G(0.5)); sun.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = sun;
+      ctx.beginPath(); ctx.arc(CX, CY, OR * 0.16, 0, 6.28); ctx.fill();
+
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+
+    // Stop loop when frame is removed from DOM
+    new MutationObserver(() => {
+      if (!document.body.contains(frame)) alive = false;
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  const orreryObs = new MutationObserver(mountOrrery);
+  orreryObs.observe(document.body, { childList: true, subtree: true });
+  setTimeout(mountOrrery, 300);
 })();

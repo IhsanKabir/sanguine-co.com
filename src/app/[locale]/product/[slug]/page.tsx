@@ -11,6 +11,7 @@ import PdpGallery from "@/components/storefront/PdpGallery";
 import JsonLd from "@/components/seo/JsonLd";
 import ReviewsSection from "@/components/storefront/ReviewsSection";
 import NotifyMeButton from "@/components/storefront/NotifyMeButton";
+import PreorderButton from "@/components/storefront/PreorderButton";
 import RecentlyViewedTracker from "@/components/storefront/RecentlyViewedTracker";
 import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
 import ProductViewTracker from "@/components/storefront/ProductViewTracker";
@@ -235,18 +236,46 @@ export default async function ProductPage({ params }: Props) {
           <div style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>
             {description}
           </div>
-          {p.stock > 0 ? (
-            <AddToBagButton
-              product={{
-                productId: p.id,
-                slug: p.slug,
-                sku: p.sku,
-                name,
-                priceBdt: p.priceBdt,
-                cat: p.segmentId || "clothing",
-              }}
-              colors={(p.colors as string[] | null) || []}
-              sizes={(p.sizes as string[] | null) || []}
+          {p.preorderOnly ? (
+            <PreorderButton
+              slug={p.slug}
+              estimatedDelivery={p.estimatedDelivery}
+              preorderPriceBdt={p.preorderPriceBdt}
+              priceBdt={p.priceBdt}
+              locale={locale}
+            />
+          ) : p.stock > 0 ? (
+            <>
+              <AddToBagButton
+                product={{
+                  productId: p.id,
+                  slug: p.slug,
+                  sku: p.sku,
+                  name,
+                  priceBdt: p.priceBdt,
+                  cat: p.segmentId || "clothing",
+                }}
+                colors={(p.colors as string[] | null) || []}
+                sizes={(p.sizes as string[] | null) || []}
+              />
+              {p.preorderEnabled && (
+                <PreorderButton
+                  slug={p.slug}
+                  estimatedDelivery={p.estimatedDelivery}
+                  preorderPriceBdt={p.preorderPriceBdt}
+                  priceBdt={p.priceBdt}
+                  locale={locale}
+                  variant="secondary"
+                />
+              )}
+            </>
+          ) : p.preorderEnabled ? (
+            <PreorderButton
+              slug={p.slug}
+              estimatedDelivery={p.estimatedDelivery}
+              preorderPriceBdt={p.preorderPriceBdt}
+              priceBdt={p.priceBdt}
+              locale={locale}
             />
           ) : (
             <NotifyMeButton
@@ -256,7 +285,15 @@ export default async function ProductPage({ params }: Props) {
             />
           )}
           <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>
-            {p.stock === 0 ? "Currently out of stock" : p.stock < 10 ? t("pdp.remaining", { count: p.stock }) : t("pdp.inStock")}
+            {p.preorderOnly
+              ? "Available by preorder only"
+              : p.stock === 0 && !p.preorderEnabled
+                ? "Currently out of stock"
+                : p.stock === 0
+                  ? "Out of stock — preorder available"
+                  : p.stock < 10
+                    ? t("pdp.remaining", { count: p.stock })
+                    : t("pdp.inStock")}
           </div>
           <div className="pdp-feats">
             <div className="pdp-feat"><Icon name="arrow" size={18} /><div><b>{t("pdp.freeShipping")}</b>{t("pdp.freeShippingNote")}</div></div>

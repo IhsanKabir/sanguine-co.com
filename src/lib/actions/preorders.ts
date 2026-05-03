@@ -106,6 +106,96 @@ export async function createPreorderRequest(
   return { ok: true as const, id: row.id };
 }
 
+// ─── Product preorder (known product, no bespoke description needed) ────
+
+const productPreorderSchema = z.object({
+  productId: z.string().min(1).max(120),
+  quantity: z.number().int().min(1).max(50),
+  color: z.string().max(80).optional().nullable(),
+  size: z.string().max(40).optional().nullable(),
+  notes: z.string().max(1000).optional().nullable(),
+  customerName: z.string().min(1).max(120),
+  customerPhone: z.string().min(6).max(40).optional().nullable(),
+  deliveryAddress: z.object({
+    line1: z.string().min(1).max(200),
+    area: z.string().max(80).optional().nullable(),
+    city: z.string().min(1).max(80),
+    postcode: z.string().max(20).optional().nullable(),
+  }).optional().nullable(),
+});
+
+export type ProductPreorderInput = z.infer<typeof productPreorderSchema>;
+
+export async function createProductPreorderRequest(
+  input: ProductPreorderInput,
+): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+  const user = await requireUser();
+  const data = productPreorderSchema.parse(input);
+
+  const [product] = await db.select().from(schema.products)
+    .where(eq(schema.products.id, data.productId)).limit(1);
+
+  if (!product || !product.preorderEnabled) {
+    return { ok: false as const, error: "This product is not available for preorder." };
+  }
+
+  const description = [
+    `Preorder · ${product.name}`,
+    data.color ? `Colour: ${data.color}` : null,
+    data.size ? `Size: ${data.size}` : null,
+    data.notes ? `Notes: ${data.notes}` : null,
+  ].filter(Boolean).join(" · ");
+
+  const [row] = await db.insert(schema.preorderRequests).values({
+    productId: data.productId,
+    segmentId: product.segmentId ?? null,
+    customerId: user.id,
+    customerEmail: user.email ?? "",
+    customerName: data.customerName,
+    customerPhone: data.customerPhone || null,
+    description,
+    quantity: data.quantity,
+    color: data.color || null,
+    size: data.size || null,
+    deliveryAddress: data.deliveryAddress ?? null,
+    attachments: [],
+  }).returning();
+
+  if (user.email) {
+    const { subject, html } = preorderReceivedEmail({
+      customerName: data.customerName,
+      segmentName: product.name,
+      description,
+      quantity: data.quantity,
+      budgetHintBdt: null,
+      targetDate: null,
+      attachmentCount: 0,
+    });
+    sendEmail({ to: user.email, toName: data.customerName, subject, html }).catch(() => {});
+  }
+  const adminEmail = process.env.PREORDER_ADMIN_EMAIL || process.env.BREVO_FROM_EMAIL;
+  if (adminEmail) {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine.vercel.app";
+    const { subject, html } = preorderAdminNotifyEmail({
+      customerName: data.customerName,
+      segmentName: product.name,
+      description,
+      quantity: data.quantity,
+      budgetHintBdt: null,
+      targetDate: null,
+      attachmentCount: 0,
+      requestId: row.id,
+      customerEmail: user.email ?? "",
+      customerPhone: data.customerPhone || null,
+      adminUrl: `${baseUrl}/en/admin/preorders?id=${row.id}`,
+    });
+    sendEmail({ to: adminEmail, subject, html }).catch(() => {});
+  }
+
+  revalidatePath("/[locale]/admin/preorders", "page");
+  return { ok: true as const, id: row.id };
+}
+
 // ─── Admin actions ──────────────────────────────────────────────────────
 
 export async function listPreorderRequests(opts?: { status?: string }) {
@@ -164,10 +254,12 @@ export async function quotePreorderRequest(input: z.infer<typeof quoteSchema>) {
 
   // Email customer the quote.
   if (row.customerEmail) {
-    const seg = await db.select().from(schema.segments).where(eq(schema.segments.id, row.segmentId)).limit(1);
+    const seg = row.segmentId
+      ? await db.select().from(schema.segments).where(eq(schema.segments.id, row.segmentId)).limit(1)
+      : [];
     const { subject, html } = preorderQuoteEmail({
       customerName: row.customerName ?? "",
-      segmentName: seg[0]?.name ?? row.segmentId,
+      segmentName: seg[0]?.name ?? row.segmentId ?? "piece",
       description: row.description,
       quantity: row.quantity,
       budgetHintBdt: row.budgetHintBdt ?? null,

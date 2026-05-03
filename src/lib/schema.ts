@@ -38,6 +38,11 @@ export const products = pgTable("products", {
   descriptionBn: text("description_bn"),
   colors: jsonb("colors").$type<string[]>().default([]),
   sizes: jsonb("sizes").$type<string[]>().default([]),
+  // Per-product preorder settings. Independent of segment.preorderEnabled.
+  preorderEnabled: boolean("preorder_enabled").default(false).notNull(),
+  preorderOnly: boolean("preorder_only").default(false).notNull(),
+  estimatedDelivery: text("estimated_delivery"),   // e.g. "4–6 weeks"
+  preorderPriceBdt: integer("preorder_price_bdt"), // null = use priceBdt
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
@@ -278,7 +283,10 @@ export type PreorderAttachment = {
 
 export const preorderRequests = pgTable("preorder_requests", {
   id: uuid("id").primaryKey().defaultRandom(),
-  segmentId: text("segment_id").notNull().references(() => segments.id),
+  // segmentId is nullable so product preorders (no segment context) can be stored.
+  segmentId: text("segment_id").references(() => segments.id),
+  // productId is set for product-level preorders; null for bespoke segment requests.
+  productId: text("product_id").references(() => products.id),
   customerId: uuid("customer_id").notNull(),
   customerEmail: text("customer_email").notNull(),
   customerPhone: text("customer_phone"),
@@ -288,6 +296,8 @@ export const preorderRequests = pgTable("preorder_requests", {
   quantity: integer("quantity").default(1).notNull(),
   budgetHintBdt: integer("budget_hint_bdt"),
   targetDate: text("target_date"),                 // YYYY-MM-DD as text for simplicity
+  color: text("color"),
+  size: text("size"),
 
   deliveryAddress: jsonb("delivery_address"),
   attachments: jsonb("attachments").$type<PreorderAttachment[]>().default([]).notNull(),

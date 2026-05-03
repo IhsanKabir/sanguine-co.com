@@ -24,12 +24,18 @@ type Editing = {
   descriptionBn: string;
   colors: string;   // comma-separated
   sizes: string;    // comma-separated
+  preorderEnabled: boolean;
+  preorderOnly: boolean;
+  estimatedDelivery: string;
+  preorderPriceBdt: string;
 };
 
 const empty = (segId: string): Editing => ({
   name: "", nameBn: "", sku: "", segmentId: segId,
   priceBdt: "0", wasBdt: "", stock: "0", tag: "",
   description: "", descriptionBn: "", colors: "", sizes: "",
+  preorderEnabled: false, preorderOnly: false,
+  estimatedDelivery: "", preorderPriceBdt: "",
 });
 
 export default function ProductsClient({ segments, products }: Props) {
@@ -60,6 +66,10 @@ export default function ProductsClient({ segments, products }: Props) {
       descriptionBn: editing.descriptionBn || null,
       colors: editing.colors.split(",").map((s) => s.trim()).filter(Boolean),
       sizes: editing.sizes.split(",").map((s) => s.trim()).filter(Boolean),
+      preorderEnabled: editing.preorderEnabled,
+      preorderOnly: editing.preorderOnly,
+      estimatedDelivery: editing.estimatedDelivery || null,
+      preorderPriceBdt: editing.preorderPriceBdt ? parseInt(editing.preorderPriceBdt) : null,
     };
     startTransition(async () => {
       if (editing.id) await updateProduct(editing.id, payload);
@@ -125,6 +135,10 @@ export default function ProductsClient({ segments, products }: Props) {
                       description: p.description || "", descriptionBn: p.descriptionBn || "",
                       colors: ((p.colors as string[] | null) || []).join(", "),
                       sizes:  ((p.sizes as string[] | null) || []).join(", "),
+                      preorderEnabled: p.preorderEnabled,
+                      preorderOnly: p.preorderOnly,
+                      estimatedDelivery: p.estimatedDelivery || "",
+                      preorderPriceBdt: p.preorderPriceBdt ? String(p.preorderPriceBdt) : "",
                     })}><Icon name="feather" size={14}/></button>
                     <button className="icon-btn" onClick={() => setPendingDel(p)}><Icon name="x" size={14}/></button>
                   </td>
@@ -177,6 +191,26 @@ export default function ProductsClient({ segments, products }: Props) {
             <div className="row">
               <div className="field"><label>Colours (comma-separated)</label><input value={editing.colors} onChange={(e) => setEditing({ ...editing, colors: e.target.value })} placeholder="Aubergine, Obsidian, Rose"/></div>
               <div className="field"><label>Sizes (comma-separated)</label><input value={editing.sizes} onChange={(e) => setEditing({ ...editing, sizes: e.target.value })} placeholder="XS, S, M, L, XL"/></div>
+            </div>
+
+            <div style={{ borderTop: "1px solid var(--line)", paddingTop: 16, marginTop: 4 }}>
+              <div style={{ fontSize: 11, letterSpacing: ".2em", color: "var(--ink-soft)", textTransform: "uppercase", marginBottom: 12 }}>Preorder</div>
+              <div className="row" style={{ gridTemplateColumns: "1fr 1fr" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+                  <input type="checkbox" checked={editing.preorderEnabled} onChange={(e) => setEditing({ ...editing, preorderEnabled: e.target.checked, preorderOnly: e.target.checked ? editing.preorderOnly : false })} />
+                  Preorder available
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", opacity: editing.preorderEnabled ? 1 : 0.4 }}>
+                  <input type="checkbox" checked={editing.preorderOnly} disabled={!editing.preorderEnabled} onChange={(e) => setEditing({ ...editing, preorderOnly: e.target.checked })} />
+                  Preorder only (hides Add to Bag)
+                </label>
+              </div>
+              {editing.preorderEnabled && (
+                <div className="row" style={{ marginTop: 10 }}>
+                  <div className="field"><label>Estimated delivery</label><input value={editing.estimatedDelivery} onChange={(e) => setEditing({ ...editing, estimatedDelivery: e.target.value })} placeholder="e.g. 4–6 weeks"/></div>
+                  <div className="field"><label>Preorder price (৳, optional)</label><input type="number" value={editing.preorderPriceBdt} onChange={(e) => setEditing({ ...editing, preorderPriceBdt: e.target.value })} placeholder="Leave blank to use regular price"/></div>
+                </div>
+              )}
             </div>
 
             {editing.id ? (

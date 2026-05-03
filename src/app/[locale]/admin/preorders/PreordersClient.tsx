@@ -47,7 +47,7 @@ type Props = {
 export default function PreordersClient({ requests, segments, linkedOrders }: Props) {
   const [filter, setFilter] = useState<string>("all");
   const [selected, setSelected] = useState<PreorderRequest | null>(null);
-  const segName = (id: string) => segments.find((s) => s.id === id)?.name ?? id;
+  const segName = (id: string | null) => id ? (segments.find((s) => s.id === id)?.name ?? id) : "—";
 
   const visible = filter === "all" ? requests : requests.filter((r) => r.status === filter);
   const linkedFor = (r: PreorderRequest): LinkedOrderInfo | undefined =>

@@ -343,17 +343,10 @@
   position: absolute; inset: 0;
   border: 1px solid oklch(0.85 0.13 85 / 0.55);
   border-radius: 200px 200px 8px 8px / 280px 280px 8px 8px;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 30%, oklch(0.45 0.20 320 / 0.35), transparent 70%),
-    linear-gradient(180deg, oklch(0.30 0.16 320), oklch(0.18 0.12 290));
+  background: oklch(0.05 0.02 240);
   overflow: hidden;
 }
-.hero-still .hs-frame::after {
-  content: ""; position: absolute; inset: 0;
-  background: repeating-linear-gradient(135deg,
-    transparent 0 20px,
-    oklch(0.85 0.13 85 / 0.05) 20px 22px);
-}
+.hero-still .hs-frame::after { display: none; }
 .hero-still .hs-numeral {
   position: absolute; left: 50%; top: 38%;
   transform: translate(-50%, -50%);
