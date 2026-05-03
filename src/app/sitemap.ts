@@ -6,25 +6,6 @@ import { routing } from "@/i18n/routing";
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
 const LOCALES = routing.locales;
 
-/**
- * Build the alternates map for a path. Used by Google to discover the
- * translated variants of every URL.
- */
-function alternates(path: string): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const l of LOCALES) {
-    // BCP-47 region tag — Google treats `en-BD` / `bn-BD` as a stronger
-    // geo-targeting signal than bare `en` / `bn`, and Mr Porter / Net-A-Porter
-    // both use the regional form. Bengali in Bangladesh is the only locale
-    // we serve, so the region is unambiguous.
-    out[`${l}-BD`] = `${BASE}/${l}${path}`;
-  }
-  // x-default lets Google pick a sensible default for users with no
-  // language match (typical international visitors land here).
-  out["x-default"] = `${BASE}/en${path}`;
-  return out;
-}
-
 function entry(
   path: string,
   opts?: Partial<Omit<MetadataRoute.Sitemap[number], "url" | "alternates">>,
@@ -34,7 +15,6 @@ function entry(
     lastModified: opts?.lastModified ?? new Date(),
     changeFrequency: opts?.changeFrequency ?? "weekly",
     priority: opts?.priority ?? 0.7,
-    alternates: { languages: alternates(path) },
   }));
 }
 
