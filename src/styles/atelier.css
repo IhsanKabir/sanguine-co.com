@@ -752,10 +752,9 @@
   font-size: 18px;
   color: var(--purple-900);
   letter-spacing: -.01em;
-  opacity: 0.7;
-  transition: opacity .2s, color .2s;
+  transition: color .2s;
 }
-.press-mark:hover { opacity: 1; color: var(--gold-deep); }
+.press-mark:hover { color: var(--purple-800); }
 .press-mark sup {
   font-family: var(--mono); font-style: normal;
   font-size: 8px; letter-spacing: .3em;

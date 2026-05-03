@@ -33,7 +33,7 @@ export default async function TopNav() {
             <Link href="/wishlist" className="nav-link">{t("nav.wishlist")}</Link>
           </div>
           <Link href="/" className="nav-brand" aria-label={t("brand.name")}>
-            {t("brand.name")}<sup>SSG</sup>
+            {t("brand.name")}<sup aria-hidden="true">SSG</sup>
           </Link>
           <div className="nav-right">
             <SearchDropdown />

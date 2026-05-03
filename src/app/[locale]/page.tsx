@@ -199,7 +199,7 @@ export default async function Home({ params }: Props) {
             * anchor-without-destination as "implied false authority". Swap
             * to real publications + real URLs once we have citations. */}
           {PRESS_MARKS.map((m) => (
-            <span key={m.name} className="press-mark">{m.name}<sup>{m.sup}</sup></span>
+            <span key={m.name} className="press-mark">{m.name}<sup aria-hidden="true">{m.sup}</sup></span>
           ))}
         </div>
       </section>
