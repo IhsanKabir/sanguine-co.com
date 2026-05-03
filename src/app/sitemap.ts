@@ -21,6 +21,8 @@ function entry(
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     ...entry("", { priority: 1.0, changeFrequency: "daily" }),
+    ...entry("/atelier", { priority: 0.6, changeFrequency: "monthly" }),
+    ...entry("/journal", { priority: 0.6, changeFrequency: "monthly" }),
     ...entry("/legal/privacy", { priority: 0.3, changeFrequency: "yearly" }),
     ...entry("/legal/terms", { priority: 0.3, changeFrequency: "yearly" }),
     ...entry("/legal/returns", { priority: 0.3, changeFrequency: "yearly" }),

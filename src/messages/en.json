@@ -132,9 +132,19 @@
     "addresses": "Addresses",
     "details": "Details"
   },
+  "atelier": {
+    "metaTitle": "The Atelier — Saanguine Maison",
+    "metaDescription": "The craft, materials and philosophy behind Saanguine Maison — a house built on slow work and deliberate beauty."
+  },
+  "journal": {
+    "metaTitle": "The Journal — Saanguine Maison",
+    "metaDescription": "Notes from the maison — on cloth, scent, time and the small ceremonies that make a life worth living."
+  },
   "footer": {
     "shop": "Shop",
     "maison": "Maison",
+    "atelier": "The Atelier",
+    "journal": "The Journal",
     "service": "Service",
     "contact": "Contact",
     "rights": "All rights reserved",
