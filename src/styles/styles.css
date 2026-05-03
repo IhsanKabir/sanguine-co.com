@@ -7,7 +7,7 @@
   --purple-950:oklch(0.22 0.06 220);--purple-900:oklch(0.36 0.08 215);--purple-800:oklch(0.48 0.07 210);
   --purple-700:oklch(0.58 0.06 205);--purple-600:oklch(0.66 0.06 200);--purple-400:oklch(0.78 0.06 200);
   --purple-200:oklch(0.88 0.04 200);--purple-100:oklch(0.93 0.025 200);--purple-50:oklch(0.97 0.015 200);
-  --gold:oklch(0.78 0.12 85);--gold-deep:oklch(0.62 0.13 70);
+  --gold:oklch(0.78 0.12 85);--gold-deep:oklch(0.62 0.13 70);--gold-text:oklch(0.46 0.12 70);
   --cream:oklch(0.97 0.012 75);--ink:oklch(0.20 0.02 220);--ink-soft:oklch(0.45 0.025 215);--line:oklch(0.86 0.02 200);
   --ok:oklch(0.65 0.14 150);--warn:oklch(0.70 0.15 60);--err:oklch(0.58 0.20 25);
   --rose-dust:oklch(0.78 0.07 30);          /* single accent — newsletter, "thank you" moments */
@@ -101,7 +101,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 
 .section{max-width:1400px;margin:0 auto;padding:64px 32px}
 .section-hd{display:flex;align-items:end;justify-content:space-between;margin-bottom:28px;gap:20px;border-bottom:1px solid var(--line);padding-bottom:16px}
-.section-hd .kicker{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:6px}
+.section-hd .kicker{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-text);margin-bottom:6px}
 .section-hd h2{font-family:var(--serif);font-size:40px;font-weight:500;margin:0;color:var(--purple-900);letter-spacing:-.01em}
 .section-hd .link{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--purple-800);border-bottom:1px solid var(--gold);padding-bottom:2px;cursor:pointer}
 

@@ -16,7 +16,7 @@ export default async function Footer() {
       <div className="footer-inner">
         <div className="footer-grid">
           <div>
-            <h4 style={{ fontStyle: "italic" }}>{t("brand.name")}</h4>
+            <p style={{ fontStyle: "italic", fontFamily: "var(--serif)", fontSize: 18, margin: "0 0 8px", color: "var(--cream)" }}>{t("brand.name")}</p>
             <p style={{ fontSize: 13, color: "var(--purple-200)", maxWidth: 300, lineHeight: 1.7 }}>
               {t("brand.tagline")}
             </p>

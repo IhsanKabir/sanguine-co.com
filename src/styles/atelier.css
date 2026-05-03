@@ -665,7 +665,7 @@
 .journal-kicker {
   font-family: var(--mono);
   font-size: 10px; letter-spacing: .4em; text-transform: uppercase;
-  color: var(--gold-deep);
+  color: var(--gold-text);
   margin-bottom: 12px;
 }
 .journal-num {
@@ -679,7 +679,7 @@
   display: block;
   font-family: var(--mono); font-style: normal;
   font-size: 10px; letter-spacing: .3em;
-  color: var(--gold-deep);
+  color: var(--gold-text);
   margin-top: 18px;
 }
 .journal h2 {
