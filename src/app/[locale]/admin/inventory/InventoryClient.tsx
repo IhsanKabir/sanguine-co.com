@@ -36,12 +36,17 @@ export default function InventoryClient({ products, segments, canSeeRevenue, pen
   const [reason, setReason] = useState("restock");
   const [busyNotifyId, setBusyNotifyId] = useState<string | null>(null);
   const [notifyResult, setNotifyResult] = useState<string | null>(null);
+  const [notifyConfirm, setNotifyConfirm] = useState<{ id: string; count: number } | null>(null);
   const [, startTransition] = useTransition();
 
   const onNotify = (productId: string) => {
     const count = pendingNotifs[productId] ?? 0;
     if (count === 0) return;
-    if (!confirm(`Send back-in-stock email to ${count} subscriber${count === 1 ? "" : "s"}?`)) return;
+    setNotifyConfirm({ id: productId, count });
+  };
+
+  const doNotify = (productId: string) => {
+    setNotifyConfirm(null);
     setBusyNotifyId(productId);
     setNotifyResult(null);
     startTransition(async () => {
@@ -131,15 +136,23 @@ export default function InventoryClient({ products, segments, canSeeRevenue, pen
                   </td>
                   <td style={{ textAlign: "right" }}>
                     {p.stock > 0 && pendingNotifs[p.id] > 0 && (
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        style={{ marginRight: 6, borderColor: "var(--gold-deep)", color: "var(--gold-deep)" }}
-                        onClick={() => onNotify(p.id)}
-                        disabled={busyNotifyId === p.id}
-                        title="Email everyone who asked to be notified"
-                      >
-                        {busyNotifyId === p.id ? "Sending…" : `Notify ${pendingNotifs[p.id]}`}
-                      </button>
+                      notifyConfirm?.id === p.id ? (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, marginRight: 6 }}>
+                          <span style={{ color: "var(--ink-soft)" }}>Send to {notifyConfirm.count}?</span>
+                          <button type="button" className="btn btn-primary btn-sm" onClick={() => doNotify(p.id)} style={{ padding: "3px 10px" }}>Confirm</button>
+                          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setNotifyConfirm(null)} style={{ padding: "3px 8px" }}>Cancel</button>
+                        </span>
+                      ) : (
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          style={{ marginRight: 6, borderColor: "var(--gold-deep)", color: "var(--gold-deep)" }}
+                          onClick={() => onNotify(p.id)}
+                          disabled={busyNotifyId === p.id}
+                          title="Email everyone who asked to be notified"
+                        >
+                          {busyNotifyId === p.id ? "Sending…" : `Notify ${pendingNotifs[p.id]}`}
+                        </button>
+                      )
                     )}
                     <button className="btn btn-ghost btn-sm" onClick={() => { setAdjusting({ id: p.id, name: p.name, current: p.stock }); setDelta(""); setReason("restock"); }}>
                       Adjust

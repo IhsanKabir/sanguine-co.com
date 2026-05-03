@@ -15,6 +15,7 @@ export default function ImportClient() {
   const [filename, setFilename] = useState<string | null>(null);
   const [preview, setPreview] = useState<ImportPreview | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirmApply, setConfirmApply] = useState(false);
   const [pending, startTransition] = useTransition();
 
   const onFile = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +43,11 @@ export default function ImportClient() {
 
   const commit = () => {
     if (!preview) return;
-    if (!confirm(`Apply ${preview.toCreate} new + ${preview.toUpdate} updated rows? This cannot be undone in one click.`)) return;
+    setConfirmApply(true);
+  };
+
+  const doApply = () => {
+    setConfirmApply(false);
     setError(null);
     startTransition(async () => {
       try {
@@ -101,14 +106,22 @@ export default function ImportClient() {
           </details>
         </div>
         {csv && (
-          <div style={{ marginTop: 14, display: "flex", gap: 8 }}>
+          <div style={{ marginTop: 14, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             <button type="button" className="btn btn-primary btn-sm" onClick={dryRun} disabled={pending}>
               {pending ? "Checking…" : "Check (dry run)"}
             </button>
             {preview && preview.validRows > 0 && !preview.committed && (
-              <button type="button" className="btn btn-sm" style={{ background: "var(--gold-deep)", color: "white", border: "none" }} onClick={commit} disabled={pending}>
-                {pending ? "Importing…" : `Apply (${preview.toCreate} new, ${preview.toUpdate} updated)`}
-              </button>
+              confirmApply ? (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+                  <span style={{ color: "var(--ink-soft)" }}>Apply {preview.toCreate} new, {preview.toUpdate} updated — cannot be undone</span>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={doApply} style={{ padding: "3px 10px" }}>Confirm</button>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirmApply(false)} style={{ padding: "3px 8px" }}>Cancel</button>
+                </span>
+              ) : (
+                <button type="button" className="btn btn-sm" style={{ background: "var(--gold-deep)", color: "white", border: "none" }} onClick={commit} disabled={pending}>
+                  {pending ? "Importing…" : `Apply (${preview.toCreate} new, ${preview.toUpdate} updated)`}
+                </button>
+              )
             )}
           </div>
         )}

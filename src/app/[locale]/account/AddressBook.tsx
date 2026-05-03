@@ -58,6 +58,7 @@ export default function AddressBook({ addresses }: { addresses: Address[] }) {
   const [editing, setEditing] = useState<EditState | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDelId, setConfirmDelId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
   const onSave = (e: FormEvent) => {
@@ -85,7 +86,11 @@ export default function AddressBook({ addresses }: { addresses: Address[] }) {
   };
 
   const onDelete = (id: string) => {
-    if (!confirm("Remove this address?")) return;
+    setConfirmDelId(id);
+  };
+
+  const doDelete = (id: string) => {
+    setConfirmDelId(null);
     setBusyId(id);
     startTransition(async () => {
       await deleteAddress(id);
@@ -136,7 +141,7 @@ export default function AddressBook({ addresses }: { addresses: Address[] }) {
                 {a.area ? `${a.area}, ` : ""}{a.city}{a.postcode ? ` — ${a.postcode}` : ""}<br />
                 {a.phone}
               </div>
-              <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
+              <div style={{ display: "flex", gap: 6, marginTop: 12, alignItems: "center", flexWrap: "wrap" }}>
                 <button className="icon-btn" title="Edit" onClick={() => setEditing(toEdit(a))} disabled={busyId === a.id}>
                   <Icon name="feather" size={12} />
                 </button>
@@ -145,9 +150,17 @@ export default function AddressBook({ addresses }: { addresses: Address[] }) {
                     <Icon name="check" size={12} />
                   </button>
                 )}
-                <button className="icon-btn" title="Delete" onClick={() => onDelete(a.id)} disabled={busyId === a.id}>
-                  <Icon name="x" size={12} />
-                </button>
+                {confirmDelId === a.id ? (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+                    <span style={{ color: "var(--ink-soft)" }}>Remove?</span>
+                    <button type="button" className="btn btn-primary btn-sm" onClick={() => doDelete(a.id)} style={{ padding: "3px 10px" }}>Yes</button>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirmDelId(null)} style={{ padding: "3px 8px" }}>No</button>
+                  </span>
+                ) : (
+                  <button className="icon-btn" title="Delete" onClick={() => onDelete(a.id)} disabled={busyId === a.id}>
+                    <Icon name="x" size={12} />
+                  </button>
+                )}
               </div>
             </article>
           ))}

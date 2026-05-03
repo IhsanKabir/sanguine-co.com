@@ -25,6 +25,7 @@ export default function OrdersClient({ orders, lines }: Props) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkMsg, setBulkMsg] = useState<string | null>(null);
+  const [pendingBulk, setPendingBulk] = useState<typeof STATUSES[number] | null>(null);
 
   const toggleId = (id: string) => {
     setSelectedIds((prev) => {
@@ -43,22 +44,29 @@ export default function OrdersClient({ orders, lines }: Props) {
     });
   };
   const clearSelection = () => setSelectedIds(new Set());
-  const onBulk = async (status: typeof STATUSES[number]) => {
+  const onBulk = (status: typeof STATUSES[number]) => {
     if (selectedIds.size === 0) return;
-    if (!confirm(`Mark ${selectedIds.size} order${selectedIds.size === 1 ? "" : "s"} as ${status}?`)) return;
+    setPendingBulk(status);
+  };
+  const confirmBulk = () => {
+    if (!pendingBulk) return;
+    const status = pendingBulk;
+    setPendingBulk(null);
     setBulkBusy(true);
     setBulkMsg(null);
-    try {
-      const r = await bulkUpdateOrderStatus({ orderIds: Array.from(selectedIds), status });
-      if (r.ok) {
-        setBulkMsg(`Updated ${r.updated} order${r.updated === 1 ? "" : "s"} to ${status}.`);
-        clearSelection();
-      } else {
-        setBulkMsg(r.error);
+    startTransition(async () => {
+      try {
+        const r = await bulkUpdateOrderStatus({ orderIds: Array.from(selectedIds), status });
+        if (r.ok) {
+          setBulkMsg(`Updated ${r.updated} order${r.updated === 1 ? "" : "s"} to ${status}.`);
+          clearSelection();
+        } else {
+          setBulkMsg(r.error ?? "Update failed.");
+        }
+      } finally {
+        setBulkBusy(false);
       }
-    } finally {
-      setBulkBusy(false);
-    }
+    });
   };
 
   // Load the timeline whenever a different order is opened.
@@ -117,7 +125,7 @@ export default function OrdersClient({ orders, lines }: Props) {
 
       {(selectedIds.size > 0 || bulkMsg) && (
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "var(--purple-50)", border: "1px solid var(--purple-200)", marginBottom: 10, fontSize: 13 }}>
-          {selectedIds.size > 0 && (
+          {selectedIds.size > 0 && !pendingBulk && (
             <>
               <b>{selectedIds.size} selected</b>
               <span style={{ color: "var(--ink-soft)" }}>· bulk update to:</span>
@@ -135,6 +143,17 @@ export default function OrdersClient({ orders, lines }: Props) {
               ))}
               <button type="button" className="btn btn-ghost btn-sm" onClick={clearSelection} style={{ marginLeft: "auto", padding: "4px 10px" }}>
                 Clear
+              </button>
+            </>
+          )}
+          {pendingBulk && (
+            <>
+              <span>Mark <b>{selectedIds.size}</b> order{selectedIds.size === 1 ? "" : "s"} as <b>{pendingBulk}</b>?</span>
+              <button type="button" className="btn btn-primary btn-sm" disabled={bulkBusy} onClick={confirmBulk} style={{ padding: "4px 12px" }}>
+                Confirm
+              </button>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPendingBulk(null)} style={{ padding: "4px 10px" }}>
+                Cancel
               </button>
             </>
           )}

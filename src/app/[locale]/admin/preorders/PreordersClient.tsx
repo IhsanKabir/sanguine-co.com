@@ -145,6 +145,9 @@ function DetailDrawer({
   const [rejectReason, setRejectReason] = useState("");
   const [showReject, setShowReject] = useState(false);
 
+  // Convert confirmation
+  const [showConvertConfirm, setShowConvertConfirm] = useState(false);
+
   useEffect(() => {
     if ((request.attachments ?? []).length === 0) return;
     setLoadingUrls(true);
@@ -187,8 +190,12 @@ function DetailDrawer({
   };
 
   const onConvert = () => {
+    setShowConvertConfirm(true);
+  };
+
+  const doConvert = () => {
+    setShowConvertConfirm(false);
     setError(null);
-    if (!confirm(`Convert to a real COD order for ${formatBdt(request.quotedPriceBdt! * request.quantity)}?`)) return;
     startTransition(async () => {
       const r = await convertPreorderToOrder({ id: request.id });
       if (r.ok) onClose();
@@ -313,9 +320,17 @@ function DetailDrawer({
               <p style={{ fontSize: 13, color: "#2e4f33", margin: "0 0 12px", lineHeight: 1.6 }}>
                 Click below to convert this request into a real COD order. The customer will appear in your Orders queue and the piece will be paid for on delivery.
               </p>
-              <button type="button" className="btn btn-primary btn-sm" onClick={onConvert} disabled={pending}>
-                Convert to COD order ({formatBdt(request.quotedPriceBdt * request.quantity)})
-              </button>
+              {showConvertConfirm ? (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+                  <span style={{ color: "var(--ink-soft)" }}>Convert this request into a real COD order?</span>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={doConvert} style={{ padding: "3px 10px" }}>Confirm</button>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowConvertConfirm(false)} style={{ padding: "3px 8px" }}>Cancel</button>
+                </span>
+              ) : (
+                <button type="button" className="btn btn-primary btn-sm" onClick={onConvert} disabled={pending}>
+                  Convert to COD order ({formatBdt(request.quotedPriceBdt * request.quantity)})
+                </button>
+              )}
             </div>
           )}
 

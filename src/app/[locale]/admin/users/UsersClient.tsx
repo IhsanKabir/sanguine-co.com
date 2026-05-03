@@ -191,6 +191,7 @@ function EditModal({ user, onClose }: { user: AdminUserSummary; onClose: () => v
   const [permissions, setPermissions] = useState<Permission[]>(user.permissions);
   const [pending, startTransition] = useTransition();
   const [, startDemote] = useTransition();
+  const [demoteConfirm, setDemoteConfirm] = useState(false);
 
   const togglePerm = (p: Permission) => {
     setPermissions((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
@@ -202,7 +203,10 @@ function EditModal({ user, onClose }: { user: AdminUserSummary; onClose: () => v
     });
   };
   const onDemote = () => {
-    if (!confirm(`Demote ${user.email} to customer? They will lose all admin access immediately.`)) return;
+    setDemoteConfirm(true);
+  };
+  const doDemote = () => {
+    setDemoteConfirm(false);
     startDemote(async () => {
       await demoteAdminUser(user.id);
       onClose();
@@ -241,9 +245,17 @@ function EditModal({ user, onClose }: { user: AdminUserSummary; onClose: () => v
           )}
           {user.role !== "owner" && (
             <div style={{ marginTop: 24, paddingTop: 14, borderTop: "1px solid var(--line)" }}>
-              <button type="button" className="btn btn-ghost btn-sm" style={{ borderColor: "var(--err)", color: "var(--err)" }} onClick={onDemote}>
-                Demote to customer
-              </button>
+              {demoteConfirm ? (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+                  <span style={{ color: "var(--ink-soft)" }}>Demote {user.email}? They will lose admin access.</span>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={doDemote} style={{ padding: "3px 10px" }}>Confirm</button>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setDemoteConfirm(false)} style={{ padding: "3px 8px" }}>Cancel</button>
+                </span>
+              ) : (
+                <button type="button" className="btn btn-ghost btn-sm" style={{ borderColor: "var(--err)", color: "var(--err)" }} onClick={onDemote}>
+                  Demote to customer
+                </button>
+              )}
               <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 8 }}>
                 Removes admin role + permissions. Account stays; user can no longer access /admin.
               </p>

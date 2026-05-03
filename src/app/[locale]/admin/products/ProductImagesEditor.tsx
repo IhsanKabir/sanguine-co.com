@@ -26,6 +26,7 @@ export default function ProductImagesEditor({ productId, productSku }: Props) {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDelId, setConfirmDelId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
   const refresh = async () => {
@@ -91,7 +92,11 @@ export default function ProductImagesEditor({ productId, productSku }: Props) {
   };
 
   const onDelete = (id: string) => {
-    if (!confirm("Remove this image?")) return;
+    setConfirmDelId(id);
+  };
+
+  const doDelete = (id: string) => {
+    setConfirmDelId(null);
     startTransition(async () => {
       await deleteProductImage(id);
       await refresh();
@@ -172,12 +177,20 @@ export default function ProductImagesEditor({ productId, productSku }: Props) {
                   style={{ width: "100%", padding: "6px 8px", fontSize: 12, border: "1px solid var(--line)", fontFamily: "inherit" }}
                 />
               </div>
-              <div style={{ display: "flex", gap: 4 }}>
+              <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                 <button type="button" className="icon-btn" title="Move up" onClick={() => onMoveUp(i)} disabled={i === 0}>↑</button>
                 <button type="button" className="icon-btn" title="Move down" onClick={() => onMoveDown(i)} disabled={i === images.length - 1}>↓</button>
-                <button type="button" className="icon-btn" title="Delete" onClick={() => onDelete(img.id)}>
-                  <Icon name="x" size={12} />
-                </button>
+                {confirmDelId === img.id ? (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+                    <span style={{ color: "var(--ink-soft)" }}>Remove?</span>
+                    <button type="button" className="btn btn-primary btn-sm" onClick={() => doDelete(img.id)} style={{ padding: "3px 10px" }}>Yes</button>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirmDelId(null)} style={{ padding: "3px 8px" }}>Cancel</button>
+                  </span>
+                ) : (
+                  <button type="button" className="icon-btn" title="Delete" onClick={() => onDelete(img.id)}>
+                    <Icon name="x" size={12} />
+                  </button>
+                )}
               </div>
             </div>
           ))}

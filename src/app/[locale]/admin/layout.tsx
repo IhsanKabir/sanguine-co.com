@@ -92,7 +92,7 @@ export default async function AdminLayout({ children, params }: Props) {
       <div className="admin-main">
         <div className="admin-topbar">
           <div className="crumb">Admin</div>
-          <Link href="/" className="icon-btn"><Icon name="x" size={16} /></Link>
+          <Link href="/" className="icon-btn" aria-label="Exit admin"><Icon name="x" size={16} /></Link>
         </div>
         <div className="admin-content">{children}</div>
       </div>
