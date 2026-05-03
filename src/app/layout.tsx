@@ -32,6 +32,7 @@ export const metadata: Metadata = {
   title: { default: "Saanguine Maison", template: "%s · Saanguine" },
   description: "Garments, flora & small ceremonies for the violet hour. A Bangladeshi maison, slowly assembled.",
   applicationName: "Saanguine",
+  verification: { google: "ZKS_JSSguTq9M5qdH24Y4p8m5XKUXnHuvXI2CNMQPdM" },
   // No `keywords` — Google has ignored meta keywords since 2009 and Bing
   // treats large keyword lists as a weak spam signal. Targeting lives in
   // page-level title / description copy.
