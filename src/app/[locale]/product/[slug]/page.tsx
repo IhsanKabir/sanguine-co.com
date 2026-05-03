@@ -39,8 +39,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: url,
       languages: {
-        en: `${BASE}/en/product/${slug}`,
-        bn: `${BASE}/bn/product/${slug}`,
+        "en-BD": `${BASE}/en/product/${slug}`,
+        "bn-BD": `${BASE}/bn/product/${slug}`,
+        "x-default": `${BASE}/en/product/${slug}`,
       },
     },
     openGraph: {
@@ -50,6 +51,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       locale: isBn ? "bn_BD" : "en_BD",
       images: ogImage ? [{ url: ogImage, alt: name }] : undefined,
+    },
+    // Facebook / LinkedIn / Pinterest render product cards with price +
+    // availability when og:type is "product". Next.js's Metadata type
+    // doesn't list "product" as an enum value, so we override the meta
+    // tag through `other`. The `type: "website"` above only seeds defaults
+    // — when both are present, the explicit `og:type` wins in the head.
+    other: {
+      "og:type": "product",
+      "product:price:amount": String(p.priceBdt),
+      "product:price:currency": "BDT",
+      "product:availability": p.stock > 0 ? "in stock" : "out of stock",
     },
     twitter: {
       card: "summary_large_image",
@@ -131,7 +143,15 @@ export default async function ProductPage({ params }: Props) {
   if (seg) {
     crumbItems.push({ "@type": "ListItem", position: 2, name: segName, item: `${BASE}/${locale}/shop/${seg.id}` });
   }
-  crumbItems.push({ "@type": "ListItem", position: crumbItems.length + 1, name });
+  // Google's BreadcrumbList validator requires the leaf item to carry an
+  // `item` URL too, even though it's the page the user is already on. Without
+  // it the rich result is silently dropped.
+  crumbItems.push({
+    "@type": "ListItem",
+    position: crumbItems.length + 1,
+    name,
+    item: `${BASE}/${locale}/product/${p.slug}`,
+  });
 
   const breadcrumbLd = {
     "@context": "https://schema.org",

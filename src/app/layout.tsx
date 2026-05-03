@@ -31,7 +31,9 @@ export const metadata: Metadata = {
   title: { default: "Saanguine Maison", template: "%s · Saanguine" },
   description: "Garments, flora & small ceremonies for the violet hour. A Bangladeshi maison, slowly assembled.",
   applicationName: "Saanguine",
-  keywords: ["luxury", "Bangladesh", "Dhaka", "perfume", "jewelry", "clothing", "boutique", "maison"],
+  // No `keywords` — Google has ignored meta keywords since 2009 and Bing
+  // treats large keyword lists as a weak spam signal. Targeting lives in
+  // page-level title / description copy.
   openGraph: {
     type: "website",
     siteName: "Saanguine Maison",
