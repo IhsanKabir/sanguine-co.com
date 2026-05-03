@@ -5,6 +5,7 @@ import { getSegmentBySlug, getLiveProducts, getHeroImagesFor } from "@/lib/queri
 import { Link } from "@/i18n/routing";
 import ProductCard from "@/components/storefront/ProductCard";
 import SegmentFilters from "@/components/storefront/SegmentFilters";
+import JsonLd from "@/components/seo/JsonLd";
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
 
@@ -34,8 +35,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: url,
       languages: {
-        en: `${BASE}/en/shop/${segment}`,
-        bn: `${BASE}/bn/shop/${segment}`,
+        "en-BD": `${BASE}/en/shop/${segment}`,
+        "bn-BD": `${BASE}/bn/shop/${segment}`,
+        "x-default": `${BASE}/en/shop/${segment}`,
       },
     },
     openGraph: {
@@ -115,8 +117,35 @@ export default async function SegmentPage({ params, searchParams }: Props) {
 
   const cursor = CURSOR_BY_SEGMENT[segment] || "crosshair";
 
+  // Structured data: BreadcrumbList for the shop trail + ItemList of the
+  // products visible on this segment. Lets Google render category-level
+  // rich results (price-range, item count, breadcrumb) — Loro Piana / Aesop
+  // both ship this on every category page.
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Maison", item: `${BASE}/${locale}` },
+      { "@type": "ListItem", position: 2, name: "Boutique", item: `${BASE}/${locale}/shop/${segment}` },
+      { "@type": "ListItem", position: 3, name, item: `${BASE}/${locale}/shop/${segment}` },
+    ],
+  };
+  const itemListLd = items.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    numberOfItems: items.length,
+    itemListElement: items.slice(0, 30).map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${BASE}/${locale}/product/${p.slug}`,
+      name: (locale === "bn" && p.nameBn) || p.name,
+    })),
+  } : null;
+
   return (
     <>
+      <JsonLd data={itemListLd ? [breadcrumbLd, itemListLd] : [breadcrumbLd]} />
       <div className="crumbs">
         <Link href="/" style={{ cursor: "pointer" }}>Maison</Link>
         <span>Boutique</span>

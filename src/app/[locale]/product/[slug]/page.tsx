@@ -114,6 +114,12 @@ export default async function ProductPage({ params }: Props) {
   const segName = seg ? ((isBn && seg.nameBn) || seg.name) : "";
   const segTag = seg ? ((isBn && seg.tagBn) || seg.tag) : "";
 
+  // Product schema with full Offer (shipping + returns) so Google Shopping
+  // can render shipping cost and return-policy snippets in rich results.
+  // shippingDetails is the standard for Bangladesh COD-only logistics:
+  // — Pathao Courier, 5–7 day standard, ৳80 inside Dhaka / ৳150 outside.
+  // hasMerchantReturnPolicy follows our /legal/returns: 7-day window,
+  // courier-arranged pickup, BDT refund.
   const productLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -127,7 +133,32 @@ export default async function ProductPage({ params }: Props) {
       price: p.priceBdt,
       availability: p.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       url: `${BASE}/${locale}/product/${p.slug}`,
-      seller: { "@type": "Organization", name: "Maison Saanguine" },
+      seller: { "@type": "Organization", name: "Saanguine Maison" },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: 80,
+          currency: "BDT",
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "BD",
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
+          transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 5, unitCode: "DAY" },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "BD",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 7,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+      },
     },
     aggregateRating: p.reviewCount > 0 ? {
       "@type": "AggregateRating",

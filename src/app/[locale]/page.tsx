@@ -9,6 +9,7 @@ import NewsletterForm from "@/components/storefront/NewsletterForm";
 import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
 import HeroTide from "@/components/storefront/HeroTide";
 import Ornament from "@/components/storefront/Ornament";
+import JsonLd from "@/components/seo/JsonLd";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -101,8 +102,39 @@ export default async function Home({ params }: Props) {
   // Wunderkammer scrolls — duplicate for seamless loop
   const wkCats = [...segs, ...segs];
 
+  // Editorial product groupings exposed as ItemList structured data so
+  // Google can surface featured products in image / shopping results.
+  // Bergdorf Goodman / Mr Porter both ship this on their homepage.
+  const homeListsLd = [
+    news.length > 0 && {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "New This Week",
+      numberOfItems: news.length,
+      itemListElement: news.map((p, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `${BASE}/${locale}/product/${p.slug}`,
+        name: (locale === "bn" && p.nameBn) || p.name,
+      })),
+    },
+    eds.length > 0 && {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "Editor's Selection",
+      numberOfItems: eds.length,
+      itemListElement: eds.map((p, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `${BASE}/${locale}/product/${p.slug}`,
+        name: (locale === "bn" && p.nameBn) || p.name,
+      })),
+    },
+  ].filter(Boolean) as Record<string, unknown>[];
+
   return (
     <>
+      {homeListsLd.length > 0 && <JsonLd data={homeListsLd} />}
       {showSetupBanner && (
         <div style={{ background: "#fff8d4", borderBottom: "1px solid #c8a200", padding: "10px 20px", textAlign: "center", fontFamily: "var(--mono)", fontSize: 12, color: "#704d00" }}>
           ⚠ Database not configured · copy <code>.env.example</code> → <code>.env</code>, fill Supabase URL + DATABASE_URL, run <code>npm run db:migrate</code> + <code>npm run db:seed</code>.

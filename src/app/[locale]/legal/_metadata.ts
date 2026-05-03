@@ -1,0 +1,59 @@
+import type { Metadata } from "next";
+
+const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+
+type Slug = "privacy" | "terms" | "returns" | "shipping";
+
+const COPY: Record<Slug, { en: { title: string; description: string }; bn: { title: string; description: string } }> = {
+  privacy: {
+    en: { title: "Privacy", description: "How Saanguine Maison handles personal information, cookies and analytics — bilingual EN/BN policy." },
+    bn: { title: "গোপনীয়তা", description: "সাঙ্গুইন মেইসন কীভাবে ব্যক্তিগত তথ্য, কুকি ও অ্যানালিটিক্স পরিচালনা করে — দ্বিভাষিক নীতি।" },
+  },
+  terms: {
+    en: { title: "Terms", description: "Terms of service for shopping at Saanguine Maison — orders, payments, courier, refunds." },
+    bn: { title: "শর্তাবলী", description: "সাঙ্গুইন মেইসনে কেনাকাটার সেবার শর্তাবলী — অর্ডার, পেমেন্ট, কুরিয়ার, রিফান্ড।" },
+  },
+  returns: {
+    en: { title: "Returns", description: "Saanguine Maison return policy — eligible items, courier pickup, refund timeline." },
+    bn: { title: "ফেরত", description: "সাঙ্গুইন মেইসনের ফেরত নীতি — যোগ্য পিস, কুরিয়ার পিকআপ, রিফান্ড সময়রেখা।" },
+  },
+  shipping: {
+    en: { title: "Shipping", description: "Shipping rates, courier partners (Pathao, Steadfast) and delivery timeline across Bangladesh." },
+    bn: { title: "শিপিং", description: "বাংলাদেশ জুড়ে শিপিং রেট, কুরিয়ার পার্টনার (পাঠাও, স্টেডফাস্ট) ও ডেলিভারি সময়।" },
+  },
+};
+
+/**
+ * Shared `generateMetadata` builder for the four legal pages. Each page imports
+ * this and calls `legalMetadata("privacy", params)` etc. so canonical, hreflang
+ * (BCP-47 + x-default), per-locale title and description are consistent.
+ */
+export async function legalMetadata(
+  slug: Slug,
+  params: Promise<{ locale: string }>,
+): Promise<Metadata> {
+  const { locale } = await params;
+  const isBn = locale === "bn";
+  const copy = isBn ? COPY[slug].bn : COPY[slug].en;
+  const url = `${BASE}/${locale}/legal/${slug}`;
+  return {
+    title: copy.title,
+    description: copy.description,
+    alternates: {
+      canonical: url,
+      languages: {
+        "en-BD": `${BASE}/en/legal/${slug}`,
+        "bn-BD": `${BASE}/bn/legal/${slug}`,
+        "x-default": `${BASE}/en/legal/${slug}`,
+      },
+    },
+    openGraph: {
+      title: copy.title,
+      description: copy.description,
+      url,
+      type: "website",
+      locale: isBn ? "bn_BD" : "en_BD",
+      siteName: "Saanguine Maison",
+    },
+  };
+}

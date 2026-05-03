@@ -1,8 +1,9 @@
 import { setRequestLocale } from "next-intl/server";
+import { legalMetadata } from "../_metadata";
 
 type Props = { params: Promise<{ locale: string }> };
 
-export const metadata = { title: "Returns" };
+export const generateMetadata = ({ params }: Props) => legalMetadata("returns", params);
 
 export default async function ReturnsPage({ params }: Props) {
   const { locale } = await params;
