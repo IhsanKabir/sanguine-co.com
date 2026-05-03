@@ -1,28 +1,18 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { safeRedirect } from "@/lib/safe-redirect";
 
 /**
  * Magic-link callback. Supabase appends `?code=...` to the redirect URL.
  * We exchange it for a session, then bounce to /account (default locale path).
  *
- * Open-redirect guard: `next` must be a same-origin relative path. We strictly
- * require it to start with a single `/` and reject anything that begins with
- * `//`, contains `://` (scheme injection), or `\` (Windows-style traversal
- * some validators miss). On reject we fall back to the safe default.
+ * Open-redirect guard lives in `safeRedirect` (single source of truth across
+ * the three callsites that handle `?next=`).
  */
-function safeNext(raw: string | null, fallback: string): string {
-  if (!raw) return fallback;
-  if (!raw.startsWith("/")) return fallback;
-  if (raw.startsWith("//")) return fallback;
-  if (raw.includes("://")) return fallback;
-  if (raw.includes("\\")) return fallback;
-  return raw;
-}
-
 export async function GET(req: NextRequest) {
   const { searchParams, origin } = new URL(req.url);
   const code = searchParams.get("code");
-  const next = safeNext(searchParams.get("next"), "/en/account");
+  const next = safeRedirect(searchParams.get("next"), "/en/account");
 
   if (code) {
     const supabase = await createSupabaseServerClient();

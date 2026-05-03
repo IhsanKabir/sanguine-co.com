@@ -1,22 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { safeRedirect } from "@/lib/safe-redirect";
 
 /**
  * Locale-prefixed magic-link callback. Mirrors /auth/callback so emails
- * sent before middleware exclusion was added still work.
- *
- * Same open-redirect guard as the root callback: `next` must be a same-origin
- * relative path with no `//`, `://`, or `\` injection patterns.
+ * sent before middleware exclusion was added still work. Open-redirect
+ * guard lives in `safeRedirect`.
  */
-function safeNext(raw: string | null, fallback: string): string {
-  if (!raw) return fallback;
-  if (!raw.startsWith("/")) return fallback;
-  if (raw.startsWith("//")) return fallback;
-  if (raw.includes("://")) return fallback;
-  if (raw.includes("\\")) return fallback;
-  return raw;
-}
-
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ locale: string }> },
@@ -24,7 +14,7 @@ export async function GET(
   const { locale } = await params;
   const { searchParams, origin } = new URL(req.url);
   const code = searchParams.get("code");
-  const next = safeNext(searchParams.get("next"), `/${locale}/account`);
+  const next = safeRedirect(searchParams.get("next"), `/${locale}/account`);
 
   if (code) {
     const supabase = await createSupabaseServerClient();
