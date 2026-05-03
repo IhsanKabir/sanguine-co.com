@@ -361,7 +361,7 @@
 }
 .hero-still .hs-ring {
   position: absolute; left: 50%; top: 38%;
-  width: 56%; aspect-ratio: 1;
+  width: 72%; aspect-ratio: 1;
   border-radius: 50%;
   border: 1px solid oklch(0.85 0.13 85 / 0.45);
   transform: translate(-50%, -50%);
