@@ -12,8 +12,17 @@
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
-  // ============ 1. WEBGL HERO SHADER ============
-  function mountShader() {
+  // ============ 1. WEBGL HERO SHADER (DISABLED 2026-05-03) ============
+  // The hero is now painted by `<HeroTide>` (SVG, three-layer parallax). The
+  // WebGL violet shader below was the original treatment but it overlays
+  // `mix-blend-mode: screen` at opacity 0.85 *on top* of HeroTide, washing
+  // out the SVG. Per EXECUTION-PLAN.md Phase 1.2 we keep the SVG-only
+  // register from AESTHETIC-DIRECTION.md.
+  //
+  // Code retained but bypassed; remove entirely in Phase 5 cleanup.
+  function mountShader() { return; }
+  // Original implementation kept below for reference / restoration.
+  function _mountShaderOriginal() {
     const hero = document.querySelector('.hero');
     if (!hero || hero.querySelector('canvas.ssg-shader')) return;
     if (reduced) return;
@@ -231,7 +240,11 @@
     if (initial) setTimeout(hideSeal, 1100);
   }
 
-  // ============ 4. IDLE CONSTELLATION ============
+  // ============ 4. IDLE CONSTELLATION (DISABLED 2026-05-03) ============
+  // The constellation was a hold-over from the violet/dusk register. With
+  // HeroTide + cursor ripple already providing ambient motion, the canvas
+  // dots-and-lines layer on top of everything else read as visual noise.
+  // Per EXECUTION-PLAN.md Phase 1.5. Code retained, listeners short-circuited.
   let idleTimer = null, idlePts = [], idleCanvas = null, idleCtx = null;
   function ensureIdleCanvas() {
     if (idleCanvas) return;
@@ -269,23 +282,8 @@
     if (idlePts.length) requestAnimationFrame(idleTick);
     else { idleCanvas.remove(); idleCanvas = null; idleCtx = null; }
   }
-  function resetIdle() {
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => {
-      if (reduced || isTouch) return;
-      ensureIdleCanvas();
-      const drift = setInterval(() => {
-        idlePts.push({ x: idleX + (Math.random()-0.5)*200, y: idleY + (Math.random()-0.5)*200, life: 1 });
-        if (idlePts.length > 40) idlePts.shift();
-        if (!idleCanvas) clearInterval(drift);
-      }, 250);
-      requestAnimationFrame(idleTick);
-    }, 5000);
-  }
-  addEventListener('mousemove', e => { idleX = e.clientX; idleY = e.clientY; resetIdle(); });
-  addEventListener('keydown', resetIdle);
-  addEventListener('scroll', resetIdle, { passive: true });
-  resetIdle();
+  function resetIdle() { return; /* disabled — see Phase 1.5 */ }
+  // No mousemove / keydown / scroll listeners — idle constellation off.
 
   // ============ 5. LIVE ADMIN — count-up + chart draw ============
   function liveAdmin() {
@@ -361,27 +359,12 @@
   const kMo = new MutationObserver(() => kineticSubline());
   kMo.observe(document.body, { childList: true, subtree: true });
 
-  // ============ 7. SHARED-ELEMENT FLIGHT ON CARD CLICK ============
-  // Intercept card clicks to do FLIP-style transition.
-  document.addEventListener('click', e => {
-    const card = e.target.closest('.card');
-    if (!card || reduced) return;
-    if (e.target.closest('button, a')) return;
-    const img = card.querySelector('.ph');
-    if (!img) return;
-    const r = img.getBoundingClientRect();
-    const ghost = img.cloneNode(true);
-    ghost.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;z-index:9000;pointer-events:none;transition:all .55s cubic-bezier(.6,.04,.3,1);box-shadow:0 30px 80px oklch(0.2 0.18 300 / 0.4);`;
-    document.body.appendChild(ghost);
-    requestAnimationFrame(() => {
-      ghost.style.left = '5%';
-      ghost.style.top = '160px';
-      ghost.style.width = '50%';
-      ghost.style.height = `${innerHeight - 200}px`;
-    });
-    setTimeout(() => { ghost.style.opacity = '0'; }, 520);
-    setTimeout(() => ghost.remove(), 900);
-  }, true);
+  // ============ 7. SHARED-ELEMENT FLIGHT (DISABLED 2026-05-03) ============
+  // The FLIP card flight overlapped with `<RouteTransition>`'s fade — both
+  // fired on card→PDP navigation, producing two competing transitions.
+  // RouteTransition wins (per EXECUTION-PLAN.md Phase 1.5). The View
+  // Transitions API will replace this properly in Phase 3 (cross-document
+  // shared elements between PLP and PDP).
 
   // ============ 8. SCROLL-DRIVEN PINNED SHOWCASE ============
   function pinShowcase() {
