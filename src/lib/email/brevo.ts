@@ -13,6 +13,25 @@ type SendArgs = {
   replyTo?: string;
 };
 
+/** Add a contact to a Brevo list. Silently skips if config is missing. */
+export async function addBrevoContact(email: string, listId: number): Promise<void> {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) return;
+  try {
+    await fetch("https://api.brevo.com/v3/contacts", {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "api-key": apiKey,
+      },
+      body: JSON.stringify({ email, listIds: [listId], updateEnabled: true }),
+    });
+  } catch {
+    // Best-effort; never block the caller.
+  }
+}
+
 export async function sendEmail(args: SendArgs): Promise<{ ok: boolean; id?: string; error?: string }> {
   const apiKey = process.env.BREVO_API_KEY;
   const fromEmail = process.env.BREVO_FROM_EMAIL;

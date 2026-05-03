@@ -166,6 +166,44 @@ export function preorderAdminNotifyEmail(d: PreorderEmailData & {
   return { subject, html: SHELL(body) };
 }
 
+// ─── Newsletter welcome ───────────────────────────────────────────────
+export function newsletterWelcomeEmail(siteUrl: string) {
+  const subject = "Letters from the Maison — welcome";
+  const body = `
+    <p style="font-size:15px;margin:0 0 24px;">You asked the maison to write. It will.</p>
+    <p style="font-size:15px;margin:0 0 20px;">We send letters rarely — only when there is something genuinely worth pausing for. A new cloth. A scent that took three seasons to settle. A small piece that will not be restocked.</p>
+    <p style="font-size:15px;margin:0 0 32px;">The next one will find you when it is ready.</p>
+    <p style="margin:0 0 32px;"><a href="${siteUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Wander the boutique &rarr;</a></p>
+    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:0;">— The atelier</p>
+  `;
+  return { subject, html: SHELL(body) };
+}
+
+// ─── Review request (sent after order delivered) ──────────────────────
+export function reviewRequestEmail(firstName: string, orderNumber: string, trackingUrl: string) {
+  const subject = `Your order has arrived · ${orderNumber}`;
+  const body = `
+    <p style="font-size:15px;margin:0 0 6px;">Dear ${firstName},</p>
+    <p style="font-size:15px;margin:0 0 24px;">We hope your parcel arrived in the way the maison intended it — quietly, in the right state.</p>
+    <p style="font-size:15px;margin:0 0 24px;">If you have a moment, a few words on the piece would mean a great deal to the small team that prepared it. No obligation. Only if it earned them.</p>
+    <p style="margin:0 0 32px;"><a href="${trackingUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Leave a note &rarr;</a></p>
+    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:0;">— The atelier</p>
+  `;
+  return { subject, html: SHELL(body) };
+}
+
+// ─── Back in stock ────────────────────────────────────────────────────
+export function backInStockEmail(productName: string, productUrl: string) {
+  const subject = `Back in the maison · ${productName}`;
+  const body = `
+    <p style="font-size:11px;letter-spacing:.4em;color:#a07e2c;margin:0 0 14px;font-family:'Courier New',monospace;">BACK ON THE SHELF</p>
+    <h2 style="font-size:24px;font-weight:400;color:#2a1854;margin:0 0 14px;font-family:Georgia,serif;">${productName}</h2>
+    <p style="font-size:15px;margin:0 0 28px;">The piece you asked the maison to remember has returned. Quantities are limited &mdash; we will not write again until you say so.</p>
+    <p style="margin:0 0 6px;"><a href="${productUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Return to the piece &rarr;</a></p>
+  `;
+  return { subject, html: SHELL(body) };
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

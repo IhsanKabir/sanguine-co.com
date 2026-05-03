@@ -13,7 +13,7 @@ import { slugify } from "@/lib/utils";
 import { createPathaoOrder } from "@/lib/shipping/pathao";
 import { createSteadfastOrder } from "@/lib/shipping/steadfast";
 import { sendEmail } from "@/lib/email/brevo";
-import { orderShippedEmail, type OrderEmailLine } from "@/lib/email/templates";
+import { orderShippedEmail, reviewRequestEmail, type OrderEmailLine } from "@/lib/email/templates";
 import { sendSms } from "@/lib/sms/ssl-wireless";
 import { logOrderEvent, listOrderEvents } from "@/lib/order-events";
 
@@ -190,6 +190,59 @@ export async function adjustStock(id: string, delta: number, reason: string) {
 // ─── Orders ────────────────────────────────────────────────────────────
 const validStatuses = ["pending","cod_pending","paid","processing","shipped","delivered","cancelled","refunded"] as const;
 
+const SITE_URL_ORDERS = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+
+/** Resolve recipient email for any order — guests have guestEmail, auth users need Supabase lookup. */
+async function resolveOrderEmail(orderId: string): Promise<{ email: string; firstName: string; number: string; trackingToken: string } | null> {
+  const [order] = await db
+    .select({
+      guestEmail: schema.orders.guestEmail,
+      customerId: schema.orders.customerId,
+      shippingAddress: schema.orders.shippingAddress,
+      number: schema.orders.number,
+      trackingToken: schema.orders.trackingToken,
+    })
+    .from(schema.orders)
+    .where(eq(schema.orders.id, orderId))
+    .limit(1);
+
+  if (!order) return null;
+
+  const addr = parseShippingAddress(order.shippingAddress);
+  const firstName = (addr.fullName ?? "").split(" ")[0] || "friend";
+
+  if (order.guestEmail) {
+    return { email: order.guestEmail, firstName, number: order.number, trackingToken: order.trackingToken };
+  }
+
+  if (order.customerId) {
+    try {
+      const { data } = await adminClient().auth.admin.getUserById(order.customerId);
+      if (data?.user?.email) {
+        return { email: data.user.email, firstName, number: order.number, trackingToken: order.trackingToken };
+      }
+    } catch {}
+  }
+
+  return null;
+}
+
+/** Fire review request email for a delivered order. Best-effort; never throws. */
+async function fireReviewRequest(orderId: string): Promise<void> {
+  const recipient = await resolveOrderEmail(orderId);
+  if (!recipient) return;
+
+  const trackingUrl = `${SITE_URL_ORDERS}/en/order/${recipient.number}/track?t=${recipient.trackingToken}`;
+  const { subject, html } = reviewRequestEmail(recipient.firstName, recipient.number, trackingUrl);
+
+  const result = await sendEmail({ to: recipient.email, subject, html });
+  await logOrderEvent({
+    orderId,
+    type: "email_sent",
+    payload: { subject, to: recipient.email, ok: result.ok, error: result.error ?? null },
+  });
+}
+
 /** Public-to-admin wrapper around the order events log. Permission-gated. */
 export async function getOrderTimeline(orderId: string) {
   await requirePermission("orders");
@@ -205,6 +258,12 @@ export async function updateOrderStatus(orderId: string, status: typeof validSta
     type: "status_changed",
     payload: { from: before?.status ?? null, to: status },
   });
+
+  // Send review request when an order transitions into delivered for the first time.
+  if (status === "delivered" && before?.status !== "delivered") {
+    fireReviewRequest(orderId).catch(() => {});
+  }
+
   revalidatePath("/admin", "layout");
 }
 

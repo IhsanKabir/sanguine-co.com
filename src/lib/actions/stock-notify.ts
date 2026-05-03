@@ -6,6 +6,7 @@ import { eq, and, isNull, gte, sql } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { getCurrentUser, requirePermission } from "@/lib/auth-utils";
 import { sendEmail } from "@/lib/email/brevo";
+import { backInStockEmail } from "@/lib/email/templates";
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
 
@@ -82,8 +83,7 @@ export async function notifyBackInStock(productId: string) {
   if (pending.length === 0) return { ok: true as const, notified: 0 };
 
   const url = `${SITE_URL}/en/product/${product.slug}`;
-  const subject = `Back in the maison · ${product.name}`;
-  const html = backInStockEmail(product.name, url);
+  const { subject, html } = backInStockEmail(product.name, url);
 
   let notified = 0;
   for (const row of pending) {
@@ -114,27 +114,3 @@ export async function pendingNotificationsByProduct(): Promise<Map<string, numbe
   return new Map(rows.map((r) => [r.product_id, r.count]));
 }
 
-function backInStockEmail(productName: string, url: string): string {
-  return `<!doctype html>
-<html><body style="margin:0;padding:0;background:#fdfbf7;font-family:Georgia,serif;color:#2a1854;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fdfbf7;padding:40px 20px;">
-    <tr><td align="center">
-      <table role="presentation" width="540" cellspacing="0" cellpadding="0" style="background:white;max-width:540px;width:100%;">
-        <tr><td style="padding:36px 36px 16px;border-bottom:1px solid #e8e0d2;text-align:center;">
-          <div style="font-family:Georgia,serif;font-style:italic;font-size:28px;color:#2a1854;">Saanguine</div>
-          <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.4em;color:#a07e2c;margin-top:6px;">MAISON · MMXXVI</div>
-        </td></tr>
-        <tr><td style="padding:32px 36px;line-height:1.7;">
-          <p style="font-size:11px;letter-spacing:.4em;color:#a07e2c;margin:0 0 14px;">BACK ON THE SHELF</p>
-          <h2 style="font-size:24px;font-weight:400;color:#2a1854;margin:0 0 14px;">${productName}</h2>
-          <p style="font-size:14px;color:#3a2a64;margin:0 0 22px;">The piece you asked the maison to remember has returned. Quantities are limited &mdash; we will not write again until you say so.</p>
-          <p style="margin:0 0 6px;"><a href="${url}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Return to the piece &rarr;</a></p>
-        </td></tr>
-        <tr><td style="padding:18px 36px 28px;border-top:1px solid #e8e0d2;text-align:center;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.2em;color:#7a6a52;">
-          MAISON SAANGUINE · DHAKA
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body></html>`;
-}
