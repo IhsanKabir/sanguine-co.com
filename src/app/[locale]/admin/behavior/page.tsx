@@ -3,12 +3,25 @@ import { sql, desc } from "drizzle-orm";
 import { requirePermission } from "@/lib/auth-utils";
 import { formatDate } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 type Range = { days: number; label: string };
 const RANGES: Range[] = [
   { days: 7, label: "Last 7 days" },
   { days: 30, label: "Last 30 days" },
   { days: 90, label: "Last 90 days" },
 ];
+
+// Centralised error sink so all five queries below surface their failure to
+// Vercel logs instead of silently rendering zeros. Returns the supplied empty
+// fallback so the page still renders.
+function logAndFallback<T>(label: string, fallback: T) {
+  return (e: unknown) => {
+    const msg = e instanceof Error ? `${e.message}\n${e.stack ?? ""}` : String(e);
+    console.error(`[admin/behavior] ${label} failed:`, msg);
+    return fallback;
+  };
+}
 
 export default async function AdminBehaviorPage({
   searchParams,
@@ -20,66 +33,77 @@ export default async function AdminBehaviorPage({
   const days = parseInt(sp.days || "30") || 30;
   const since = new Date(Date.now() - days * 86400_000);
 
-  const [funnel] = await db.execute<{
+  const funnelRows = await db.execute<{
     sessions: number; product_views: number; adds: number; checkouts: number; orders: number;
   }>(sql`
     select
-      count(*) filter (where ${schema.events.type} = 'session_start')::int   as sessions,
-      count(*) filter (where ${schema.events.type} = 'product_view')::int    as product_views,
-      count(*) filter (where ${schema.events.type} = 'add_to_cart')::int     as adds,
-      count(*) filter (where ${schema.events.type} = 'checkout_start')::int  as checkouts,
-      count(*) filter (where ${schema.events.type} = 'order_placed')::int    as orders
-    from ${schema.events}
-    where ${schema.events.createdAt} >= ${since}
-  `).catch(() => [{ sessions: 0, product_views: 0, adds: 0, checkouts: 0, orders: 0 }]);
+      count(*) filter (where type = 'session_start')::int   as sessions,
+      count(*) filter (where type = 'product_view')::int    as product_views,
+      count(*) filter (where type = 'add_to_cart')::int     as adds,
+      count(*) filter (where type = 'checkout_start')::int  as checkouts,
+      count(*) filter (where type = 'order_placed')::int    as orders
+    from events
+    where created_at >= ${since}
+  `).catch(logAndFallback("funnel", [{ sessions: 0, product_views: 0, adds: 0, checkouts: 0, orders: 0 }] as Array<{
+    sessions: number; product_views: number; adds: number; checkouts: number; orders: number;
+  }>));
+  // Defensive — drizzle has shipped versions where execute() returns
+  // `{ rows }` or `Row[]` depending on driver; pull the first row from either.
+  const funnel = Array.isArray(funnelRows)
+    ? funnelRows[0]
+    : (funnelRows as { rows?: unknown[] }).rows?.[0] as typeof funnelRows[number] | undefined;
 
-  const topSearches = await db.execute<{ query: string; count: number; zero_results: number }>(sql`
+  const topSearchesRaw = await db.execute<{ query: string; count: number; zero_results: number }>(sql`
     select
-      ${schema.events.payload}->>'query' as query,
+      payload->>'query' as query,
       count(*)::int as count,
-      sum(case when (${schema.events.payload}->>'zero_result')::boolean then 1 else 0 end)::int as zero_results
-    from ${schema.events}
-    where ${schema.events.type} = 'search'
-      and ${schema.events.createdAt} >= ${since}
-      and ${schema.events.payload}->>'query' is not null
+      sum(case when (payload->>'zero_result')::boolean then 1 else 0 end)::int as zero_results
+    from events
+    where type = 'search'
+      and created_at >= ${since}
+      and payload->>'query' is not null
     group by query
     order by count desc
     limit 15
-  `).catch(() => []);
+  `).catch(logAndFallback("topSearches", [] as Array<{ query: string; count: number; zero_results: number }>));
+  const topSearches = Array.isArray(topSearchesRaw) ? topSearchesRaw : (topSearchesRaw as { rows?: typeof topSearchesRaw }).rows ?? [];
 
-  const topProducts = await db.execute<{ product_id: string; views: number; name: string | null }>(sql`
+  const topProductsRaw = await db.execute<{ product_id: string; views: number; name: string | null }>(sql`
     select
-      coalesce(${schema.events.productId}, ${schema.events.path}) as product_id,
+      coalesce(product_id, path) as product_id,
       count(*)::int as views,
-      (select ${schema.products.name} from ${schema.products} where ${schema.products.slug} = coalesce(${schema.events.productId}, replace(${schema.events.path}, '/product/', '')) limit 1) as name
-    from ${schema.events}
-    where ${schema.events.type} = 'product_view'
-      and ${schema.events.createdAt} >= ${since}
+      (select name from products where slug = coalesce(events.product_id, replace(events.path, '/product/', '')) limit 1) as name
+    from events
+    where type = 'product_view'
+      and created_at >= ${since}
     group by product_id
     order by views desc
     limit 10
-  `).catch(() => []);
+  `).catch(logAndFallback("topProducts", [] as Array<{ product_id: string; views: number; name: string | null }>));
+  const topProducts = Array.isArray(topProductsRaw) ? topProductsRaw : (topProductsRaw as { rows?: typeof topProductsRaw }).rows ?? [];
 
-  const topPages = await db.execute<{ path: string; views: number }>(sql`
-    select ${schema.events.path} as path, count(*)::int as views
-    from ${schema.events}
-    where ${schema.events.type} = 'page_view'
-      and ${schema.events.createdAt} >= ${since}
-      and ${schema.events.path} is not null
+  const topPagesRaw = await db.execute<{ path: string; views: number }>(sql`
+    select path, count(*)::int as views
+    from events
+    where type = 'page_view'
+      and created_at >= ${since}
+      and path is not null
     group by path
     order by views desc
     limit 12
-  `).catch(() => []);
+  `).catch(logAndFallback("topPages", [] as Array<{ path: string; views: number }>));
+  const topPages = Array.isArray(topPagesRaw) ? topPagesRaw : (topPagesRaw as { rows?: typeof topPagesRaw }).rows ?? [];
 
-  const dailyVolume = await db.execute<{ day: string; sessions: number; orders: number }>(sql`
-    select to_char(${schema.events.createdAt}, 'YYYY-MM-DD') as day,
-           count(*) filter (where ${schema.events.type} = 'session_start')::int as sessions,
-           count(*) filter (where ${schema.events.type} = 'order_placed')::int as orders
-    from ${schema.events}
-    where ${schema.events.createdAt} >= ${since}
+  const dailyVolumeRaw = await db.execute<{ day: string; sessions: number; orders: number }>(sql`
+    select to_char(created_at, 'YYYY-MM-DD') as day,
+           count(*) filter (where type = 'session_start')::int as sessions,
+           count(*) filter (where type = 'order_placed')::int as orders
+    from events
+    where created_at >= ${since}
     group by day
     order by day asc
-  `).catch(() => []);
+  `).catch(logAndFallback("dailyVolume", [] as Array<{ day: string; sessions: number; orders: number }>));
+  const dailyVolume = Array.isArray(dailyVolumeRaw) ? dailyVolumeRaw : (dailyVolumeRaw as { rows?: typeof dailyVolumeRaw }).rows ?? [];
 
   const safeFunnel = funnel ?? { sessions: 0, product_views: 0, adds: 0, checkouts: 0, orders: 0 };
   const max = Math.max(1, safeFunnel.sessions, safeFunnel.product_views, safeFunnel.adds, safeFunnel.checkouts, safeFunnel.orders);
