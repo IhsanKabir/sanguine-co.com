@@ -22,10 +22,28 @@ export default function HeroTide() {
   const seaRef = useRef<SVGGElement | null>(null);
   const tideRef = useRef<SVGGElement | null>(null);
   const cloudRef = useRef<SVGGElement | null>(null);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
+
+    // Cursor-tide parallax: mouse position drives a small extra horizontal
+    // offset on each layer, in opposite directions to depth. Disabled on
+    // touch devices (no real cursor) where it would be noise. Tracked as
+    // -1..1 normalised so we can scale per-layer without re-reading rect.
+    const hasCursor = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    let cursorX = 0; // -1 (left edge) .. 1 (right edge)
+    if (hasCursor) {
+      const onMove = (e: MouseEvent) => {
+        cursorX = (e.clientX / window.innerWidth) * 2 - 1;
+      };
+      window.addEventListener("mousemove", onMove, { passive: true });
+      // Cleanup wired into the rAF cleanup below.
+      const cleanupMove = () => window.removeEventListener("mousemove", onMove);
+      // Stash on ref so the rAF cleanup can call it.
+      cleanupRef.current = cleanupMove;
+    }
 
     let raf = 0;
     const start = performance.now();
@@ -49,15 +67,25 @@ export default function HeroTide() {
       const tideSway = Math.sin(t * 2 * Math.PI / 7) * 3;
       const cloudSway = ((t * 6) % 1400) - 700;  // slow rightward drift, looping
 
-      if (skyRef.current)   skyRef.current.style.transform   = `translate3d(${skySway}px, ${-skyY}px, 0)`;
-      if (seaRef.current)   seaRef.current.style.transform   = `translate3d(${seaSway}px, ${-seaY + Math.sin(t * 2 * Math.PI / 9) * 2}px, 0)`;
-      if (tideRef.current)  tideRef.current.style.transform  = `translate3d(${tideSway}px, ${-tideY}px, 0)`;
-      if (cloudRef.current) cloudRef.current.style.transform = `translate3d(${cloudSway}px, 0, 0)`;
+      // Cursor-tide: each layer offsets by a small amount in the cursor's
+      // horizontal direction. Sky drifts opposite to foreground (eye-tracking
+      // illusion) at lower amplitude. Max ~8 px so it stays atmospheric.
+      const cursorSky  = -cursorX * 4;   // sky moves opposite, gentlest
+      const cursorSea  = cursorX * 5;
+      const cursorTide = cursorX * 8;    // foreground tracks the cursor most
+
+      if (skyRef.current)   skyRef.current.style.transform   = `translate3d(${skySway + cursorSky}px, ${-skyY}px, 0)`;
+      if (seaRef.current)   seaRef.current.style.transform   = `translate3d(${seaSway + cursorSea}px, ${-seaY + Math.sin(t * 2 * Math.PI / 9) * 2}px, 0)`;
+      if (tideRef.current)  tideRef.current.style.transform  = `translate3d(${tideSway + cursorTide}px, ${-tideY}px, 0)`;
+      if (cloudRef.current) cloudRef.current.style.transform = `translate3d(${cloudSway + cursorSky * 1.5}px, 0, 0)`;
 
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      cleanupRef.current?.();
+    };
   }, []);
 
   return (
