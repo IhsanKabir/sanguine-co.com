@@ -55,7 +55,7 @@ export default function CartPage() {
                 <div>
                   <Link href={`/product/${i.slug}`} className="name">{i.name}</Link>
                   <div className="meta">{i.color || ""}{i.size ? ` · ${i.size}` : ""}</div>
-                  <div className="qty" style={{ transform: "scale(.85)", transformOrigin: "left", marginTop: 10 }}>
+                  <div className="qty qty-sm" style={{ marginTop: 10 }}>
                     <button onClick={() => dec(k)} aria-label="Decrease">−</button>
                     <span>{i.qty}</span>
                     <button onClick={() => inc(k)} aria-label="Increase">+</button>

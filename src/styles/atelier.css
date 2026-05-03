@@ -587,6 +587,10 @@
 }
 .card .heart-tick { opacity: 0; transition: opacity .2s, transform .15s; }
 .card:hover .heart-tick { opacity: 1; }
+/* Always visible on touch — hover never fires, so the button would be unreachable */
+@media (hover: none) {
+  .card .heart-tick { opacity: 1; }
+}
 .heart-tick:hover { transform: scale(1.1); }
 .heart-tick.on { background: var(--gold); color: var(--purple-950); opacity: 1; }
 .heart-tick.on svg { fill: currentColor; }
@@ -932,12 +936,13 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   display: inline-flex;
   border: 1px solid var(--line);
   margin-right: 8px;
-  height: 28px;
+  height: 36px;
   align-self: center;
 }
 .locale-switch button {
   border: none; background: transparent;
-  padding: 0 10px;
+  padding: 0 12px;
+  min-width: 36px;
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: .15em;

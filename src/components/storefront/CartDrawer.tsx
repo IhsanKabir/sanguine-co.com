@@ -90,7 +90,7 @@ export default function CartDrawer() {
                       </Link>
                       <div className="meta">{i.color || ""}{i.size ? ` · ${i.size}` : ""}</div>
                       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10 }}>
-                        <div className="qty" style={{ transform: "scale(.85)", transformOrigin: "left" }}>
+                        <div className="qty qty-sm">
                           <button onClick={() => dec(k)} aria-label="Decrease">−</button>
                           <span>{i.qty}</span>
                           <button onClick={() => inc(k)} aria-label="Increase">+</button>

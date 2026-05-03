@@ -73,14 +73,15 @@
   background: transparent;
   border: 1px solid oklch(0.78 0.10 145);
   color: oklch(0.45 0.14 145);
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   display: grid;
   place-items: center;
   transition: background .15s, color .15s;
+  flex-shrink: 0;
 }
 .coupon-applied .ca-remove:hover { background: var(--err); color: white; border-color: var(--err); }
 .coupon-applied.compact { padding: 10px 12px; }
