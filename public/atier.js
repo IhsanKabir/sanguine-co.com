@@ -212,6 +212,7 @@
     b.setAttribute('data-muted', muted);
     if (!audioPermitted()) b.setAttribute('data-locked', 'true');
     b.title = 'Sound';
+    b.setAttribute('aria-label', 'Toggle sound');
     b.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path class="on" d="M5 9v6h4l5 4V5L9 9zm12 0a4 4 0 0 1 0 6"/><path class="off" d="M5 9v6h4l5 4V5L9 9zM18 9l4 6m-4 0 4-6"/></svg>`;
     b.addEventListener('click', () => {
       // Block unmute until cookie consent is given. The button stays visible
@@ -255,6 +256,8 @@
     if (s) return s;
     s = document.createElement('div');
     s.className = 'ssg-seal-loader';
+    s.setAttribute('aria-hidden', 'true');
+    s.setAttribute('role', 'presentation');
     s.innerHTML = `
       <div class="seal-disc">
         <svg viewBox="0 0 100 100" width="100" height="100">
@@ -278,7 +281,7 @@
   // Page-load seal
   if (!reduced) {
     const initial = showSeal();
-    if (initial) setTimeout(hideSeal, 1100);
+    if (initial) setTimeout(hideSeal, 300);
   }
 
   // ============ 4. IDLE CONSTELLATION (DISABLED 2026-05-03) ============
