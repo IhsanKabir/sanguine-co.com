@@ -1,7 +1,8 @@
 "use server";
 
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { COPY_CACHE_TAG } from "@/lib/copy";
 import { db, schema } from "@/lib/db";
 import { parseShippingAddress } from "@/lib/schema";
 import { eq, desc, sql, inArray } from "drizzle-orm";
@@ -420,7 +421,10 @@ export async function updateCopyOverrides(input: z.infer<typeof copyOverridesSch
       target: schema.siteSettings.key,
       set: { value: clean, updatedAt: new Date() },
     });
-  // Storefront reads merged messages from the layout, so revalidate everything.
+  // Bust the unstable_cache wrapping `getCopyOverrides()` so the next i18n
+  // request reads fresh values, then bump the route cache so already-rendered
+  // pages re-render with the new merged messages.
+  revalidateTag(COPY_CACHE_TAG);
   revalidatePath("/", "layout");
   return { ok: true as const };
 }

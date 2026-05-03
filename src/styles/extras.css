@@ -87,11 +87,15 @@
 .coupon-applied.compact .ca-code { font-size: 12px; }
 .coupon-applied.compact .ca-savings { font-size: 10px; }
 
-/* Floating chat (WhatsApp + Messenger) */
+/* Floating chat (WhatsApp + Messenger).
+ *
+ * Lifted above the audio mute button (.ssg-mute lives at right:18px;bottom:18px;
+ * 40px tall) so the bottom Messenger button isn't covered. ~72px gives a 12px
+ * breathing space between the chat column and the mute. */
 .floating-chat {
   position: fixed;
   right: 22px;
-  bottom: 22px;
+  bottom: 72px;
   z-index: 90;
   display: flex;
   flex-direction: column;
@@ -131,7 +135,7 @@
 }
 .fc-btn:hover .fc-tooltip { opacity: 1; }
 @media (max-width: 640px) {
-  .floating-chat { right: 16px; bottom: 16px; }
+  .floating-chat { right: 16px; bottom: 66px; }
   .fc-btn { width: 48px; height: 48px; }
   .fc-tooltip { display: none; }
 }

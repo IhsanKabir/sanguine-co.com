@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db, schema } from "./db";
@@ -30,25 +30,34 @@ export type CopyOverrides = z.infer<typeof overridesSchema>;
 const EMPTY_OVERRIDES: CopyOverrides = { en: {}, bn: {} };
 
 export const COPY_KEY = "copy";
+export const COPY_CACHE_TAG = "site-copy-overrides";
 
-// Memoised per server request so multiple `t()` calls inside one render hit the
-// DB at most once. Cleared automatically between requests.
-export const getCopyOverrides = cache(async (): Promise<CopyOverrides> => {
-  try {
-    const rows = await db
-      .select()
-      .from(schema.siteSettings)
-      .where(eq(schema.siteSettings.key, COPY_KEY))
-      .limit(1);
-    if (!rows[0]) return EMPTY_OVERRIDES;
-    const parsed = overridesSchema.safeParse(rows[0].value);
-    return parsed.success ? parsed.data : EMPTY_OVERRIDES;
-  } catch {
-    // DB unreachable (build-time, transient outage) — fall back to defaults so
-    // the storefront still renders the static messages.
-    return EMPTY_OVERRIDES;
-  }
-});
+// Cached at the Next.js full-route level with tag-based invalidation. The
+// admin's `updateCopyOverrides` action calls `revalidateTag(COPY_CACHE_TAG)`
+// after every save, so even statically-optimised pages pick up new copy on
+// the very next request without us having to mark every page as dynamic.
+//
+// Returns the parsed overrides or an empty map if the row is missing or the
+// DB is unreachable (build-time, transient outage) — never throws so the
+// storefront always renders.
+export const getCopyOverrides = unstable_cache(
+  async (): Promise<CopyOverrides> => {
+    try {
+      const rows = await db
+        .select()
+        .from(schema.siteSettings)
+        .where(eq(schema.siteSettings.key, COPY_KEY))
+        .limit(1);
+      if (!rows[0]) return EMPTY_OVERRIDES;
+      const parsed = overridesSchema.safeParse(rows[0].value);
+      return parsed.success ? parsed.data : EMPTY_OVERRIDES;
+    } catch {
+      return EMPTY_OVERRIDES;
+    }
+  },
+  ["site-copy-overrides"],
+  { tags: [COPY_CACHE_TAG] },
+);
 
 /**
  * Apply dotted-path overrides onto a deep copy of the messages object.

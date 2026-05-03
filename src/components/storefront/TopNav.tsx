@@ -5,6 +5,7 @@ import Icon from "./Icon";
 import LocaleSwitcher from "./LocaleSwitcher";
 import CartIcon from "./CartIcon";
 import SearchDropdown from "./SearchDropdown";
+import CatStrip from "./CatStrip";
 
 export default async function TopNav() {
   const t = await getTranslations();
@@ -46,19 +47,7 @@ export default async function TopNav() {
             <CartIcon ariaLabel={t("nav.cart")} />
           </div>
         </div>
-        <div className="cat-strip">
-          <div className="cat-strip-inner">
-            {segments.map((c) => (
-              <Link
-                key={c.id}
-                href={`/shop/${c.id}`}
-                className="cat-chip"
-              >
-                {c.name}
-              </Link>
-            ))}
-          </div>
-        </div>
+        <CatStrip segments={segments.map((s) => ({ id: s.id, name: s.name }))} />
       </nav>
     </>
   );

@@ -52,8 +52,29 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 
 .cat-strip{background:var(--cream);border-bottom:1px solid var(--line);overflow-x:auto}
 .cat-strip-inner{max-width:1400px;margin:0 auto;display:flex;gap:4px;padding:0 32px;justify-content:center}
-.cat-chip{font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:14px 18px;color:var(--ink-soft);white-space:nowrap;border-bottom:2px solid transparent}
-.cat-chip:hover{color:var(--purple-800)}.cat-chip.active{color:var(--purple-900);border-bottom-color:var(--purple-800)}
+/* Cat-chip — animated underline draws in on hover (preview) and stays drawn
+ * when the segment is the active route. Matches the oceanic register: a tide
+ * line underneath the label that ebbs in and out instead of a hard border. */
+.cat-chip{
+  position:relative;
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  padding:14px 18px;color:var(--ink-soft);white-space:nowrap;
+  transition:color .25s cubic-bezier(.16,.84,.32,1);
+}
+.cat-chip::after{
+  content:"";position:absolute;left:18px;right:18px;bottom:8px;
+  height:1.5px;background:linear-gradient(90deg,transparent,var(--gold) 20%,var(--gold) 80%,transparent);
+  transform:scaleX(0);transform-origin:center;
+  transition:transform .45s cubic-bezier(.16,.84,.32,1),background .25s;
+  pointer-events:none;
+}
+.cat-chip:hover{color:var(--purple-800)}
+.cat-chip:hover::after{transform:scaleX(.7)}
+.cat-chip.active{color:var(--purple-900);font-weight:500}
+.cat-chip.active::after{transform:scaleX(1);background:linear-gradient(90deg,transparent,var(--purple-800) 20%,var(--purple-800) 80%,transparent)}
+@media (prefers-reduced-motion: reduce){
+  .cat-chip,.cat-chip::after{transition:none}
+}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:2px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;border:1px solid transparent;transition:all .15s}
 .btn-primary{background:var(--purple-900);color:var(--cream)}.btn-primary:hover{background:var(--purple-800)}
