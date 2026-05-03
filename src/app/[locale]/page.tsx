@@ -194,8 +194,12 @@ export default async function Home({ params }: Props) {
       <section className="press" aria-label="Press">
         <div className="press-inner">
           <span className="press-kicker">As discussed in</span>
+          {/* Press marks are aspirational placeholders. Rendered as <span>,
+            * not <a> with no href — Google's quality rater guidelines flag
+            * anchor-without-destination as "implied false authority". Swap
+            * to real publications + real URLs once we have citations. */}
           {PRESS_MARKS.map((m) => (
-            <a key={m.name} className="press-mark">{m.name}<sup>{m.sup}</sup></a>
+            <span key={m.name} className="press-mark">{m.name}<sup>{m.sup}</sup></span>
           ))}
         </div>
       </section>

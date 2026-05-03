@@ -31,10 +31,9 @@ export default async function Footer() {
               ))}
             </ul>
           </div>
-          <div>
-            <div className="col-title">{t("footer.maison")}</div>
-            <ul><li>Atelier</li><li>Journal</li><li>Craftsmanship</li></ul>
-          </div>
+          {/* Maison column intentionally omitted until /atelier and /journal
+            * are live. Per SEO-AUDIT.md: dead nav-link stubs read as a quality
+            * signal. Restore once the editorial routes ship. */}
           <div>
             <div className="col-title">{t("footer.service")}</div>
             <ul>
