@@ -13,6 +13,10 @@
 .ssg-mute:hover { transform: scale(1.08); box-shadow: 0 10px 30px oklch(0.2 0.15 300 / 0.55); }
 .ssg-mute[data-muted="true"] .on { display: none; }
 .ssg-mute[data-muted="false"] .off { display: none; }
+/* Locked state — pre-consent. Dimmed and slightly de-saturated to signal
+ * "this control isn't available yet". Tooltip from JS explains why. */
+.ssg-mute[data-locked="true"] { opacity: 0.45; cursor: not-allowed; }
+.ssg-mute[data-locked="true"]:hover { transform: none; }
 
 /* Wax-seal loader */
 .ssg-seal-loader {

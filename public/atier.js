@@ -133,7 +133,38 @@
   setTimeout(mountShader, 400);
 
   // ============ 2. SOUND DESIGN ============
-  let muted = localStorage.getItem('ssg-muted') !== 'false';
+  // Audio is gated on cookie consent. Until the visitor clicks "Accept all"
+  // on the consent banner, `audioAllowed` stays false and every tone() /
+  // noiseBurst() call early-returns. The mute toggle is still mounted but
+  // its unmute path is also gated. Existing visitors who already toggled
+  // sound on get grandfathered via `localStorage.ssg-muted === 'false'`
+  // — that legacy preference is treated as implicit consent for audio
+  // since the toggle pre-dated the consent banner.
+  function readConsent() {
+    try {
+      const raw = localStorage.getItem('ssg-cookie-consent-v1');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed && parsed.choice ? parsed.choice : null;
+    } catch { return null; }
+  }
+  function audioPermitted() {
+    const consent = readConsent();
+    if (consent === 'accept') return true;
+    // Grandfather: someone who previously unmuted before consent was a thing.
+    if (localStorage.getItem('ssg-muted') === 'false') return true;
+    return false;
+  }
+  let muted = !audioPermitted() || localStorage.getItem('ssg-muted') !== 'false';
+  // Re-evaluate when the consent banner persists a choice (it dispatches a
+  // storage event same-tab). Once allowed, leave the mute toggle in the
+  // user's hands.
+  window.addEventListener('storage', e => {
+    if (e.key === 'ssg-cookie-consent-v1' && audioPermitted()) {
+      // Don't auto-unmute — just allow it. User still has to press the toggle.
+      document.querySelectorAll('.ssg-mute').forEach(el => el.removeAttribute('data-locked'));
+    }
+  });
   let actx = null;
   function ensureAudio() {
     if (!actx) try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
@@ -179,9 +210,16 @@
     const b = document.createElement('button');
     b.className = 'ssg-mute';
     b.setAttribute('data-muted', muted);
+    if (!audioPermitted()) b.setAttribute('data-locked', 'true');
     b.title = 'Sound';
     b.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path class="on" d="M5 9v6h4l5 4V5L9 9zm12 0a4 4 0 0 1 0 6"/><path class="off" d="M5 9v6h4l5 4V5L9 9zM18 9l4 6m-4 0 4-6"/></svg>`;
     b.addEventListener('click', () => {
+      // Block unmute until cookie consent is given. The button stays visible
+      // but no-ops with a brief hint so the visitor knows where to look.
+      if (!audioPermitted()) {
+        b.title = 'Accept cookies to enable sound';
+        return;
+      }
       ensureAudio();
       setMuted(!muted);
       if (!muted) window.SSG_SOUND.chime();
@@ -189,17 +227,20 @@
     document.body.appendChild(b);
   }
   mountMuteToggle();
-  // Hook sounds — guarded by user-gesture audio init
+  // Click-driven cues (button feedback, card hover) — gated on consent and mute.
   document.addEventListener('click', e => {
+    if (!audioPermitted()) return;
     ensureAudio();
     const t = e.target;
     if (t.closest && t.closest('.btn-primary, .btn-gold')) window.SSG_SOUND.click();
     else if (t.closest && t.closest('.cat-tile, .card')) window.SSG_SOUND.rustle();
   }, true);
-  // First gong on first user gesture
+  // First gong on first user gesture — gated on consent. Pre-consent
+  // visitors get a silent first paint, which is what PDPO/WCAG expect.
   let gongPlayed = false;
   const playGong = () => {
     if (gongPlayed) return;
+    if (!audioPermitted()) return;
     gongPlayed = true;
     ensureAudio();
     setTimeout(() => window.SSG_SOUND.gong(), 100);
