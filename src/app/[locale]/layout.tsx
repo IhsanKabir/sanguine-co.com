@@ -9,7 +9,6 @@ import { CartProvider } from "@/lib/cart-context";
 import { WishlistProvider } from "@/lib/wishlist-context";
 import CartDrawer from "@/components/storefront/CartDrawer";
 import RouteTransition from "@/components/storefront/RouteTransition";
-import HtmlLangSync from "@/components/storefront/HtmlLangSync";
 import SessionTracker from "@/components/storefront/SessionTracker";
 import FloatingChat from "@/components/storefront/FloatingChat";
 import CookieConsent from "@/components/storefront/CookieConsent";
@@ -35,7 +34,6 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <HtmlLangSync />
       <SessionTracker />
       <a href="#main" className="skip-link">Skip to content</a>
       <CartProvider>

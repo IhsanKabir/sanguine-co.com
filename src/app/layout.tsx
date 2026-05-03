@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond, JetBrains_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
+import { getLocale } from "next-intl/server";
 import "./globals.css";
 import JsonLd from "@/components/seo/JsonLd";
 
@@ -79,11 +80,14 @@ const websiteLd = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // Default lang="en"; the LocaleLayout below patches document.documentElement.lang
-  // to match the active locale on each render via a tiny client effect.
+// `lang` is sourced from next-intl's `getLocale()` so SSR / SSG / Googlebot
+// see the correct `lang="bn"` for Bengali pages on first paint. Previously
+// `HtmlLangSync` patched it client-side after hydration, which crawlers
+// never see. WCAG 3.1.1 also requires this to be correct.
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
   return (
-    <html lang="en" className={`${inter.variable} ${cormorant.variable} ${jbMono.variable}`} suppressHydrationWarning>
+    <html lang={locale} className={`${inter.variable} ${cormorant.variable} ${jbMono.variable}`} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <JsonLd data={[organizationLd, websiteLd]} />
         {children}

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { getVisibleSegments, getLiveProducts, getHeroImagesFor } from "@/lib/queries";
@@ -10,6 +11,48 @@ import HeroTide from "@/components/storefront/HeroTide";
 import Ornament from "@/components/storefront/Ornament";
 
 type Props = { params: Promise<{ locale: string }> };
+
+const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+
+/**
+ * Per-locale homepage metadata.
+ *
+ * The previous setup fell through to root-layout defaults — same title and
+ * description for `/en` and `/bn`, no canonical, no in-page hreflang. The
+ * homepage is the brand's highest-priority crawl target so it gets the most
+ * specific metadata. Sources copy from next-intl messages so the admin copy
+ * library can override `home.metaTitle` / `home.metaDescription` without a
+ * redeploy.
+ */
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale });
+  const isBn = locale === "bn";
+  const url = `${BASE}/${locale}`;
+  const title = t("home.metaTitle");
+  const description = t("home.metaDescription");
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: {
+        "en-BD": `${BASE}/en`,
+        "bn-BD": `${BASE}/bn`,
+        "x-default": `${BASE}/en`,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "website",
+      locale: isBn ? "bn_BD" : "en_BD",
+      siteName: "Saanguine Maison",
+    },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 const PRESS_MARKS = [
   { name: "Maison Quarterly", sup: "MMXXVI" },
