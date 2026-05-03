@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 360">
+  <rect width="500" height="360" fill="#122030"/>
+
+  <!-- wave mark -->
+  <path d="M 55,158 C 145,158 178,88 250,88 C 322,88 355,158 445,158"
+    stroke="#C8A86E" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- echo wave -->
+  <path d="M 80,176 C 162,176 192,114 250,114 C 308,114 338,176 420,176"
+    stroke="#C8A86E" stroke-width="0.7" fill="none" stroke-linecap="round" opacity="0.28"/>
+
+  <!-- wordmark -->
+  <text x="250" y="252"
+    font-family="'Cormorant Garamond', 'Cormorant', 'Georgia', serif"
+    font-style="italic"
+    font-weight="400"
+    font-size="64"
+    fill="#C8A86E"
+    text-anchor="middle"
+    letter-spacing="2">Saanguine</text>
+
+  <!-- rule -->
+  <line x1="110" y1="272" x2="390" y2="272" stroke="#C8A86E" stroke-width="0.6" opacity="0.4"/>
+
+  <!-- sub-label -->
+  <text x="250" y="298"
+    font-family="monospace"
+    font-size="9"
+    fill="#C8A86E"
+    opacity="0.38"
+    text-anchor="middle"
+    letter-spacing="10">MAISON · DHAKA</text>
+</svg>

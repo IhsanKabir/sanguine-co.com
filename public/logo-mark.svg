@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
+  <rect width="600" height="400" fill="#122030"/>
+  <!-- primary wave -->
+  <path d="M 60,200 C 155,200 195,120 300,120 C 405,120 445,200 540,200"
+    stroke="#C8A86E" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- echo -->
+  <path d="M 90,228 C 175,228 213,158 300,158 C 387,158 425,228 510,228"
+    stroke="#C8A86E" stroke-width="0.9" fill="none" stroke-linecap="round" opacity="0.28"/>
+</svg>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#122030"/>
+  <rect x="22" y="22" width="1156" height="586" fill="none" stroke="#C8A86E" stroke-width="0.6" opacity="0.18"/>
+
+  <!-- wave mark — left -->
+  <path d="M 80,315 C 200,315 248,200 360,200 C 472,200 520,315 640,315"
+    stroke="#C8A86E" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <path d="M 115,345 C 224,345 268,246 360,246 C 452,246 496,345 605,345"
+    stroke="#C8A86E" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.25"/>
+
+  <!-- divider -->
+  <line x1="700" y1="130" x2="700" y2="500" stroke="#C8A86E" stroke-width="0.5" opacity="0.15"/>
+
+  <!-- wordmark — right, Georgia italic as system font fallback -->
+  <text x="940" y="308"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-style="italic"
+    font-size="90"
+    fill="#C8A86E"
+    text-anchor="middle"
+    letter-spacing="2">Saanguine</text>
+
+  <line x1="740" y1="345" x2="1140" y2="345" stroke="#C8A86E" stroke-width="0.7" opacity="0.35"/>
+
+  <text x="940" y="388"
+    font-family="monospace"
+    font-size="14"
+    fill="#C8A86E"
+    opacity="0.38"
+    text-anchor="middle"
+    letter-spacing="12">MAISON · DHAKA</text>
+</svg>
