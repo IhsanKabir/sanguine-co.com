@@ -7,6 +7,7 @@ import { formatBdt } from "@/lib/utils";
 import Composition from "@/components/storefront/Composition";
 import Icon from "@/components/storefront/Icon";
 import CouponInput from "@/components/storefront/CouponInput";
+import OceanicBand from "@/components/storefront/OceanicBand";
 
 const FREE_THRESHOLD = 3000;
 
@@ -40,9 +41,10 @@ export default function CartPage() {
 
   return (
     <section className="section" style={{ maxWidth: 1100 }}>
-      <h1 className="serif" style={{ fontSize: 44, margin: "0 0 28px", color: "var(--purple-900)", fontWeight: 400 }}>
-        {t("cart.title")}
-      </h1>
+      <OceanicBand
+        kicker={t("cart.subtotal")}
+        name={t("cart.title")}
+      />
       <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 24 }}>
         <div>
           {items.map((i) => {

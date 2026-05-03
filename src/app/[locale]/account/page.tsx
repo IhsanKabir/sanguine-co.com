@@ -7,6 +7,7 @@ import { formatBdt, formatDate } from "@/lib/utils";
 import { signOut } from "@/lib/actions/auth";
 import { listMyAddresses } from "@/lib/actions/addresses";
 import AddressBook from "./AddressBook";
+import OceanicBand from "@/components/storefront/OceanicBand";
 
 export const dynamic = "force-dynamic";
 
@@ -30,17 +31,15 @@ export default async function AccountPage({ params }: Props) {
 
   return (
     <section className="section" style={{ maxWidth: 900 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", marginBottom: 32 }}>
-        <div>
-          <div style={{ fontSize: 11, letterSpacing: ".3em", color: "var(--gold-deep)", marginBottom: 8 }}>{t("nav.account").toUpperCase()}</div>
-          <h1 className="serif" style={{ fontSize: 56, margin: 0, color: "var(--purple-900)", fontWeight: 400 }}>
-            {user.email}
-          </h1>
-        </div>
-        <form action={signOut}>
-          <button type="submit" className="btn btn-ghost btn-sm">{t("account.signOut")}</button>
-        </form>
-      </div>
+      <OceanicBand
+        kicker={t("nav.account")}
+        name={user.email ?? ""}
+        trailing={
+          <form action={signOut}>
+            <button type="submit" className="btn btn-ghost btn-sm">{t("account.signOut")}</button>
+          </form>
+        }
+      />
 
       <h2 className="serif" style={{ fontSize: 24, color: "var(--purple-900)", fontWeight: 500, marginBottom: 16 }}>
         {t("account.orders")}
