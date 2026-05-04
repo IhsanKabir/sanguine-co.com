@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useMemo } from "react";
 import type { Order, OrderEvent, OrderLine } from "@/lib/schema";
 import { parseShippingAddress } from "@/lib/schema";
 import { updateOrderStatus, bookCourier, getOrderTimeline, bulkUpdateOrderStatus } from "@/lib/actions/admin";
@@ -79,8 +79,21 @@ export default function OrdersClient({ orders, lines }: Props) {
       .finally(() => setTimelineLoading(false));
   }, [selected?.id]);
 
-  const list = orders.filter((o) => filter === "all" || o.status === filter);
-  const linesFor = (orderId: string) => lines.filter((l) => l.orderId === orderId);
+  const list = useMemo(
+    () => orders.filter((o) => filter === "all" || o.status === filter),
+    [orders, filter],
+  );
+
+  const linesByOrder = useMemo(() => {
+    const map = new Map<string, OrderLine[]>();
+    for (const l of lines) {
+      const bucket = map.get(l.orderId) ?? [];
+      bucket.push(l);
+      map.set(l.orderId, bucket);
+    }
+    return map;
+  }, [lines]);
+  const linesFor = (orderId: string) => linesByOrder.get(orderId) ?? [];
 
   return (
     <>
@@ -187,7 +200,7 @@ export default function OrdersClient({ orders, lines }: Props) {
               const addr = parseShippingAddress(o.shippingAddress);
               const itemCount = linesFor(o.id).reduce((s, l) => s + l.qty, 0);
               return (
-                <tr key={o.id} onClick={() => setSelected(o)} style={{ cursor: "pointer" }}>
+                <tr key={o.id} onClick={() => startTransition(() => setSelected(o))} style={{ cursor: "pointer" }}>
                   <td style={{ width: 28 }} onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"

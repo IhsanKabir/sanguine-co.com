@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import type { Product, Segment } from "@/lib/schema";
 import { adjustStock } from "@/lib/actions/admin";
 import { notifyBackInStock } from "@/lib/actions/stock-notify";
@@ -62,9 +62,12 @@ export default function InventoryClient({ products, segments, canSeeRevenue, pen
     { out: 0, critical: 0, low: 0, healthy: 0 } as Record<StockHealth, number>,
   );
 
-  const list = filter === "all"
-    ? [...products].sort((a, b) => a.stock - b.stock)
-    : products.filter((p) => healthOf(p.stock) === filter).sort((a, b) => a.stock - b.stock);
+  const list = useMemo(
+    () => filter === "all"
+      ? [...products].sort((a, b) => a.stock - b.stock)
+      : products.filter((p) => healthOf(p.stock) === filter).sort((a, b) => a.stock - b.stock),
+    [products, filter],
+  );
 
   const totalUnits = products.reduce((s, p) => s + p.stock, 0);
   const totalValue = products.reduce((s, p) => s + p.stock * p.priceBdt, 0);

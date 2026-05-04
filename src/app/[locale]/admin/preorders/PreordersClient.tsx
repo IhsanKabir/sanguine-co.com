@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useMemo } from "react";
 import {
   setPreorderStatus,
   quotePreorderRequest,
@@ -47,9 +47,23 @@ type Props = {
 export default function PreordersClient({ requests, segments, linkedOrders }: Props) {
   const [filter, setFilter] = useState<string>("all");
   const [selected, setSelected] = useState<PreorderRequest | null>(null);
+  const [, startTransition] = useTransition();
   const segName = (id: string | null) => id ? (segments.find((s) => s.id === id)?.name ?? id) : "—";
 
-  const visible = filter === "all" ? requests : requests.filter((r) => r.status === filter);
+  const visible = useMemo(
+    () => filter === "all" ? requests : requests.filter((r) => r.status === filter),
+    [requests, filter],
+  );
+
+  const countsByStatus = useMemo(
+    () => Object.fromEntries(
+      STATUS_FILTERS.map((f) => [
+        f.key,
+        f.key === "all" ? requests.length : requests.filter((r) => r.status === f.key).length,
+      ]),
+    ),
+    [requests],
+  );
   const linkedFor = (r: PreorderRequest): LinkedOrderInfo | undefined =>
     r.convertedOrderId ? linkedOrders[r.convertedOrderId] : undefined;
 
@@ -64,7 +78,7 @@ export default function PreordersClient({ requests, segments, linkedOrders }: Pr
 
       <div className="period-chips" style={{ marginBottom: 18 }}>
         {STATUS_FILTERS.map((f) => {
-          const count = f.key === "all" ? requests.length : requests.filter((r) => r.status === f.key).length;
+          const count = countsByStatus[f.key] ?? 0;
           return (
             <button
               key={f.key}
@@ -90,7 +104,7 @@ export default function PreordersClient({ requests, segments, linkedOrders }: Pr
                 {filter === "all" ? "No pre-order requests yet." : `No ${filter} requests.`}
               </td></tr>
             ) : visible.map((r) => (
-              <tr key={r.id} style={{ cursor: "pointer" }} onClick={() => setSelected(r)}>
+              <tr key={r.id} style={{ cursor: "pointer" }} onClick={() => startTransition(() => setSelected(r))}>
                 <td style={{ fontSize: 12, color: "var(--ink-soft)" }}>{formatDate(new Date(r.createdAt))}</td>
                 <td>
                   <div style={{ fontWeight: 500 }}>{r.customerName || "—"}</div>
