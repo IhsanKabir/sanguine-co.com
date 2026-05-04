@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { createSegment, updateSegment, toggleSegment, moveSegment, deleteSegment } from "@/lib/actions/admin";
 import type { Segment, Product } from "@/lib/schema";
 import Composition from "@/components/storefront/Composition";
@@ -29,8 +29,11 @@ export default function SegmentsClient({ segments, products }: Props) {
   const [pendingDel, setPendingDel] = useState<Segment | null>(null);
   const [, startTransition] = useTransition();
 
-  const counts: Record<string, number> = {};
-  products.forEach((p) => { if (p.segmentId) counts[p.segmentId] = (counts[p.segmentId] || 0) + 1; });
+  const counts = useMemo(() => {
+    const c: Record<string, number> = {};
+    products.forEach((p) => { if (p.segmentId) c[p.segmentId] = (c[p.segmentId] || 0) + 1; });
+    return c;
+  }, [products]);
 
   const startNew = () => setEditing({
     mode: "new",

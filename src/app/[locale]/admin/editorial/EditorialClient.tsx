@@ -48,14 +48,22 @@ export default function EditorialClient({
     return byGroup;
   }, [defaultsEn]);
 
-  const filterLower = filter.trim().toLowerCase();
-  const matchesFilter = (path: string): boolean => {
-    if (!filterLower) return true;
-    if (path.toLowerCase().includes(filterLower)) return true;
-    if ((en[path] ?? "").toLowerCase().includes(filterLower)) return true;
-    if ((bn[path] ?? "").toLowerCase().includes(filterLower)) return true;
-    return false;
-  };
+  const filterLower = useMemo(() => filter.trim().toLowerCase(), [filter]);
+
+  const visibleGroups = useMemo(() => {
+    if (!filterLower) return groups;
+    const result: Record<string, string[]> = {};
+    for (const [ns, paths] of Object.entries(groups)) {
+      const visible = paths.filter(
+        (p) =>
+          p.toLowerCase().includes(filterLower) ||
+          (en[p] ?? "").toLowerCase().includes(filterLower) ||
+          (bn[p] ?? "").toLowerCase().includes(filterLower),
+      );
+      if (visible.length > 0) result[ns] = visible;
+    }
+    return result;
+  }, [groups, filterLower, en, bn]);
 
   const setValue = (locale: "en" | "bn", path: string, value: string) => {
     if (locale === "en") setEn((m) => ({ ...m, [path]: value }));
@@ -188,9 +196,9 @@ export default function EditorialClient({
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {Object.keys(groups).sort().map((ns) => {
-            const visible = groups[ns].filter(matchesFilter);
-            if (visible.length === 0) return null;
+          {Object.keys(visibleGroups).sort().map((ns) => {
+            const visible = visibleGroups[ns];
+            if (!visible || visible.length === 0) return null;
             const isOpen = filter ? true : openGroups[ns] ?? false;
             return (
               <div key={ns} style={{ border: "1px solid var(--line)", borderRadius: 2 }}>

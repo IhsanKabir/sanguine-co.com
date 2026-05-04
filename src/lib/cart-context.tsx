@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useReducer, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useReducer, useCallback, useMemo, type ReactNode } from "react";
 
 export type CartItem = {
   productId: string;
@@ -161,27 +161,32 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [state.coupon, state.hydrated]);
 
-  const value: CartCtx = {
-    items: state.items,
-    saved: state.saved,
-    open: state.open,
-    hydrated: state.hydrated,
-    coupon: state.coupon,
-    count: state.items.reduce((s, i) => s + i.qty, 0),
-    subtotalBdt: state.items.reduce((s, i) => s + i.priceBdt * i.qty, 0),
-    add: useCallback((item) => dispatch({ type: "ADD", item }), []),
-    inc: useCallback((key) => dispatch({ type: "INC", key }), []),
-    dec: useCallback((key) => dispatch({ type: "DEC", key }), []),
-    remove: useCallback((key) => dispatch({ type: "REMOVE", key }), []),
-    clear: useCallback(() => dispatch({ type: "CLEAR" }), []),
-    openDrawer: useCallback(() => dispatch({ type: "OPEN" }), []),
-    closeDrawer: useCallback(() => dispatch({ type: "CLOSE" }), []),
-    setCoupon: useCallback((coupon) => dispatch({ type: "SET_COUPON", coupon }), []),
-    saveForLater: useCallback((key) => dispatch({ type: "SAVE_FOR_LATER", key }), []),
-    moveToCart: useCallback((key) => dispatch({ type: "MOVE_TO_CART", key }), []),
-    removeSaved: useCallback((key) => dispatch({ type: "REMOVE_SAVED", key }), []),
-    itemKey,
-  };
+  const add        = useCallback((item: CartItem) => dispatch({ type: "ADD", item }), []);
+  const inc        = useCallback((key: string) => dispatch({ type: "INC", key }), []);
+  const dec        = useCallback((key: string) => dispatch({ type: "DEC", key }), []);
+  const remove     = useCallback((key: string) => dispatch({ type: "REMOVE", key }), []);
+  const clear      = useCallback(() => dispatch({ type: "CLEAR" }), []);
+  const openDrawer = useCallback(() => dispatch({ type: "OPEN" }), []);
+  const closeDrawer= useCallback(() => dispatch({ type: "CLOSE" }), []);
+  const setCoupon  = useCallback((coupon: State["coupon"]) => dispatch({ type: "SET_COUPON", coupon }), []);
+  const saveForLater = useCallback((key: string) => dispatch({ type: "SAVE_FOR_LATER", key }), []);
+  const moveToCart   = useCallback((key: string) => dispatch({ type: "MOVE_TO_CART", key }), []);
+  const removeSaved  = useCallback((key: string) => dispatch({ type: "REMOVE_SAVED", key }), []);
+
+  const count = useMemo(() => state.items.reduce((s, i) => s + i.qty, 0), [state.items]);
+  const subtotalBdt = useMemo(() => state.items.reduce((s, i) => s + i.priceBdt * i.qty, 0), [state.items]);
+
+  const value = useMemo<CartCtx>(
+    () => ({
+      items: state.items, saved: state.saved, open: state.open,
+      hydrated: state.hydrated, coupon: state.coupon,
+      count, subtotalBdt,
+      add, inc, dec, remove, clear, openDrawer, closeDrawer,
+      setCoupon, saveForLater, moveToCart, removeSaved, itemKey,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.items, state.saved, state.open, state.hydrated, state.coupon, count, subtotalBdt],
+  );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

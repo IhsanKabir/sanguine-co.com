@@ -67,12 +67,16 @@
   window.addEventListener('mousedown', (e) => {
     down = true; cur.classList.add('down');
     if (mode === 'seal') {
-      const im = document.createElement('div');
-      im.className = 'wax-imprint';
-      im.style.left = e.clientX + 'px';
-      im.style.top = e.clientY + 'px';
-      document.body.appendChild(im);
-      setTimeout(() => im.remove(), 1500);
+      // Defer DOM mutation to next rAF so it doesn't block the pointer-down frame.
+      const sx = e.clientX, sy = e.clientY;
+      requestAnimationFrame(() => {
+        const im = document.createElement('div');
+        im.className = 'wax-imprint';
+        im.style.left = sx + 'px';
+        im.style.top = sy + 'px';
+        document.body.appendChild(im);
+        setTimeout(() => im.remove(), 1500);
+      });
     }
   });
   window.addEventListener('mouseup',   () => { down = false; cur.classList.remove('down'); });
@@ -144,6 +148,10 @@
 
     cur.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
 
+    // Hover detection every other frame (~30fps) inside the rAF loop so it
+    // doesn't compete with pointer events via a separate setInterval timer.
+    if (++hoverFrame % 2 === 0) updateHover();
+
     // HUD coords for admin
     if (mode === 'admin') {
       hudX.textContent = String(Math.round(cx)).padStart(4, '0');
@@ -212,8 +220,9 @@
   };
   requestAnimationFrame(tick);
 
-  // Update hover ~30fps for perf
-  setInterval(updateHover, 33);
+  // updateHover runs inside the rAF loop every other frame (~30fps equivalent)
+  // to avoid a competing setInterval forcing layout on a separate timer.
+  let hoverFrame = 0;
 
   // ===== Page transition curtain =====
   window.SSG_TRANSITION = function(cb) {
@@ -257,11 +266,25 @@
   mo.observe(document.body, { childList: true, subtree: true });
 
   // ===== Magnetic effect for buttons =====
+  // Cache both elements and their rects. Rects are refreshed on resize/scroll
+  // so getBoundingClientRect is never called inside the hot mousemove path.
+  let magneticCache = [];
+  const refreshMagnetic = () => {
+    magneticCache = Array.from(document.querySelectorAll('[data-magnetic]')).map((el) => ({
+      el,
+      rect: el.getBoundingClientRect(),
+    }));
+  };
+  refreshMagnetic();
+  const magObs = new MutationObserver(refreshMagnetic);
+  magObs.observe(document.body, { childList: true, subtree: true });
+  window.addEventListener('resize', refreshMagnetic, { passive: true });
+  window.addEventListener('scroll', refreshMagnetic, { passive: true });
+
   document.addEventListener('mousemove', (e) => {
-    document.querySelectorAll('[data-magnetic]').forEach(el => {
-      const r = el.getBoundingClientRect();
-      const dx = e.clientX - (r.left + r.width / 2);
-      const dy = e.clientY - (r.top + r.height / 2);
+    for (const { el, rect } of magneticCache) {
+      const dx = e.clientX - (rect.left + rect.width / 2);
+      const dy = e.clientY - (rect.top + rect.height / 2);
       const dist = Math.hypot(dx, dy);
       if (dist < 80) {
         const f = (1 - dist / 80) * 0.3;
@@ -269,23 +292,32 @@
       } else {
         el.style.transform = '';
       }
-    });
-  });
+    }
+  }, { passive: true });
 
   // ===== Card tilt on cursor proximity =====
-  document.addEventListener('mousemove', (e) => {
-    document.querySelectorAll('.card:hover, .cat-tile:hover').forEach(el => {
-      const r = el.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5;
-      const py = (e.clientY - r.top) / r.height - 0.5;
-      el.style.setProperty('--tilt-x', `${py * -3}deg`);
-      el.style.setProperty('--tilt-y', `${px * 3}deg`);
-    });
-  });
+  // Track the single currently-hovered card via mouseover/mouseout delegation
+  // instead of querySelectorAll('.card:hover') on every mousemove, which forces
+  // a style recalculation pass across the entire document.
+  let tiltCard = null;
+  document.addEventListener('mouseover', (e) => {
+    const card = e.target.closest?.('.card, .cat-tile');
+    tiltCard = card || null;
+  }, { passive: true });
   document.addEventListener('mouseout', (e) => {
-    if (e.target.classList && (e.target.classList.contains('card') || e.target.classList.contains('cat-tile'))) {
-      e.target.style.removeProperty('--tilt-x');
-      e.target.style.removeProperty('--tilt-y');
+    const card = e.target.closest?.('.card, .cat-tile');
+    if (card) {
+      card.style.removeProperty('--tilt-x');
+      card.style.removeProperty('--tilt-y');
+      if (tiltCard === card) tiltCard = null;
     }
-  });
+  }, { passive: true });
+  document.addEventListener('mousemove', (e) => {
+    if (!tiltCard) return;
+    const r = tiltCard.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    tiltCard.style.setProperty('--tilt-x', `${py * -3}deg`);
+    tiltCard.style.setProperty('--tilt-y', `${px * 3}deg`);
+  }, { passive: true });
 })();

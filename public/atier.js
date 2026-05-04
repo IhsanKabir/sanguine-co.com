@@ -127,9 +127,6 @@
     };
     tick();
   }
-  // Mount whenever a hero appears
-  const heroObs = new MutationObserver(() => mountShader());
-  heroObs.observe(document.body, { childList: true, subtree: true });
   setTimeout(mountShader, 400);
 
   // ============ 2. SOUND DESIGN ============
@@ -384,10 +381,6 @@
       if ((p.textContent || '').trim().toLowerCase() === 'processing') p.classList.add('pulsing');
     });
   }
-  const adminMo = new MutationObserver(() => {
-    if (document.querySelector('.admin-body')) liveAdmin();
-  });
-  adminMo.observe(document.body, { childList: true, subtree: true });
   setTimeout(liveAdmin, 500);
 
   // ============ 6. KINETIC TYPOGRAPHY — hero subline ============
@@ -400,8 +393,6 @@
     requestAnimationFrame(() => p.querySelectorAll('.kw').forEach(s => s.classList.add('in')));
   }
   setTimeout(kineticSubline, 200);
-  const kMo = new MutationObserver(() => kineticSubline());
-  kMo.observe(document.body, { childList: true, subtree: true });
 
   // ============ 7. SHARED-ELEMENT FLIGHT (DISABLED 2026-05-03) ============
   // The FLIP card flight overlapped with `<RouteTransition>`'s fade — both
@@ -435,8 +426,6 @@
     });
   }
   setTimeout(pinShowcase, 600);
-  const pinMo = new MutationObserver(() => pinShowcase());
-  pinMo.observe(document.body, { childList: true, subtree: true });
 
   // ============ 9. MOBILE MOTION ============
   if (isTouch) {
@@ -638,13 +627,26 @@
     }
     requestAnimationFrame(draw);
 
-    // Stop loop when frame is removed from DOM
-    new MutationObserver(() => {
-      if (!document.body.contains(frame)) alive = false;
-    }).observe(document.body, { childList: true, subtree: true });
+    // Alive check happens in the draw loop (document.body.contains check already present).
   }
 
-  const orreryObs = new MutationObserver(mountOrrery);
-  orreryObs.observe(document.body, { childList: true, subtree: true });
   setTimeout(mountOrrery, 300);
+
+  // Single consolidated MutationObserver for all mount-on-route-change work.
+  // One rAF-debounced callback instead of five independent body-subtree observers
+  // firing synchronously on every React DOM commit.
+  let atierRafPending = false;
+  const sharedObs = new MutationObserver(() => {
+    if (atierRafPending) return;
+    atierRafPending = true;
+    requestAnimationFrame(() => {
+      atierRafPending = false;
+      mountShader();
+      kineticSubline();
+      pinShowcase();
+      mountOrrery();
+      if (document.querySelector('.admin-body')) liveAdmin();
+    });
+  });
+  sharedObs.observe(document.body, { childList: true, subtree: true });
 })();

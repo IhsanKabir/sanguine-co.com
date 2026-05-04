@@ -195,8 +195,14 @@
     });
   };
   setTimeout(maskReveal, 300);
-  // Re-run on route changes
-  const mo = new MutationObserver(() => maskReveal());
+  // Re-run on route changes — debounce to one rAF to avoid firing synchronously
+  // on every React DOM commit (which would call querySelectorAll + innerHTML on each).
+  let maskPending = false;
+  const mo = new MutationObserver(() => {
+    if (maskPending) return;
+    maskPending = true;
+    requestAnimationFrame(() => { maskReveal(); maskPending = false; });
+  });
   mo.observe(document.body, { childList: true, subtree: true });
 
   // ===== 5. FLYING ADD-TO-BAG =====

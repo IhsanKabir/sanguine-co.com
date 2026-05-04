@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from "react";
 
 const KEY = "ssg-wish-v1";
 
@@ -41,7 +41,11 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
   const has = useCallback((id: string) => items.has(id), [items]);
 
-  return <C.Provider value={{ items, toggle, has, hydrated }}>{children}</C.Provider>;
+  const ctxValue = useMemo(
+    () => ({ items, toggle, has, hydrated }),
+    [items, toggle, has, hydrated],
+  );
+  return <C.Provider value={ctxValue}>{children}</C.Provider>;
 }
 
 export function useWishlist() {

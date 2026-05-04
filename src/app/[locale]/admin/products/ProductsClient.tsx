@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useRef, useEffect } from "react";
+import { useState, useTransition, useRef, useEffect, useMemo } from "react";
 import { createProduct, updateProduct, deleteProduct } from "@/lib/actions/admin";
 import type { Segment, Product } from "@/lib/schema";
 import Composition from "@/components/storefront/Composition";
@@ -33,17 +33,24 @@ function LookPicker({
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const selectedProducts = selected
-    .map((id) => products.find((p) => p.id === id))
-    .filter((p): p is Product => !!p);
+  const selectedSet = useMemo(() => new Set(selected), [selected]);
 
-  const options = products.filter(
-    (p) =>
-      p.id !== currentProductId &&
-      !selected.includes(p.id) &&
-      (q === "" ||
-        p.name.toLowerCase().includes(q.toLowerCase()) ||
-        p.sku.toLowerCase().includes(q.toLowerCase())),
+  const selectedProducts = useMemo(
+    () => selected.map((id) => products.find((p) => p.id === id)).filter((p): p is Product => !!p),
+    [selected, products],
+  );
+
+  const options = useMemo(
+    () =>
+      products.filter(
+        (p) =>
+          p.id !== currentProductId &&
+          !selectedSet.has(p.id) &&
+          (q === "" ||
+            p.name.toLowerCase().includes(q.toLowerCase()) ||
+            p.sku.toLowerCase().includes(q.toLowerCase())),
+      ),
+    [products, currentProductId, selectedSet, q],
   );
 
   return (
@@ -154,9 +161,14 @@ export default function ProductsClient({ segments, products }: Props) {
   const [filter, setFilter] = useState("all");
   const [, startTransition] = useTransition();
 
-  const list = products.filter((p) =>
-    (filter === "all" || p.segmentId === filter) &&
-    p.name.toLowerCase().includes(search.toLowerCase()),
+  const list = useMemo(
+    () =>
+      products.filter(
+        (p) =>
+          (filter === "all" || p.segmentId === filter) &&
+          p.name.toLowerCase().includes(search.toLowerCase()),
+      ),
+    [products, filter, search],
   );
 
   const onSave = () => {
