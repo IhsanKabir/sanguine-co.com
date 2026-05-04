@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { createProduct, updateProduct, deleteProduct } from "@/lib/actions/admin";
 import type { Segment, Product } from "@/lib/schema";
 import Composition from "@/components/storefront/Composition";
@@ -9,6 +9,112 @@ import { formatBdt } from "@/lib/utils";
 import ProductImagesEditor from "./ProductImagesEditor";
 
 type Props = { segments: Segment[]; products: Product[] };
+
+function LookPicker({
+  selected,
+  products,
+  currentProductId,
+  onChange,
+}: {
+  selected: string[];
+  products: Product[];
+  currentProductId?: string;
+  onChange: (ids: string[]) => void;
+}) {
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const selectedProducts = selected
+    .map((id) => products.find((p) => p.id === id))
+    .filter((p): p is Product => !!p);
+
+  const options = products.filter(
+    (p) =>
+      p.id !== currentProductId &&
+      !selected.includes(p.id) &&
+      (q === "" ||
+        p.name.toLowerCase().includes(q.toLowerCase()) ||
+        p.sku.toLowerCase().includes(q.toLowerCase())),
+  );
+
+  return (
+    <div ref={wrapRef}>
+      {selectedProducts.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
+          {selectedProducts.map((p) => (
+            <span
+              key={p.id}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 5,
+                padding: "3px 8px", background: "var(--purple-50)",
+                border: "1px solid var(--line)", fontSize: 12, borderRadius: 2,
+              }}
+            >
+              <span style={{ fontWeight: 500 }}>{p.name}</span>
+              <span style={{ color: "var(--ink-soft)", fontSize: 10 }}>{p.sku}</span>
+              <button
+                type="button"
+                onClick={() => onChange(selected.filter((id) => id !== p.id))}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--ink-soft)", padding: "0 0 0 2px", lineHeight: 1, fontSize: 14 }}
+                aria-label={`Remove ${p.name}`}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      <div style={{ position: "relative" }}>
+        <input
+          value={q}
+          onChange={(e) => { setQ(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          placeholder="Search products to add…"
+          style={{ width: "100%", padding: "7px 10px", border: "1px solid var(--line)", fontSize: 13, boxSizing: "border-box" }}
+        />
+        {open && (q || options.length > 0) && (
+          <div style={{
+            position: "absolute", top: "100%", left: 0, right: 0, zIndex: 200,
+            border: "1px solid var(--line)", borderTop: "none",
+            background: "white", maxHeight: 200, overflowY: "auto",
+            boxShadow: "0 4px 12px rgba(0,0,0,.08)",
+          }}>
+            {options.length === 0 ? (
+              <div style={{ padding: "8px 12px", fontSize: 12, color: "var(--ink-soft)" }}>No matches</div>
+            ) : (
+              options.slice(0, 10).map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onMouseDown={(e) => { e.preventDefault(); onChange([...selected, p.id]); setQ(""); setOpen(false); }}
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    width: "100%", padding: "8px 12px", background: "none", border: "none",
+                    cursor: "pointer", fontSize: 13, textAlign: "left", gap: 12,
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#f9f4ec")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+                >
+                  <span style={{ fontWeight: 500 }}>{p.name}</span>
+                  <span style={{ color: "var(--ink-soft)", fontSize: 11, flexShrink: 0 }}>{p.sku}</span>
+                </button>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 type Editing = {
   id?: string;
@@ -29,7 +135,7 @@ type Editing = {
   estimatedDelivery: string;
   preorderPriceBdt: string;
   modelNote: string;
-  lookProductIds: string;
+  lookProductIds: string[];
 };
 
 const empty = (segId: string): Editing => ({
@@ -38,7 +144,7 @@ const empty = (segId: string): Editing => ({
   description: "", descriptionBn: "", colors: "", sizes: "",
   preorderEnabled: false, preorderOnly: false,
   estimatedDelivery: "", preorderPriceBdt: "",
-  modelNote: "", lookProductIds: "",
+  modelNote: "", lookProductIds: [],
 });
 
 export default function ProductsClient({ segments, products }: Props) {
@@ -74,7 +180,7 @@ export default function ProductsClient({ segments, products }: Props) {
       estimatedDelivery: editing.estimatedDelivery || null,
       preorderPriceBdt: editing.preorderPriceBdt ? parseInt(editing.preorderPriceBdt) : null,
       modelNote: editing.modelNote.trim() || null,
-      lookProductIds: editing.lookProductIds.split(",").map((s) => s.trim()).filter(Boolean),
+      lookProductIds: editing.lookProductIds,
     };
     startTransition(async () => {
       if (editing.id) await updateProduct(editing.id, payload);
@@ -145,7 +251,7 @@ export default function ProductsClient({ segments, products }: Props) {
                       estimatedDelivery: p.estimatedDelivery || "",
                       preorderPriceBdt: p.preorderPriceBdt ? String(p.preorderPriceBdt) : "",
                       modelNote: p.modelNote ?? "",
-                      lookProductIds: (p.lookProductIds as string[] ?? []).join(", "),
+                      lookProductIds: (p.lookProductIds as string[] | null) ?? [],
                     })}><Icon name="feather" size={14}/></button>
                     <button className="icon-btn" onClick={() => setPendingDel(p)}><Icon name="x" size={14}/></button>
                   </td>
@@ -210,11 +316,12 @@ export default function ProductsClient({ segments, products }: Props) {
               />
             </div>
             <div className="field" style={{ marginTop: 8 }}>
-              <label>Complete the look — product IDs (comma-separated)</label>
-              <input
-                value={editing.lookProductIds}
-                onChange={(e) => setEditing({ ...editing, lookProductIds: e.target.value })}
-                placeholder="prod_abc123, prod_def456"
+              <label>Complete the look</label>
+              <LookPicker
+                selected={editing.lookProductIds}
+                products={products}
+                currentProductId={editing.id}
+                onChange={(ids) => setEditing({ ...editing, lookProductIds: ids })}
               />
             </div>
 
