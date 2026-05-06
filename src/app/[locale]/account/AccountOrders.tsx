@@ -107,13 +107,21 @@ export default function AccountOrders({ orders, locale }: Props) {
                   {formatBdt(o.totalBdt, locale)}
                 </td>
                 <td>
-                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                     <Link
-                      href={`/order/${o.number}`}
+                      href={`/order/${o.number}/track`}
                       style={{ fontSize: 12, color: "var(--purple-800)", borderBottom: "1px solid var(--gold)", paddingBottom: 1 }}
                     >
-                      View
+                      Track
                     </Link>
+                    <a
+                      href={`/api/invoice/${o.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ fontSize: 11, color: "var(--ink-soft)", borderBottom: "1px solid var(--line)", paddingBottom: 1, cursor: "pointer" }}
+                    >
+                      Invoice
+                    </a>
                     {canReturn(o) && (
                       <button
                         type="button"

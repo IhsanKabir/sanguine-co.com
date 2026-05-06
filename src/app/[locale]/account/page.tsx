@@ -6,13 +6,34 @@ import { eq, desc, or, count } from "drizzle-orm";
 import { formatBdt } from "@/lib/utils";
 import { signOut } from "@/lib/actions/auth";
 import { listMyAddresses } from "@/lib/actions/addresses";
+import { ensureReferralCode } from "@/lib/actions/profile";
 import AddressBook from "./AddressBook";
 import ProfileEditor from "./ProfileEditor";
 import AccountOrders from "./AccountOrders";
+import LoyaltyCard from "./LoyaltyCard";
+import StylePreferences from "./StylePreferences";
+import NotificationPrefs from "./NotificationPrefs";
+import ReferralCard from "./ReferralCard";
+import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
 
 export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ locale: string }> };
+
+// ─── Loyalty tiers (mirrored from LoyaltyCard for header badge) ──────────────
+const TIER_NAMES = [
+  { min: 0,       name: "Maison Initié",     color: "var(--purple-400)" },
+  { min: 10_000,  name: "Atelier Guest",      color: "var(--mauve)" },
+  { min: 50_000,  name: "Patron de Maison",   color: "var(--gold)" },
+  { min: 150_000, name: "Grand Élite",         color: "oklch(0.78 0.15 78)" },
+];
+
+function getTierName(spend: number) {
+  for (let i = TIER_NAMES.length - 1; i >= 0; i--) {
+    if (spend >= TIER_NAMES[i].min) return TIER_NAMES[i];
+  }
+  return TIER_NAMES[0];
+}
 
 function monogram(name: string | null | undefined, email: string): string {
   if (name?.trim()) {
@@ -59,6 +80,10 @@ export default async function AccountPage({ params }: Props) {
     ? new Date(user.created_at).getFullYear()
     : new Date().getFullYear();
   const displayName = profile?.fullName || user.email || "Guest";
+  const tier = getTierName(lifetimeSpend);
+
+  // Ensure referral code exists (generates + saves on first visit)
+  const referralCode = await ensureReferralCode().catch(() => null);
 
   return (
     <div style={{ maxWidth: 980, margin: "0 auto", padding: "48px 32px 80px" }}>
@@ -70,7 +95,6 @@ export default async function AccountPage({ params }: Props) {
         background: "var(--purple-950)", borderRadius: 2, marginBottom: 2,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          {/* Monogram avatar */}
           <div style={{
             width: 64, height: 64, borderRadius: "50%", flexShrink: 0,
             background: "linear-gradient(135deg, var(--mauve), var(--purple-800))",
@@ -91,11 +115,11 @@ export default async function AccountPage({ params }: Props) {
             )}
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
               <span style={{
-                background: "oklch(0.62 0.12 300 / 0.2)", border: "1px solid var(--mauve)",
-                color: "var(--mauve)", fontSize: 9, fontFamily: "var(--mono)",
+                background: "oklch(0.62 0.12 300 / 0.2)", border: `1px solid ${tier.color}`,
+                color: tier.color, fontSize: 9, fontFamily: "var(--mono)",
                 letterSpacing: ".2em", textTransform: "uppercase", padding: "3px 10px", borderRadius: 2,
               }}>
-                Maison Member
+                {tier.name}
               </span>
               <span style={{ fontSize: 11, color: "var(--purple-400)", fontFamily: "var(--mono)" }}>
                 since {memberYear}
@@ -126,12 +150,13 @@ export default async function AccountPage({ params }: Props) {
 
       {/* ─── Stats strip ────────────────────────────────────────────────── */}
       <div style={{
-        display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
+        display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr",
         gap: 2, marginBottom: 48, background: "var(--line)",
       }}>
         {[
-          { k: "Orders placed", v: String(orders.length) },
+          { k: "Orders placed",   v: String(orders.length) },
           { k: "Lifetime spend",  v: lifetimeSpend > 0 ? formatBdt(lifetimeSpend, loc) : "—" },
+          { k: "Loyalty tier",    v: tier.name },
           { k: "Wishlist",        v: wishlistCount > 0 ? `${wishlistCount} piece${wishlistCount !== 1 ? "s" : ""}` : "Empty" },
         ].map(({ k, v }) => (
           <div key={k} style={{ background: "var(--cream)", padding: "22px 28px" }}>
@@ -139,7 +164,7 @@ export default async function AccountPage({ params }: Props) {
               fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase",
               color: "var(--ink-soft)", marginBottom: 6, fontFamily: "var(--mono)",
             }}>{k}</div>
-            <div style={{ fontFamily: "var(--serif)", fontSize: 24, color: "var(--purple-900)", fontWeight: 500 }}>
+            <div style={{ fontFamily: "var(--serif)", fontSize: 20, color: "var(--purple-900)", fontWeight: 500 }}>
               {v}
             </div>
           </div>
@@ -186,12 +211,37 @@ export default async function AccountPage({ params }: Props) {
         />
       </section>
 
+      {/* ─── Loyalty ─────────────────────────────────────────────────────── */}
+      <LoyaltyCard lifetimeSpend={lifetimeSpend} locale={loc} />
+
       {/* ─── Profile editor ─────────────────────────────────────────────── */}
       <ProfileEditor
         initialName={profile?.fullName ?? ""}
         initialPhone={profile?.phone ?? ""}
         initialMarketing={profile?.acceptsMarketing ?? false}
+        initialBirthday={profile?.birthday ?? ""}
+        initialAnniversary={profile?.anniversary ?? ""}
       />
+
+      {/* ─── Style preferences ──────────────────────────────────────────── */}
+      <StylePreferences
+        initial={{
+          perfumeFamily: profile?.perfumeFamily ?? null,
+          bookGenre: profile?.bookGenre ?? null,
+          flowerPreference: profile?.flowerPreference ?? null,
+        }}
+      />
+
+      {/* ─── Notification preferences ───────────────────────────────────── */}
+      <NotificationPrefs
+        initialEmail={profile?.notifyEmail ?? true}
+        initialSms={profile?.notifySms ?? false}
+      />
+
+      {/* ─── Referral ───────────────────────────────────────────────────── */}
+      {referralCode && (
+        <ReferralCard code={referralCode} locale={loc} />
+      )}
 
       {/* ─── Address book ───────────────────────────────────────────────── */}
       <AddressBook
@@ -199,6 +249,20 @@ export default async function AccountPage({ params }: Props) {
         profileName={profile?.fullName ?? ""}
         profilePhone={profile?.phone ?? ""}
       />
+
+      {/* ─── Recently viewed ────────────────────────────────────────────── */}
+      <div style={{ marginTop: 56, paddingTop: 40, borderTop: "1px solid var(--line)" }}>
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 10, letterSpacing: ".18em", color: "var(--gold-text)", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 4 }}>
+            Your browsing
+          </div>
+          <h2 className="serif" style={{ fontSize: 28, color: "var(--purple-900)", fontWeight: 500, margin: 0 }}>
+            Recently Viewed
+          </h2>
+        </div>
+        <RecentlyViewedStrip />
+      </div>
+
     </div>
   );
 }

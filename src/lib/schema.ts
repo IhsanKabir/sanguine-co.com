@@ -67,6 +67,14 @@ export const customerProfiles = pgTable("customer_profiles", {
   phone: text("phone"),                         // +8801XXXXXXXXX
   acceptsMarketing: boolean("accepts_marketing").default(false).notNull(),
   preferredLocale: text("preferred_locale").default("en"),
+  birthday: text("birthday"),                   // 'YYYY-MM-DD'
+  anniversary: text("anniversary"),             // 'YYYY-MM-DD'
+  perfumeFamily: text("perfume_family"),
+  bookGenre: text("book_genre"),
+  flowerPreference: text("flower_preference"),
+  notifyEmail: boolean("notify_email").default(true).notNull(),
+  notifySms: boolean("notify_sms").default(false).notNull(),
+  referralCode: text("referral_code"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
