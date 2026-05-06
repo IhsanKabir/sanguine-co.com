@@ -348,17 +348,18 @@
 }
 .hero-still .hs-frame::after { display: none; }
 .hero-still .hs-numeral {
-  position: absolute; left: 50%; top: 38%;
-  transform: translate(-50%, -50%);
+  position: absolute; left: 50%; bottom: 22px;
+  transform: translateX(-50%);
   font-family: var(--serif);
   font-style: italic;
-  font-size: clamp(80px, 14vw, 200px);
+  font-size: clamp(18px, 3vw, 36px);
   font-weight: 400;
   color: transparent;
-  -webkit-text-stroke: 1px oklch(0.85 0.13 85 / 0.38);
-  letter-spacing: -0.03em;
-  z-index: 1;
+  -webkit-text-stroke: 1px oklch(0.85 0.13 85 / 0.55);
+  letter-spacing: 0.06em;
+  z-index: 3;
   text-shadow: none;
+  white-space: nowrap;
 }
 .hero-still .hs-ring {
   position: absolute; left: 50%; top: 38%;
