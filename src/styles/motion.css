@@ -59,11 +59,7 @@
   width: 28px; height: 28px;
   border: 1px solid color-mix(in oklch, var(--purple-900) 70%, transparent);
   border-radius: 50%;
-  backdrop-filter: blur(1.5px);
-  -webkit-backdrop-filter: blur(1.5px);
-  box-shadow:
-    0 0 18px color-mix(in oklch, var(--purple-200) 30%, transparent),
-    inset 0 0 6px color-mix(in oklch, var(--purple-100) 25%, transparent);
+  box-shadow: 0 0 12px color-mix(in oklch, var(--purple-200) 25%, transparent);
 }
 .cur-ring::after {
   content: "";

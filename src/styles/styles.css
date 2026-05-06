@@ -338,3 +338,81 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .tweaks .t-swatches{display:flex;gap:6px}
 .tweaks .t-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent}
 .tweaks .t-swatch.active{border-color:var(--gold)}
+
+/* ─── Responsive / Mobile ────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* Hero */
+  .hero-inner{grid-template-columns:1fr;gap:32px;padding:56px 24px 40px}
+  .hero h1{font-size:clamp(40px,9vw,72px)}
+  .hero p{font-size:15px}
+  .hero-still{max-width:420px;margin:0 auto}
+
+  /* Product grids */
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .grid-3{grid-template-columns:repeat(2,1fr)}
+  .cat-grid{grid-template-columns:repeat(2,1fr)}
+
+  /* PDP */
+  .pdp{grid-template-columns:1fr;gap:28px;padding:20px 24px}
+  .pdp-gallery{grid-template-columns:1fr}
+  .pdp-thumbs{flex-direction:row;flex-wrap:wrap}
+  .pdp-info h1{font-size:32px}
+  .pdp-feats{grid-template-columns:1fr}
+
+  /* Section chrome */
+  .section{padding:48px 24px}
+  .section-hd h2{font-size:30px}
+
+  /* Footer */
+  .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
+
+  /* Drawer full-width */
+  .drawer{width:100%;max-width:100%}
+
+  /* Seg-modal (quick view) */
+  .seg-modal{width:calc(100vw - 24px) !important}
+}
+
+@media (max-width: 640px) {
+  /* Hero */
+  .hero-inner{padding:40px 16px 32px}
+  .hero h1{font-size:clamp(32px,8vw,48px);margin-bottom:16px}
+  .hero-kicker{margin-bottom:16px}
+  .hero p{font-size:14px;margin-bottom:24px}
+
+  /* Grids */
+  .grid-4,.grid-3{grid-template-columns:repeat(2,1fr);gap:12px}
+  .grid-2{grid-template-columns:1fr}
+  .cat-grid{grid-template-columns:1fr 1fr;gap:10px}
+
+  /* Sections */
+  .section{padding:32px 16px}
+  .section-hd{flex-direction:column;align-items:start;gap:8px}
+  .section-hd h2{font-size:26px}
+
+  /* PDP */
+  .pdp{padding:16px}
+  .pdp-price .now{font-size:28px}
+  .pdp-actions{grid-template-columns:1fr}
+  .crumbs{padding:12px 16px 0}
+
+  /* Footer */
+  .footer-grid{grid-template-columns:1fr;gap:20px}
+  .footer{padding:40px 16px 24px}
+  .footer-bottom{flex-direction:column;gap:8px;text-align:center}
+
+  /* Forms */
+  .row{grid-template-columns:1fr}
+  .panel{padding:16px}
+
+  /* Checkout steps */
+  .step-bar{overflow-x:auto}
+  .step{min-width:80px;font-size:10px;padding:12px 0}
+  .step .num{font-size:15px}
+
+  /* Cart drawer */
+  .cart-line{grid-template-columns:72px 1fr auto;gap:10px}
+
+  /* Product card */
+  .prod-name{font-size:16px}
+}

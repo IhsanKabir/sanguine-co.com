@@ -138,8 +138,9 @@
     const dt = Math.min((t - lastT) / 16, 3) || 1;
     lastT = t;
 
-    // lerp cursor toward mouse
-    const ease = mode === 'admin' ? 1 : 0.22;
+    // lerp cursor toward mouse — multiply by dt so it's frame-rate independent
+    // (without dt a 144 Hz screen gets ~0.09 effective ease vs 0.22 at 60 Hz)
+    const ease = Math.min((mode === 'admin' ? 1 : 0.28) * dt, 1);
     cx += (mx - cx) * ease;
     cy += (my - cy) * ease;
     vx = cx - lastX; vy = cy - lastY;
