@@ -1,5 +1,29 @@
 /* ─── Saanguine — extras (floating chat, cookie banner, legal, tracking, coupons) ─── */
 
+/* ─── Product card hover overlay ────────────────────────────────────────── */
+.qv-overlay{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--purple-950);color:var(--gold);
+  font-family:var(--sans);font-size:11px;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:14px;text-align:center;border:none;width:100%;
+  opacity:0;transition:opacity .2s ease;
+  z-index:3;cursor:pointer;
+}
+.card-cover:hover .qv-overlay{opacity:1}
+
+/* ─── Single-row nav responsive ─────────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* Hide category links; they reappear via the departments section anchor. */
+  .nav-cats { display: none; }
+  .nav-inner { padding: 12px 20px; gap: 12px; }
+  .nav-brand { font-size: 26px; }
+}
+@media (max-width: 640px) {
+  .nav-brand { font-size: 22px; }
+  .nav-right { gap: 4px; }
+}
+
 /* Coupon input + applied badge */
 .coupon-input {
   display: flex;

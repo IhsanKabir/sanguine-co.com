@@ -159,8 +159,8 @@ export default async function Home({ params }: Props) {
                   {t("home.ctaPrimary")} <Icon name="arrow" size={14} />
                 </Link>
               )}
-              {segs.find((c) => c.id === "perfume") && (
-                <Link href="/shop/perfume" className="btn btn-ghost" data-magnetic style={{ borderColor: "var(--gold)", color: "var(--gold)" }}>
+              {segs.length > 0 && (
+                <Link href="#departments" className="btn btn-ghost" data-magnetic style={{ borderColor: "var(--gold)", color: "var(--gold)" }}>
                   {t("home.ctaSecondary")}
                 </Link>
               )}
@@ -180,35 +180,21 @@ export default async function Home({ params }: Props) {
         </div>
       </section>
 
-      {/* ─── Marquee ──────────────────────────────────────────────── */}
+      {/* ─── Marquee — concise trust points ──────────────────────── */}
       <div className="marquee" data-cursor="default">
         <div className="marquee-track">
-          <span>Hand-finished</span><span>Wax-sealed</span><span>Cash on Delivery</span>
-          <span>White-glove courier</span><span>30-day returns</span><span>Atelier-made</span>
-          <span>Hand-finished</span><span>Wax-sealed</span><span>Cash on Delivery</span>
-          <span>White-glove courier</span><span>30-day returns</span><span>Atelier-made</span>
+          <span>Atelier-made</span><span>Cash on Delivery</span>
+          <span>Gift packaging</span><span>Free delivery over ৳3,000</span>
+          <span>30-day returns</span><span>House-certified</span>
+          <span>Atelier-made</span><span>Cash on Delivery</span>
+          <span>Gift packaging</span><span>Free delivery over ৳3,000</span>
+          <span>30-day returns</span><span>House-certified</span>
         </div>
       </div>
 
-      {/* ─── Press strip ──────────────────────────────────────────── */}
-      <section className="press" aria-label="Press">
-        <div className="press-inner">
-          <span className="press-kicker">As discussed in</span>
-          {/* Press marks are aspirational placeholders. Rendered as <span>,
-            * not <a> with no href — Google's quality rater guidelines flag
-            * anchor-without-destination as "implied false authority". Swap
-            * to real publications + real URLs once we have citations. */}
-          {PRESS_MARKS.map((m) => (
-            <span key={m.name} className="press-mark">{m.name}<sup aria-hidden="true">{m.sup}</sup></span>
-          ))}
-        </div>
-      </section>
-
-      <Ornament variant="tide-line" />
-
       {/* ─── Departments / Wander the House ──────────────────────── */}
       {segs.length > 0 && (
-        <section className="section" data-cursor="magnify">
+        <section id="departments" className="section" data-cursor="magnify">
           <div className="section-hd" data-reveal>
             <div>
               <div className="kicker">{t("home.departments")}</div>
@@ -260,6 +246,80 @@ export default async function Home({ params }: Props) {
                 </div>
               );
             })}
+          </div>
+        </section>
+      )}
+
+      {/* ─── Bento · A small cabinet of curiosities ─────────────── */}
+      {bento.length > 0 && (
+        <section className="section" data-cursor="crosshair">
+          <div className="section-hd" data-reveal>
+            <div>
+              <div className="kicker">{t("home.atelier")}</div>
+              <h2>{t("home.cabinet")}</h2>
+              <div className="ornament-rule" />
+            </div>
+          </div>
+          <div className="bento" data-reveal>
+            {bento.map((p, i) => {
+              const cls = ["b-1", "b-2", "b-3", "b-4", "b-3", "b-5"][i] || "b-3";
+              const seg = segs.find((s) => s.id === p.segmentId);
+              return (
+                <Link
+                  key={p.id}
+                  href={`/product/${p.slug}`}
+                  className={cls}
+                  data-cursor={CAT_CURSOR[p.segmentId || ""] || "magnify"}
+                >
+                  <Composition cat={p.segmentId || "clothing"} sku={p.sku} name={p.name} tag={p.tag} />
+                  <div className="b-overlay">
+                    <div className="b-kicker">{seg?.tag}</div>
+                    <h3 className="b-name">{p.name}</h3>
+                    <div className="b-price">৳{p.priceBdt.toLocaleString("en-IN")}</div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      <Ornament variant="spiral" size={64} />
+
+      {/* ─── Editor's Selection · House Favourites ──────────────── */}
+      {eds.length > 0 && (
+        <section className="section" data-cursor="crosshair">
+          <div className="section-hd" data-reveal>
+            <div>
+              <div className="kicker">{t("home.editors")}</div>
+              <h2>{t("home.favourites")}</h2>
+              <div className="ornament-rule" />
+            </div>
+          </div>
+          <div className="grid grid-3">
+            {eds.slice(0, 6).map((p, i) => {
+              const seg = segs.find((s) => s.id === p.segmentId);
+              return (
+                <div key={p.id} data-reveal data-reveal-delay={(i % 3) + 1}>
+                  <ProductCard product={p} segmentTag={seg?.tag} heroImage={heroImages.get(p.id) ?? null} />
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ─── Wunderkammer · scrolling curiosity strip ───────────── */}
+      {segs.length > 0 && (
+        <section className="wunderkammer" aria-label="Curiosities by category" data-cursor="magnify">
+          <div className="wunderkammer-track">
+            {wkCats.map((c, i) => (
+              <Link key={c.id + i} href={`/shop/${c.id}`} className="wunderkammer-card">
+                <Composition cat={c.id} sku={c.id} name={c.name} />
+                <span className="wk-tag">{c.tag}</span>
+                <div className="wk-name">{c.name}</div>
+              </Link>
+            ))}
           </div>
         </section>
       )}
@@ -323,56 +383,21 @@ export default async function Home({ params }: Props) {
         </div>
       </section>
 
-      <Ornament variant="spiral" size={64} />
+      {/* ─── Press strip — aspirational citations ────────────────── */}
+      <section className="press" aria-label="Press">
+        <div className="press-inner">
+          <span className="press-kicker">As discussed in</span>
+          {/* Press marks are aspirational placeholders. Rendered as <span>,
+            * not <a> with no href — Google's quality rater guidelines flag
+            * anchor-without-destination as "implied false authority". Swap
+            * to real publications + real URLs once we have citations. */}
+          {PRESS_MARKS.map((m) => (
+            <span key={m.name} className="press-mark">{m.name}<sup aria-hidden="true">{m.sup}</sup></span>
+          ))}
+        </div>
+      </section>
 
-      {/* ─── Bento · A small cabinet of curiosities ─────────────── */}
-      {bento.length > 0 && (
-        <section className="section" data-cursor="crosshair">
-          <div className="section-hd" data-reveal>
-            <div>
-              <div className="kicker">{t("home.atelier")}</div>
-              <h2>{t("home.cabinet")}</h2>
-              <div className="ornament-rule" />
-            </div>
-          </div>
-          <div className="bento" data-reveal>
-            {bento.map((p, i) => {
-              const cls = ["b-1", "b-2", "b-3", "b-4", "b-3", "b-5"][i] || "b-3";
-              const seg = segs.find((s) => s.id === p.segmentId);
-              return (
-                <Link
-                  key={p.id}
-                  href={`/product/${p.slug}`}
-                  className={cls}
-                  data-cursor={CAT_CURSOR[p.segmentId || ""] || "magnify"}
-                >
-                  <Composition cat={p.segmentId || "clothing"} sku={p.sku} name={p.name} tag={p.tag} />
-                  <div className="b-overlay">
-                    <div className="b-kicker">{seg?.tag}</div>
-                    <h3 className="b-name">{p.name}</h3>
-                    <div className="b-price">৳{p.priceBdt.toLocaleString("en-IN")}</div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* ─── Wunderkammer · scrolling curiosity strip ───────────── */}
-      {segs.length > 0 && (
-        <section className="wunderkammer" aria-label="Curiosities by category" data-cursor="magnify">
-          <div className="wunderkammer-track">
-            {wkCats.map((c, i) => (
-              <Link key={c.id + i} href={`/shop/${c.id}`} className="wunderkammer-card">
-                <Composition cat={c.id} sku={c.id} name={c.name} />
-                <span className="wk-tag">{c.tag}</span>
-                <div className="wk-name">{c.name}</div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+      <Ornament variant="tide-line" />
 
       {/* ─── Our Promise · dark slab with 4 features ────────────── */}
       <section data-cursor="seal" data-reveal style={{ background: "var(--purple-950)", color: "var(--cream)", padding: "80px 32px", margin: "0" }}>
@@ -404,29 +429,6 @@ export default async function Home({ params }: Props) {
       </section>
 
       <Ornament variant="frond" size={72} />
-
-      {/* ─── Editor's Selection · House Favourites ──────────────── */}
-      {eds.length > 0 && (
-        <section className="section" data-cursor="crosshair">
-          <div className="section-hd" data-reveal>
-            <div>
-              <div className="kicker">{t("home.editors")}</div>
-              <h2>{t("home.favourites")}</h2>
-              <div className="ornament-rule" />
-            </div>
-          </div>
-          <div className="grid grid-3">
-            {eds.slice(0, 6).map((p, i) => {
-              const seg = segs.find((s) => s.id === p.segmentId);
-              return (
-                <div key={p.id} data-reveal data-reveal-delay={(i % 3) + 1}>
-                  <ProductCard product={p} segmentTag={seg?.tag} heroImage={heroImages.get(p.id) ?? null} />
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
 
       {/* ─── Recently viewed (client-rendered, hidden if list is empty) ─ */}
       <RecentlyViewedStrip />

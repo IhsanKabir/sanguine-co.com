@@ -338,18 +338,18 @@
 .marquee {
   background: var(--purple-950);
   color: var(--gold);
-  padding: 18px 0;
+  padding: 10px 0;
   overflow: hidden;
-  border-top: 1px solid oklch(0.4 0.18 300);
-  border-bottom: 1px solid oklch(0.4 0.18 300);
+  border-top: 1px solid oklch(0.4 0.06 220 / 0.5);
+  border-bottom: 1px solid oklch(0.4 0.06 220 / 0.5);
 }
 .marquee-track {
-  display: flex; gap: 64px;
-  animation: marquee 32s linear infinite;
+  display: flex; gap: 48px;
+  animation: marquee 36s linear infinite;
   white-space: nowrap;
   font-family: "Cormorant Garamond", serif;
   font-style: italic;
-  font-size: 28px;
+  font-size: 16px;
   font-weight: 400;
   width: max-content;
 }

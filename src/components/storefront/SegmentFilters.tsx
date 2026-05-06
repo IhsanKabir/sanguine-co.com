@@ -74,7 +74,7 @@ export default function SegmentFilters(props: Props) {
     minActive || maxActive || tagActive || colorList.length > 0 || sizeList.length > 0 || (sortActive && sortActive !== "featured");
 
   return (
-    <div style={{ marginBottom: 24, padding: 14, background: "#fcfaf6", border: "1px solid var(--line)" }}>
+    <div style={{ marginBottom: 24, padding: 14, background: "#fcfaf6", border: "1px solid var(--line)", position: "sticky", top: 72, zIndex: 20 }}>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
         {/* Sort */}
         <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>

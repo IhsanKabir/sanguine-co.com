@@ -3,6 +3,16 @@
 import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { COPY_CACHE_TAG } from "@/lib/copy";
+
+// Bust the ISR cache for every locale-prefixed route.
+// revalidatePath("/", "layout") alone does not reach /en or /bn because
+// localePrefix:"always" in next-intl means the root "/" path never serves
+// storefront content — all pages live under /{locale}/...
+function revalidateAllLocales() {
+  for (const locale of ["en", "bn"]) {
+    revalidatePath(`/${locale}`, "layout");
+  }
+}
 import { db, schema } from "@/lib/db";
 import { parseShippingAddress } from "@/lib/schema";
 import { eq, desc, sql, inArray } from "drizzle-orm";
@@ -47,7 +57,7 @@ export async function createSegment(input: z.infer<typeof segSchema>) {
     stockEnabled: data.stockEnabled ?? true,
     preorderEnabled: data.preorderEnabled ?? false,
   });
-  revalidatePath("/", "layout");
+  revalidateAllLocales();
   return { ok: true as const, id };
 }
 
@@ -88,7 +98,7 @@ export async function moveSegment(id: string, delta: number) {
     await tx.update(schema.segments).set({ sortOrder: j }).where(eq(schema.segments.id, all[idx].id));
     await tx.update(schema.segments).set({ sortOrder: idx }).where(eq(schema.segments.id, all[j].id));
   });
-  revalidatePath("/", "layout");
+  revalidateAllLocales();
 }
 
 export async function deleteSegment(id: string) {
@@ -112,7 +122,7 @@ export async function deleteSegment(id: string) {
     }
     await tx.delete(schema.segments).where(eq(schema.segments.id, id));
   });
-  revalidatePath("/", "layout");
+  revalidateAllLocales();
 }
 
 // ─── Products ──────────────────────────────────────────────────────────
@@ -165,7 +175,7 @@ export async function createProduct(input: z.infer<typeof prodSchema>) {
     modelNote: data.modelNote || null,
     lookProductIds: data.lookProductIds || [],
   });
-  revalidatePath("/", "layout");
+  revalidateAllLocales();
   return { ok: true as const, id, slug };
 }
 
@@ -178,14 +188,14 @@ export async function updateProduct(id: string, patch: Partial<z.infer<typeof pr
   if (typeof patch.sku === "string") update.sku = patch.sku.toUpperCase();
   if (typeof patch.name === "string") update.slug = slugify(patch.name);
   await db.update(schema.products).set(update).where(eq(schema.products.id, id));
-  revalidatePath("/", "layout");
+  revalidateAllLocales();
   return { ok: true as const };
 }
 
 export async function deleteProduct(id: string) {
   await requireAdmin();
   await db.delete(schema.products).where(eq(schema.products.id, id));
-  revalidatePath("/", "layout");
+  revalidateAllLocales();
 }
 
 export async function adjustStock(id: string, delta: number, reason: string) {
@@ -196,7 +206,7 @@ export async function adjustStock(id: string, delta: number, reason: string) {
       .where(eq(schema.products.id, id));
     await tx.insert(schema.inventoryLog).values({ productId: id, delta, reason });
   });
-  revalidatePath("/", "layout");
+  revalidateAllLocales();
 }
 
 // ─── Orders ────────────────────────────────────────────────────────────
@@ -453,7 +463,7 @@ export async function updateBrand(input: z.infer<typeof brandSchema>) {
   const data = brandSchema.parse(input);
   await db.insert(schema.siteSettings).values({ key: "brand", value: data })
     .onConflictDoUpdate({ target: schema.siteSettings.key, set: { value: data } });
-  revalidatePath("/", "layout");
+  revalidateAllLocales();
   return { ok: true as const };
 }
 
@@ -496,7 +506,7 @@ export async function updateCopyOverrides(input: z.infer<typeof copyOverridesSch
   // request reads fresh values, then bump the route cache so already-rendered
   // pages re-render with the new merged messages.
   revalidateTag(COPY_CACHE_TAG);
-  revalidatePath("/", "layout");
+  revalidateAllLocales();
   return { ok: true as const };
 }
 

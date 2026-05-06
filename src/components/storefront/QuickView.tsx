@@ -30,7 +30,7 @@ export type QuickViewProduct = {
 type Props = {
   product: QuickViewProduct;
   /** Visible-button mode: a small "Quick view" pill rendered above the card. */
-  trigger?: "pill" | "icon";
+  trigger?: "pill" | "icon" | "overlay";
 };
 
 /**
@@ -39,6 +39,24 @@ type Props = {
  */
 export default function QuickView({ product, trigger = "pill" }: Props) {
   const [open, setOpen] = useState(false);
+
+  if (trigger === "overlay") {
+    return (
+      <>
+        <button
+          type="button"
+          className="qv-overlay"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(true); }}
+          aria-label={`Quick view ${product.name}`}
+          data-quick-view-trigger
+        >
+          Add to bag
+        </button>
+        {open && <QuickViewModal product={product} onClose={() => setOpen(false)} />}
+      </>
+    );
+  }
+
   return (
     <>
       <button

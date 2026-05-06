@@ -61,6 +61,28 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
             />
           )}
           <WishHeart productId={p.id} />
+          {showQuickView && (
+            <QuickView
+              product={{
+                id: p.id,
+                slug: p.slug,
+                sku: p.sku,
+                name: p.name,
+                nameBn: p.nameBn,
+                description: p.description,
+                descriptionBn: p.descriptionBn,
+                priceBdt: p.priceBdt,
+                wasBdt: p.wasBdt,
+                segmentId: p.segmentId,
+                tag: p.tag,
+                stock: p.stock,
+                colors: (p.colors as string[] | null) ?? [],
+                sizes: (p.sizes as string[] | null) ?? [],
+                heroImage: heroImage ?? null,
+              }}
+              trigger="overlay"
+            />
+          )}
         </div>
         <div className="prod-body">
           {segmentTag && <div className="prod-meta">{segmentTag}</div>}
@@ -71,28 +93,6 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
           </div>
         </div>
       </Link>
-      {showQuickView && (
-        <QuickView
-          product={{
-            id: p.id,
-            slug: p.slug,
-            sku: p.sku,
-            name: p.name,
-            nameBn: p.nameBn,
-            description: p.description,
-            descriptionBn: p.descriptionBn,
-            priceBdt: p.priceBdt,
-            wasBdt: p.wasBdt,
-            segmentId: p.segmentId,
-            tag: p.tag,
-            stock: p.stock,
-            colors: (p.colors as string[] | null) ?? [],
-            sizes: (p.sizes as string[] | null) ?? [],
-            heroImage: heroImage ?? null,
-          }}
-          trigger="pill"
-        />
-      )}
     </article>
   );
 }

@@ -24,12 +24,18 @@ export default function SearchDropdown() {
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  // Click-outside to close.
+  // Click-outside collapses.
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setExpanded(false);
+        setQ("");
+      }
     };
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
@@ -38,32 +44,61 @@ export default function SearchDropdown() {
   // Debounced fetch.
   useEffect(() => {
     if (q.trim().length < 2) { setHits([]); return; }
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       try {
         const r = await fetch(`/api/search?q=${encodeURIComponent(q.trim())}`);
         const j = await r.json();
         setHits(j.results || []);
       } catch { setHits([]); }
     }, 220);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [q]);
 
   const onPick = (slug: string) => {
-    setOpen(false); setQ("");
+    setOpen(false);
+    setExpanded(false);
+    setQ("");
     router.push(`/product/${slug}`);
   };
 
+  const handleExpand = () => {
+    setExpanded(true);
+    // Let the element mount before focusing.
+    setTimeout(() => inputRef.current?.focus(), 40);
+  };
+
+  // Collapsed state — just the icon button.
+  if (!expanded) {
+    return (
+      <button
+        className="icon-btn"
+        aria-label={t("nav.search")}
+        onClick={handleExpand}
+      >
+        <Icon name="search" size={18} />
+      </button>
+    );
+  }
+
+  // Expanded state — full search input with dropdown.
   return (
     <div className="nav-search" ref={wrapRef}>
-      <Icon name="search" size={16}/>
+      <Icon name="search" size={16} />
       <input
+        ref={inputRef}
         type="search"
         aria-label={t("nav.search")}
         placeholder={t("nav.search")}
         value={q}
         onChange={(e) => { setQ(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
-        onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            setOpen(false);
+            setExpanded(false);
+            setQ("");
+          }
+        }}
       />
       {open && q.length >= 2 && (
         <div className="search-pop" role="listbox">
