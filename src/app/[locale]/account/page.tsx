@@ -108,11 +108,16 @@ export default async function AccountPage({ params }: Props) {
           <button
             type="submit"
             style={{
-              background: "transparent", border: "1px solid var(--purple-700)",
-              color: "var(--purple-300)", fontSize: 11, letterSpacing: ".1em",
-              textTransform: "uppercase", padding: "9px 18px",
+              background: "transparent",
+              border: "1px solid oklch(0.65 0.08 300 / 0.6)",
+              color: "var(--cream)",
+              fontSize: 11, letterSpacing: ".1em",
+              textTransform: "uppercase", padding: "9px 20px",
               cursor: "pointer", fontFamily: "var(--sans)", transition: "all .15s",
+              opacity: 0.75,
             }}
+            onMouseOver={(e) => (e.currentTarget.style.opacity = "1")}
+            onMouseOut={(e) => (e.currentTarget.style.opacity = "0.75")}
           >
             Sign out
           </button>
