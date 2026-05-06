@@ -243,25 +243,8 @@
   white-space: nowrap;
 }
 
-/* ===== Floating label ===== */
-.cur-label {
-  position: absolute;
-  top: 30px; left: 30px;
-  transform: translate(0, 0);
-  font-family: "JetBrains Mono", monospace;
-  font-size: 10px; letter-spacing: .25em;
-  color: var(--purple-900);
-  background: var(--gold);
-  padding: 4px 8px;
-  white-space: nowrap;
-  text-transform: uppercase;
-  font-weight: 500;
-  opacity: 0;
-}
-#ssg-cursor.hover-link .cur-label { opacity: 1 !important; }
-#ssg-cursor[data-mode="seal"] .cur-label,
-#ssg-cursor[data-mode="loupe"] .cur-label,
-#ssg-cursor[data-mode="magnify"] .cur-label { display: none; }
+/* ===== Floating label — hidden; diamond cursor is sufficient ===== */
+.cur-label { display: none; }
 
 /* ===== Page transition curtain ===== */
 .ssg-curtain {
