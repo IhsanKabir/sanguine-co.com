@@ -52,30 +52,46 @@ export default async function AccountPage({ params }: Props) {
   const user = await requireUser();
   const loc = locale as "en" | "bn";
 
-  const [orders, addresses, profileRows, wishlistRows] = await Promise.all([
-    db.select()
+  // ── Data fetching with explicit error isolation ──────────────────────────
+  type OrderSelect = typeof schema.orders.$inferSelect;
+  type AddressSelect = typeof schema.addresses.$inferSelect;
+
+  let orders: OrderSelect[] = [];
+  let addresses: AddressSelect[] = [];
+  let profileRows: (typeof schema.customerProfiles.$inferSelect)[] = [];
+  let wishlistTotal = 0;
+
+  try {
+    orders = await db.select()
       .from(schema.orders)
       .where(or(
         eq(schema.orders.guestEmail, user.email ?? ""),
         eq(schema.orders.customerId, user.id as unknown as string),
       ))
       .orderBy(desc(schema.orders.createdAt))
-      .limit(30)
-      .catch(() => []),
-    listMyAddresses().catch(() => []),
-    db.select()
+      .limit(30);
+  } catch (e) { console.error("[account] orders query failed:", e); }
+
+  try {
+    addresses = await listMyAddresses();
+  } catch (e) { console.error("[account] addresses query failed:", e); }
+
+  try {
+    profileRows = await db.select()
       .from(schema.customerProfiles)
-      .where(eq(schema.customerProfiles.id, user.id))
-      .catch(() => []),
-    db.select({ total: count() })
+      .where(eq(schema.customerProfiles.id, user.id));
+  } catch (e) { console.error("[account] customerProfiles query failed:", e); }
+
+  try {
+    const rows = await db.select({ total: count() })
       .from(schema.wishlists)
-      .where(eq(schema.wishlists.customerId, user.id as unknown as string))
-      .catch(() => [{ total: 0 }]),
-  ]);
+      .where(eq(schema.wishlists.customerId, user.id as unknown as string));
+    wishlistTotal = Number(rows[0]?.total ?? 0);
+  } catch (e) { console.error("[account] wishlists query failed:", e); }
 
   const profile = profileRows[0] ?? null;
   const lifetimeSpend = orders.reduce((s, o) => s + o.totalBdt, 0);
-  const wishlistCount = wishlistRows[0]?.total ?? 0;
+  const wishlistCount = wishlistTotal;
   const initials = monogram(profile?.fullName, user.email ?? "");
   const memberYear = user.created_at
     ? new Date(user.created_at).getFullYear()
@@ -84,7 +100,10 @@ export default async function AccountPage({ params }: Props) {
   const tier = getTierName(lifetimeSpend);
 
   // Ensure referral code exists (generates + saves on first visit)
-  const referralCode = await ensureReferralCode().catch(() => null);
+  let referralCode: string | null = null;
+  try {
+    referralCode = await ensureReferralCode();
+  } catch (e) { console.error("[account] ensureReferralCode failed:", e); }
 
   return (
     <div style={{ maxWidth: 980, margin: "0 auto", padding: "48px 32px 80px" }}>
