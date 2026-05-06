@@ -15,7 +15,17 @@ const FREE_THRESHOLD = 3000;
 const FLAT_DHAKA = 80;
 const FLAT_OUTSIDE = 150;
 
-export default function CheckoutForm() {
+type Prefill = {
+  fullName: string;
+  email: string;
+  phone: string;
+  line1: string;
+  area: string;
+  city: string;
+  postcode: string;
+};
+
+export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
   const t = useTranslations();
   const locale = useLocale() as "en" | "bn";
   const router = useRouter();
@@ -25,9 +35,19 @@ export default function CheckoutForm() {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const [c, setC] = useState({ fullName: "", email: "", phone: "" });
+  const [c, setC] = useState({
+    fullName: prefill?.fullName ?? "",
+    email: prefill?.email ?? "",
+    phone: prefill?.phone ?? "",
+  });
   const [s, setS] = useState({
-    line1: "", line2: "", area: "", city: "Dhaka", district: "", division: "Dhaka", postcode: "",
+    line1: prefill?.line1 ?? "",
+    line2: "",
+    area: prefill?.area ?? "",
+    city: prefill?.city ?? "Dhaka",
+    district: "",
+    division: "Dhaka",
+    postcode: prefill?.postcode ?? "",
   });
   const [notes, setNotes] = useState("");
 

@@ -55,29 +55,35 @@
  *
  * Honoured by reduced-motion via the existing #ssg-cursor-root display:none
  * higher up in this file. */
+/* Silver diamond cursor — square rotated 45° with a violet-silver glow.
+ * Slow twinkling rotation gives the "sparkle" effect without being distracting. */
 .cur-ring {
-  width: 28px; height: 28px;
-  border: 1px solid color-mix(in oklch, var(--purple-900) 70%, transparent);
-  border-radius: 50%;
-  box-shadow: 0 0 12px color-mix(in oklch, var(--purple-200) 25%, transparent);
+  width: 16px; height: 16px;
+  border: 1.5px solid oklch(0.82 0.04 275);
+  border-radius: 0;
+  box-shadow:
+    0 0 6px oklch(0.82 0.04 275 / 0.7),
+    0 0 18px oklch(0.82 0.04 275 / 0.25);
+  animation: ssg-diamond-spin 4s ease-in-out infinite;
 }
 .cur-ring::after {
   content: "";
-  position: absolute; inset: -8px;
-  border: 1px solid color-mix(in oklch, var(--purple-900) 25%, transparent);
-  border-radius: 50%;
-  animation: ssg-cursor-pulse 4.2s ease-in-out infinite;
+  position: absolute; inset: -7px;
+  border: 1px solid oklch(0.82 0.04 275 / 0.22);
+  border-radius: 0;
 }
-@keyframes ssg-cursor-pulse {
-  0%   { transform: scale(0.85); opacity: 0.55; }
-  50%  { transform: scale(1.18); opacity: 0.10; }
-  100% { transform: scale(0.85); opacity: 0.55; }
+@keyframes ssg-diamond-spin {
+  0%   { transform: translate(-50%,-50%) rotate(45deg) scale(1);    opacity: 0.85; }
+  25%  { transform: translate(-50%,-50%) rotate(90deg) scale(1.15); opacity: 1; }
+  50%  { transform: translate(-50%,-50%) rotate(135deg) scale(0.95);opacity: 0.8; }
+  75%  { transform: translate(-50%,-50%) rotate(180deg) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%,-50%) rotate(225deg) scale(1);   opacity: 0.85; }
 }
 .cur-dot {
   width: 3px; height: 3px;
-  background: var(--gold);
+  background: oklch(0.88 0.03 275);
   border-radius: 50%;
-  box-shadow: 0 0 4px var(--gold);
+  box-shadow: 0 0 5px oklch(0.88 0.03 275 / 0.9);
 }
 #ssg-cursor[data-mode="default"] .cur-ring,
 #ssg-cursor[data-mode="default"] .cur-dot,

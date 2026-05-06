@@ -34,8 +34,8 @@ type EditState = {
   isDefault: boolean;
 };
 
-const empty = (): EditState => ({
-  label: "Home", fullName: "", phone: "", line1: "", line2: "",
+const empty = (profileName = "", profilePhone = ""): EditState => ({
+  label: "Home", fullName: profileName, phone: profilePhone, line1: "", line2: "",
   area: "", city: "Dhaka", district: "Dhaka", division: "Dhaka", postcode: "", isDefault: false,
 });
 
@@ -54,7 +54,15 @@ const toEdit = (a: Address): EditState => ({
   isDefault: a.isDefault,
 });
 
-export default function AddressBook({ addresses }: { addresses: Address[] }) {
+export default function AddressBook({
+  addresses,
+  profileName = "",
+  profilePhone = "",
+}: {
+  addresses: Address[];
+  profileName?: string;
+  profilePhone?: string;
+}) {
   const [editing, setEditing] = useState<EditState | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +120,7 @@ export default function AddressBook({ addresses }: { addresses: Address[] }) {
         <h2 className="serif" style={{ fontSize: 24, color: "var(--purple-900)", fontWeight: 500, margin: 0 }}>
           Addresses
         </h2>
-        <button className="btn btn-ghost btn-sm" onClick={() => setEditing(empty())}>
+        <button className="btn btn-ghost btn-sm" onClick={() => setEditing(empty(profileName, profilePhone))}>
           <Icon name="plus" size={12} /> Add address
         </button>
       </div>
