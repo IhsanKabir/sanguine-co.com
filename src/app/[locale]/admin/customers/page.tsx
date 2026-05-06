@@ -15,9 +15,18 @@ type CustomerRow = {
   lastOrderAt: Date | null;
 };
 
+const TIERS = [
+  { min: 150_000, name: "Grand Élite",       pill: "pill-ok"   },
+  { min: 50_000,  name: "Patron de Maison",   pill: "pill-ok"   },
+  { min: 10_000,  name: "Atelier Guest",       pill: "pill-info" },
+  { min: 0,       name: "Maison Initié",       pill: "pill-warn" },
+] as const;
+
+function tierFor(spend: number) {
+  return TIERS.find((t) => spend >= t.min) ?? TIERS[TIERS.length - 1];
+}
+
 async function getCustomers(): Promise<CustomerRow[]> {
-  // Aggregate from orders table — works for both guest and signed-in customers
-  // because we always store guest_email/guest_phone snapshot.
   const rows = await db.execute<{
     email: string;
     full_name: string | null;
@@ -89,7 +98,7 @@ export default async function AdminCustomersPage() {
         {canSeeRevenue && (
           <div className="stat kpi"><div className="kpi-top"><div className="k">Lifetime spend</div></div><div className="v">{formatBdt(totalSpend)}</div></div>
         )}
-        <div className="stat kpi"><div className="kpi-top"><div className="k">Accounts</div></div><div className="v">{authCount}</div></div>
+        <div className="stat kpi"><div className="kpi-top"><div className="k">Auth accounts</div></div><div className="v">{authCount}</div></div>
       </div>
 
       {customers.length === 0 ? (
@@ -97,34 +106,47 @@ export default async function AdminCustomersPage() {
       ) : (
         <div className="table">
           <table>
-            <thead><tr><th>Customer</th><th>Email</th><th>Phone</th><th>City</th><th>Orders</th>{canSeeRevenue && <th>Spend</th>}<th>Last order</th><th>Tier</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>City</th>
+                <th>Orders</th>
+                {canSeeRevenue && <th>Spend</th>}
+                <th>Last order</th>
+                <th>Tier</th>
+              </tr>
+            </thead>
             <tbody>
-              {customers.map((c) => (
-                <tr key={c.email} style={{ cursor: "pointer" }}>
-                  <td>
-                    <Link href={`/admin/customers/${encodeURIComponent(c.email)}`} style={{ display: "flex", alignItems: "center", gap: 10, color: "inherit", textDecoration: "none" }}>
-                      <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--purple-100)", color: "var(--purple-900)", display: "grid", placeItems: "center", fontFamily: "var(--serif)", fontSize: 13, fontWeight: 600 }}>
-                        {(c.fullName || c.email).split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase()}
-                      </div>
-                      <span style={{ fontWeight: 500 }}>{c.fullName || c.email.split("@")[0]}</span>
-                    </Link>
-                  </td>
-                  <td style={{ color: "var(--ink-soft)", fontSize: 12 }}>
-                    <Link href={`/admin/customers/${encodeURIComponent(c.email)}`} style={{ color: "inherit" }}>{c.email}</Link>
-                  </td>
-                  <td style={{ fontFamily: "var(--mono)", fontSize: 11 }}>{c.phone || "—"}</td>
-                  <td>{c.city || "—"}</td>
-                  <td>{c.orderCount}</td>
-                  {canSeeRevenue && <td style={{ fontWeight: 500 }}>{formatBdt(c.totalSpentBdt)}</td>}
-                  <td style={{ color: "var(--ink-soft)", fontSize: 12 }}>{c.lastOrderAt ? formatDate(c.lastOrderAt) : "—"}</td>
-                  <td>
-                    {/* Tier without revenue: derive from order count alone */}
-                    {canSeeRevenue && c.totalSpentBdt > 50000 ? <span className="pill pill-ok">Patron</span>
-                      : c.orderCount > 1 ? <span className="pill pill-info">Returning</span>
-                      : <span className="pill pill-warn">New</span>}
-                  </td>
-                </tr>
-              ))}
+              {customers.map((c) => {
+                const t = canSeeRevenue ? tierFor(c.totalSpentBdt) : null;
+                return (
+                  <tr key={c.email} style={{ cursor: "pointer" }}>
+                    <td>
+                      <Link href={`/admin/customers/${encodeURIComponent(c.email)}`} style={{ display: "flex", alignItems: "center", gap: 10, color: "inherit", textDecoration: "none" }}>
+                        <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--purple-100)", color: "var(--purple-900)", display: "grid", placeItems: "center", fontFamily: "var(--serif)", fontSize: 13, fontWeight: 600 }}>
+                          {(c.fullName || c.email).split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase()}
+                        </div>
+                        <span style={{ fontWeight: 500 }}>{c.fullName || c.email.split("@")[0]}</span>
+                      </Link>
+                    </td>
+                    <td style={{ color: "var(--ink-soft)", fontSize: 12 }}>
+                      <Link href={`/admin/customers/${encodeURIComponent(c.email)}`} style={{ color: "inherit" }}>{c.email}</Link>
+                    </td>
+                    <td style={{ fontFamily: "var(--mono)", fontSize: 11 }}>{c.phone || "—"}</td>
+                    <td>{c.city || "—"}</td>
+                    <td>{c.orderCount}</td>
+                    {canSeeRevenue && <td style={{ fontWeight: 500 }}>{formatBdt(c.totalSpentBdt)}</td>}
+                    <td style={{ color: "var(--ink-soft)", fontSize: 12 }}>{c.lastOrderAt ? formatDate(c.lastOrderAt) : "—"}</td>
+                    <td>
+                      {t
+                        ? <span className={"pill " + t.pill}>{t.name}</span>
+                        : <span className="pill pill-warn">{c.orderCount > 1 ? "Returning" : "New"}</span>}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

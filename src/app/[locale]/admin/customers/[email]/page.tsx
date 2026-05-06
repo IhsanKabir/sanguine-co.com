@@ -16,6 +16,21 @@ export const metadata = {
 
 type Props = { params: Promise<{ email: string; locale: string }> };
 
+const TIERS = [
+  { min: 150_000, name: "Grand Élite",       color: "oklch(0.78 0.15 78)",  pill: "pill-ok"   },
+  { min: 50_000,  name: "Patron de Maison",   color: "var(--gold)",           pill: "pill-ok"   },
+  { min: 10_000,  name: "Atelier Guest",       color: "var(--mauve)",          pill: "pill-info" },
+  { min: 0,       name: "Maison Initié",       color: "var(--purple-400)",     pill: "pill-warn" },
+] as const;
+
+function tierFor(spend: number) {
+  return TIERS.find((t) => spend >= t.min) ?? TIERS[TIERS.length - 1];
+}
+
+function fmtPref(v: string | null | undefined) {
+  return v ?? <span style={{ color: "var(--ink-soft)", fontSize: 11 }}>—</span>;
+}
+
 export default async function AdminCustomerDetailPage({ params }: Props) {
   const ctx = await requirePermission("customers");
   const canSeeRevenue = ctx.has("revenue");
@@ -23,7 +38,6 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
   setRequestLocale(locale);
   const email = decodeURIComponent(encEmail);
 
-  // Pull all orders for this email (guest or signed-in).
   const orders = await db.select().from(schema.orders)
     .where(eq(schema.orders.guestEmail, email))
     .orderBy(desc(schema.orders.createdAt))
@@ -32,31 +46,48 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
   if (orders.length === 0) notFound();
 
   const totalSpent = orders.reduce((s, o) => s + o.totalBdt, 0);
+  const tier = tierFor(totalSpent);
   const firstAddr = parseShippingAddress(orders[0].shippingAddress);
   const customerName = firstAddr.fullName ?? null;
   const customerPhone = firstAddr.phone ?? orders[0].guestPhone ?? null;
   const customerCity = firstAddr.city ?? null;
 
-  // Reviews + preorders + refund-totals — gather in parallel.
-  const [reviewRows, preorderRows, refundAgg] = await Promise.all([
+  // Resolve the auth user ID (may be null for guests who never signed up)
+  const customerId = orders.find((o) => o.customerId)?.customerId ?? null;
+
+  const [reviewRows, preorderRows, refundAgg, profileRow, addressRows] = await Promise.all([
     db.select().from(schema.reviews)
-      .where(and(eq(schema.reviews.customerId, orders[0].customerId ?? "00000000-0000-0000-0000-000000000000")))
+      .where(and(eq(schema.reviews.customerId, customerId ?? "00000000-0000-0000-0000-000000000000")))
       .orderBy(desc(schema.reviews.createdAt))
       .catch(() => []),
     db.select().from(schema.preorderRequests)
       .where(eq(schema.preorderRequests.customerEmail, email))
       .orderBy(desc(schema.preorderRequests.createdAt))
       .catch(() => []),
-    orders[0].customerId
+    customerId
       ? db.select({ total: sum(schema.refunds.amountBdt), n: count(schema.refunds.id) })
           .from(schema.refunds)
           .innerJoin(schema.orders, eq(schema.orders.id, schema.refunds.orderId))
           .where(eq(schema.orders.guestEmail, email))
           .catch(() => [{ total: 0, n: 0 }])
       : Promise.resolve([{ total: 0, n: 0 }]),
+    customerId
+      ? db.select().from(schema.customerProfiles)
+          .where(eq(schema.customerProfiles.id, customerId))
+          .limit(1)
+          .catch(() => [])
+      : Promise.resolve([]),
+    customerId
+      ? db.select().from(schema.addresses)
+          .where(eq(schema.addresses.customerId, customerId as unknown as string))
+          .orderBy(desc(schema.addresses.isDefault))
+          .catch(() => [])
+      : Promise.resolve([]),
   ]);
+
   const refundTotal = Number(refundAgg[0]?.total ?? 0);
   const refundCount = Number(refundAgg[0]?.n ?? 0);
+  const profile = profileRow[0] ?? null;
 
   const delivered = orders.filter((o) => o.status === "delivered").length;
   const cancelled = orders.filter((o) => o.status === "cancelled" || o.status === "refunded").length;
@@ -67,13 +98,16 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
         <Link href="/admin/customers">← All customers</Link>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 16, gap: 16, flexWrap: "wrap" }}>
         <div>
           <h1 className="admin-h1">{customerName ?? email.split("@")[0]}</h1>
           <p className="admin-sub">
             {email}{customerPhone ? ` · ${customerPhone}` : ""}{customerCity ? ` · ${customerCity}` : ""}
           </p>
         </div>
+        {canSeeRevenue && (
+          <span className={"pill " + tier.pill} style={{ fontSize: 11 }}>{tier.name}</span>
+        )}
       </div>
 
       <div className="stat-grid">
@@ -93,7 +127,71 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
         )}
       </div>
 
-      <h2 className="serif" style={{ fontSize: 22, color: "var(--purple-900)", fontWeight: 500, marginTop: 28, marginBottom: 12 }}>
+      {/* ─── Customer profile (from customer_profiles) ───────────────────── */}
+      {profile && (
+        <>
+          <h2 className="serif" style={{ fontSize: 22, color: "var(--purple-900)", fontWeight: 500, marginTop: 32, marginBottom: 12 }}>
+            Profile &amp; Preferences
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12, marginBottom: 8 }}>
+            {[
+              { k: "Full name",          v: profile.fullName },
+              { k: "Phone",              v: profile.phone },
+              { k: "Birthday",           v: profile.birthday },
+              { k: "Anniversary",        v: profile.anniversary },
+              { k: "Perfume family",     v: profile.perfumeFamily },
+              { k: "Book genre",         v: profile.bookGenre },
+              { k: "Flower preference",  v: profile.flowerPreference },
+              { k: "Locale",             v: profile.preferredLocale },
+              { k: "Referral code",      v: profile.referralCode },
+            ].map(({ k, v }) => (
+              <div key={k} style={{ padding: "12px 16px", background: "white", border: "1px solid var(--line)", borderRadius: 2 }}>
+                <div style={{ fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--ink-soft)", fontFamily: "var(--mono)", marginBottom: 4 }}>{k}</div>
+                <div style={{ fontSize: 13, color: v ? "var(--purple-900)" : "var(--line)", fontWeight: v ? 500 : 400 }}>{v || "—"}</div>
+              </div>
+            ))}
+            <div style={{ padding: "12px 16px", background: "white", border: "1px solid var(--line)", borderRadius: 2 }}>
+              <div style={{ fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--ink-soft)", fontFamily: "var(--mono)", marginBottom: 4 }}>Marketing</div>
+              <span className={"pill " + (profile.acceptsMarketing ? "pill-ok" : "pill-warn")}>
+                {profile.acceptsMarketing ? "Opted in" : "Opted out"}
+              </span>
+            </div>
+            <div style={{ padding: "12px 16px", background: "white", border: "1px solid var(--line)", borderRadius: 2 }}>
+              <div style={{ fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--ink-soft)", fontFamily: "var(--mono)", marginBottom: 6 }}>Notifications</div>
+              <div style={{ display: "flex", gap: 6 }}>
+                <span className={"pill " + (profile.notifyEmail ? "pill-ok" : "pill-warn")}>Email {profile.notifyEmail ? "on" : "off"}</span>
+                <span className={"pill " + (profile.notifySms ? "pill-ok" : "pill-warn")}>SMS {profile.notifySms ? "on" : "off"}</span>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ─── Saved addresses ─────────────────────────────────────────────── */}
+      {addressRows.length > 0 && (
+        <>
+          <h2 className="serif" style={{ fontSize: 22, color: "var(--purple-900)", fontWeight: 500, marginTop: 32, marginBottom: 12 }}>
+            Saved addresses
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12, marginBottom: 8 }}>
+            {addressRows.map((a) => (
+              <div key={a.id} style={{ padding: "14px 16px", background: "white", border: "1px solid var(--line)", borderRadius: 2, fontSize: 13, lineHeight: 1.6, color: "var(--purple-900)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span style={{ fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--ink-soft)", fontFamily: "var(--mono)" }}>{a.label || "Address"}</span>
+                  {a.isDefault && <span className="pill pill-ok" style={{ fontSize: 9 }}>Default</span>}
+                </div>
+                <b>{a.fullName}</b><br />
+                {a.line1}{a.line2 ? `, ${a.line2}` : ""}<br />
+                {a.area ? `${a.area}, ` : ""}{a.city}{a.postcode ? ` — ${a.postcode}` : ""}<br />
+                <span style={{ color: "var(--ink-soft)", fontSize: 12 }}>{a.phone}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* ─── Orders ──────────────────────────────────────────────────────── */}
+      <h2 className="serif" style={{ fontSize: 22, color: "var(--purple-900)", fontWeight: 500, marginTop: 32, marginBottom: 12 }}>
         Orders
       </h2>
       <div className="table">
@@ -102,11 +200,13 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
           <tbody>
             {orders.map((o) => (
               <tr key={o.id}>
-                <td style={{ fontFamily: "var(--mono)", color: "var(--purple-900)", fontWeight: 500 }}>{o.number}</td>
+                <td style={{ fontFamily: "var(--mono)", color: "var(--purple-900)", fontWeight: 500 }}>
+                  <Link href={`/admin/orders`} style={{ color: "inherit" }}>{o.number}</Link>
+                </td>
                 <td>{o.createdAt ? formatDate(new Date(o.createdAt)) : "—"}</td>
                 <td>
                   <span className={"pill " + (o.status === "delivered" ? "pill-ok" : o.status === "shipped" ? "pill-info" : o.status === "cancelled" || o.status === "refunded" ? "pill-err" : "pill-warn")}>
-                    {o.status}
+                    {o.status.replace("_", " ")}
                   </span>
                 </td>
                 <td style={{ fontWeight: 500 }}>{formatBdt(o.totalBdt)}</td>
@@ -119,6 +219,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
         </table>
       </div>
 
+      {/* ─── Bespoke requests ────────────────────────────────────────────── */}
       {preorderRows.length > 0 && (
         <>
           <h2 className="serif" style={{ fontSize: 22, color: "var(--purple-900)", fontWeight: 500, marginTop: 32, marginBottom: 12 }}>
@@ -132,9 +233,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
                   <tr key={r.id}>
                     <td style={{ fontSize: 12, color: "var(--ink-soft)" }}>{formatDate(new Date(r.createdAt))}</td>
                     <td>{r.segmentId}</td>
-                    <td style={{ maxWidth: 360, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 13, color: "var(--ink-soft)" }}>
-                      {r.description}
-                    </td>
+                    <td style={{ maxWidth: 360, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 13, color: "var(--ink-soft)" }}>{r.description}</td>
                     <td><span className={"pill " + (r.status === "converted" ? "pill-ok" : r.status === "rejected" ? "pill-err" : "pill-warn")}>{r.status}</span></td>
                     <td>{r.quotedPriceBdt ? formatBdt(r.quotedPriceBdt) : "—"}</td>
                   </tr>
@@ -145,6 +244,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
         </>
       )}
 
+      {/* ─── Reviews ─────────────────────────────────────────────────────── */}
       {reviewRows.length > 0 && (
         <>
           <h2 className="serif" style={{ fontSize: 22, color: "var(--purple-900)", fontWeight: 500, marginTop: 32, marginBottom: 12 }}>

@@ -15,6 +15,7 @@ import StylePreferences from "./StylePreferences";
 import NotificationPrefs from "./NotificationPrefs";
 import ReferralCard from "./ReferralCard";
 import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
+import EmailVerificationBanner from "./EmailVerificationBanner";
 
 export const dynamic = "force-dynamic";
 
@@ -87,6 +88,11 @@ export default async function AccountPage({ params }: Props) {
 
   return (
     <div style={{ maxWidth: 980, margin: "0 auto", padding: "48px 32px 80px" }}>
+
+      {/* ─── Email verification banner ──────────────────────────────────── */}
+      {!user.email_confirmed_at && user.email && (
+        <EmailVerificationBanner email={user.email} />
+      )}
 
       {/* ─── Profile header ─────────────────────────────────────────────── */}
       <div style={{
