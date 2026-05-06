@@ -160,7 +160,7 @@ export default async function Home({ params }: Props) {
                 </Link>
               )}
               {segs.length > 0 && (
-                <Link href="#departments" className="btn btn-ghost" data-magnetic style={{ borderColor: "var(--gold)", color: "var(--gold)" }}>
+                <Link href="#departments" className="btn btn-ghost" data-magnetic style={{ borderColor: "var(--mauve)", color: "var(--mauve)" }}>
                   {t("home.ctaSecondary")}
                 </Link>
               )}
