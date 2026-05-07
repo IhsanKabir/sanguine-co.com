@@ -4,7 +4,6 @@ import { requireUser } from "@/lib/auth-utils";
 import { db, schema } from "@/lib/db";
 import { eq, desc, or, count } from "drizzle-orm";
 import { formatBdt } from "@/lib/utils";
-import { signOut } from "@/lib/actions/auth";
 import { listMyAddresses } from "@/lib/actions/addresses";
 import { ensureReferralCode } from "@/lib/actions/profile";
 import AddressBook from "./AddressBook";
@@ -16,6 +15,7 @@ import NotificationPrefs from "./NotificationPrefs";
 import ReferralCard from "./ReferralCard";
 import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
 import EmailVerificationBanner from "./EmailVerificationBanner";
+import SignOutButton from "./SignOutButton";
 
 export const dynamic = "force-dynamic";
 
@@ -153,24 +153,7 @@ export default async function AccountPage({ params }: Props) {
           </div>
         </div>
 
-        <form action={signOut}>
-          <button
-            type="submit"
-            style={{
-              background: "transparent",
-              border: "1px solid oklch(0.65 0.08 300 / 0.6)",
-              color: "var(--cream)",
-              fontSize: 11, letterSpacing: ".1em",
-              textTransform: "uppercase", padding: "9px 20px",
-              cursor: "pointer", fontFamily: "var(--sans)", transition: "all .15s",
-              opacity: 0.75,
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.opacity = "1")}
-            onMouseOut={(e) => (e.currentTarget.style.opacity = "0.75")}
-          >
-            Sign out
-          </button>
-        </form>
+        <SignOutButton />
       </div>
 
       {/* ─── Stats strip ────────────────────────────────────────────────── */}
