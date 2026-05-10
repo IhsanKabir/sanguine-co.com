@@ -153,7 +153,7 @@ export default async function Home({ params }: Props) {
               {t("home.headlineLineThree")}
             </h1>
             <p>{t("home.lede")}</p>
-            <div style={{ display: "flex", gap: 12 }}>
+            <div className="hero-btns">
               {segs[0] && (
                 <Link href={`/shop/${segs[0].id}`} className="btn btn-gold" data-magnetic data-cursor-label="Enter">
                   {t("home.ctaPrimary")} <Icon name="arrow" size={14} />
@@ -400,7 +400,7 @@ export default async function Home({ params }: Props) {
       <Ornament variant="tide-line" />
 
       {/* ─── Our Promise · dark slab with 4 features ────────────── */}
-      <section data-cursor="seal" data-reveal style={{ background: "var(--purple-950)", color: "var(--cream)", padding: "80px 32px", margin: "0" }}>
+      <section data-cursor="seal" data-reveal className="promise-section" style={{ background: "var(--purple-950)", color: "var(--cream)", margin: "0" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
           <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold)", marginBottom: 16 }}>OUR PROMISE</div>
           <h2 className="serif" style={{ fontSize: 48, margin: "0 0 20px", color: "var(--cream)", fontWeight: 400, lineHeight: 1.1 }}>
@@ -409,7 +409,7 @@ export default async function Home({ params }: Props) {
           <p style={{ color: "var(--purple-200)", fontSize: 16, maxWidth: 600, margin: "0 auto 24px", lineHeight: 1.7 }}>
             Pay by card, wallet, UPI, or in cash when our courier arrives at your door. Complimentary returns within thirty days.
           </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 32, marginTop: 40, textAlign: "left" }}>
+          <div className="promise-grid">
             {[
               { i: "arrow",   t: "White-glove delivery",   s: "Courier, signed." },
               { i: "check",   t: "Cash on Delivery",       s: "No pre-payment required." },

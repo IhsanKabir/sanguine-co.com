@@ -106,7 +106,7 @@ export default async function AccountPage({ params }: Props) {
   } catch (e) { console.error("[account] ensureReferralCode failed:", e); }
 
   return (
-    <div style={{ maxWidth: 980, margin: "0 auto", padding: "48px 32px 80px" }}>
+    <div className="acct-wrap">
 
       {/* ─── Email verification banner ──────────────────────────────────── */}
       {!user.email_confirmed_at && user.email && (
@@ -114,12 +114,8 @@ export default async function AccountPage({ params }: Props) {
       )}
 
       {/* ─── Profile header ─────────────────────────────────────────────── */}
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        gap: 24, padding: "32px 36px",
-        background: "var(--purple-950)", borderRadius: 2, marginBottom: 2,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+      <div className="acct-header">
+        <div className="acct-header-left">
           <div style={{
             width: 64, height: 64, borderRadius: "50%", flexShrink: 0,
             background: "linear-gradient(135deg, var(--mauve), var(--purple-800))",
@@ -157,10 +153,7 @@ export default async function AccountPage({ params }: Props) {
       </div>
 
       {/* ─── Stats strip ────────────────────────────────────────────────── */}
-      <div style={{
-        display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr",
-        gap: 2, marginBottom: 48, background: "var(--line)",
-      }}>
+      <div className="acct-stats">
         {[
           { k: "Orders placed",   v: String(orders.length) },
           { k: "Lifetime spend",  v: lifetimeSpend > 0 ? formatBdt(lifetimeSpend, loc) : "—" },

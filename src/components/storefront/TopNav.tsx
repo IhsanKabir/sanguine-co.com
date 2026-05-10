@@ -6,6 +6,7 @@ import LocaleSwitcher from "./LocaleSwitcher";
 import CartIcon from "./CartIcon";
 import SearchDropdown from "./SearchDropdown";
 import CatStrip from "./CatStrip";
+import MobileMenuButton from "./MobileMenuButton";
 
 export default async function TopNav() {
   const t = await getTranslations();
@@ -16,6 +17,8 @@ export default async function TopNav() {
     // DB not configured yet — the storefront still renders.
   }
 
+  const segmentData = segments.map((s) => ({ id: s.id, name: s.name }));
+
   return (
     <>
       <div className="topbar">
@@ -23,22 +26,24 @@ export default async function TopNav() {
       </div>
       <nav className="nav" aria-label="Primary">
         <div className="nav-inner">
+          <MobileMenuButton segments={segmentData} />
           <Link href="/" className="nav-brand" aria-label={t("brand.name")}>
             {t("brand.name")}<sup aria-hidden="true">SSG</sup>
           </Link>
-          <CatStrip
-            segments={segments.map((s) => ({ id: s.id, name: s.name }))}
-            inline
-          />
+          <CatStrip segments={segmentData} inline />
           <div className="nav-right">
             <SearchDropdown />
-            <LocaleSwitcher />
-            <Link href="/account" className="icon-btn" aria-label={t("nav.account")}>
-              <Icon name="user" />
-            </Link>
-            <Link href="/wishlist" className="icon-btn" aria-label={t("nav.wishlist")}>
-              <Icon name="heart" />
-            </Link>
+            <span className="nav-hide-sm"><LocaleSwitcher /></span>
+            <span className="nav-hide-sm">
+              <Link href="/account" className="icon-btn" aria-label={t("nav.account")}>
+                <Icon name="user" />
+              </Link>
+            </span>
+            <span className="nav-hide-sm">
+              <Link href="/wishlist" className="icon-btn" aria-label={t("nav.wishlist")}>
+                <Icon name="heart" />
+              </Link>
+            </span>
             <CartIcon ariaLabel={t("nav.cart")} />
           </div>
         </div>

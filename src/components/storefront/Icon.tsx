@@ -14,6 +14,8 @@ const PATHS: Record<string, JSX.Element> = {
   arrow:   <><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></>,
   check:   <path d="m5 13 4 4 10-11"/>,
   feather: <><path d="M20 4 9 15l-3 5 5-3L22 6z"/><path d="M16 8l-9 9"/></>,
+  menu:    <><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></>,
+  close:   <><path d="M6 6l12 12"/><path d="M18 6L6 18"/></>,
 };
 
 export default function Icon({ name, size = 18, fill, className }: Props) {

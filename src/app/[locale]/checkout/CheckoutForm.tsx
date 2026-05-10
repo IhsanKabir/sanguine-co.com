@@ -120,7 +120,7 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
   };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 24 }}>
+    <div className="checkout-grid">
       <div>
         <div className="step-bar">
           {[t("checkout.stepAddress"), t("checkout.stepPayment"), t("checkout.stepConfirmation")].map((n, i) => (
@@ -159,7 +159,7 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
                 {fieldErrors.line1 && <span className="field-err">{fieldErrors.line1}</span>}
               </div>
             </div>
-            <div className="row" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+            <div className="row row-3">
               <div className="field">
                 <label>{t("checkout.area")}</label>
                 <input value={s.area} onChange={(e) => setS({ ...s, area: e.target.value })} placeholder="Gulshan" />
@@ -219,7 +219,7 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
       </div>
 
       <div>
-        <div className="panel" style={{ position: "sticky", top: 100 }}>
+        <div className="panel checkout-panel">
           <h3>Order Summary</h3>
           {items.map((i, idx) => (
             <div key={idx} style={{ display: "grid", gridTemplateColumns: "56px 1fr auto", gap: 12, marginBottom: 12, alignItems: "start" }}>

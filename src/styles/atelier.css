@@ -644,6 +644,11 @@
   .bento .b-1 { grid-column: span 2; }
   .bento .b-5 { grid-column: span 2; }
 }
+@media (max-width: 640px) {
+  .bento { grid-auto-rows: 160px; gap: 8px; }
+  .bento .b-2 { grid-row: span 1; }
+  .bento .b-1 .b-name { font-size: 24px; }
+}
 
 /* ===========================================================
    Journal / atmosphere band

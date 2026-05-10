@@ -45,7 +45,7 @@ export default function CartPage() {
         kicker={t("cart.subtotal")}
         name={t("cart.title")}
       />
-      <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 24 }}>
+      <div className="cart-grid">
         <div>
           {items.map((i) => {
             const k = itemKey(i);
@@ -67,7 +67,7 @@ export default function CartPage() {
             );
           })}
         </div>
-        <div className="panel" style={{ position: "sticky", top: 100, alignSelf: "start" }}>
+        <div className="panel cart-panel">
           <h3>Order Summary</h3>
           <CouponInput />
           <div className="totals" style={{ marginTop: 16 }}>

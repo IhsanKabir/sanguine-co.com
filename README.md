@@ -87,3 +87,5 @@ web/
 4. Deploy
 
 Vercel auto-deploys every PR with a preview URL.
+
+> Codex will review your output once you are done
