@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useMemo, useTransition } from "react";
+import { useMemo, useTransition, useState } from "react";
 
 type Props = {
   segmentSlug: string;
@@ -17,8 +17,8 @@ type Props = {
 const SORT_OPTIONS: { id: string; label: string }[] = [
   { id: "featured",    label: "Featured" },
   { id: "newest",      label: "Newest" },
-  { id: "price-asc",   label: "Price · low to high" },
-  { id: "price-desc",  label: "Price · high to low" },
+  { id: "price-asc",   label: "Price · low → high" },
+  { id: "price-desc",  label: "Price · high → low" },
   { id: "rating",      label: "Most loved" },
 ];
 
@@ -29,17 +29,12 @@ const TAG_LABELS: Record<string, string> = {
   "staff-pick": "Staff pick",
 };
 
-/**
- * URL-state-driven filter strip for the segment shop page.
- * State is held entirely in `?min=&max=&tag=&color=&size=&sort=`. Toggling a
- * value rewrites the URL and the segment page re-renders server-side with
- * the filtered query.
- */
 export default function SegmentFilters(props: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
   const [pending, startTransition] = useTransition();
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const minActive = params.get("min") ?? "";
   const maxActive = params.get("max") ?? "";
@@ -65,126 +60,173 @@ export default function SegmentFilters(props: Props) {
   };
 
   const clearAll = () => {
-    startTransition(() => {
-      router.push(pathname);
-    });
+    startTransition(() => router.push(pathname));
+    setFilterOpen(false);
   };
 
-  const hasAnyActive =
-    minActive || maxActive || tagActive || colorList.length > 0 || sizeList.length > 0 || (sortActive && sortActive !== "featured");
+  const activeCount =
+    (tagActive ? 1 : 0) +
+    colorList.length +
+    sizeList.length +
+    (minActive ? 1 : 0) +
+    (maxActive ? 1 : 0) +
+    (sortActive && sortActive !== "featured" ? 1 : 0);
+
+  const hasAnyActive = activeCount > 0;
 
   return (
-    <div style={{ marginBottom: 24, padding: 14, background: "#fcfaf6", border: "1px solid var(--line)", position: "sticky", top: 72, zIndex: 20 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
-        {/* Sort */}
-        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
-          <span style={{ color: "var(--ink-soft)", letterSpacing: ".15em", textTransform: "uppercase", fontSize: 10 }}>Sort</span>
+    <div className="filter-bar">
+      {/* ── Mobile compact trigger row ─────────────────────────────── */}
+      <div className="filter-trigger-row">
+        <button
+          type="button"
+          className={"filter-trigger-btn" + (filterOpen ? " open" : "") + (activeCount > 0 ? " has-active" : "")}
+          onClick={() => setFilterOpen((v) => !v)}
+          aria-expanded={filterOpen}
+          aria-controls="filter-body"
+        >
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+            <line x1="3" y1="6" x2="17" y2="6" />
+            <line x1="6" y1="10" x2="14" y2="10" />
+            <line x1="8" y1="14" x2="12" y2="14" />
+          </svg>
+          Filters{activeCount > 0 ? ` (${activeCount})` : ""}
+        </button>
+
+        <label className="filter-sort-inline">
           <select
             value={sortActive}
             onChange={(e) => updateParam("sort", e.target.value === "featured" ? null : e.target.value)}
             disabled={pending}
-            style={{ padding: "6px 8px", border: "1px solid var(--line)", background: "white", fontSize: 12 }}
           >
             {SORT_OPTIONS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
           </select>
         </label>
 
-        {/* Tag */}
-        {props.availableTags.length > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ color: "var(--ink-soft)", letterSpacing: ".15em", textTransform: "uppercase", fontSize: 10 }}>Tag</span>
-            {props.availableTags.map((t) => (
-              <button
-                key={t}
-                type="button"
-                disabled={pending}
-                onClick={() => updateParam("tag", tagActive === t ? null : t)}
-                className={"filter-pill " + (tagActive === t ? "active" : "")}
-                style={{ padding: "5px 10px", fontSize: 11 }}
-              >
-                {TAG_LABELS[t] ?? t}
-              </button>
-            ))}
-          </div>
-        )}
+        <span className="filter-count-inline">
+          {props.shownCount} of {props.totalCount}{pending ? " …" : ""}
+        </span>
+      </div>
 
-        {/* Price */}
-        {props.priceMax > props.priceMin && (
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
-            <span style={{ color: "var(--ink-soft)", letterSpacing: ".15em", textTransform: "uppercase", fontSize: 10 }}>Price</span>
-            <input
-              type="number"
-              placeholder={`৳${props.priceMin}`}
-              value={minActive}
-              onChange={(e) => updateParam("min", e.target.value || null)}
+      {/* ── Full filter body (always visible on desktop, toggle on mobile) ── */}
+      <div id="filter-body" className={"filter-body" + (filterOpen ? " open" : "")}>
+        <div className="filter-body-inner">
+          {/* Sort — desktop only (mobile has inline select above) */}
+          <label className="filter-group filter-sort-desktop">
+            <span className="filter-label">Sort</span>
+            <select
+              value={sortActive}
+              onChange={(e) => updateParam("sort", e.target.value === "featured" ? null : e.target.value)}
               disabled={pending}
-              style={{ width: 80, padding: "6px 8px", border: "1px solid var(--line)", fontSize: 12 }}
-            />
-            <span style={{ color: "var(--ink-soft)" }}>–</span>
-            <input
-              type="number"
-              placeholder={`৳${props.priceMax}`}
-              value={maxActive}
-              onChange={(e) => updateParam("max", e.target.value || null)}
-              disabled={pending}
-              style={{ width: 80, padding: "6px 8px", border: "1px solid var(--line)", fontSize: 12 }}
-            />
-          </div>
-        )}
-
-        {/* Colours */}
-        {props.availableColors.length > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-            <span style={{ color: "var(--ink-soft)", letterSpacing: ".15em", textTransform: "uppercase", fontSize: 10 }}>Colour</span>
-            {props.availableColors.map((c) => (
-              <button
-                key={c}
-                type="button"
-                disabled={pending}
-                onClick={() => toggleListParam("color", c)}
-                className={"filter-pill " + (colorList.includes(c) ? "active" : "")}
-                style={{ padding: "5px 10px", fontSize: 11 }}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Sizes */}
-        {props.availableSizes.length > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-            <span style={{ color: "var(--ink-soft)", letterSpacing: ".15em", textTransform: "uppercase", fontSize: 10 }}>Size</span>
-            {props.availableSizes.map((s) => (
-              <button
-                key={s}
-                type="button"
-                disabled={pending}
-                onClick={() => toggleListParam("size", s)}
-                className={"filter-pill " + (sizeList.includes(s) ? "active" : "")}
-                style={{ padding: "5px 10px", fontSize: 11, fontFamily: "var(--mono)" }}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>
-            {props.shownCount} of {props.totalCount} {pending ? "…" : ""}
-          </span>
-          {hasAnyActive && (
-            <button
-              type="button"
-              disabled={pending}
-              onClick={clearAll}
-              className="btn btn-ghost btn-sm"
-              style={{ padding: "4px 10px", fontSize: 11 }}
+              className="filter-select"
             >
-              Clear
-            </button>
+              {SORT_OPTIONS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+            </select>
+          </label>
+
+          {/* Tag */}
+          {props.availableTags.length > 0 && (
+            <div className="filter-group">
+              <span className="filter-label">Tag</span>
+              <div className="filter-chips">
+                {props.availableTags.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    disabled={pending}
+                    onClick={() => updateParam("tag", tagActive === t ? null : t)}
+                    className={"filter-pill " + (tagActive === t ? "active" : "")}
+                  >
+                    {TAG_LABELS[t] ?? t}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
+
+          {/* Price */}
+          {props.priceMax > props.priceMin && (
+            <div className="filter-group">
+              <span className="filter-label">Price</span>
+              <div className="filter-price">
+                <input
+                  type="number"
+                  placeholder={`৳${props.priceMin}`}
+                  value={minActive}
+                  onChange={(e) => updateParam("min", e.target.value || null)}
+                  disabled={pending}
+                  className="filter-price-input"
+                />
+                <span className="filter-price-dash">–</span>
+                <input
+                  type="number"
+                  placeholder={`৳${props.priceMax}`}
+                  value={maxActive}
+                  onChange={(e) => updateParam("max", e.target.value || null)}
+                  disabled={pending}
+                  className="filter-price-input"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Colours */}
+          {props.availableColors.length > 0 && (
+            <div className="filter-group">
+              <span className="filter-label">Colour</span>
+              <div className="filter-chips">
+                {props.availableColors.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    disabled={pending}
+                    onClick={() => toggleListParam("color", c)}
+                    className={"filter-pill " + (colorList.includes(c) ? "active" : "")}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Sizes */}
+          {props.availableSizes.length > 0 && (
+            <div className="filter-group">
+              <span className="filter-label">Size</span>
+              <div className="filter-chips">
+                {props.availableSizes.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    disabled={pending}
+                    onClick={() => toggleListParam("size", s)}
+                    className={"filter-pill " + (sizeList.includes(s) ? "active" : "")}
+                    style={{ fontFamily: "var(--mono)" }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="filter-footer">
+            <span className="filter-count-desktop">
+              {props.shownCount} of {props.totalCount}{pending ? " …" : ""}
+            </span>
+            {hasAnyActive && (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={clearAll}
+                className="btn btn-ghost btn-sm"
+                style={{ padding: "4px 10px", fontSize: 11 }}
+              >
+                Clear all
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

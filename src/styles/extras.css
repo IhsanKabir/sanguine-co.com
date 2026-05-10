@@ -302,6 +302,149 @@
 .coupon-applied.compact .ca-code { font-size: 12px; }
 .coupon-applied.compact .ca-savings { font-size: 10px; }
 
+/* ─── Segment page responsive ────────────────────────────────────────────── */
+.segment-h1 { font-size: 64px; }
+@media (max-width: 768px) { .segment-h1 { font-size: 44px; } }
+@media (max-width: 480px) { .segment-h1 { font-size: 34px; } }
+
+.preorder-cta {
+  padding: 56px;
+  background: var(--purple-950);
+  color: var(--cream);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 32px;
+}
+@media (max-width: 640px) {
+  .preorder-cta {
+    padding: 36px 24px;
+    grid-template-columns: 1fr;
+  }
+  .preorder-cta h2 { font-size: 28px !important; }
+  .preorder-cta .btn { width: 100%; text-align: center; justify-content: center; }
+}
+
+/* ─── Filter bar ─────────────────────────────────────────────────────────── */
+.filter-bar {
+  margin-bottom: 24px;
+  background: #fcfaf6;
+  border: 1px solid var(--line);
+  position: sticky;
+  top: 72px;
+  z-index: 20;
+}
+
+/* Mobile trigger row — hidden on desktop */
+.filter-trigger-row {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+}
+.filter-trigger-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  background: white;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+  white-space: nowrap;
+}
+.filter-trigger-btn.has-active {
+  border-color: var(--purple-700);
+  color: var(--purple-900);
+}
+.filter-trigger-btn.open { background: var(--purple-50, #f6f2ff); }
+.filter-sort-inline select {
+  flex: 1;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  background: white;
+  font-size: 12px;
+  min-width: 0;
+}
+.filter-count-inline {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+/* Filter body */
+.filter-body { display: block; }
+.filter-body-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.filter-label {
+  color: var(--ink-soft);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.filter-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.filter-price { display: flex; align-items: center; gap: 6px; }
+.filter-price-input {
+  width: 80px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  font-size: 12px;
+}
+.filter-price-dash { color: var(--ink-soft); }
+.filter-select {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  background: white;
+  font-size: 12px;
+}
+.filter-footer {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.filter-count-desktop { font-size: 11px; color: var(--ink-soft); }
+
+/* Mobile overrides */
+@media (max-width: 768px) {
+  .filter-trigger-row { display: flex; }
+  .filter-sort-desktop { display: none !important; }
+  .filter-count-desktop { display: none; }
+
+  /* Collapsed by default on mobile */
+  .filter-body { display: none; }
+  .filter-body.open { display: block; border-top: 1px solid var(--line); }
+
+  .filter-body-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+  }
+  .filter-group { width: 100%; }
+  .filter-price-input { width: 100px; }
+  .filter-footer { margin-left: 0; width: 100%; justify-content: space-between; padding-top: 4px; }
+}
+
 /* Floating chat (WhatsApp + Messenger).
  *
  * Lifted above the audio mute button (.ssg-mute lives at right:18px;bottom:18px;

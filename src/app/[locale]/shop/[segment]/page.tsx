@@ -120,7 +120,7 @@ export default async function SegmentPage({ params }: Props) {
           <div style={{ fontSize: 11, letterSpacing: ".3em", color: "var(--gold-deep)", marginBottom: 8 }}>
             {displayTag.toUpperCase()}
           </div>
-          <h1 className="serif" style={{ fontSize: 64, margin: 0, color: "var(--purple-900)", fontWeight: 400 }}>
+          <h1 className="serif segment-h1" style={{ margin: 0, color: "var(--purple-900)", fontWeight: 400 }}>
             {name}
           </h1>
           <p style={{ fontSize: 15, color: "var(--ink-soft)", margin: "12px 0 0", maxWidth: 520 }}>
@@ -153,16 +153,7 @@ export default async function SegmentPage({ params }: Props) {
 
         {/* Bespoke pre-order CTA */}
         {showPreorder && (
-          <div style={{
-            marginTop: showStock ? 60 : 0,
-            padding: 56,
-            background: "var(--purple-950)",
-            color: "var(--cream)",
-            display: "grid",
-            gridTemplateColumns: "1fr auto",
-            alignItems: "center",
-            gap: 32,
-          }}>
+          <div className="preorder-cta" style={{ marginTop: showStock ? 60 : 0 }}>
             <div>
               <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold)", marginBottom: 14 }}>
                 BESPOKE · ON REQUEST
