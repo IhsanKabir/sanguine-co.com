@@ -271,7 +271,7 @@ export default async function Home({ params }: Props) {
                   className={cls}
                   data-cursor={CAT_CURSOR[p.segmentId || ""] || "magnify"}
                 >
-                  <Composition cat={p.segmentId || "clothing"} sku={p.sku} name={p.name} tag={p.tag} />
+                  <Composition cat={p.segmentId || "clothing"} sku={p.sku} name={p.name} tag={p.tag} image={heroImages.get(p.id) ?? null} />
                   <div className="b-overlay">
                     <div className="b-kicker">{seg?.tag}</div>
                     <h3 className="b-name">{p.name}</h3>

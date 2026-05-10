@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import { seed } from "@/lib/utils";
 
@@ -11,6 +12,7 @@ type Props = {
   ribbon?: string | null;
   sale?: boolean;
   style?: CSSProperties;
+  image?: { url: string; alt: string | null } | null;
 };
 
 /**
@@ -30,6 +32,7 @@ export default function Composition({
   ribbon,
   sale,
   style,
+  image,
 }: Props) {
   const initial = (name || sku || "S").trim().charAt(0).toUpperCase();
   const h = (seed((sku || name || cat || "x") + variant) % 60) - 30;
@@ -41,18 +44,32 @@ export default function Composition({
     tag === "new" && "is-new",
   ].filter(Boolean).join(" ");
 
-  const css: CSSProperties = {
-    ...style,
-    ["--cmp-h" as string]: String(h),
-    ["--cmp-i" as string]: `"${initial}"`,
-  };
+  const css: CSSProperties = image
+    ? { ...style, position: "relative" }
+    : {
+        ...style,
+        ["--cmp-h" as string]: String(h),
+        ["--cmp-i" as string]: `"${initial}"`,
+      };
 
   return (
     <div className={cls} data-v={variant} style={css}>
-      <span className="cmp-grain" />
-      <span className="cmp-mark" />
-      {!small && <span className="cmp-corner">{(sku || "SSG").slice(-3)}</span>}
-      {!small && <span className="cmp-cap">{cat}</span>}
+      {image ? (
+        <Image
+          src={image.url}
+          alt={image.alt ?? name ?? cat}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          style={{ objectFit: "cover" }}
+        />
+      ) : (
+        <>
+          <span className="cmp-grain" />
+          <span className="cmp-mark" />
+          {!small && <span className="cmp-corner">{(sku || "SSG").slice(-3)}</span>}
+          {!small && <span className="cmp-cap">{cat}</span>}
+        </>
+      )}
       {ribbon && <span className="ribbon">{ribbon}</span>}
       {sale && <span className="ribbon sale">Sale</span>}
     </div>
