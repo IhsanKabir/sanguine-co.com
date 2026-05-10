@@ -16,8 +16,8 @@
 .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
 
 @media (max-width: 900px) {
-  /* Decorative right-panel — absolutely-positioned children bleed on mobile */
-  .hero-still { display: none; }
+  /* overflow:hidden clips the overlay text elements that bled on narrow screens */
+  .hero-still { overflow: hidden; }
 }
 
 /* ─── Single-row nav responsive ─────────────────────────────────────────── */
