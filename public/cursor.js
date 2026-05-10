@@ -5,7 +5,33 @@
 (function() {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-  if (isTouch) return; // native cursor on touch
+
+  // ===== Scroll reveal — runs on ALL devices (touch + pointer) =====
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('reveal-in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
+
+  const observeAll = () => {
+    document.querySelectorAll('[data-reveal]:not(.reveal-init)').forEach(el => {
+      el.classList.add('reveal-init');
+      const r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight && r.bottom > 0) {
+        requestAnimationFrame(() => el.classList.add('reveal-in'));
+      } else {
+        io.observe(el);
+      }
+    });
+  };
+  observeAll();
+  const mo = new MutationObserver(observeAll);
+  mo.observe(document.body, { childList: true, subtree: true });
+
+  if (isTouch) return; // custom cursor + effects only on pointer devices
 
   // ===== Mount cursor DOM =====
   const root = document.createElement('div');
@@ -239,32 +265,7 @@
     }, 380);
   };
 
-  // ===== Scroll reveal =====
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('reveal-in');
-        io.unobserve(e.target);
-      }
-    });
-  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
-
-  // Observe new reveal elements as DOM mutates; if already in/above viewport, reveal immediately
-  const observeAll = () => {
-    document.querySelectorAll('[data-reveal]:not(.reveal-init)').forEach(el => {
-      el.classList.add('reveal-init');
-      const r = el.getBoundingClientRect();
-      if (r.top < window.innerHeight && r.bottom > 0) {
-        // already visible — reveal next frame
-        requestAnimationFrame(() => el.classList.add('reveal-in'));
-      } else {
-        io.observe(el);
-      }
-    });
-  };
-  observeAll();
-  const mo = new MutationObserver(observeAll);
-  mo.observe(document.body, { childList: true, subtree: true });
+  // (Scroll reveal is registered above the isTouch guard so it runs on all devices.)
 
   // ===== Magnetic effect for buttons =====
   // Cache both elements and their rects. Rects are refreshed on resize/scroll
