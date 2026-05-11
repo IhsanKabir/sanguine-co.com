@@ -63,7 +63,7 @@ export default async function CheckoutPage({ params }: Props) {
         <Link href="/">Maison</Link>
         <span className="current">{t("checkout.title")}</span>
       </div>
-      <h1 className="serif" style={{ fontSize: 44, margin: "0 0 28px", color: "var(--purple-900)", fontWeight: 400 }}>
+      <h1 className="serif page-h1" style={{ margin: "0 0 28px", color: "var(--purple-900)", fontWeight: 400 }}>
         {t("checkout.title")}
       </h1>
       <CheckoutForm prefill={prefill} />
