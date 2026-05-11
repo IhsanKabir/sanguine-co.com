@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef, useEffect, useMemo } from "react";
-import { createProduct, updateProduct, deleteProduct } from "@/lib/actions/admin";
+import { createProduct, updateProduct, deleteProduct, deleteProducts } from "@/lib/actions/admin";
 import type { Segment, Product } from "@/lib/schema";
 import Composition from "@/components/storefront/Composition";
 import Icon from "@/components/storefront/Icon";
@@ -157,6 +157,8 @@ const empty = (segId: string): Editing => ({
 export default function ProductsClient({ segments, products }: Props) {
   const [editing, setEditing] = useState<Editing | null>(null);
   const [pendingDel, setPendingDel] = useState<Product | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [pendingBulkDel, setPendingBulkDel] = useState(false);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [, startTransition] = useTransition();
@@ -170,6 +172,21 @@ export default function ProductsClient({ segments, products }: Props) {
       ),
     [products, filter, search],
   );
+
+  const allVisibleSelected = list.length > 0 && list.every((p) => selected.has(p.id));
+  const someSelected = selected.size > 0;
+
+  const toggleAll = () => {
+    if (allVisibleSelected) {
+      setSelected((prev) => { const next = new Set(prev); list.forEach((p) => next.delete(p.id)); return next; });
+    } else {
+      setSelected((prev) => { const next = new Set(prev); list.forEach((p) => next.add(p.id)); return next; });
+    }
+  };
+
+  const toggleOne = (id: string) => {
+    setSelected((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+  };
 
   const onSave = () => {
     if (!editing) return;
@@ -215,7 +232,7 @@ export default function ProductsClient({ segments, products }: Props) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+      <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center", flexWrap: "wrap" }}>
         <div className="nav-search" style={{ width: 280 }}>
           <Icon name="search" size={14}/>
           <input placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)}/>
@@ -224,16 +241,44 @@ export default function ProductsClient({ segments, products }: Props) {
           <option value="all">All segments</option>
           {segments.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
+        {someSelected && (
+          <button
+            className="btn btn-sm"
+            style={{ background: "var(--err)", color: "white", border: "none", marginLeft: "auto" }}
+            onClick={() => setPendingBulkDel(true)}
+          >
+            <Icon name="x" size={12}/> Delete {selected.size} selected
+          </button>
+        )}
       </div>
 
       <div className="table">
         <table>
-          <thead><tr><th>Product</th><th>Segment</th><th>Price</th><th>Stock</th><th>Status</th><th style={{ textAlign: "right" }}>Actions</th></tr></thead>
+          <thead><tr>
+            <th style={{ width: 36 }}>
+              <input
+                type="checkbox"
+                checked={allVisibleSelected}
+                ref={(el) => { if (el) el.indeterminate = someSelected && !allVisibleSelected; }}
+                onChange={toggleAll}
+                aria-label="Select all"
+              />
+            </th>
+            <th>Product</th><th>Segment</th><th>Price</th><th>Stock</th><th>Status</th><th style={{ textAlign: "right" }}>Actions</th>
+          </tr></thead>
           <tbody>
             {list.map((p) => {
               const seg = segments.find((s) => s.id === p.segmentId);
               return (
-                <tr key={p.id}>
+                <tr key={p.id} style={{ background: selected.has(p.id) ? "var(--purple-50)" : undefined }}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selected.has(p.id)}
+                      onChange={() => toggleOne(p.id)}
+                      aria-label={`Select ${p.name}`}
+                    />
+                  </td>
                   <td>
                     <div className="admin-product-cell">
                       <Composition cat={p.segmentId || "clothing"} sku={p.sku} name={p.name} small/>
@@ -386,9 +431,33 @@ export default function ProductsClient({ segments, products }: Props) {
               <button className="btn btn-sm" style={{ background: "var(--err)", color: "white", border: "none" }}
                 onClick={() => startTransition(async () => {
                   await deleteProduct(pendingDel.id);
+                  setSelected((prev) => { const next = new Set(prev); next.delete(pendingDel.id); return next; });
                   setPendingDel(null);
                 })}>
                 Delete
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {pendingBulkDel && (
+        <>
+          <div className="overlay" onClick={() => setPendingBulkDel(false)}/>
+          <div className="seg-confirm">
+            <h3 className="serif" style={{ margin: "0 0 12px" }}>Delete {selected.size} product{selected.size !== 1 ? "s" : ""}?</h3>
+            <p style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.6, margin: "0 0 18px" }}>
+              These products will be permanently removed from the storefront. Past order history is preserved.
+            </p>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => setPendingBulkDel(false)}>Cancel</button>
+              <button className="btn btn-sm" style={{ background: "var(--err)", color: "white", border: "none" }}
+                onClick={() => startTransition(async () => {
+                  await deleteProducts(Array.from(selected));
+                  setSelected(new Set());
+                  setPendingBulkDel(false);
+                })}>
+                Delete {selected.size}
               </button>
             </div>
           </div>

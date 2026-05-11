@@ -194,7 +194,28 @@ export async function updateProduct(id: string, patch: Partial<z.infer<typeof pr
 
 export async function deleteProduct(id: string) {
   await requireAdmin();
-  await db.delete(schema.products).where(eq(schema.products.id, id));
+  await db.transaction(async (tx) => {
+    // orderLines.productId and preorderRequests.productId are nullable FKs with no cascade —
+    // nullify them so order history is preserved but the constraint doesn't block the delete.
+    await tx.update(schema.orderLines).set({ productId: null }).where(eq(schema.orderLines.productId, id));
+    await tx.update(schema.preorderRequests).set({ productId: null }).where(eq(schema.preorderRequests.productId, id));
+    // inventoryLog.productId is NOT NULL with no cascade — delete those rows first.
+    await tx.delete(schema.inventoryLog).where(eq(schema.inventoryLog.productId, id));
+    // Product row last (cascade handles productImages, reviews, wishlists, stockNotifications).
+    await tx.delete(schema.products).where(eq(schema.products.id, id));
+  });
+  revalidateAllLocales();
+}
+
+export async function deleteProducts(ids: string[]) {
+  if (!ids.length) return;
+  await requireAdmin();
+  await db.transaction(async (tx) => {
+    await tx.update(schema.orderLines).set({ productId: null }).where(inArray(schema.orderLines.productId, ids));
+    await tx.update(schema.preorderRequests).set({ productId: null }).where(inArray(schema.preorderRequests.productId, ids));
+    await tx.delete(schema.inventoryLog).where(inArray(schema.inventoryLog.productId, ids));
+    await tx.delete(schema.products).where(inArray(schema.products.id, ids));
+  });
   revalidateAllLocales();
 }
 
