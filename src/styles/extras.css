@@ -386,6 +386,66 @@
 .coupon-applied.compact .ca-code { font-size: 12px; }
 .coupon-applied.compact .ca-savings { font-size: 10px; }
 
+/* ─── Responsive page headings (replaces hardcoded fontSize in inline styles) */
+.page-h1    { font-size: 56px; }
+.page-h1-sm { font-size: 40px; }
+@media (max-width: 768px) {
+  .page-h1    { font-size: 38px; }
+  .page-h1-sm { font-size: 28px; }
+}
+@media (max-width: 480px) {
+  .page-h1    { font-size: 28px; }
+  .page-h1-sm { font-size: 22px; }
+}
+
+/* ─── Order confirmation page ────────────────────────────────────────────── */
+.order-confirm-section { padding: 100px 32px 80px; }
+@media (max-width: 640px) { .order-confirm-section { padding: 48px 20px 56px; } }
+
+.order-confirm-stats {
+  display: inline-grid;
+  grid-template-columns: auto auto auto;
+  gap: 40px;
+  margin: 32px 0;
+  text-align: left;
+  padding: 24px 40px;
+  background: white;
+  border: 1px solid var(--line);
+}
+@media (max-width: 480px) {
+  .order-confirm-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* ─── Sign-in page ────────────────────────────────────────────────────────── */
+.sign-in-section { padding: 100px 32px; }
+@media (max-width: 640px) { .sign-in-section { padding: 48px 20px; } }
+
+/* ─── Preorder product header ────────────────────────────────────────────── */
+.preorder-product-hd.has-photo {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 28px;
+  align-items: center;
+}
+@media (max-width: 480px) {
+  .preorder-product-hd.has-photo { display: block; }
+  .preorder-product-hd img { width: 100%; height: 200px; object-fit: cover; margin-bottom: 16px; }
+}
+
+/* ─── Quick-view modal grid ──────────────────────────────────────────────── */
+.qv-grid { display: grid; grid-template-columns: 1fr 1fr; }
+@media (max-width: 600px) {
+  .qv-grid { grid-template-columns: 1fr; }
+  .qv-grid > div:first-child { max-height: 260px; }
+}
+
 /* ─── Segment page responsive ────────────────────────────────────────────── */
 .segment-h1 { font-size: 64px; }
 @media (max-width: 768px) { .segment-h1 { font-size: 44px; } }

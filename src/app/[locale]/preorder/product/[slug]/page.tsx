@@ -50,7 +50,7 @@ export default async function ProductPreorderPage({ params }: Props) {
         <span className="current">Preorder</span>
       </div>
       <section className="section" style={{ paddingTop: 28, maxWidth: 880 }}>
-        <div style={{ marginBottom: 36, paddingBottom: 24, borderBottom: "1px solid var(--line)", display: "grid", gridTemplateColumns: photos[0] ? "120px 1fr" : "1fr", gap: 28, alignItems: "center" }}>
+        <div className={"preorder-product-hd" + (photos[0] ? " has-photo" : "")} style={{ marginBottom: 36, paddingBottom: 24, borderBottom: "1px solid var(--line)" }}>
           {photos[0] && (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={photos[0].url} alt={name} style={{ width: 120, height: 160, objectFit: "cover" }} />
@@ -59,7 +59,7 @@ export default async function ProductPreorderPage({ params }: Props) {
             <div style={{ fontSize: 11, letterSpacing: ".3em", color: "var(--gold-deep)", marginBottom: 8 }}>
               PREORDER
             </div>
-            <h1 className="serif" style={{ fontSize: 40, margin: "0 0 10px", color: "var(--purple-900)", fontWeight: 400, lineHeight: 1.05 }}>
+            <h1 className="serif page-h1-sm" style={{ margin: "0 0 10px", color: "var(--purple-900)", fontWeight: 400, lineHeight: 1.05 }}>
               {name}
             </h1>
             <div style={{ fontSize: 20, fontWeight: 500, color: "var(--purple-900)", marginBottom: 6 }}>

@@ -116,7 +116,7 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
           <button className="icon-btn" onClick={onClose} aria-label="Close"><Icon name="x" /></button>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+        <div className="qv-grid">
           <div style={{ position: "relative", aspectRatio: "3/4", overflow: "hidden", background: "#f4ecd8" }}>
             {product.heroImage ? (
               <Image

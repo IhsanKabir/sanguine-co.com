@@ -22,14 +22,14 @@ export default async function OrderConfirmation({ params }: Props) {
   const firstName = (addr.fullName ?? "").split(" ")[0] || "friend";
 
   return (
-    <section className="section" style={{ maxWidth: 760, textAlign: "center", padding: "100px 32px 80px" }}>
+    <section className="section order-confirm-section" style={{ maxWidth: 760, textAlign: "center" }}>
       <div style={{ marginBottom: 28 }}>
         <WaxSeal size={180} />
       </div>
       <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold-deep)", marginBottom: 10, textTransform: "uppercase" }}>
         {t("checkout.orderConfirmed")}
       </div>
-      <h1 className="serif" style={{ fontSize: 56, fontWeight: 400, color: "var(--purple-900)", margin: "0 0 16px", lineHeight: 1.1 }}>
+      <h1 className="serif page-h1" style={{ fontWeight: 400, color: "var(--purple-900)", margin: "0 0 16px", lineHeight: 1.1 }}>
         {t("checkout.thankYou")}, {firstName}.
       </h1>
       <p style={{ color: "var(--ink-soft)", fontSize: 16, maxWidth: 500, margin: "0 auto 28px", lineHeight: 1.7 }}>
@@ -38,7 +38,7 @@ export default async function OrderConfirmation({ params }: Props) {
       <div className="divider-ornament">
         <span className="mono" style={{ fontSize: 10, letterSpacing: ".3em", color: "var(--gold-deep)" }}>CEREMONY COMPLETE</span>
       </div>
-      <div style={{ display: "inline-grid", gridTemplateColumns: "auto auto auto", gap: 40, margin: "32px 0", textAlign: "left", padding: "24px 40px", background: "white", border: "1px solid var(--line)" }}>
+      <div className="order-confirm-stats">
         <div>
           <div className="pdp-label">{t("cart.total")}</div>
           <div className="serif" style={{ fontSize: 24, color: "var(--purple-900)" }}>{formatBdt(order.totalBdt, locale as "en"|"bn")}</div>

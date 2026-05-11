@@ -76,9 +76,9 @@ function SignInInner() {
   };
 
   return (
-    <section className="section" style={{ maxWidth: 440, padding: "100px 32px" }}>
+    <section className="section sign-in-section" style={{ maxWidth: 440 }}>
       <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold-deep)", marginBottom: 8, textAlign: "center" }}>WELCOME</div>
-      <h1 className="serif" style={{ fontSize: 48, margin: "0 0 8px", color: "var(--purple-900)", fontWeight: 400, textAlign: "center" }}>
+      <h1 className="serif page-h1" style={{ margin: "0 0 8px", color: "var(--purple-900)", fontWeight: 400, textAlign: "center" }}>
         {t("account.signIn")}
       </h1>
       <p style={{ color: "var(--ink-soft)", fontSize: 14, margin: "0 0 28px", textAlign: "center" }}>

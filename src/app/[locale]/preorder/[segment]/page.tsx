@@ -40,7 +40,7 @@ export default async function PreorderPage({ params }: Props) {
           <div style={{ fontSize: 11, letterSpacing: ".3em", color: "var(--gold-deep)", marginBottom: 8 }}>
             {tag.toUpperCase()} · BESPOKE
           </div>
-          <h1 className="serif" style={{ fontSize: 56, margin: 0, color: "var(--purple-900)", fontWeight: 400, lineHeight: 1.05 }}>
+          <h1 className="serif page-h1" style={{ margin: 0, color: "var(--purple-900)", fontWeight: 400, lineHeight: 1.05 }}>
             Compose a piece
           </h1>
           <p style={{ fontSize: 15, color: "var(--ink-soft)", margin: "16px 0 0", maxWidth: 620, lineHeight: 1.7 }}>

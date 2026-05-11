@@ -107,7 +107,7 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
 
       <div style={{ marginBottom: 32, paddingBottom: 20, borderBottom: "1px solid var(--line)" }}>
         <div style={{ fontSize: 11, letterSpacing: ".3em", color: "var(--gold-deep)", marginBottom: 8 }}>{t("YOUR ORDER", "আপনার অর্ডার")}</div>
-        <h1 className="serif" style={{ fontSize: 56, margin: 0, color: "var(--purple-900)", fontWeight: 400, fontFamily: "var(--serif)" }}>
+        <h1 className="serif page-h1" style={{ margin: 0, color: "var(--purple-900)", fontWeight: 400 }}>
           {number}
         </h1>
         <p style={{ fontSize: 14, color: "var(--ink-soft)", marginTop: 12 }}>
