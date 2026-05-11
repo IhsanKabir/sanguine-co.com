@@ -120,18 +120,7 @@ export default function LoyaltyCard({ lifetimeSpend, locale }: Props) {
         </h2>
       </div>
 
-      <div
-        style={{
-          background: "var(--purple-950)",
-          color: "var(--cream)",
-          padding: 32,
-          display: "grid",
-          gridTemplateColumns: "auto 1fr auto",
-          gap: 32,
-          alignItems: "flex-start",
-          borderRadius: 2,
-        }}
-      >
+      <div className="loyalty-card">
         {/* LEFT: Tier badge */}
         <div
           aria-hidden
@@ -267,20 +256,7 @@ export default function LoyaltyCard({ lifetimeSpend, locale }: Props) {
         </div>
 
         {/* RIGHT: Tier ladder */}
-        <ol
-          style={{
-            listStyle: "none",
-            padding: 0,
-            margin: 0,
-            display: "flex",
-            flexDirection: "column",
-            gap: 14,
-            borderLeft: "1px solid color-mix(in oklab, var(--cream) 12%, transparent)",
-            paddingLeft: 20,
-            minWidth: 160,
-          }}
-          aria-label="Tier ladder"
-        >
+        <ol className="loyalty-tiers" aria-label="Tier ladder">
           {TIERS.map((tier, i) => {
             const achieved = i <= currentIndex;
             const isCurrent = i === currentIndex;

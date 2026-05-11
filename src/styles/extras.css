@@ -214,6 +214,90 @@
   .acct-stats       { grid-template-columns: 1fr 1fr; margin-bottom: 32px; }
 }
 
+/* ─── Orders table → card layout on mobile ───────────────────────────────── */
+@media (max-width: 640px) {
+  .orders-table-wrap table { display: block; width: 100%; }
+  .orders-table-wrap thead { display: none; }
+  .orders-table-wrap tbody { display: flex; flex-direction: column; gap: 10px; }
+  .orders-table-wrap tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto auto;
+    column-gap: 12px;
+    row-gap: 4px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    background: white;
+    width: 100%;
+  }
+  /* order number */
+  .orders-table-wrap td:nth-child(1) { grid-column: 1; grid-row: 1; }
+  /* date */
+  .orders-table-wrap td:nth-child(2) { grid-column: 1; grid-row: 2; }
+  /* status badge — right side spanning rows 1-2 */
+  .orders-table-wrap td:nth-child(3) { grid-column: 2; grid-row: 1 / 3; display: flex; align-items: center; justify-content: flex-end; }
+  /* tracking — hide if just a dash */
+  .orders-table-wrap td:nth-child(4) { grid-column: 1; grid-row: 3; }
+  /* total */
+  .orders-table-wrap td:nth-child(5) { grid-column: 2; grid-row: 3; display: flex; align-items: center; justify-content: flex-end; font-size: 14px; }
+  /* actions: Track / Invoice / Return */
+  .orders-table-wrap td:nth-child(6) {
+    grid-column: 1 / 3;
+    grid-row: 4;
+    padding-top: 10px;
+    margin-top: 6px;
+    border-top: 1px solid var(--line);
+  }
+  .orders-table-wrap td:nth-child(6) > div { flex-wrap: nowrap; gap: 16px; }
+}
+
+/* ─── Loyalty card responsive ────────────────────────────────────────────── */
+.loyalty-card {
+  background: var(--purple-950);
+  color: var(--cream);
+  padding: 32px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 32px;
+  align-items: flex-start;
+  border-radius: 2px;
+}
+.loyalty-tiers {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-left: 1px solid color-mix(in oklab, var(--cream) 12%, transparent);
+  padding-left: 20px;
+  min-width: 160px;
+}
+@media (max-width: 640px) {
+  .loyalty-card {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    gap: 20px 16px;
+    padding: 24px 18px;
+  }
+  /* Badge: row 1 col 1, Center: row 1 col 2 */
+  .loyalty-card > div:first-child { grid-column: 1; grid-row: 1; }
+  .loyalty-card > div:nth-child(2) { grid-column: 2; grid-row: 1; }
+  /* Tier ladder: row 2, full width, horizontal */
+  .loyalty-tiers {
+    grid-column: 1 / 3;
+    grid-row: 2;
+    border-left: none;
+    border-top: 1px solid color-mix(in oklab, var(--cream) 12%, transparent);
+    padding-left: 0;
+    padding-top: 16px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    min-width: unset;
+  }
+}
+
 /* Coupon input + applied badge */
 .coupon-input {
   display: flex;

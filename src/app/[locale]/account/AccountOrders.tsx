@@ -63,7 +63,7 @@ export default function AccountOrders({ orders, locale }: Props) {
 
   return (
     <>
-      <div className="table">
+      <div className="table orders-table-wrap">
         <table>
           <thead>
             <tr>
