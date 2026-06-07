@@ -166,7 +166,7 @@
     lastT = t;
 
     // Lerp toward mouse — dt-normalised so 144 Hz feels identical to 60 Hz.
-    const ease = Math.min((mode === 'admin' ? 1 : 0.20) * dt, 1);
+    const ease = Math.min((mode === 'admin' ? 1 : 0.28) * dt, 1);
     cx += (mx - cx) * ease;
     cy += (my - cy) * ease;
 
