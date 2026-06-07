@@ -78,13 +78,9 @@
   const canvas = document.getElementById('ssg-cursor-trail');
   const ctx = canvas.getContext('2d');
 
-  // ===== Mouse tracking with two-layer spring physics =====
-  // Dot (main cursor) — fast spring; Ring — slow spring that trails behind.
-  // Individual CSS `translate` property composes with the ring's keyframe
-  // `transform` so we can offset the ring without fighting the animation.
+  // ===== Mouse tracking =====
   let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-  let cx = mx, cy = my, dvx = 0, dvy = 0;   // dot position + velocity
-  let rx = mx, ry = my, rvx = 0, rvy = 0;   // ring position + velocity
+  let cx = mx, cy = my;
   let vx = 0, vy = 0;
   let lastX = mx, lastY = my;
   let mode = 'default';
@@ -93,11 +89,7 @@
 
   window.addEventListener('mousemove', e => {
     mx = e.clientX; my = e.clientY;
-    if (!visible) {
-      cx = mx; cy = my; rx = mx; ry = my;
-      dvx = 0; dvy = 0; rvx = 0; rvy = 0;
-      visible = true; cur.classList.add('visible');
-    }
+    if (!visible) { cx = mx; cy = my; visible = true; cur.classList.add('visible'); }
   });
   window.addEventListener('mousedown', (e) => {
     down = true; cur.classList.add('down');
@@ -173,30 +165,16 @@
     const dt = Math.min((t - lastT) / 16, 3) || 1;
     lastT = t;
 
-    if (mode === 'admin') {
-      // Snap instantly for pixel-perfect admin HUD positioning
-      cx = mx; cy = my; rx = mx; ry = my;
-      dvx = 0; dvy = 0; rvx = 0; rvy = 0;
-    } else {
-      // Dot spring — fast, snappy (settles in ~18 frames)
-      dvx = (dvx + (mx - cx) * 0.18 * dt) * 0.78;
-      dvy = (dvy + (my - cy) * 0.18 * dt) * 0.78;
-      cx += dvx; cy += dvy;
-
-      // Ring spring — slow, trailing (settles in ~40 frames)
-      rvx = (rvx + (mx - rx) * 0.08 * dt) * 0.80;
-      rvy = (rvy + (my - ry) * 0.08 * dt) * 0.80;
-      rx += rvx; ry += rvy;
-    }
+    // Lerp toward mouse — dt-normalised so 144 Hz feels identical to 60 Hz.
+    const ease = Math.min((mode === 'admin' ? 1 : 0.20) * dt, 1);
+    cx += (mx - cx) * ease;
+    cy += (my - cy) * ease;
 
     vx = cx - lastX; vy = cy - lastY;
     lastX = cx; lastY = cy;
     const speed = Math.hypot(vx, vy);
 
-    // Dot drives the main cursor position; ring gets an additional offset
-    // via the CSS `translate` property (composes with its keyframe transform).
     cur.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
-    ringEl.style.translate = `${rx - cx}px ${ry - cy}px`;
 
     // Hover detection every other frame (~30fps) inside the rAF loop so it
     // doesn't compete with pointer events via a separate setInterval timer.
