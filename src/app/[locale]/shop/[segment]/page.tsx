@@ -39,6 +39,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url,
       type: "website",
       locale: isBn ? "bn_BD" : "en_BD",
+      // Maison card — child openGraph replaces the root fallback wholesale.
+      images: [{ url: "/api/og", width: 1200, height: 630, alt: "Saanguine Maison" }],
     },
     twitter: { card: "summary_large_image", title: name, description: blurb },
   };

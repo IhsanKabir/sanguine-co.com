@@ -54,6 +54,8 @@ export async function legalMetadata(
       type: "website",
       locale: isBn ? "bn_BD" : "en_BD",
       siteName: "Saanguine Maison",
+      // Maison card — child openGraph replaces the root fallback wholesale.
+      images: [{ url: "/api/og", width: 1200, height: 630, alt: "Saanguine Maison" }],
     },
   };
 }

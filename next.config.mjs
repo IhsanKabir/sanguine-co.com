@@ -17,6 +17,12 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ["next-intl"],
   },
+  // The OG card route reads its bundled TTFs from disk at runtime; make sure
+  // Vercel's file tracing packs them into the function even though they are
+  // only referenced through a computed path.join().
+  outputFileTracingIncludes: {
+    "/api/og": ["./src/app/api/og/_fonts/*.ttf"],
+  },
 };
 
 // Sentry build-time options. Source maps are uploaded only when both
@@ -40,10 +46,8 @@ if (process.env.NODE_ENV !== "test") {
   const hasOrg = Boolean(process.env.SENTRY_ORG);
   const hasProject = Boolean(process.env.SENTRY_PROJECT);
   if (hasToken && hasOrg && hasProject) {
-    // eslint-disable-next-line no-console
     console.log(`[sentry] Source maps will be uploaded for ${process.env.SENTRY_ORG}/${process.env.SENTRY_PROJECT}.`);
   } else {
-    // eslint-disable-next-line no-console
     console.log(
       `[sentry] Source maps skipped — missing: ${[
         !hasToken && "SENTRY_AUTH_TOKEN",

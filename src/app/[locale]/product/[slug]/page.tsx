@@ -34,7 +34,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const name = (isBn && p.nameBn) || p.name;
   const description = (isBn && p.descriptionBn) || p.description || "A piece from the maison.";
   const url = `${BASE}/${locale}/product/${slug}`;
-  const ogImage = photos[0]?.url;
+  // Branded 1200×630 card from /api/og — it overlays the first product photo
+  // when one exists and falls back to the maison card when none does, so
+  // every PDP gets a real share preview (most products have no photography
+  // yet). The raw photo stays as a secondary og:image for scrapers that
+  // prefer a plain product shot.
+  const ogCard = `${BASE}/api/og?slug=${encodeURIComponent(slug)}`;
+  const photo = photos[0]?.url;
+  const ogImages = [
+    { url: ogCard, width: 1200, height: 630, alt: name },
+    ...(photo ? [{ url: photo, alt: name }] : []),
+  ];
   return {
     title: name,
     description,
@@ -52,7 +62,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url,
       type: "website",
       locale: isBn ? "bn_BD" : "en_BD",
-      images: ogImage ? [{ url: ogImage, alt: name }] : undefined,
+      images: ogImages,
     },
     // Facebook / LinkedIn / Pinterest render product cards with price +
     // availability when og:type is "product". Next.js's Metadata type
@@ -69,7 +79,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title: name,
       description,
-      images: ogImage ? [ogImage] : undefined,
+      images: [ogCard],
     },
   };
 }

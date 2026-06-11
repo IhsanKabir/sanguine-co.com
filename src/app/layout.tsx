@@ -44,12 +44,14 @@ export const metadata: Metadata = {
     url: BASE,
     title: "Saanguine Maison",
     description: "Garments, flora & small ceremonies for the violet hour.",
-    images: [{ url: "/logo.png", width: 1200, height: 630, alt: "Saanguine Maison" }],
+    // Generic maison card rendered by /api/og (wordmark + tagline, 1200×630).
+    // Pages with richer context (PDP) override this with their own card.
+    images: [{ url: "/api/og", width: 1200, height: 630, alt: "Saanguine Maison" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Saanguine Maison",
-    images: ["/logo.png"],
+    images: ["/api/og"],
   },
   icons: {
     icon: [

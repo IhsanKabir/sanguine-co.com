@@ -7,7 +7,11 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        // `/api/og` must stay fetchable despite the `/api` + `/*?*` disallows
+        // below — Google only shows OG images in rich results / Discover if
+        // the image URL itself is crawlable. Longest-match precedence means
+        // this allow rule wins for /api/og?slug=… on Google and Bing.
+        allow: ["/", "/api/og"],
         disallow: [
           "/admin",         // private operations area
           "/api",           // server actions / webhook endpoints

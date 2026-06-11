@@ -8,6 +8,11 @@ import { COPY_CACHE_TAG } from "@/lib/copy";
 // revalidatePath("/", "layout") alone does not reach /en or /bn because
 // localePrefix:"always" in next-intl means the root "/" path never serves
 // storefront content — all pages live under /{locale}/...
+//
+// Known limit: this does NOT purge the /api/og share-card CDN cache
+// (s-maxage=86400), so a product's social card can show an old price/name
+// for up to a day after an edit. Accepted trade-off — see the Cache-Control
+// note in src/app/api/og/route.tsx.
 function revalidateAllLocales() {
   for (const locale of ["en", "bn"]) {
     revalidatePath(`/${locale}`, "layout");
@@ -15,7 +20,7 @@ function revalidateAllLocales() {
 }
 import { db, schema } from "@/lib/db";
 import { parseShippingAddress } from "@/lib/schema";
-import { eq, desc, sql, inArray } from "drizzle-orm";
+import { eq, sql, inArray } from "drizzle-orm";
 import { createClient } from "@supabase/supabase-js";
 import { requireAdmin, requirePermission } from "@/lib/auth-utils";
 import { PERMISSIONS, type Permission, type AdminRole } from "@/lib/permissions";

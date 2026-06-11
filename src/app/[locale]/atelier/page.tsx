@@ -33,6 +33,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       locale: isBn ? "bn_BD" : "en_BD",
       siteName: "Saanguine Maison",
+      // Maison card — child openGraph replaces the root fallback wholesale.
+      images: [{ url: "/api/og", width: 1200, height: 630, alt: "Saanguine Maison" }],
     },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -92,7 +94,7 @@ export default async function AtelierPage({ params }: Props) {
           <div className="ed-section-kicker">III. Philosophy</div>
           <h2>Slow is not a style</h2>
           <p>There is a certain kind of deliberateness that looks, from a distance, like inefficiency. It is the florist who ties a ribbon three times before it is right. The perfumer who lets a maceration sit a week past the minimum. The bookbinder who chooses the cloth before the title. We take this as instruction.</p>
-          <p>We produce limited quantities for a reason that is not strategic: we cannot make more without compromising what we make. Each season's output is bounded by what a small team can do with full attention, and we consider that boundary a feature, not a constraint.</p>
+          <p>We produce limited quantities for a reason that is not strategic: we cannot make more without compromising what we make. Each season&rsquo;s output is bounded by what a small team can do with full attention, and we consider that boundary a feature, not a constraint.</p>
           <blockquote className="ed-pull">
             <p>A wax seal cools in under a minute but holds for a century. We are interested in that ratio.</p>
           </blockquote>
