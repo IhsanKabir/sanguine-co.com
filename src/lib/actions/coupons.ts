@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { db, schema } from "@/lib/db";
-import { and, eq, gt, lte, gte, isNull, or, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { requirePermission } from "@/lib/auth-utils";
 
 export type CouponValidation =

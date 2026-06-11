@@ -3,6 +3,7 @@
 import { useState, useTransition, type FormEvent } from "react";
 import { createManualOrder } from "@/lib/actions/manual-order";
 import { formatBdt } from "@/lib/utils";
+import { Link } from "@/i18n/routing";
 import Icon from "@/components/storefront/Icon";
 
 type Product = {
@@ -63,6 +64,15 @@ export default function ManualOrderForm({ products }: { products: Product[] }) {
     setItems((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  // Restore every field to its initial value so "Create another" starts from
+  // a blank form without forcing a full page reload.
+  const resetForm = () => {
+    setName(""); setEmail(""); setPhone("");
+    setLine1(""); setArea(""); setCity("Dhaka"); setPostcode("");
+    setItems([]); setShippingFee("0"); setNotes("");
+    setSendEmail(true); setError(null); setDone(null);
+  };
+
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -103,8 +113,8 @@ export default function ManualOrderForm({ products }: { products: Product[] }) {
           Number: <b style={{ fontFamily: "var(--mono)" }}>{done.number}</b>
         </p>
         <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-          <a href="/admin/orders" className="btn btn-primary btn-sm">Back to orders</a>
-          <a href="/admin/orders/new" className="btn btn-ghost btn-sm">Create another</a>
+          <Link href="/admin/orders" className="btn btn-primary btn-sm">Back to orders</Link>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={resetForm}>Create another</button>
         </div>
       </div>
     );
@@ -117,7 +127,7 @@ export default function ManualOrderForm({ products }: { products: Product[] }) {
           <h1 className="admin-h1">New manual order</h1>
           <p className="admin-sub">Create a phone-in or walk-in order on a customer&rsquo;s behalf. Same flow as a storefront order — emails the customer if checked, decrements stock, lands in the orders queue.</p>
         </div>
-        <a href="/admin/orders" className="btn btn-ghost btn-sm">Cancel</a>
+        <Link href="/admin/orders" className="btn btn-ghost btn-sm">Cancel</Link>
       </div>
 
       <fieldset style={{ border: "1px solid var(--line)", padding: 16 }}>
@@ -239,7 +249,7 @@ export default function ManualOrderForm({ products }: { products: Product[] }) {
       {error && <p style={{ color: "var(--err)", fontSize: 13 }}>{error}</p>}
 
       <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-        <a href="/admin/orders" className="btn btn-ghost btn-sm">Cancel</a>
+        <Link href="/admin/orders" className="btn btn-ghost btn-sm">Cancel</Link>
         <button type="submit" className="btn btn-primary" disabled={pending || items.length === 0} style={{ minWidth: 200 }}>
           {pending ? "Creating…" : `Create order · ${formatBdt(total)}`}
         </button>

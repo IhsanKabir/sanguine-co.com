@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition, type FormEvent } from "react";
+import { useCallback, useEffect, useState, useTransition, type FormEvent } from "react";
 import { issueRefund, listRefundsForOrder } from "@/lib/actions/refunds";
 import type { Refund } from "@/lib/schema";
 import { formatBdt, formatDate } from "@/lib/utils";
@@ -30,10 +30,10 @@ export default function RefundPanel({ orderId, orderTotalBdt, onIssued }: Props)
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const reload = () => {
+  const reload = useCallback(() => {
     listRefundsForOrder(orderId).then(setRefunds).catch(() => setRefunds([]));
-  };
-  useEffect(() => { reload(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [orderId]);
+  }, [orderId]);
+  useEffect(() => { reload(); }, [reload]);
 
   const refundedSoFar = refunds.reduce((s, r) => s + r.amountBdt, 0);
   const remaining = Math.max(0, orderTotalBdt - refundedSoFar);

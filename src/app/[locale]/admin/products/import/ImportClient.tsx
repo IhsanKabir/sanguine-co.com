@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type ChangeEvent } from "react";
 import { importProductsCsv, type ImportPreview } from "@/lib/actions/product-import";
+import { Link } from "@/i18n/routing";
 import Icon from "@/components/storefront/Icon";
 
 const TEMPLATE = [
@@ -77,7 +78,7 @@ export default function ImportClient() {
           <h1 className="admin-h1">Bulk import products</h1>
           <p className="admin-sub">Upload a CSV to create or update many products at once. Existing SKUs are updated; new SKUs become new pieces.</p>
         </div>
-        <a href="/admin/products" className="btn btn-ghost btn-sm">Back to products</a>
+        <Link href="/admin/products" className="btn btn-ghost btn-sm">Back to products</Link>
       </div>
 
       <div className="panel" style={{ padding: 18, marginBottom: 16 }}>
@@ -140,7 +141,7 @@ export default function ImportClient() {
           {preview.committed && (
             <div style={{ padding: 16, background: "#eef7ee", border: "1px solid #4caf50", marginTop: 16, fontSize: 14 }}>
               <b>Imported.</b> {preview.toCreate} created, {preview.toUpdate} updated. Visit{" "}
-              <a href="/admin/products" style={{ color: "#2e7d32", fontWeight: 500 }}>products</a> to verify.
+              <Link href="/admin/products" style={{ color: "#2e7d32", fontWeight: 500 }}>products</Link> to verify.
             </div>
           )}
 

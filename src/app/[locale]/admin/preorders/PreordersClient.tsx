@@ -10,6 +10,7 @@ import {
 } from "@/lib/actions/preorders";
 import type { PreorderRequest, Segment } from "@/lib/schema";
 import { formatBdt, formatDate } from "@/lib/utils";
+import { Link } from "@/i18n/routing";
 import Icon from "@/components/storefront/Icon";
 
 const STATUS_PILL: Record<string, string> = {
@@ -376,7 +377,7 @@ function DetailDrawer({
           )}
           {request.status === "converted" && request.convertedOrderId && (
             <div style={{ marginTop: 16, padding: 14, background: "#eef7ee", border: "1px solid #4caf50", fontSize: 13, color: "#2e4f33" }}>
-              <b>Converted</b> — order <a href="/admin/orders" style={{ color: "#2e7d32", fontFamily: "var(--mono)" }}>{linkedOrder?.number ?? "created"}</a>.
+              <b>Converted</b> — order <Link href="/admin/orders" style={{ color: "#2e7d32", fontFamily: "var(--mono)" }}>{linkedOrder?.number ?? "created"}</Link>.
               <BespokePipeline linkedOrder={linkedOrder} />
             </div>
           )}

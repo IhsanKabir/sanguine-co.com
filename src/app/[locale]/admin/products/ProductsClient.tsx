@@ -5,6 +5,7 @@ import { createProduct, updateProduct, deleteProduct, deleteProducts } from "@/l
 import type { Segment, Product } from "@/lib/schema";
 import Composition from "@/components/storefront/Composition";
 import Icon from "@/components/storefront/Icon";
+import { Link } from "@/i18n/routing";
 import { formatBdt } from "@/lib/utils";
 import ProductImagesEditor from "./ProductImagesEditor";
 
@@ -185,7 +186,12 @@ export default function ProductsClient({ segments, products }: Props) {
   };
 
   const toggleOne = (id: string) => {
-    setSelected((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   const onSave = () => {
@@ -223,9 +229,9 @@ export default function ProductsClient({ segments, products }: Props) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", marginBottom: 20 }}>
         <div><h1 className="admin-h1">Products</h1><p className="admin-sub">{products.length} pieces across {segments.length} segments.</p></div>
         <div style={{ display: "flex", gap: 8 }}>
-          <a href="/admin/products/import" className="btn btn-ghost btn-sm" title="Bulk import from a CSV">
+          <Link href="/admin/products/import" className="btn btn-ghost btn-sm" title="Bulk import from a CSV">
             <Icon name="plus" size={12}/> Import CSV
-          </a>
+          </Link>
           <button className="btn btn-primary btn-sm" onClick={() => setEditing(empty(segments[0]?.id || "clothing"))}>
             <Icon name="check" size={14}/> New Product
           </button>

@@ -1,5 +1,4 @@
 import { pgTable, text, integer, boolean, uuid, timestamp, jsonb, numeric, primaryKey } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 
 // ─── Catalogue ─────────────────────────────────────────────────────────
 export const segments = pgTable("segments", {

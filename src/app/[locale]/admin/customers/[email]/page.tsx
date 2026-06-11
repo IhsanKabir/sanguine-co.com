@@ -27,10 +27,6 @@ function tierFor(spend: number) {
   return TIERS.find((t) => spend >= t.min) ?? TIERS[TIERS.length - 1];
 }
 
-function fmtPref(v: string | null | undefined) {
-  return v ?? <span style={{ color: "var(--ink-soft)", fontSize: 11 }}>—</span>;
-}
-
 export default async function AdminCustomerDetailPage({ params }: Props) {
   const ctx = await requirePermission("customers");
   const canSeeRevenue = ctx.has("revenue");

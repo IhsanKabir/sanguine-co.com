@@ -14,8 +14,6 @@ type Props = {
   overridesBn: Map;
 };
 
-const QUICK_PATHS = ["brand.name", "brand.tagline", "topbar.announcement"] as const;
-
 export default function EditorialClient({
   email: initialEmail,
   defaultsEn,

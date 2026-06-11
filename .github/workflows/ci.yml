@@ -30,9 +30,8 @@ jobs:
       - name: TypeScript typecheck
         run: npx tsc --noEmit --pretty false
 
+      # `next lint` is deprecated (removed in Next 16); we run the ESLint CLI
+      # directly against eslint.config.mjs. The baseline is clean, so lint
+      # failures block the build, and --max-warnings 0 stops warning creep.
       - name: ESLint
-        run: npx next lint
-        # Lint failures do not block the build today — Phase 5 cleanup will
-        # tighten this. Surface the report regardless of exit status so PR
-        # reviewers can see it.
-        continue-on-error: true
+        run: npx eslint . --max-warnings 0

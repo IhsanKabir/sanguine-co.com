@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/routing";
 import { legalMetadata } from "../_metadata";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -37,7 +38,7 @@ function EnglishSection() {
       <p>For bespoke pieces, the timeline begins when the quote is accepted and is stated in the quote itself.</p>
 
       <h2>Returns and refunds</h2>
-      <p>Please see our <a href="/legal/returns">Returns Policy</a>. In short: stock pieces may be returned within fourteen days; bespoke pieces (those made or sourced specifically for you) are not returnable except in the case of a defect in the piece itself.</p>
+      <p>Please see our <Link href="/legal/returns">Returns Policy</Link>. In short: stock pieces may be returned within fourteen days; bespoke pieces (those made or sourced specifically for you) are not returnable except in the case of a defect in the piece itself.</p>
 
       <h2>Your account</h2>
       <p>You are responsible for keeping your sign-in details private. Tell us at once if you suspect someone else has used your account. We may suspend or close an account that breaches these terms or appears to be used fraudulently.</p>
@@ -86,7 +87,7 @@ function BangleSection() {
       <p>বেসপোক পিসের ক্ষেত্রে কোট গৃহীত হওয়ার দিন থেকে সময় গণনা শুরু হয়, এবং তা কোটেই উল্লেখ থাকে।</p>
 
       <h2>ফেরত ও অর্থ ফেরত</h2>
-      <p>বিস্তারিতের জন্য আমাদের <a href="/legal/returns">ফেরত নীতি</a> দেখুন। সংক্ষেপে: স্টক পিস চৌদ্দ দিনের মধ্যে ফেরত দেয়া যাবে; বেসপোক পিস (আপনার জন্য বিশেষভাবে তৈরি বা সংগৃহীত) ফেরতযোগ্য নয়, পিসটিতে ত্রুটি থাকলে ব্যতিক্রম।</p>
+      <p>বিস্তারিতের জন্য আমাদের <Link href="/legal/returns">ফেরত নীতি</Link> দেখুন। সংক্ষেপে: স্টক পিস চৌদ্দ দিনের মধ্যে ফেরত দেয়া যাবে; বেসপোক পিস (আপনার জন্য বিশেষভাবে তৈরি বা সংগৃহীত) ফেরতযোগ্য নয়, পিসটিতে ত্রুটি থাকলে ব্যতিক্রম।</p>
 
       <h2>আপনার অ্যাকাউন্ট</h2>
       <p>আপনার সাইন-ইনের তথ্য গোপনে রাখার দায়িত্ব আপনার। অন্য কেউ আপনার অ্যাকাউন্ট ব্যবহার করেছে বলে সন্দেহ হলে অবিলম্বে আমাদের জানান। শর্ত লঙ্ঘন বা প্রতারণার লক্ষণ থাকলে আমরা অ্যাকাউন্ট স্থগিত বা বন্ধ করতে পারি।</p>

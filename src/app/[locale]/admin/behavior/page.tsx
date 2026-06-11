@@ -1,7 +1,6 @@
-import { db, schema } from "@/lib/db";
-import { sql, desc } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { sql } from "drizzle-orm";
 import { requirePermission } from "@/lib/auth-utils";
-import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 

@@ -1,5 +1,5 @@
 import { db, schema } from "@/lib/db";
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, sql } from "drizzle-orm";
 import { formatBdt, formatDate } from "@/lib/utils";
 import { Link } from "@/i18n/routing";
 import { requirePermission } from "@/lib/auth-utils";

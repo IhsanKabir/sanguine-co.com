@@ -5,6 +5,7 @@ import type { Order, OrderEvent, OrderLine } from "@/lib/schema";
 import { parseShippingAddress } from "@/lib/schema";
 import { updateOrderStatus, bookCourier, getOrderTimeline, bulkUpdateOrderStatus } from "@/lib/actions/admin";
 import { formatBdt, formatDate } from "@/lib/utils";
+import { Link } from "@/i18n/routing";
 import Icon from "@/components/storefront/Icon";
 import RefundPanel from "./RefundPanel";
 
@@ -69,15 +70,17 @@ export default function OrdersClient({ orders, lines }: Props) {
     });
   };
 
-  // Load the timeline whenever a different order is opened.
+  // Load the timeline whenever a different order is opened. Keyed on the id
+  // (not the order object) so re-renders with the same order don't refetch.
+  const selectedId = selected?.id ?? null;
   useEffect(() => {
-    if (!selected) { setTimeline([]); return; }
+    if (!selectedId) { setTimeline([]); return; }
     setTimelineLoading(true);
-    getOrderTimeline(selected.id)
+    getOrderTimeline(selectedId)
       .then(setTimeline)
       .catch(() => setTimeline([]))
       .finally(() => setTimelineLoading(false));
-  }, [selected?.id]);
+  }, [selectedId]);
 
   const list = useMemo(
     () => orders.filter((o) => filter === "all" || o.status === filter),
@@ -103,16 +106,19 @@ export default function OrdersClient({ orders, lines }: Props) {
           <p className="admin-sub">{orders.length} total · {orders.filter((o) => o.status === "cod_pending").length} awaiting fulfilment.</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <a
+          <Link
             href="/admin/orders/new"
             className="btn btn-ghost btn-sm"
             title="Create a phone-in order on a customer's behalf"
             style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
           >
             <Icon name="plus" size={12} /> New order
-          </a>
+          </Link>
+          {/* Plain <a download> on purpose: this is a file download from an
+              API route, not a client-side navigation. */}
           <a
             href="/api/admin/orders/export"
+            download
             className="btn btn-ghost btn-sm"
             title="Download all orders as a CSV (one row per line item)"
             style={{ display: "inline-flex", alignItems: "center", gap: 6 }}

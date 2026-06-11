@@ -110,6 +110,7 @@ export default function SearchDropdown() {
                 key={p.id}
                 className="search-row"
                 role="option"
+                aria-selected={false}
                 tabIndex={0}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => onPick(p.slug)}

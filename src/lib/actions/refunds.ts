@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { eq, sum, and } from "drizzle-orm";
+import { eq, sum } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { requirePermission } from "@/lib/auth-utils";
 import { logOrderEvent } from "@/lib/order-events";
