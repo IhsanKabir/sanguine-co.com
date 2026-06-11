@@ -3,10 +3,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import Ornament from "@/components/storefront/Ornament";
 import JsonLd from "@/components/seo/JsonLd";
+import { SITE_URL as BASE } from "@/lib/site-url";
 
 type Props = { params: Promise<{ locale: string }> };
-
-const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;

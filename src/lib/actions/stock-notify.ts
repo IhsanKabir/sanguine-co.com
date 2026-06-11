@@ -8,7 +8,7 @@ import { getCurrentUser, requirePermission } from "@/lib/auth-utils";
 import { sendEmail } from "@/lib/email/brevo";
 import { backInStockEmail } from "@/lib/email/templates";
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+import { SITE_URL } from "@/lib/site-url";
 
 const subscribeSchema = z.object({
   productId: z.string().min(1).max(120),

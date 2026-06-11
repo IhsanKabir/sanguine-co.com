@@ -10,10 +10,9 @@ import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
 import HeroTide from "@/components/storefront/HeroTide";
 import Ornament from "@/components/storefront/Ornament";
 import JsonLd from "@/components/seo/JsonLd";
+import { SITE_URL as BASE } from "@/lib/site-url";
 
 type Props = { params: Promise<{ locale: string }> };
-
-const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
 
 /**
  * Per-locale homepage metadata.

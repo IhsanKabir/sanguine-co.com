@@ -5,7 +5,7 @@ import { sendEmail, addBrevoContact } from "@/lib/email/brevo";
 import { newsletterWelcomeEmail } from "@/lib/email/templates";
 import { captureError } from "@/lib/monitoring";
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+import { SITE_URL } from "@/lib/site-url";
 
 const schema = z.object({ email: z.string().email().max(200) });
 

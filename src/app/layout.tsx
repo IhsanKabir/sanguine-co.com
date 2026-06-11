@@ -6,7 +6,7 @@ import { getLocale } from "next-intl/server";
 import "./globals.css";
 import JsonLd from "@/components/seo/JsonLd";
 
-const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+import { SITE_URL as BASE } from "@/lib/site-url";
 
 const inter = Inter({
   subsets: ["latin"],

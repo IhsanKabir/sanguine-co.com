@@ -3,7 +3,7 @@ import { db, schema } from "@/lib/db";
 import { eq, and, inArray } from "drizzle-orm";
 import { routing } from "@/i18n/routing";
 
-const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+import { SITE_URL as BASE } from "@/lib/site-url";
 const LOCALES = routing.locales;
 
 function entry(

@@ -10,7 +10,7 @@ import { logOrderEvent } from "@/lib/order-events";
 import { sendEmail } from "@/lib/email/brevo";
 import { orderPlacedEmail, type OrderEmailLine } from "@/lib/email/templates";
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+import { SITE_URL } from "@/lib/site-url";
 
 const itemSchema = z.object({
   productId: z.string().min(1).max(120),

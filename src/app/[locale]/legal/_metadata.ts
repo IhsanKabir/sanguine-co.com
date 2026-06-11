@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+import { SITE_URL as BASE } from "@/lib/site-url";
 
 type Slug = "privacy" | "terms" | "returns" | "shipping";
 

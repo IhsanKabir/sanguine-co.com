@@ -14,6 +14,7 @@ import {
   preorderQuoteEmail,
   preorderAdminNotifyEmail,
 } from "@/lib/email/templates";
+import { SITE_URL } from "@/lib/site-url";
 
 const attachmentSchema = z.object({
   url: z.string().url(),
@@ -91,7 +92,7 @@ export async function createPreorderRequest(
   }
   const adminEmail = process.env.PREORDER_ADMIN_EMAIL || process.env.BREVO_FROM_EMAIL;
   if (adminEmail) {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine.vercel.app";
+    const baseUrl = SITE_URL;
     const { subject, html } = preorderAdminNotifyEmail({
       ...customerPayload,
       requestId: row.id,
@@ -175,7 +176,7 @@ export async function createProductPreorderRequest(
   }
   const adminEmail = process.env.PREORDER_ADMIN_EMAIL || process.env.BREVO_FROM_EMAIL;
   if (adminEmail) {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine.vercel.app";
+    const baseUrl = SITE_URL;
     const { subject, html } = preorderAdminNotifyEmail({
       customerName: data.customerName,
       segmentName: product.name,

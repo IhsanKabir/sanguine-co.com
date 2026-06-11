@@ -20,10 +20,9 @@ import { listApprovedReviews } from "@/lib/actions/reviews";
 import { getCurrentUser } from "@/lib/auth-utils";
 import { db, schema } from "@/lib/db";
 import { and, eq, sql } from "drizzle-orm";
+import { SITE_URL as BASE } from "@/lib/site-url";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
-
-const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;

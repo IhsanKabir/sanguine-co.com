@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { COPY_CACHE_TAG } from "@/lib/copy";
+import { SITE_URL } from "@/lib/site-url";
 
 // Bust the ISR cache for every locale-prefixed route.
 // revalidatePath("/", "layout") alone does not reach /en or /bn because
@@ -238,7 +239,7 @@ export async function adjustStock(id: string, delta: number, reason: string) {
 // ─── Orders ────────────────────────────────────────────────────────────
 const validStatuses = ["pending","cod_pending","paid","processing","shipped","delivered","cancelled","refunded"] as const;
 
-const SITE_URL_ORDERS = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+const SITE_URL_ORDERS = SITE_URL;
 
 /** Resolve recipient email for any order — guests have guestEmail, auth users need Supabase lookup. */
 async function resolveOrderEmail(orderId: string): Promise<{ email: string; firstName: string; number: string; trackingToken: string } | null> {
@@ -433,7 +434,7 @@ export async function bookCourier(input: z.infer<typeof courierSchema>) {
       color: l.color,
       size: l.size,
     }));
-    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+    const siteUrl = SITE_URL;
     const { subject, html } = orderShippedEmail({
       number: order.number,
       customerName: addr.fullName,

@@ -12,7 +12,7 @@ import { validateCoupon, recordCouponRedemption } from "./coupons";
 import { formatBdt } from "@/lib/utils";
 import { logOrderEvent } from "@/lib/order-events";
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+import { SITE_URL } from "@/lib/site-url";
 
 const FREE_THRESHOLD = 3000;
 const FLAT_SHIPPING_DHAKA = 80;

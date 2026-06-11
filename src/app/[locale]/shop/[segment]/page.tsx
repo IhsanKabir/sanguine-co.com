@@ -7,7 +7,7 @@ import { Link } from "@/i18n/routing";
 import ShopGrid from "@/components/storefront/ShopGrid";
 import JsonLd from "@/components/seo/JsonLd";
 
-const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://saanguine-the-retail-shop.vercel.app").replace(/\/$/, "");
+import { SITE_URL as BASE } from "@/lib/site-url";
 
 type Props = {
   params: Promise<{ locale: string; segment: string }>;
