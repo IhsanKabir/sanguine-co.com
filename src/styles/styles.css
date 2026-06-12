@@ -32,8 +32,19 @@ a{color:inherit;text-decoration:none;cursor:pointer}button{font-family:inherit;c
 input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;display:block}
 .serif{font-family:var(--serif);font-weight:500;letter-spacing:-.01em}.mono{font-family:var(--mono)}
 
-.topbar{background:var(--purple-950);color:var(--purple-100);font-size:12px;letter-spacing:.07em;text-transform:uppercase;text-align:center;padding:8px 16px}
+.topbar{background:var(--purple-950);color:var(--purple-100);font-size:12px;letter-spacing:.07em;text-transform:uppercase;text-align:center;padding:8px 16px;position:relative}
 .topbar b{color:var(--gold);font-weight:500;letter-spacing:.12em}
+/* Scheduled announcement variants (admin → Editorial). Only "neutral" and
+ * "celebration" exist by design — a red "warn" tone would fight the register. */
+.topbar--celebration{background:var(--gold-deep);color:var(--cream)}
+.topbar--celebration b{color:var(--cream)}
+.topbar-dismiss{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  width:28px;height:28px;display:grid;place-items:center;border-radius:999px;
+  color:inherit;opacity:.7;font-size:16px;line-height:1;
+}
+.topbar-dismiss:hover,.topbar-dismiss:focus-visible{opacity:1;background:rgba(255,255,255,.12)}
+.topbar-dismiss:focus-visible{outline:1px solid var(--gold);outline-offset:1px}
 .nav{background:var(--cream);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
 .nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:20px;padding:14px 32px}
 .nav-cats{display:flex;align-items:center;flex:1;justify-content:center}

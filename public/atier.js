@@ -190,12 +190,45 @@
     src.connect(filt).connect(g).connect(actx.destination);
     src.start();
   }
-  window.SSG_SOUND = {
+  // Curated audio (admin-uploaded via /admin/audio) takes precedence over
+  // the synth tones for the three signature sounds. The locale layout
+  // injects `window.SSG_AUDIO_URLS = { gong, chime, seal }` inline before
+  // this script runs. ANY playback failure — 404, decode error, autoplay
+  // rejection — falls back to the synth so the cue is never silently lost.
+  // click/rustle stay synth-only by design (sub-50ms cues, files add lag).
+  const synthTones = {
     gong() { tone(110, 2.0, 'sine', 0.18, 80); tone(220, 1.8, 'sine', 0.06, 165); tone(440, 1.6, 'sine', 0.03, 330); },
-    click() { tone(2400, 0.04, 'square', 0.03); },
-    rustle() { noiseBurst(0.18, 0.05, 5000); },
     chime() { tone(1320, 0.4, 'sine', 0.08, 1760); tone(1760, 0.5, 'sine', 0.04, 2200); },
     seal() { tone(80, 0.25, 'sine', 0.15, 50); noiseBurst(0.15, 0.04, 1500); },
+  };
+  const audioFiles = {};
+  function fileOrSynth(kind) {
+    // Gate on BOTH the mute toggle and cookie consent, matching tone()'s
+    // effective gating (muted starts true whenever consent is absent, but
+    // restating it here keeps the PDPO guarantee independent of that
+    // initialisation invariant).
+    if (muted || !audioPermitted()) return;
+    const url = (window.SSG_AUDIO_URLS || {})[kind];
+    if (!url) return synthTones[kind]();
+    try {
+      let el = audioFiles[kind];
+      if (!el || el.src !== url) {
+        el = new Audio(url);
+        el.preload = 'auto';
+        el.volume = 0.55;
+        audioFiles[kind] = el;
+      }
+      el.currentTime = 0;
+      const p = el.play();
+      if (p && p.catch) p.catch(() => synthTones[kind]());
+    } catch { synthTones[kind](); }
+  }
+  window.SSG_SOUND = {
+    gong() { fileOrSynth('gong'); },
+    click() { tone(2400, 0.04, 'square', 0.03); },
+    rustle() { noiseBurst(0.18, 0.05, 5000); },
+    chime() { fileOrSynth('chime'); },
+    seal() { fileOrSynth('seal'); },
   };
   function setMuted(m) {
     muted = m;

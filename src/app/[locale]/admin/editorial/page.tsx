@@ -1,6 +1,8 @@
 import { getBrand } from "@/lib/actions/admin";
 import { getCopyOverrides, flattenMessages } from "@/lib/copy";
+import { getAnnouncementUncached } from "@/lib/announcement";
 import EditorialClient from "./EditorialClient";
+import AnnouncementEditor from "./AnnouncementEditor";
 import { requirePermission } from "@/lib/auth-utils";
 import enMessages from "@/messages/en.json";
 import bnMessages from "@/messages/bn.json";
@@ -15,18 +17,22 @@ export default async function AdminEditorialPage() {
   const defaultsEn = flattenMessages(enMessages as Record<string, unknown>);
   const defaultsBn = flattenMessages(bnMessages as Record<string, unknown>);
 
-  const [overrides, brand] = await Promise.all([
+  const [overrides, brand, announcement] = await Promise.all([
     getCopyOverrides(),
     getBrand(),
+    getAnnouncementUncached(),
   ]);
 
   return (
-    <EditorialClient
-      email={brand?.email ?? "concierge@saanguine.com"}
-      defaultsEn={defaultsEn}
-      defaultsBn={defaultsBn}
-      overridesEn={overrides.en}
-      overridesBn={overrides.bn}
-    />
+    <>
+      <EditorialClient
+        email={brand?.email ?? "concierge@saanguine.com"}
+        defaultsEn={defaultsEn}
+        defaultsBn={defaultsBn}
+        overridesEn={overrides.en}
+        overridesBn={overrides.bn}
+      />
+      <AnnouncementEditor initial={announcement} />
+    </>
   );
 }
