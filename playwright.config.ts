@@ -29,8 +29,9 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
     // Dev server, not build+start: SSG prerendering at build time wants a
-    // reachable database, which CI does not have. Dev compiles per-request
-    // and every page degrades gracefully without the DB.
+    // reachable database, which CI does not have. Dev compiles per-request,
+    // and with the placeholder DATABASE_URL the CI job provides (db.ts
+    // throws at module load without one) every page degrades gracefully.
     command: "npm run dev -- -p 3777",
     url: "http://localhost:3777/en",
     reuseExistingServer: !process.env.CI,

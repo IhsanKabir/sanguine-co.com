@@ -54,12 +54,20 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      # The runner has no Supabase credentials — specs tagged @db self-skip
-      # (see e2e/helpers.ts) and every page degrades gracefully without the
-      # database, so this tier checks the skeleton: rendering, OG cards,
-      # robots/JSON-LD, and the audio-consent gate.
+      # The runner has no Supabase credentials. db.ts throws at module load
+      # without a DATABASE_URL, so we provide a placeholder — postgres-js
+      # connects lazily, so module init succeeds and queries fail at runtime
+      # where the storefront's catch-paths degrade gracefully. E2E_SKIP_DB
+      # makes the @db-tagged specs self-skip (see e2e/helpers.ts) since the
+      # placeholder DB has no catalogue. This tier checks the skeleton:
+      # rendering, OG cards, robots/JSON-LD, and the audio-consent gate.
       - name: Run smoke suite
         run: npx playwright test
+        env:
+          E2E_SKIP_DB: "1"
+          DATABASE_URL: postgresql://placeholder:placeholder@127.0.0.1:5432/placeholder
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
 
       - name: Upload report on failure
         if: failure()
