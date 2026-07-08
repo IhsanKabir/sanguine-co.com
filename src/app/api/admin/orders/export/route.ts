@@ -106,7 +106,7 @@ export async function GET() {
   }
 
   const csv = rows.join("\r\n") + "\r\n";
-  const filename = `saanguine-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+  const filename = `sanguine-orders-${new Date().toISOString().slice(0, 10)}.csv`;
 
   return new NextResponse(csv, {
     headers: {

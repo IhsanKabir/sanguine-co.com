@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!seg || seg.hidden) return { title: "Not found" };
   const isBn = locale === "bn";
   const name = (isBn && seg.nameBn) || seg.name;
-  const blurb = (isBn && seg.blurbBn) || seg.blurb || `Pieces in ${name}, composed by Maison Saanguine.`;
+  const blurb = (isBn && seg.blurbBn) || seg.blurb || `Pieces in ${name}, composed by Sanguine.`;
   const url = `${BASE}/${locale}/shop/${segment}`;
   return {
     title: name,
@@ -34,13 +34,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: `${name} · Maison Saanguine`,
+      title: `${name} · Sanguine`,
       description: blurb,
       url,
       type: "website",
       locale: isBn ? "bn_BD" : "en_BD",
       // Maison card — child openGraph replaces the root fallback wholesale.
-      images: [{ url: "/api/og", width: 1200, height: 630, alt: "Saanguine Maison" }],
+      images: [{ url: "/api/og", width: 1200, height: 630, alt: "Sanguine" }],
     },
     twitter: { card: "summary_large_image", title: name, description: blurb },
   };

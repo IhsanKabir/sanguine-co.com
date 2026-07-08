@@ -1,4 +1,4 @@
-// Ssanguine — A-tier features
+// Sanguine — A-tier features
 // 1. WebGL hero shader (violet plasma + cursor reactive)
 // 2. Sound design (gong, paper, click) with mute toggle
 // 3. Wax-seal loading state on route changes

@@ -95,7 +95,7 @@ export default function EditorialClient({
     startTransition(async () => {
       const [r1, r2] = await Promise.all([
         updateBrand({
-          name: en["brand.name"] || "Saanguine",
+          name: en["brand.name"] || "Sanguine",
           tagline: en["brand.tagline"] || undefined,
           email: email || undefined,
           announcement: en["topbar.announcement"] || undefined,

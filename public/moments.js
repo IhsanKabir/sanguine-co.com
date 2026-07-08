@@ -1,4 +1,4 @@
-// Ssanguine — Signature Moments
+// Sanguine — Signature Moments
 // 1. Hero gold-dust headline assembly (canvas particles -> letterforms)
 // 2. Scroll-velocity coupled marquee
 // 3. Scroll-driven hero parallax (depth layers)

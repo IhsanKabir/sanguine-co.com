@@ -246,7 +246,7 @@ export async function createCodOrder(input: CreateOrderInput) {
     .catch((e) => console.error("[order email]", e));
   sendSms(
     data.customer.phone,
-    `Maison Saanguine: order ${number} confirmed (COD ${formatBdt(total)}). Have cash ready for our courier.`,
+    `Sanguine: order ${number} confirmed (COD ${formatBdt(total)}). Have cash ready for our courier.`,
   )
     .then((r) => logOrderEvent({
       orderId: order.id,

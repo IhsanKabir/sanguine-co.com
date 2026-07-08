@@ -460,7 +460,7 @@ export async function bookCourier(input: z.infer<typeof courierSchema>) {
       .catch(() => {});
   }
   if (order.guestPhone) {
-    sendSms(order.guestPhone, `Maison Saanguine: ${order.number} shipped via ${data.courier} (${trackingCode}).`)
+    sendSms(order.guestPhone, `Sanguine: ${order.number} shipped via ${data.courier} (${trackingCode}).`)
       .then((r) => logOrderEvent({
         orderId: order.id,
         type: "sms_sent",

@@ -1,4 +1,4 @@
--- Saanguine — events table for behavior analytics
+-- Sanguine — events table for behavior analytics
 -- Lightweight event tracking. Server-side, fire-and-forget. Read by admin reports.
 
 create table if not exists events (

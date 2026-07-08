@@ -133,7 +133,7 @@ function InviteModal({ onClose }: { onClose: () => void }) {
         <form onSubmit={onSubmit}>
           <div className="seg-modal-body" style={{ display: "block" }}>
             <div className="row">
-              <div className="field"><label>Email</label><input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="manager@saanguine.com"/></div>
+              <div className="field"><label>Email</label><input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="manager@sanguine-co.com"/></div>
               <div className="field"><label>Initial password</label><input type="password" autoComplete="new-password" required minLength={6} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="They can change it later"/></div>
             </div>
             <div className="field" style={{ marginTop: 12 }}>

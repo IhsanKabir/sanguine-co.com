@@ -1,6 +1,6 @@
-# Saanguine — Web
+# Sanguine — Web
 
-Production storefront for Maison Saanguine. Bangladesh, COD-first soft launch.
+Production storefront for Sanguine. Bangladesh, COD-first soft launch.
 
 ## Stack
 

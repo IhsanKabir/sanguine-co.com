@@ -20,7 +20,7 @@ function EnglishSection() {
 
       <h2>Stock pieces &mdash; fourteen days</h2>
       <p>A piece bought from our in-stock collection may be returned within <b>fourteen days of delivery</b>, in its original condition (unworn, unwashed, with tags and packaging intact). The fourteen-day window matches the prevailing standard of Bangladeshi e-commerce.</p>
-      <p>To begin a return, write to <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a> with your order number (SSG-XXXX) and a sentence about why you are returning. We will book a collection through our courier; the maison covers return shipping for any defective or incorrect piece, otherwise return shipping is at the customer&rsquo;s cost (typically ৳60&ndash;120).</p>
+      <p>To begin a return, write to <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a> with your order number (SSG-XXXX) and a sentence about why you are returning. We will book a collection through our courier; the maison covers return shipping for any defective or incorrect piece, otherwise return shipping is at the customer&rsquo;s cost (typically ৳60&ndash;120).</p>
       <p>Once the piece arrives back at the atelier and we have verified its condition, we will refund you within seven working days. Refunds for cash-on-delivery orders are made by bKash or bank transfer to a number/account you nominate.</p>
 
       <h2>Bespoke pieces &mdash; defects only</h2>
@@ -37,13 +37,13 @@ function EnglishSection() {
       </ul>
 
       <h2>Damaged on arrival</h2>
-      <p>If your parcel arrives damaged, photograph it before opening, and write to us the same day at <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a>. We will arrange a replacement or refund without requiring you to send the piece back.</p>
+      <p>If your parcel arrives damaged, photograph it before opening, and write to us the same day at <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>. We will arrange a replacement or refund without requiring you to send the piece back.</p>
 
       <h2>Cancelling an order</h2>
       <p>You may cancel an order before it has been booked with the courier. Once it has been collected by the courier, it is treated as a delivery in progress and the return policy above applies.</p>
 
       <h2>Contact</h2>
-      <p>Maison Saanguine, Dhaka, Bangladesh. <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a></p>
+      <p>Sanguine, Dhaka, Bangladesh. <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
     </>
   );
 }
@@ -57,7 +57,7 @@ function BangleSection() {
 
       <h2>স্টক পিস &mdash; চৌদ্দ দিন</h2>
       <p>আমাদের ইন-স্টক সংগ্রহ থেকে কেনা একটি পিস ডেলিভারির <b>চৌদ্দ দিনের মধ্যে</b> মূল অবস্থায় ফেরত দেওয়া যায় (পরা হয়নি, ধোয়া হয়নি, ট্যাগ ও প্যাকেজিং অক্ষত)। চৌদ্দ দিনের সময়সীমাটি বাংলাদেশী ই-কমার্সের প্রচলিত মানদণ্ডের সঙ্গে সঙ্গতিপূর্ণ।</p>
-      <p>ফেরত শুরু করতে আপনার অর্ডার নম্বর (SSG-XXXX) এবং কারণসংক্রান্ত একটি সংক্ষিপ্ত বার্তা দিয়ে <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a>-এ লিখুন। আমরা আমাদের কুরিয়ারের মাধ্যমে কালেকশন বুক করব; ত্রুটিযুক্ত বা ভুল পিসের ক্ষেত্রে ফেরতের শিপিং মেইসন বহন করে, অন্যথায় ফেরতের শিপিং গ্রাহকের খরচে (সাধারণত ৳৬০&ndash;১২০)।</p>
+      <p>ফেরত শুরু করতে আপনার অর্ডার নম্বর (SSG-XXXX) এবং কারণসংক্রান্ত একটি সংক্ষিপ্ত বার্তা দিয়ে <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>-এ লিখুন। আমরা আমাদের কুরিয়ারের মাধ্যমে কালেকশন বুক করব; ত্রুটিযুক্ত বা ভুল পিসের ক্ষেত্রে ফেরতের শিপিং মেইসন বহন করে, অন্যথায় ফেরতের শিপিং গ্রাহকের খরচে (সাধারণত ৳৬০&ndash;১২০)।</p>
       <p>পিসটি অ্যাটেলিয়ারে ফিরে আসা ও অবস্থা যাচাই হওয়ার পর সাত কর্মদিবসের মধ্যে আপনাকে অর্থ ফেরত দেওয়া হবে। ক্যাশ অন ডেলিভারি অর্ডারের ফেরত আপনার নির্দেশিত bKash বা ব্যাংক অ্যাকাউন্টে পাঠানো হবে।</p>
 
       <h2>বেসপোক পিস &mdash; কেবল ত্রুটিতে</h2>
@@ -74,13 +74,13 @@ function BangleSection() {
       </ul>
 
       <h2>পৌঁছানোর সময় ক্ষতিগ্রস্ত</h2>
-      <p>পার্সেল ক্ষতিগ্রস্ত অবস্থায় পৌঁছালে খোলার আগে ছবি তুলুন এবং সেদিনই <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a>-এ আমাদের জানান। প্রতিস্থাপন বা অর্থ ফেরতের ব্যবস্থা করা হবে &mdash; পিস ফেরত পাঠানোর প্রয়োজন নেই।</p>
+      <p>পার্সেল ক্ষতিগ্রস্ত অবস্থায় পৌঁছালে খোলার আগে ছবি তুলুন এবং সেদিনই <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>-এ আমাদের জানান। প্রতিস্থাপন বা অর্থ ফেরতের ব্যবস্থা করা হবে &mdash; পিস ফেরত পাঠানোর প্রয়োজন নেই।</p>
 
       <h2>অর্ডার বাতিল</h2>
       <p>কুরিয়ারের সঙ্গে বুকিং হওয়ার আগে আপনি অর্ডার বাতিল করতে পারেন। কুরিয়ার সংগ্রহ করে নেয়ার পর সেটি একটি চলমান ডেলিভারি হিসেবে গণ্য হবে এবং উপরের ফেরত নীতি প্রযোজ্য হবে।</p>
 
       <h2>যোগাযোগ</h2>
-      <p>মেইসন স্যাঙ্গুইন, ঢাকা, বাংলাদেশ। <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a></p>
+      <p>সাঙ্গুইন, ঢাকা, বাংলাদেশ। <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
     </>
   );
 }

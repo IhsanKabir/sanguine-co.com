@@ -1,4 +1,4 @@
--- Saanguine — Pre-order (bespoke request) system
+-- Sanguine — Pre-order (bespoke request) system
 --
 -- Two parts:
 --   1) Per-segment toggles: stock_enabled + preorder_enabled (independent).

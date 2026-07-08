@@ -11,7 +11,7 @@ export async function GET() {
     await db.execute(sql`select 1`);
     return NextResponse.json({
       ok: true,
-      service: "saanguine-web",
+      service: "sanguine-web",
       ts: new Date().toISOString(),
     });
   } catch (e) {

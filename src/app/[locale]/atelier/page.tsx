@@ -31,9 +31,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url,
       type: "website",
       locale: isBn ? "bn_BD" : "en_BD",
-      siteName: "Saanguine Maison",
+      siteName: "Sanguine",
       // Maison card — child openGraph replaces the root fallback wholesale.
-      images: [{ url: "/api/og", width: 1200, height: 630, alt: "Saanguine Maison" }],
+      images: [{ url: "/api/og", width: 1200, height: 630, alt: "Sanguine" }],
     },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -46,7 +46,7 @@ export default async function AtelierPage({ params }: Props) {
   const organizationLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Saanguine Maison",
+    name: "Sanguine",
     description: "A curated Bangladeshi maison for perfume, flora, books and small ceremonies.",
     url: BASE,
     address: {
@@ -63,7 +63,7 @@ export default async function AtelierPage({ params }: Props) {
 
       <div className="ed-hero">
         <div className="kicker">The House Atelier · Dhaka · Est. MMXXVI</div>
-        <h1>The Saanguine<br />Atelier</h1>
+        <h1>The Sanguine<br />Atelier</h1>
         <p className="ed-lede">
           A workshop built on the conviction that beautiful things deserve to be made slowly.
         </p>

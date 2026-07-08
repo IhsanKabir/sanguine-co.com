@@ -7,9 +7,9 @@ export default async function AdminSettingsPage() {
   const brand = await getBrand();
   return (
     <SettingsClient initialBrand={brand || {
-      name: "Saanguine",
+      name: "Sanguine",
       tagline: "Garments, flora & small ceremonies",
-      email: "concierge@saanguine.com",
+      email: "concierge@sanguine-co.com",
       announcement: "Complimentary shipping over ৳3,000 · Cash on Delivery available nationwide",
     }} />
   );

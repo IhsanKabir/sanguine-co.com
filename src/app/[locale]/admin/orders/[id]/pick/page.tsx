@@ -69,7 +69,7 @@ export default async function PackingSlipPage({ params }: Props) {
       <div className="pack-slip">
         <div className="row" style={{ borderBottom: "2px solid #1a1330", paddingBottom: 14, marginBottom: 18 }}>
           <div>
-            <h1 style={{ fontStyle: "italic" }}>Saanguine</h1>
+            <h1 style={{ fontStyle: "italic" }}>Sanguine</h1>
             <div style={{ fontFamily: "'Courier New', monospace", fontSize: 10, letterSpacing: ".4em", color: "#a07e2c", marginTop: 4 }}>
               MAISON · MMXXVI · DHAKA
             </div>

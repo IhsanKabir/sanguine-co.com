@@ -48,10 +48,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url,
       type: "website",
       locale: isBn ? "bn_BD" : "en_BD",
-      siteName: "Saanguine Maison",
+      siteName: "Sanguine",
       // Child openGraph replaces the root one wholesale, so the /api/og
       // maison card must be restated or the page ships with no og:image.
-      images: [{ url: "/api/og", width: 1200, height: 630, alt: "Saanguine Maison" }],
+      images: [{ url: "/api/og", width: 1200, height: 630, alt: "Sanguine" }],
     },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -380,7 +380,7 @@ export default async function Home({ params }: Props) {
             <h2>On the cutting of <em>velvet</em> at dusk, and the patience it asks of the hand.</h2>
             <p>The first cut is never the deepest. We learned this from an aunt — who learned it from her own — that velvet asks for the slow knife, the one that waits for the nap to settle before it commits. The maison was built around small lessons of this kind: that a wax seal cools in under a minute but holds for a century, that an iris will refuse to open if you watch it too closely, that a watch crown is best turned with the ball of the thumb, not the nail.</p>
             <p>None of this is on our website by accident. Each object you&rsquo;ll find here has been refused, redrafted, and accepted by hands that have argued about it. We are a small house. We prefer it this way.</p>
-            <div className="journal-sig">— The Atelier<small>Maison {t("brand.name")} · MMXXVI</small></div>
+            <div className="journal-sig">— The Atelier<small>{t("brand.name")} · MMXXVI</small></div>
           </div>
         </div>
       </section>

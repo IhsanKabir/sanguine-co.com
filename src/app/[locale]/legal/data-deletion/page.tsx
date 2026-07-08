@@ -14,7 +14,7 @@ export default function DataDeletionPage() {
       </p>
 
       <h2>How to request deletion</h2>
-      <p>Send an email to <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a> with the subject line <b>Data deletion request</b>. Please include:</p>
+      <p>Send an email to <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a> with the subject line <b>Data deletion request</b>. Please include:</p>
       <ul>
         <li>The email address tied to your account, or the email you used at checkout.</li>
         <li>Whether you want everything removed, or only certain things (your wishlist, your saved addresses, etc).</li>
@@ -38,7 +38,7 @@ export default function DataDeletionPage() {
       </p>
 
       <h2>Contact</h2>
-      <p>Maison Saanguine, Dhaka, Bangladesh. <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a></p>
+      <p>Sanguine, Dhaka, Bangladesh. <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
     </>
   );
 }

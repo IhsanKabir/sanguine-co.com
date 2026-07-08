@@ -1,4 +1,4 @@
--- Saanguine — discount codes (coupons)
+-- Sanguine — discount codes (coupons)
 -- Three discount types: percent off, fixed BDT off, free shipping.
 -- Server-side validation only — never trust client price calculations.
 

@@ -1,4 +1,4 @@
--- Saanguine — Refund workflow
+-- Sanguine — Refund workflow
 --
 -- Each refund is a row in `refunds`; refunds can be partial or full. We do not
 -- mutate the order's totalBdt — the original total is preserved as a snapshot.

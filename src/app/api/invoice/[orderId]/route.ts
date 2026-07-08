@@ -92,7 +92,7 @@ export async function GET(
 
 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px">
   <div>
-    <div class="logo">Saanguine <sup>SSG</sup></div>
+    <div class="logo">Sanguine <sup>SSG</sup></div>
     <div class="mono" style="font-size:10px;letter-spacing:.2em;color:#8b7bb0;margin-top:6px;text-transform:uppercase">Invoice</div>
   </div>
   <div style="text-align:right">
@@ -152,7 +152,7 @@ export async function GET(
 
 <hr class="divider" style="margin-top:32px" />
 <p style="font-size:12px;color:#aaa;text-align:center;font-family:'JetBrains Mono',monospace;letter-spacing:.08em">
-  Thank you for shopping at Saanguine Maison · concierge@saanguine.com
+  Thank you for shopping at Sanguine · concierge@sanguine-co.com
 </p>
 
 <div class="no-print" style="margin-top:28px;text-align:center">

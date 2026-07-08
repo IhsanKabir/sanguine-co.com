@@ -66,7 +66,7 @@ export default async function AdminLayout({ children, params }: Props) {
   return (
     <div className="admin-body">
       <aside className="admin-side">
-        <div className="admin-logo">Saanguine<small>ADMIN · v3.0</small></div>
+        <div className="admin-logo">Sanguine<small>ADMIN · v3.0</small></div>
         {groups.map((g) => {
           const items = visibleNav.filter((n) => n.group === g);
           if (items.length === 0) return null;

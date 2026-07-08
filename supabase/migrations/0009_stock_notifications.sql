@@ -1,4 +1,4 @@
--- Saanguine — Notify-me-when-back-in-stock
+-- Sanguine — Notify-me-when-back-in-stock
 --
 -- A customer (or guest with an email) registers their interest in a sold-out
 -- piece. When admin restocks (stock 0 → positive), an email is sent and the

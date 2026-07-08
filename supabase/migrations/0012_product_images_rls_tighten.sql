@@ -1,4 +1,4 @@
--- Saanguine — Tighten product-images bucket RLS to require the `products`
+-- Sanguine — Tighten product-images bucket RLS to require the `products`
 -- permission, not just admin tier.
 --
 -- Original policies in 0006 allowed any role in ('owner','admin','subadmin')

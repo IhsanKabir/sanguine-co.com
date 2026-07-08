@@ -39,7 +39,7 @@ function EnglishSection() {
       <p>Order records are kept for seven years to comply with Bangladeshi tax law (NBR retention requirements). Marketing email subscriptions are kept until you unsubscribe. Browsing analytics are aggregated after thirty days; we cannot identify individual visitors past that point. Bespoke pre-order references and descriptions are kept for two years after the request is closed, then deleted.</p>
 
       <h2>Your rights</h2>
-      <p>You may at any time email <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a> to ask for a copy of the information we hold on you, to correct it, or to delete it (other than the seven-year tax-record retention required by law). You may unsubscribe from the Letter from the Maison via the link at the foot of every newsletter. See our <a href="/data-deletion.html">Data Deletion</a> page for a full account of how to remove your data.</p>
+      <p>You may at any time email <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a> to ask for a copy of the information we hold on you, to correct it, or to delete it (other than the seven-year tax-record retention required by law). You may unsubscribe from the Letter from the Maison via the link at the foot of every newsletter. See our <a href="/data-deletion.html">Data Deletion</a> page for a full account of how to remove your data.</p>
 
       <h2>Cookies</h2>
       <ul>
@@ -53,7 +53,7 @@ function EnglishSection() {
       </ul>
 
       <h2>Contact</h2>
-      <p>Maison Saanguine, Dhaka, Bangladesh. <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a></p>
+      <p>Sanguine, Dhaka, Bangladesh. <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
     </>
   );
 }
@@ -86,7 +86,7 @@ function BangleSection() {
       <p>NBR-এর কর-সংরক্ষণ বিধি মেনে অর্ডার রেকর্ড সাত বছর সংরক্ষণ করা হয়। মার্কেটিং ইমেইল সাবস্ক্রিপশন আপনি সাবস্ক্রাইব ছেড়ে দেয়া পর্যন্ত রাখা হয়। ব্রাউজিং অ্যানালিটিক্স ত্রিশ দিন পর সমষ্টিগত করা হয়; এর পর আমরা আর কোনো নির্দিষ্ট দর্শক চিহ্নিত করতে পারি না। বেসপোক প্রি-অর্ডার অনুরোধ বন্ধ হওয়ার দুই বছর পর সংশ্লিষ্ট রেফারেন্স ও বিবরণ মুছে ফেলা হয়।</p>
 
       <h2>আপনার অধিকার</h2>
-      <p>আপনি যখন ইচ্ছা <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a> ঠিকানায় ইমেইল করে আপনার সম্পর্কিত তথ্যের একটি কপি চাইতে, সংশোধন করাতে, কিংবা মুছিয়ে দিতে পারেন (আইনত আবশ্যক সাত-বছরের কর-রেকর্ড ব্যতীত)। প্রতিটি নিউজলেটারের পাদদেশে থাকা লিঙ্কের মাধ্যমে Letter from the Maison সাবস্ক্রিপশন বাতিল করতে পারেন। তথ্য সরাতে চাইলে বিস্তারিতের জন্য আমাদের <a href="/data-deletion.html">Data Deletion</a> পৃষ্ঠাটি দেখুন।</p>
+      <p>আপনি যখন ইচ্ছা <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a> ঠিকানায় ইমেইল করে আপনার সম্পর্কিত তথ্যের একটি কপি চাইতে, সংশোধন করাতে, কিংবা মুছিয়ে দিতে পারেন (আইনত আবশ্যক সাত-বছরের কর-রেকর্ড ব্যতীত)। প্রতিটি নিউজলেটারের পাদদেশে থাকা লিঙ্কের মাধ্যমে Letter from the Maison সাবস্ক্রিপশন বাতিল করতে পারেন। তথ্য সরাতে চাইলে বিস্তারিতের জন্য আমাদের <a href="/data-deletion.html">Data Deletion</a> পৃষ্ঠাটি দেখুন।</p>
 
       <h2>কুকিজ</h2>
       <ul>
@@ -100,7 +100,7 @@ function BangleSection() {
       </ul>
 
       <h2>যোগাযোগ</h2>
-      <p>মেইসন স্যাঙ্গুইন, ঢাকা, বাংলাদেশ। <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a></p>
+      <p>সাঙ্গুইন, ঢাকা, বাংলাদেশ। <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
     </>
   );
 }

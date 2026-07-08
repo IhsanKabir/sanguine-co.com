@@ -54,7 +54,7 @@ function EnglishSection() {
       <p>The courier will attempt delivery up to two times. If both attempts fail, the parcel is held at the nearest depot for seven days, after which it is returned to the maison. If your parcel is returned to us, we will write to you to arrange re-delivery (charged at cost) or a refund.</p>
 
       <h2>Contact</h2>
-      <p>Maison Saanguine, Dhaka, Bangladesh. <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a></p>
+      <p>Sanguine, Dhaka, Bangladesh. <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
     </>
   );
 }
@@ -102,7 +102,7 @@ function BangleSection() {
       <p>কুরিয়ার সর্বোচ্চ দু&rsquo;বার ডেলিভারির চেষ্টা করবে। দুটি প্রচেষ্টা ব্যর্থ হলে পার্সেল নিকটস্থ ডিপোয় সাত দিন রাখা হবে, এর পর মেইসনে ফেরত আসবে। আপনার পার্সেল ফিরে এলে আমরা পুনরায় ডেলিভারি (খরচ গ্রাহকের) কিংবা অর্থ ফেরতের জন্য আপনাকে লিখব।</p>
 
       <h2>যোগাযোগ</h2>
-      <p>মেইসন স্যাঙ্গুইন, ঢাকা, বাংলাদেশ। <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a></p>
+      <p>সাঙ্গুইন, ঢাকা, বাংলাদেশ। <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
     </>
   );
 }

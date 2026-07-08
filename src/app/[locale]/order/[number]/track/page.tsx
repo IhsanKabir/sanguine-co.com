@@ -88,7 +88,7 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
           <p>{t(
             "This order is no longer active. If you have questions, write to us at",
             "এই অর্ডারটি আর সক্রিয় নয়। প্রশ্ন থাকলে আমাদের লিখুন",
-          )} <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a>.</p>
+          )} <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>.</p>
         </div>
       </section>
     );
@@ -179,7 +179,7 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
       </div>
 
       <p style={{ marginTop: 32, textAlign: "center", color: "var(--ink-soft)", fontSize: 13 }}>
-        {t("Questions? Write to", "প্রশ্ন আছে? লিখুন")} <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a>.
+        {t("Questions? Write to", "প্রশ্ন আছে? লিখুন")} <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>.
       </p>
     </section>
   );

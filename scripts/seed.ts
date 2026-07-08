@@ -1,5 +1,5 @@
 /**
- * Curated 12-product seed for the Saanguine soft launch.
+ * Curated 12-product seed for the Sanguine soft launch.
  * Run with: npm run db:seed
  *
  * Curates 4 segments × 3 products. Drops watches (price too high for unproven),

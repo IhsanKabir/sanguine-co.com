@@ -1,4 +1,4 @@
--- Saanguine — Append-only events log per order
+-- Sanguine — Append-only events log per order
 --
 -- One row per material thing that happens to an order: created, status change,
 -- courier booked, refund issued, customer email sent, etc. Renders as a
