@@ -26,7 +26,7 @@ export default async function AdminEditorialPage() {
   return (
     <>
       <EditorialClient
-        email={brand?.email ?? "concierge@saanguine.com"}
+        email={brand?.email ?? "concierge@sanguine-co.com"}
         defaultsEn={defaultsEn}
         defaultsBn={defaultsBn}
         overridesEn={overrides.en}

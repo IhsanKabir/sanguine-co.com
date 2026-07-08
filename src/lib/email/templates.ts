@@ -5,20 +5,20 @@
 import { formatBdt } from "@/lib/utils";
 
 const SHELL = (body: string) => `<!doctype html>
-<html><head><meta charset="utf-8"/><title>Saanguine Maison</title></head>
+<html><head><meta charset="utf-8"/><title>Sanguine</title></head>
 <body style="margin:0;padding:0;background:#fdfbf7;font-family:Georgia,'Cormorant Garamond',serif;color:#2a1854;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fdfbf7;padding:40px 20px;">
     <tr><td align="center">
       <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" style="background:white;max-width:560px;width:100%;">
         <tr><td style="padding:40px 40px 20px;border-bottom:1px solid #e8e0d2;text-align:center;">
-          <div style="font-family:Georgia,serif;font-style:italic;font-size:32px;color:#2a1854;letter-spacing:.02em;">Saanguine</div>
+          <div style="font-family:Georgia,serif;font-style:italic;font-size:32px;color:#2a1854;letter-spacing:.02em;">Sanguine</div>
           <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.4em;color:#a07e2c;margin-top:6px;">MAISON · MMXXVI</div>
         </td></tr>
         <tr><td style="padding:32px 40px;font-family:Georgia,serif;color:#2a1854;line-height:1.7;">
           ${body}
         </td></tr>
         <tr><td style="padding:24px 40px 32px;border-top:1px solid #e8e0d2;text-align:center;font-family:'Courier New',monospace;font-size:11px;color:#7a6a52;letter-spacing:.1em;">
-          Maison Saanguine · Bangladesh<br/>
+          Sanguine · Bangladesh<br/>
           <span style="font-size:10px;letter-spacing:.3em;">© MMXXVI · ALL RIGHTS RESERVED</span>
         </td></tr>
       </table>

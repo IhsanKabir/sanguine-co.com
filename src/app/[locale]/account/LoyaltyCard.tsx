@@ -20,7 +20,7 @@ const TIERS: Tier[] = [
     max: 9999,
     perks: [
       "Free shipping over ৳3,000",
-      "Saanguine seasonal newsletter",
+      "Sanguine seasonal newsletter",
       "Member-only sale access",
     ],
   },

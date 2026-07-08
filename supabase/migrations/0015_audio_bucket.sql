@@ -1,4 +1,4 @@
--- Saanguine — Admin-uploadable ambient audio (EXECUTION-PLAN 4.2)
+-- Sanguine — Admin-uploadable ambient audio (EXECUTION-PLAN 4.2)
 --
 -- New `audio` Storage bucket holding up to three short ambient files
 -- (gong / chime / seal) that replace the synthesised WebAudio tones in

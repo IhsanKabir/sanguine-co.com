@@ -1,4 +1,4 @@
--- Saanguine — Per-order tracking token for /order/[number]/track privacy
+-- Sanguine — Per-order tracking token for /order/[number]/track privacy
 --
 -- Without this, anyone who knows or guesses an SSG-XXXX number can see the
 -- customer's name, address, and phone number on the public tracking page.

@@ -5,13 +5,13 @@
  * customer-email link is built from this value. Before this module existed
  * the same `process.env.NEXT_PUBLIC_SITE_URL || <fallback>` expression was
  * copy-pasted in 17 files — and the Vercel env var was found set to
- * `http://saanguine.vercel.app` (wrong scheme AND a host that 404s), so
+ * `http://sanguine-co.com` (wrong scheme AND a host that 404s), so
  * every one of those surfaces silently shipped dead links in production.
  *
  * Resolution order — deliberately trusts Vercel over hand-typed config:
  *   1. VERCEL_PROJECT_PRODUCTION_URL — auto-set by Vercel to the project's
  *      real production domain (bare host, no scheme). Can't drift: when the
- *      custom domain (saanguine.com) lands it updates by itself.
+ *      custom domain (sanguine-co.com) lands it updates by itself.
  *   2. NEXT_PUBLIC_SITE_URL — manual override for setups Vercel can't know
  *      about (external proxy domain) and for local dev. Normalised: scheme
  *      forced to https (localhost excepted), trailing slashes stripped,
@@ -23,7 +23,7 @@
  * deleted instead of lying dormant.
  */
 
-const FALLBACK = "https://saanguine-the-retail-shop.vercel.app";
+const FALLBACK = "https://sanguine-co.com";
 
 function normalize(raw: string | undefined): string | null {
   if (!raw) return null;

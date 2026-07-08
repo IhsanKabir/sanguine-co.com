@@ -48,11 +48,11 @@ export default async function Footer() {
           </div>
           <div>
             <div className="col-title">{t("footer.contact")}</div>
-            <ul><li>concierge@saanguine.co</li></ul>
+            <ul><li>concierge@sanguine-co.com</li></ul>
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© MMXXVI {t("brand.name")} Maison · {t("footer.rights")}</span>
+          <span>© MMXXVI {t("brand.name")} · {t("footer.rights")}</span>
           <span>
             <Link href="/legal/privacy">{t("footer.privacy")}</Link>
             {" · "}

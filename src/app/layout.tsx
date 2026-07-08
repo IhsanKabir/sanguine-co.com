@@ -29,28 +29,28 @@ const jbMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
-  title: { default: "Saanguine Maison", template: "%s · Saanguine" },
+  title: { default: "Sanguine", template: "%s · Sanguine" },
   description: "Garments, flora & small ceremonies for the violet hour. A Bangladeshi maison, slowly assembled.",
-  applicationName: "Saanguine",
+  applicationName: "Sanguine",
   verification: { google: "ZKS_JSSguTq9M5qdH24Y4p8m5XKUXnHuvXI2CNMQPdM" },
   // No `keywords` — Google has ignored meta keywords since 2009 and Bing
   // treats large keyword lists as a weak spam signal. Targeting lives in
   // page-level title / description copy.
   openGraph: {
     type: "website",
-    siteName: "Saanguine Maison",
+    siteName: "Sanguine",
     locale: "en_BD",
     alternateLocale: ["bn_BD"],
     url: BASE,
-    title: "Saanguine Maison",
+    title: "Sanguine",
     description: "Garments, flora & small ceremonies for the violet hour.",
     // Generic maison card rendered by /api/og (wordmark + tagline, 1200×630).
     // Pages with richer context (PDP) override this with their own card.
-    images: [{ url: "/api/og", width: 1200, height: 630, alt: "Saanguine Maison" }],
+    images: [{ url: "/api/og", width: 1200, height: 630, alt: "Sanguine" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Saanguine Maison",
+    title: "Sanguine",
     images: ["/api/og"],
   },
   icons: {
@@ -63,29 +63,26 @@ export const metadata: Metadata = {
   formatDetection: { email: false, address: false, telephone: false },
 };
 
-// Canonical entity name is "Saanguine Maison" everywhere — JSON-LD, OG,
+// Canonical entity name is "Sanguine" everywhere — JSON-LD, OG,
 // manifest, brand copy. Inconsistent naming delays Google Knowledge Panel
-// disambiguation. `sameAs` lists external authoritative profiles for the
-// brand (filled with placeholders for surfaces we'll publish on).
+// disambiguation. `sameAs` lists only *claimed* external profiles for the brand.
 const organizationLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Saanguine Maison",
-  alternateName: "Saanguine",
+  name: "Sanguine",
   url: BASE,
   logo: `${BASE}/logo.png`,
   description: "A Bangladeshi maison for perfume, flora, books and small ceremonies — slowly assembled with the patience of a florist.",
-  email: "concierge@saanguine.com",
+  email: "concierge@sanguine-co.com",
   address: {
     "@type": "PostalAddress",
     addressLocality: "Dhaka",
     addressCountry: "BD",
   },
-  sameAs: [
-    "https://www.facebook.com/saanguine",
-    "https://www.instagram.com/saanguine",
-    "https://wa.me/8801XXXXXXXXX",
-  ].filter((u) => !u.includes("XXXXXXXXX")), // drop placeholders until real handles
+  // Empty until the real Sanguine accounts exist — emitting unclaimed or
+  // placeholder handles muddies Knowledge Panel disambiguation. Add claimed
+  // URLs here then, e.g. "https://www.instagram.com/<handle>".
+  sameAs: [] as string[],
 };
 
 // SearchAction removed 2026-05-03 — the query-string URL template
@@ -95,7 +92,7 @@ const organizationLd = {
 const websiteLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "Saanguine Maison",
+  name: "Sanguine",
   url: BASE,
   inLanguage: ["en-BD", "bn-BD"],
 };

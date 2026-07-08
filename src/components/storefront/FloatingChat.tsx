@@ -6,11 +6,11 @@
  * Hidden if both are unset.
  */
 const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;   // e.g. 8801XXXXXXXXX
-const MESSENGER = process.env.NEXT_PUBLIC_MESSENGER_PAGE;   // e.g. saanguine
+const MESSENGER = process.env.NEXT_PUBLIC_MESSENGER_PAGE;   // e.g. sanguine
 
 export default function FloatingChat() {
   if (!WHATSAPP && !MESSENGER) return null;
-  const greeting = encodeURIComponent("Hello, I'd like to ask about a piece on Saanguine Maison.");
+  const greeting = encodeURIComponent("Hello, I'd like to ask about a piece on Sanguine.");
   return (
     <div className="floating-chat" aria-label="Chat with the maison">
       {WHATSAPP && (

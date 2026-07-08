@@ -6,16 +6,16 @@ type Slug = "privacy" | "terms" | "returns" | "shipping";
 
 const COPY: Record<Slug, { en: { title: string; description: string }; bn: { title: string; description: string } }> = {
   privacy: {
-    en: { title: "Privacy", description: "How Saanguine Maison handles personal information, cookies and analytics — bilingual EN/BN policy." },
-    bn: { title: "গোপনীয়তা", description: "সাঙ্গুইন মেইসন কীভাবে ব্যক্তিগত তথ্য, কুকি ও অ্যানালিটিক্স পরিচালনা করে — দ্বিভাষিক নীতি।" },
+    en: { title: "Privacy", description: "How Sanguine handles personal information, cookies and analytics — bilingual EN/BN policy." },
+    bn: { title: "গোপনীয়তা", description: "সাঙ্গুইন কীভাবে ব্যক্তিগত তথ্য, কুকি ও অ্যানালিটিক্স পরিচালনা করে — দ্বিভাষিক নীতি।" },
   },
   terms: {
-    en: { title: "Terms", description: "Terms of service for shopping at Saanguine Maison — orders, payments, courier, refunds." },
-    bn: { title: "শর্তাবলী", description: "সাঙ্গুইন মেইসনে কেনাকাটার সেবার শর্তাবলী — অর্ডার, পেমেন্ট, কুরিয়ার, রিফান্ড।" },
+    en: { title: "Terms", description: "Terms of service for shopping at Sanguine — orders, payments, courier, refunds." },
+    bn: { title: "শর্তাবলী", description: "সাঙ্গুইনে কেনাকাটার সেবার শর্তাবলী — অর্ডার, পেমেন্ট, কুরিয়ার, রিফান্ড।" },
   },
   returns: {
-    en: { title: "Returns", description: "Saanguine Maison return policy — eligible items, courier pickup, refund timeline." },
-    bn: { title: "ফেরত", description: "সাঙ্গুইন মেইসনের ফেরত নীতি — যোগ্য পিস, কুরিয়ার পিকআপ, রিফান্ড সময়রেখা।" },
+    en: { title: "Returns", description: "Sanguine return policy — eligible items, courier pickup, refund timeline." },
+    bn: { title: "ফেরত", description: "সাঙ্গুইনের ফেরত নীতি — যোগ্য পিস, কুরিয়ার পিকআপ, রিফান্ড সময়রেখা।" },
   },
   shipping: {
     en: { title: "Shipping", description: "Shipping rates, courier partners (Pathao, Steadfast) and delivery timeline across Bangladesh." },
@@ -53,9 +53,9 @@ export async function legalMetadata(
       url,
       type: "website",
       locale: isBn ? "bn_BD" : "en_BD",
-      siteName: "Saanguine Maison",
+      siteName: "Sanguine",
       // Maison card — child openGraph replaces the root fallback wholesale.
-      images: [{ url: "/api/og", width: 1200, height: 630, alt: "Saanguine Maison" }],
+      images: [{ url: "/api/og", width: 1200, height: 630, alt: "Sanguine" }],
     },
   };
 }

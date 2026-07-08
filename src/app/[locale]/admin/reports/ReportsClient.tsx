@@ -52,7 +52,7 @@ export default function ReportsClient({ initialFrom, initialTo, sales, cod }: Pr
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `saanguine-sales-${from}-${to}.csv`;
+      a.download = `sanguine-sales-${from}-${to}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     });

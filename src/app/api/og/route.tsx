@@ -133,7 +133,7 @@ function Wordmark({ size = 40 }: { size?: number }) {
           letterSpacing: 1,
         }}
       >
-        Saanguine
+        Sanguine
       </span>
       <span
         style={{
@@ -185,7 +185,7 @@ function MaisonCard() {
             marginTop: 8,
           }}
         >
-          Saanguine
+          Sanguine
         </span>
         <div style={{ width: 72, height: 2, background: GOLD, marginTop: 22 }} />
         <span
@@ -310,8 +310,8 @@ function ProductCard({ p }: { p: ProductCardData }) {
       >
         <span style={{ fontSize: 19, letterSpacing: 5, color: GOLD }}>
           {p.segmentName
-            ? `SAANGUINE MAISON · ${p.segmentName.toUpperCase()}`
-            : "SAANGUINE MAISON"}
+            ? `SANGUINE · ${p.segmentName.toUpperCase()}`
+            : "SANGUINE"}
         </span>
 
         <div style={{ display: "flex", flexDirection: "column", maxWidth: hasPhoto ? 600 : 900 }}>

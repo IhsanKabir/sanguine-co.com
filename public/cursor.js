@@ -1,4 +1,4 @@
-// Ssanguine — Cursor System & Motion Layer
+// Sanguine — Cursor System & Motion Layer
 // Custom cursor that morphs per section + scroll reveal utility + page transition curtain.
 // Respects prefers-reduced-motion and disables itself on touch devices.
 

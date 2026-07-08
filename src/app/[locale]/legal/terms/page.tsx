@@ -20,10 +20,10 @@ function EnglishSection() {
       <p className="legal-lede">Last updated: 2 May 2026.</p>
 
       <h2>About these terms</h2>
-      <p>Welcome to Maison Saanguine. By placing an order or creating an account, you agree to the following. They are written plainly and we mean every line. Where the terms are silent, the laws of Bangladesh apply.</p>
+      <p>Welcome to Sanguine. By placing an order or creating an account, you agree to the following. They are written plainly and we mean every line. Where the terms are silent, the laws of Bangladesh apply.</p>
 
       <h2>About us</h2>
-      <p>Maison Saanguine is a small house operating from Dhaka, Bangladesh. We compose pieces, source pieces, and deliver them to your door. Our contact email is <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a>.</p>
+      <p>Sanguine is a small maison operating from Dhaka, Bangladesh. We compose pieces, source pieces, and deliver them to your door. Our contact email is <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>.</p>
 
       <h2>Orders</h2>
       <p>When you place an order, you make an offer to buy. The maison accepts the offer when we send you an order confirmation by email. Until that moment we may decline the order &mdash; for instance, if a piece is unexpectedly unavailable or the delivery address is outside our courier network.</p>
@@ -50,13 +50,13 @@ function EnglishSection() {
       <p>To the extent permitted by Bangladeshi law, the maison&rsquo;s liability for any single order is limited to the value of that order. Nothing in these terms limits liability that cannot, by law, be limited &mdash; for instance, in the case of personal injury caused by negligence.</p>
 
       <h2>Disputes</h2>
-      <p>If something goes wrong, please write to <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a> first. We will try to resolve the matter directly. If a dispute remains, the courts of Dhaka, Bangladesh have exclusive jurisdiction, and Bangladeshi law applies.</p>
+      <p>If something goes wrong, please write to <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a> first. We will try to resolve the matter directly. If a dispute remains, the courts of Dhaka, Bangladesh have exclusive jurisdiction, and Bangladeshi law applies.</p>
 
       <h2>Changes to these terms</h2>
       <p>We may update these terms from time to time. The version that applies to your order is the one published on the day you placed it. Material changes will be flagged in the seasonal Letter from the Maison.</p>
 
       <h2>Contact</h2>
-      <p>Maison Saanguine, Dhaka, Bangladesh. <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a></p>
+      <p>Sanguine, Dhaka, Bangladesh. <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
     </>
   );
 }
@@ -69,10 +69,10 @@ function BangleSection() {
       <p className="legal-lede">সর্বশেষ আপডেট: ২ মে ২০২৬।</p>
 
       <h2>এই শর্তাবলি সম্পর্কে</h2>
-      <p>মেইসন স্যাঙ্গুইনে স্বাগতম। অর্ডার দেয়া বা অ্যাকাউন্ট তৈরি করার মাধ্যমে আপনি নিম্নলিখিত শর্তগুলোয় সম্মতি প্রকাশ করছেন। প্রতিটি বাক্য সরাসরি লেখা, এবং প্রতিটিতেই আমরা যা বলেছি তা-ই বুঝিয়েছি। যেখানে শর্তগুলো নীরব, সেখানে বাংলাদেশের আইন প্রযোজ্য।</p>
+      <p>সাঙ্গুইনে স্বাগতম। অর্ডার দেয়া বা অ্যাকাউন্ট তৈরি করার মাধ্যমে আপনি নিম্নলিখিত শর্তগুলোয় সম্মতি প্রকাশ করছেন। প্রতিটি বাক্য সরাসরি লেখা, এবং প্রতিটিতেই আমরা যা বলেছি তা-ই বুঝিয়েছি। যেখানে শর্তগুলো নীরব, সেখানে বাংলাদেশের আইন প্রযোজ্য।</p>
 
       <h2>আমরা কে</h2>
-      <p>মেইসন স্যাঙ্গুইন একটি ছোট আঙিনা, যা ঢাকা, বাংলাদেশ থেকে পরিচালিত। আমরা পিস তৈরি ও সংগ্রহ করি এবং আপনার দরজায় পৌঁছে দিই। যোগাযোগের ইমেইল: <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a></p>
+      <p>সাঙ্গুইন একটি ছোট মেইসন, যা ঢাকা, বাংলাদেশ থেকে পরিচালিত। আমরা পিস তৈরি ও সংগ্রহ করি এবং আপনার দরজায় পৌঁছে দিই। যোগাযোগের ইমেইল: <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
 
       <h2>অর্ডার</h2>
       <p>আপনি অর্ডার দিলে সেটি একটি ক্রয়ের প্রস্তাব হিসেবে গণ্য হয়। মেইসন প্রস্তাবটি গ্রহণ করে যখন আমরা আপনাকে ইমেইলে অর্ডার নিশ্চিতকরণ পাঠাই। তার আগ পর্যন্ত আমরা অর্ডার প্রত্যাখ্যান করতে পারি &mdash; যেমন কোনো পিস হঠাৎ অপ্রাপ্য হলে কিংবা ডেলিভারি ঠিকানা আমাদের কুরিয়ার নেটওয়ার্কের বাইরে হলে।</p>
@@ -99,13 +99,13 @@ function BangleSection() {
       <p>বাংলাদেশী আইন যতদূর অনুমতি দেয়, কোনো একক অর্ডারের জন্য মেইসনের দায় সেই অর্ডারের মূল্যেই সীমাবদ্ধ। যেসব দায় আইনত সীমাবদ্ধ করা যায় না (যেমন অবহেলায় ব্যক্তিগত আঘাতের ক্ষেত্রে), এই শর্তাবলি সেগুলোয় কোনো সীমা আরোপ করে না।</p>
 
       <h2>বিরোধ</h2>
-      <p>কিছু ভুল হলে দয়া করে প্রথমে <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a> ঠিকানায় লিখুন। আমরা সরাসরি সমাধানের চেষ্টা করব। এর পরও বিরোধ থাকলে ঢাকা, বাংলাদেশের আদালতের একচেটিয়া এখতিয়ার এবং বাংলাদেশী আইন প্রযোজ্য হবে।</p>
+      <p>কিছু ভুল হলে দয়া করে প্রথমে <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a> ঠিকানায় লিখুন। আমরা সরাসরি সমাধানের চেষ্টা করব। এর পরও বিরোধ থাকলে ঢাকা, বাংলাদেশের আদালতের একচেটিয়া এখতিয়ার এবং বাংলাদেশী আইন প্রযোজ্য হবে।</p>
 
       <h2>শর্ত পরিবর্তন</h2>
       <p>আমরা সময়ে সময়ে এই শর্তাবলি হালনাগাদ করতে পারি। আপনার অর্ডারের ক্ষেত্রে প্রযোজ্য সংস্করণ হবে আপনি যেদিন অর্ডার দিয়েছেন সেদিনের প্রকাশিত সংস্করণ। উল্লেখযোগ্য পরিবর্তন ঋতুর Letter from the Maison-এ চিহ্নিত করা হবে।</p>
 
       <h2>যোগাযোগ</h2>
-      <p>মেইসন স্যাঙ্গুইন, ঢাকা, বাংলাদেশ। <a href="mailto:concierge@saanguine.com">concierge@saanguine.com</a></p>
+      <p>সাঙ্গুইন, ঢাকা, বাংলাদেশ। <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
     </>
   );
 }

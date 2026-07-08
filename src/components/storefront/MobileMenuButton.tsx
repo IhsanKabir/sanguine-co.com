@@ -47,7 +47,7 @@ export default function MobileMenuButton({ segments }: { segments: Segment[] }) 
         aria-label="Site navigation"
       >
         <div className="mobile-drawer-hd">
-          <span className="mobile-drawer-brand">Saanguine</span>
+          <span className="mobile-drawer-brand">Sanguine</span>
           <button
             className="icon-btn"
             onClick={() => setOpen(false)}

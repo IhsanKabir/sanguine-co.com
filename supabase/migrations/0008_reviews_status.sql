@@ -1,4 +1,4 @@
--- Saanguine — Review moderation
+-- Sanguine — Review moderation
 --
 -- Add a status column so the maison can vet reviews before they appear on
 -- public PDPs. Default 'pending' for any new submission; admin approves

@@ -66,7 +66,7 @@ export default function ImportClient() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "saanguine-products-template.csv";
+    a.download = "sanguine-products-template.csv";
     a.click();
     URL.revokeObjectURL(url);
   };

@@ -150,7 +150,7 @@ export default async function ProductPage({ params }: Props) {
       price: p.priceBdt,
       availability: p.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       url: `${BASE}/${locale}/product/${p.slug}`,
-      seller: { "@type": "Organization", name: "Saanguine Maison" },
+      seller: { "@type": "Organization", name: "Sanguine" },
       shippingDetails: {
         "@type": "OfferShippingDetails",
         shippingRate: {
@@ -182,7 +182,7 @@ export default async function ProductPage({ params }: Props) {
       ratingValue: Number(p.rating),
       reviewCount: p.reviewCount,
     } : undefined,
-    brand: { "@type": "Brand", name: "Saanguine" },
+    brand: { "@type": "Brand", name: "Sanguine" },
   };
 
   const crumbItems: Record<string, unknown>[] = [

@@ -16,7 +16,7 @@
     font-size="64"
     fill="#C8A86E"
     text-anchor="middle"
-    letter-spacing="2">Saanguine</text>
+    letter-spacing="2">Sanguine</text>
 
   <!-- rule -->
   <line x1="110" y1="272" x2="390" y2="272" stroke="#C8A86E" stroke-width="0.6" opacity="0.4"/>

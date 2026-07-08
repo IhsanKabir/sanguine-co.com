@@ -1,4 +1,4 @@
--- Saanguine — Product image upload (admin-managed)
+-- Sanguine — Product image upload (admin-managed)
 --
 -- Two parts:
 --   1) Add `path` column to product_images so we can remove the file from
