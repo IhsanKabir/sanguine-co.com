@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Product } from "@/lib/schema";
 import { Link } from "@/i18n/routing";
+import { priceSortValue } from "@/lib/pricing";
 import ProductCard from "./ProductCard";
 import SegmentFilters from "./SegmentFilters";
 
@@ -57,11 +58,13 @@ export default function ShopGrid({
   const filteredItems = useMemo(() => {
     let items = [...allItems];
     if (tag) items = items.filter((p) => p.tag === tag);
+    // Effective price (fixed / estimate ceiling) — quote-only pieces have no
+    // comparable price, so a max-price filter excludes them by design.
     if (typeof minPrice === "number" && !isNaN(minPrice)) {
-      items = items.filter((p) => p.priceBdt >= minPrice);
+      items = items.filter((p) => priceSortValue(p) >= minPrice);
     }
     if (typeof maxPrice === "number" && !isNaN(maxPrice)) {
-      items = items.filter((p) => p.priceBdt <= maxPrice);
+      items = items.filter((p) => priceSortValue(p) <= maxPrice);
     }
     if (colors.length > 0) {
       items = items.filter((p) => (p.colors as string[] | null)?.some((c) => colors.includes(c)));
@@ -72,9 +75,9 @@ export default function ShopGrid({
 
     switch (sort) {
       case "price-asc":
-        return [...items].sort((a, b) => a.priceBdt - b.priceBdt);
+        return [...items].sort((a, b) => priceSortValue(a) - priceSortValue(b));
       case "price-desc":
-        return [...items].sort((a, b) => b.priceBdt - a.priceBdt);
+        return [...items].sort((a, b) => priceSortValue(b) - priceSortValue(a));
       case "rating":
         return [...items].sort((a, b) => Number(b.rating ?? 0) - Number(a.rating ?? 0));
       case "newest":

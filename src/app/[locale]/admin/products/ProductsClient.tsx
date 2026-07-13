@@ -6,7 +6,7 @@ import type { Segment, Product } from "@/lib/schema";
 import Composition from "@/components/storefront/Composition";
 import Icon from "@/components/storefront/Icon";
 import { Link } from "@/i18n/routing";
-import { formatBdt } from "@/lib/utils";
+import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import ProductImagesEditor from "./ProductImagesEditor";
 
 type Props = { segments: Segment[]; products: Product[] };
@@ -144,19 +144,28 @@ type Editing = {
   preorderPriceBdt: string;
   modelNote: string;
   lookProductIds: string[];
+  priceMinBdt: string;
+  priceMaxBdt: string;
+  preorderDepositPct: string;
+  returnWindowDays: string;
 };
 
+// Price deliberately starts EMPTY — the old "0" default is how four ৳0
+// products reached production. The server rejects a buy-now product without
+// a real price.
 const empty = (segId: string): Editing => ({
   name: "", nameBn: "", sku: "", segmentId: segId,
-  priceBdt: "0", wasBdt: "", stock: "0", tag: "",
+  priceBdt: "", wasBdt: "", stock: "0", tag: "",
   description: "", descriptionBn: "", colors: "", sizes: "",
   preorderEnabled: false, preorderOnly: false,
   estimatedDelivery: "", preorderPriceBdt: "",
   modelNote: "", lookProductIds: [],
+  priceMinBdt: "", priceMaxBdt: "", preorderDepositPct: "", returnWindowDays: "",
 });
 
 export default function ProductsClient({ segments, products }: Props) {
   const [editing, setEditing] = useState<Editing | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [pendingDel, setPendingDel] = useState<Product | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [pendingBulkDel, setPendingBulkDel] = useState(false);
@@ -216,10 +225,20 @@ export default function ProductsClient({ segments, products }: Props) {
       preorderPriceBdt: editing.preorderPriceBdt ? parseInt(editing.preorderPriceBdt) : null,
       modelNote: editing.modelNote.trim() || null,
       lookProductIds: editing.lookProductIds,
+      priceMinBdt: editing.priceMinBdt ? parseInt(editing.priceMinBdt) : null,
+      priceMaxBdt: editing.priceMaxBdt ? parseInt(editing.priceMaxBdt) : null,
+      preorderDepositPct: editing.preorderDepositPct ? parseInt(editing.preorderDepositPct) : null,
+      returnWindowDays: editing.returnWindowDays !== "" ? parseInt(editing.returnWindowDays) : null,
     };
+    setSaveError(null);
     startTransition(async () => {
-      if (editing.id) await updateProduct(editing.id, payload);
-      else await createProduct(payload);
+      const res = editing.id
+        ? await updateProduct(editing.id, payload)
+        : await createProduct(payload);
+      if (res && "error" in res && res.error) {
+        setSaveError(res.error);
+        return; // keep the dialog open so the admin can correct it
+      }
       setEditing(null);
     });
   };
@@ -292,7 +311,13 @@ export default function ProductsClient({ segments, products }: Props) {
                     </div>
                   </td>
                   <td>{seg?.name || "—"}</td>
-                  <td style={{ fontWeight: 500 }}>{formatBdt(p.priceBdt)}</td>
+                  <td style={{ fontWeight: 500 }}>
+                    {(() => {
+                      const d = priceDisplay(p);
+                      return d.kind === "quote" ? <span style={{ color: "var(--ink-soft)" }}>On quote</span> : priceDisplayText(d);
+                    })()}
+                    {p.preorderOnly && <span className="pill pill-info" style={{ marginLeft: 6 }}>Preorder</span>}
+                  </td>
                   <td style={{ color: p.stock < 10 ? "var(--err)" : "inherit", fontWeight: 500 }}>{p.stock}</td>
                   <td>
                     {p.stock === 0 ? <span className="pill pill-err">Out</span>
@@ -315,6 +340,10 @@ export default function ProductsClient({ segments, products }: Props) {
                       preorderPriceBdt: p.preorderPriceBdt ? String(p.preorderPriceBdt) : "",
                       modelNote: p.modelNote ?? "",
                       lookProductIds: (p.lookProductIds as string[] | null) ?? [],
+                      priceMinBdt: p.priceMinBdt ? String(p.priceMinBdt) : "",
+                      priceMaxBdt: p.priceMaxBdt ? String(p.priceMaxBdt) : "",
+                      preorderDepositPct: p.preorderDepositPct ? String(p.preorderDepositPct) : "",
+                      returnWindowDays: p.returnWindowDays != null ? String(p.returnWindowDays) : "",
                     })}><Icon name="feather" size={14}/></button>
                     <button className="icon-btn" onClick={() => setPendingDel(p)}><Icon name="x" size={14}/></button>
                   </td>
@@ -401,11 +430,24 @@ export default function ProductsClient({ segments, products }: Props) {
                 </label>
               </div>
               {editing.preorderEnabled && (
-                <div className="row" style={{ marginTop: 10 }}>
-                  <div className="field"><label>Estimated delivery</label><input value={editing.estimatedDelivery} onChange={(e) => setEditing({ ...editing, estimatedDelivery: e.target.value })} placeholder="e.g. 4–6 weeks"/></div>
-                  <div className="field"><label>Preorder price (৳, optional)</label><input type="number" value={editing.preorderPriceBdt} onChange={(e) => setEditing({ ...editing, preorderPriceBdt: e.target.value })} placeholder="Leave blank to use regular price"/></div>
-                </div>
+                <>
+                  <div className="row" style={{ marginTop: 10 }}>
+                    <div className="field"><label>Estimated delivery</label><input value={editing.estimatedDelivery} onChange={(e) => setEditing({ ...editing, estimatedDelivery: e.target.value })} placeholder="e.g. 4–6 weeks"/></div>
+                    <div className="field"><label>Deposit % (blank = global setting)</label><input type="number" min={1} max={100} value={editing.preorderDepositPct} onChange={(e) => setEditing({ ...editing, preorderDepositPct: e.target.value })} placeholder="e.g. 20"/></div>
+                  </div>
+                  <div className="row" style={{ marginTop: 10 }}>
+                    <div className="field"><label>Estimated price — min (৳)</label><input type="number" min={1} value={editing.priceMinBdt} onChange={(e) => setEditing({ ...editing, priceMinBdt: e.target.value })} placeholder="After research"/></div>
+                    <div className="field"><label>Estimated price — max (৳)</label><input type="number" min={1} value={editing.priceMaxBdt} onChange={(e) => setEditing({ ...editing, priceMaxBdt: e.target.value })} placeholder="After research"/></div>
+                  </div>
+                  <p style={{ fontSize: 11, color: "var(--ink-soft)", margin: "8px 0 0", lineHeight: 1.6 }}>
+                    Preorder-only pieces may leave every price blank — the storefront shows
+                    “Price on quotation”. The deposit is a percentage of the price you quote later.
+                  </p>
+                </>
               )}
+              <div className="row" style={{ marginTop: 10 }}>
+                <div className="field"><label>Return window (days, blank = default)</label><input type="number" min={0} max={365} value={editing.returnWindowDays} onChange={(e) => setEditing({ ...editing, returnWindowDays: e.target.value })} placeholder="7"/></div>
+              </div>
             </div>
 
             {editing.id ? (
@@ -416,6 +458,9 @@ export default function ProductsClient({ segments, products }: Props) {
               </p>
             )}
 
+            {saveError && (
+              <p style={{ marginTop: 14, fontSize: 13, color: "var(--err)", lineHeight: 1.6 }}>{saveError}</p>
+            )}
             <div style={{ display: "flex", gap: 10, marginTop: 18, justifyContent: "flex-end" }}>
               <button className="btn btn-ghost btn-sm" onClick={() => setEditing(null)}>Cancel</button>
               <button className="btn btn-primary btn-sm" onClick={onSave}>{editing.id ? "Save" : "Create"}</button>

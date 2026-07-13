@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { COPY_CACHE_TAG } from "@/lib/copy";
+import { COMMERCE_KEY, COMMERCE_CACHE_TAG, getCommerceSettings, type CommerceSettings } from "@/lib/commerce";
 import { SITE_URL } from "@/lib/site-url";
 
 // Bust the ISR cache for every locale-prefixed route.
@@ -152,11 +153,40 @@ const prodSchema = z.object({
   preorderPriceBdt: z.number().int().min(0).optional().nullable(),
   modelNote: z.string().max(300).optional().nullable(),
   lookProductIds: z.array(z.string()).optional(),
+  // Quotation model (0016): estimated range + per-product deposit/return overrides.
+  priceMinBdt: z.number().int().min(1).optional().nullable(),
+  priceMaxBdt: z.number().int().min(1).optional().nullable(),
+  preorderDepositPct: z.number().int().min(1).max(100).optional().nullable(),
+  returnWindowDays: z.number().int().min(0).max(365).optional().nullable(),
 });
+
+/**
+ * Cross-field price rules (shared by create, update and CSV import):
+ *  - a regular (buy-now) product must have a real price — ৳0 placeholders were
+ *    the root cause of the zero-price checkout hole;
+ *  - an estimate range must be coherent (min ≤ max).
+ * Preorder-only pieces MAY omit every price ("price on quotation").
+ */
+function validatePriceRules(p: {
+  priceBdt: number;
+  preorderOnly?: boolean | null;
+  priceMinBdt?: number | null;
+  priceMaxBdt?: number | null;
+}): string | null {
+  if (!p.preorderOnly && p.priceBdt < 1) {
+    return "A buy-now product needs a price of at least ৳1. Mark it preorder-only if the price comes from quotation.";
+  }
+  if (p.priceMinBdt != null && p.priceMaxBdt != null && p.priceMinBdt > p.priceMaxBdt) {
+    return "Estimated price range is inverted — min must be ≤ max.";
+  }
+  return null;
+}
 
 export async function createProduct(input: z.infer<typeof prodSchema>) {
   await requireAdmin();
   const data = prodSchema.parse(input);
+  const priceError = validatePriceRules(data);
+  if (priceError) return { ok: false as const, error: priceError };
   const id = data.id || `p-${Date.now().toString(36)}`;
   const slug = slugify(data.name);
   await db.insert(schema.products).values({
@@ -180,6 +210,10 @@ export async function createProduct(input: z.infer<typeof prodSchema>) {
     preorderPriceBdt: data.preorderPriceBdt ?? null,
     modelNote: data.modelNote || null,
     lookProductIds: data.lookProductIds || [],
+    priceMinBdt: data.priceMinBdt ?? null,
+    priceMaxBdt: data.priceMaxBdt ?? null,
+    preorderDepositPct: data.preorderDepositPct ?? null,
+    returnWindowDays: data.returnWindowDays ?? null,
   });
   revalidateAllLocales();
   return { ok: true as const, id, slug };
@@ -187,12 +221,28 @@ export async function createProduct(input: z.infer<typeof prodSchema>) {
 
 export async function updateProduct(id: string, patch: Partial<z.infer<typeof prodSchema>>) {
   await requireAdmin();
+  // Server actions are network-callable: the Partial<> type is compile-time
+  // only, so re-validate the patch shape at runtime before touching the DB.
+  const parsed = prodSchema.partial().safeParse(patch);
+  if (!parsed.success) return { ok: false as const, error: "Invalid product patch" };
+  const safe = parsed.data;
+  // Price rules need the merged row (patch may change only one side of the rule).
+  const [current] = await db.select().from(schema.products).where(eq(schema.products.id, id)).limit(1);
+  if (!current) return { ok: false as const, error: "Product not found" };
+  const priceError = validatePriceRules({
+    priceBdt: safe.priceBdt ?? current.priceBdt,
+    preorderOnly: safe.preorderOnly ?? current.preorderOnly,
+    priceMinBdt: safe.priceMinBdt !== undefined ? safe.priceMinBdt : current.priceMinBdt,
+    priceMaxBdt: safe.priceMaxBdt !== undefined ? safe.priceMaxBdt : current.priceMaxBdt,
+  });
+  if (priceError) return { ok: false as const, error: priceError };
+
   const update: Record<string, unknown> = {};
-  for (const k of ["name","nameBn","sku","segmentId","priceBdt","wasBdt","stock","tag","description","descriptionBn","colors","sizes","preorderEnabled","preorderOnly","estimatedDelivery","preorderPriceBdt","modelNote","lookProductIds"] as const) {
-    if (patch[k] !== undefined) (update as Record<string, unknown>)[k] = patch[k];
+  for (const k of ["name","nameBn","sku","segmentId","priceBdt","wasBdt","stock","tag","description","descriptionBn","colors","sizes","preorderEnabled","preorderOnly","estimatedDelivery","preorderPriceBdt","modelNote","lookProductIds","priceMinBdt","priceMaxBdt","preorderDepositPct","returnWindowDays"] as const) {
+    if (safe[k] !== undefined) (update as Record<string, unknown>)[k] = safe[k];
   }
-  if (typeof patch.sku === "string") update.sku = patch.sku.toUpperCase();
-  if (typeof patch.name === "string") update.slug = slugify(patch.name);
+  if (typeof safe.sku === "string") update.sku = safe.sku.toUpperCase();
+  if (typeof safe.name === "string") update.slug = slugify(safe.name);
   await db.update(schema.products).set(update).where(eq(schema.products.id, id));
   revalidateAllLocales();
   return { ok: true as const };
@@ -501,6 +551,33 @@ export async function getBrand() {
   // jsonb that doesn't conform to the current `brandSchema`.
   const parsed = brandSchema.safeParse(rows[0].value);
   return parsed.success ? parsed.data : null;
+}
+
+// ─── Commerce settings (quotation-driven pricing) ──────────────────────
+//
+// Global levers for the pricing model: the preorder deposit percentage and
+// the default return window. Product-level overrides live on the product row.
+const commerceUpdateSchema = z.object({
+  preorderDepositPct: z.number().int().min(1).max(100),
+  returnWindowDays: z.number().int().min(0).max(365),
+});
+
+export async function getCommerceForAdmin(): Promise<CommerceSettings> {
+  await requirePermission("settings");
+  return getCommerceSettings();
+}
+
+export async function updateCommerceSettings(input: z.infer<typeof commerceUpdateSchema>) {
+  await requirePermission("settings");
+  const data = commerceUpdateSchema.parse(input);
+  await db.insert(schema.siteSettings).values({ key: COMMERCE_KEY, value: data })
+    .onConflictDoUpdate({
+      target: schema.siteSettings.key,
+      set: { value: data, updatedAt: new Date() },
+    });
+  revalidateTag(COMMERCE_CACHE_TAG);
+  revalidateAllLocales();
+  return { ok: true as const };
 }
 
 // ─── Copy overrides ────────────────────────────────────────────────────

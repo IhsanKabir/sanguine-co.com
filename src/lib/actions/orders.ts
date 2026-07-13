@@ -88,6 +88,17 @@ export async function createCodOrder(input: CreateOrderInput) {
     const p = byId.get(item.productId);
     if (!p) return { ok: false as const, error: `Product ${item.productId} not found` };
     if (p.status !== "live") return { ok: false as const, error: `${p.name} is no longer available` };
+    // Quotation model: preorder-only pieces have no cash-on-delivery price —
+    // they are bought via the preorder → quote → deposit pipeline. Without
+    // this guard the QuickView/stale-cart path sells them at priceBdt, which
+    // is a ৳0 placeholder for range-priced pieces.
+    if (p.preorderOnly) {
+      return { ok: false as const, error: `${p.name} is available by preorder only — please use the preorder form` };
+    }
+    // A non-positive price is corrupt catalogue data, never a legitimate sale.
+    if (p.priceBdt <= 0) {
+      return { ok: false as const, error: `${p.name} cannot be ordered right now — please contact the concierge` };
+    }
     if (p.stock < item.qty) return { ok: false as const, error: `${p.name} — only ${p.stock} in stock` };
     const lineTotal = p.priceBdt * item.qty;
     subtotal += lineTotal;

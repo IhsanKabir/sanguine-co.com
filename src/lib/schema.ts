@@ -41,7 +41,16 @@ export const products = pgTable("products", {
   preorderEnabled: boolean("preorder_enabled").default(false).notNull(),
   preorderOnly: boolean("preorder_only").default(false).notNull(),
   estimatedDelivery: text("estimated_delivery"),   // e.g. "4–6 weeks"
-  preorderPriceBdt: integer("preorder_price_bdt"), // null = use priceBdt
+  preorderPriceBdt: integer("preorder_price_bdt"), // DEPRECATED (0016) — kept for rollback; app no longer reads it
+  // Quotation-driven pricing (0016): the actual price of a preorder piece is
+  // set by quotation after research; until then the catalogue carries at most
+  // an estimated range. Deposit % of the quoted price is what the customer
+  // prepays — null falls back to site_settings.commerce.preorderDepositPct.
+  priceMinBdt: integer("price_min_bdt"),
+  priceMaxBdt: integer("price_max_bdt"),
+  preorderDepositPct: integer("preorder_deposit_pct"),
+  // Per-product return window override — null falls back to the global default.
+  returnWindowDays: integer("return_window_days"),
   modelNote: text("model_note"),
   lookProductIds: jsonb("look_product_ids").$type<string[]>().default([]),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -314,7 +323,13 @@ export const preorderRequests = pgTable("preorder_requests", {
   status: text("status").default("new").notNull(),
   // 'new' | 'reviewing' | 'quoted' | 'confirmed' | 'rejected' | 'converted'
   adminNotes: text("admin_notes"),
-  quotedPriceBdt: integer("quoted_price_bdt"),
+  quotedPriceBdt: integer("quoted_price_bdt"),   // PER-UNIT quote (owner decision 2026-07-13)
+  // Snapshot of what the customer was shown at request time (0016) — the
+  // quote can differ from the estimate, but the estimate must be on record.
+  advertisedMinBdt: integer("advertised_min_bdt"),
+  advertisedMaxBdt: integer("advertised_max_bdt"),
+  advertisedDepositPct: integer("advertised_deposit_pct"),
+  depositBdt: integer("deposit_bdt"),            // quoted unit price × pct / 100, set at quote time
   rejectionReason: text("rejection_reason"),
   convertedOrderId: uuid("converted_order_id"),
 

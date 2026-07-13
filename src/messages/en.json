@@ -54,6 +54,8 @@
   },
   "pdp": {
     "addToBag": "Add to Bag",
+    "priceOnQuote": "Price on quotation",
+    "estimated": "estimated",
     "remaining": "Only {count} remaining — assembled to order",
     "inStock": "In stock — ships in 48 hours",
     "freeShipping": "Free shipping",
