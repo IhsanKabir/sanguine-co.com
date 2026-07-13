@@ -350,6 +350,11 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
 
   const number = `SSG-PO-${Date.now().toString(36).toUpperCase()}`;
   const subtotal = req.quotedPriceBdt * req.quantity;   // per-unit quote × qty
+  // The deposit was prepaid to confirm the commission (see preorderQuoteEmail:
+  // "the remainder is paid in cash on delivery") — the COD total must deduct
+  // it or the courier double-collects. Recorded in couponDiscountBdt so the
+  // invoice/email arithmetic (subtotal − discount = total) stays consistent.
+  const depositPaid = Math.min(req.depositBdt ?? 0, subtotal);
   const trackingToken = randomBytes(16).toString("hex");
 
   const newOrderId = await db.transaction(async (tx) => {
@@ -363,10 +368,13 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
       subtotalBdt: subtotal,
       shippingBdt: 0,
       codFeeBdt: 0,
-      totalBdt: subtotal,
+      couponDiscountBdt: depositPaid,
+      totalBdt: subtotal - depositPaid,
       shippingAddress: { fullName: req.customerName, phone: req.customerPhone, ...(req.deliveryAddress as object) },
       trackingToken,
-      notes: `Bespoke pre-order · request ${req.id}`,
+      notes: depositPaid > 0
+        ? `Bespoke pre-order · request ${req.id} · deposit ${depositPaid} BDT prepaid`
+        : `Bespoke pre-order · request ${req.id}`,
     }).returning({ id: schema.orders.id });
 
     await tx.insert(schema.orderLines).values({

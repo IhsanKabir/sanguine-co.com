@@ -6,6 +6,7 @@ import { getSegmentBySlug, getLiveProducts, getHeroImagesFor } from "@/lib/queri
 import { Link } from "@/i18n/routing";
 import ShopGrid from "@/components/storefront/ShopGrid";
 import JsonLd from "@/components/seo/JsonLd";
+import { priceSortValue } from "@/lib/pricing";
 
 import { SITE_URL as BASE } from "@/lib/site-url";
 
@@ -78,8 +79,11 @@ export default async function SegmentPage({ params }: Props) {
   const availableColors = Array.from(new Set(allItems.flatMap((p) => (p.colors as string[] | null) ?? []))).sort();
   const availableSizes = Array.from(new Set(allItems.flatMap((p) => (p.sizes as string[] | null) ?? []))).sort();
   const availableTags = Array.from(new Set(allItems.map((p) => p.tag).filter((t): t is string => !!t))).sort();
-  const priceMin = allItems.length > 0 ? Math.min(...allItems.map((p) => p.priceBdt)) : 0;
-  const priceMax = allItems.length > 0 ? Math.max(...allItems.map((p) => p.priceBdt)) : 0;
+  // Filter bounds use the effective (quotation-model) price; quote-only pieces
+  // have no comparable price and are excluded from the bounds.
+  const priceValues = allItems.map(priceSortValue).filter((v) => v < Number.MAX_SAFE_INTEGER);
+  const priceMin = priceValues.length > 0 ? Math.min(...priceValues) : 0;
+  const priceMax = priceValues.length > 0 ? Math.max(...priceValues) : 0;
 
   const name = (locale === "bn" && seg.nameBn) || seg.name;
   const displayTag = (locale === "bn" && seg.tagBn) || seg.tag || "";
