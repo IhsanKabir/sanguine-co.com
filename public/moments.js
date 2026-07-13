@@ -105,8 +105,9 @@
       }
     }
 
-    // Particles
-    const N = Math.min(targets.length, 1200);
+    // Particles — capped well below the old 1200: the per-frame physics loop
+    // saturated low-end main threads exactly during first click attempts.
+    const N = Math.min(targets.length, 400);
     const particles = [];
     for (let i = 0; i < N; i++) {
       const t = targets[Math.floor(Math.random() * targets.length)];
@@ -163,7 +164,17 @@
     };
     requestAnimationFrame(tick);
   };
-  setTimeout(goldDust, 400);
+  // Desktop-with-headroom only, and deferred to idle: the getImageData scan +
+  // particle loop are pure decoration — they must never delay the user's
+  // first interaction on the landing page.
+  const dustCapable =
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+    (navigator.hardwareConcurrency || 8) >= 4 &&
+    (navigator.deviceMemory || 8) >= 4;
+  if (dustCapable) {
+    if ('requestIdleCallback' in window) requestIdleCallback(() => goldDust(), { timeout: 1500 });
+    else setTimeout(goldDust, 600);
+  }
 
   // ===== 4. TEXT MASK-REVEAL on section headings =====
   const maskReveal = () => {

@@ -1,8 +1,10 @@
 /* ===== Sanguine — Cursor & Motion Layer ===== */
 
-/* Hide native cursor when custom is active */
+/* Hide native cursor ONLY once cursor.js has mounted (it stamps
+ * .ssg-cursor-on on <html>). Plain CSS applied at parse time left users
+ * with NO cursor at all until the afterInteractive script arrived. */
 @media (hover: hover) and (pointer: fine) {
-  body, body * { cursor: none !important; }
+  html.ssg-cursor-on body, html.ssg-cursor-on body * { cursor: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   body, body * { cursor: auto !important; }
@@ -465,12 +467,16 @@
   animation-duration: .35s;
   animation-timing-function: cubic-bezier(.16,.84,.32,1);
 }
+/* .18s opacity-only (was .42s fade+rise): the RSC roundtrip already costs
+ * real time — deliberately hiding the arrived page for almost half a second
+ * on top of it read as "my click was slow". No translate: shifting the whole
+ * route re-rasterizes a full-page layer on every navigation. */
 .ssg-route-fade {
-  animation: ssg-route-fade-in .42s cubic-bezier(.16,.84,.32,1);
+  animation: ssg-route-fade-in .18s ease-out;
 }
 @keyframes ssg-route-fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* Preference: reduced motion */

@@ -28,7 +28,9 @@
   pointer-events: none;
 }
 .ssg-seal-loader.in { opacity: 1; pointer-events: auto; }
-.ssg-seal-loader.out { opacity: 0; }
+/* pointer-events must reset with the fade — without it the invisible
+ * full-viewport overlay kept eating every click for ~800ms after load. */
+.ssg-seal-loader.out { opacity: 0; pointer-events: none; }
 .seal-disc { animation: sealPulse 1.4s ease-in-out infinite; }
 @keyframes sealPulse {
   0%,100% { transform: scale(1); }
