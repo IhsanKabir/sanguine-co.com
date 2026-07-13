@@ -11,13 +11,14 @@
  * component imports the RESULT types (via `import type`) and re-runs through
  * the `getHealthReport` server action — never this module directly.
  */
-import { sql, count } from "drizzle-orm";
+import { sql, count, eq, lte, gt } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/site-url";
+import { searchProducts } from "@/lib/queries";
 
 export type HealthStatus = "ok" | "warn" | "fail";
-export type HealthCategory = "Core" | "Integrations" | "Data" | "Config";
+export type HealthCategory = "Core" | "Integrations" | "Data" | "Features" | "Config";
 
 export type HealthCheck = {
   id: string;
@@ -45,6 +46,8 @@ type CheckDef = {
   category: HealthCategory;
   critical: boolean;
   timeoutMs?: number;
+  /** Touches Postgres — throttled through dbGate (see below). */
+  usesDb?: boolean;
   run: () => Promise<Probe>;
 };
 
@@ -59,6 +62,30 @@ function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
   return Promise.race([p, timeout]).finally(() => clearTimeout(timer));
 }
 
+/**
+ * DB checks run at most N at a time. Empirically (isolated 2026-07-13): when
+ * every check fires its query in one synchronous burst, the Supabase
+ * transaction pooler + postgres.js (prepare:false) wedges ONE victim query —
+ * it never settles, regardless of which check it belongs to. Any burst below
+ * the threshold is fine, so a small gate removes the failure mode entirely
+ * (~2 waves ≈ +1s board latency, well inside the per-check timeout).
+ */
+function makeGate(max: number) {
+  let active = 0;
+  const waiters: Array<() => void> = [];
+  return async <T>(fn: () => Promise<T>): Promise<T> => {
+    if (active >= max) await new Promise<void>((resolve) => waiters.push(resolve));
+    active++;
+    try {
+      return await fn();
+    } finally {
+      active--;
+      waiters.shift()?.();
+    }
+  };
+}
+const dbGate = makeGate(4);
+
 /** Returns the subset of env var names that are missing/empty. */
 function missingEnv(...names: string[]): string[] {
   return names.filter((n) => !process.env[n]);
@@ -70,6 +97,7 @@ const CHECKS: CheckDef[] = [
     label: "Database (Postgres)",
     category: "Core",
     critical: true,
+    usesDb: true,
     run: async () => {
       await db.execute(sql`select 1`);
       return { status: "ok", detail: "Postgres reachable through the connection pooler." };
@@ -182,6 +210,7 @@ const CHECKS: CheckDef[] = [
     label: "Catalogue data",
     category: "Data",
     critical: false,
+    usesDb: true,
     run: async () => {
       const [[p], [s]] = await Promise.all([
         db.select({ n: count() }).from(schema.products),
@@ -198,12 +227,192 @@ const CHECKS: CheckDef[] = [
     label: "Site settings (brand / copy)",
     category: "Data",
     critical: false,
+    usesDb: true,
     run: async () => {
       const rows = await db.select({ key: schema.siteSettings.key }).from(schema.siteSettings);
       const keys = rows.map((r) => r.key);
       if (!keys.includes("brand"))
         return { status: "warn", detail: "No 'brand' settings row — storefront falls back to JSON defaults." };
       return { status: "ok", detail: `Settings rows present: ${keys.join(", ")}.` };
+    },
+  },
+  // ── Feature probes + data-invariant tripwires (Phase 5) ────────────────
+  // These answer "which FEATURE is broken" — each encodes a rule the earlier
+  // audit found violated in production, so regressions surface here first.
+  {
+    id: "pricing-invariants",
+    label: "Catalogue pricing rules",
+    category: "Data",
+    critical: false,
+    usesDb: true,
+    run: async () => {
+      const live = await db.select({
+        slug: schema.products.slug,
+        priceBdt: schema.products.priceBdt,
+        preorderOnly: schema.products.preorderOnly,
+        priceMinBdt: schema.products.priceMinBdt,
+        priceMaxBdt: schema.products.priceMaxBdt,
+      }).from(schema.products).where(eq(schema.products.status, "live"));
+      const zeroBuyNow = live.filter((p) => !p.preorderOnly && p.priceBdt < 1);
+      const badRange = live.filter((p) => p.priceMinBdt != null && p.priceMaxBdt != null && p.priceMinBdt > p.priceMaxBdt);
+      if (zeroBuyNow.length > 0)
+        return { status: "fail", detail: `Buy-now product(s) with no real price (customers see ৳0): ${zeroBuyNow.map((p) => p.slug).join(", ")}` };
+      if (badRange.length > 0)
+        return { status: "fail", detail: `Inverted estimate range: ${badRange.map((p) => p.slug).join(", ")}` };
+      return { status: "ok", detail: `${live.length} live product(s) pass the quotation-model price rules.` };
+    },
+  },
+  {
+    id: "zero-price-orders",
+    label: "Zero-price order tripwire",
+    category: "Data",
+    critical: false,
+    usesDb: true,
+    run: async () => {
+      const [lines] = await db.select({ n: count() }).from(schema.orderLines).where(lte(schema.orderLines.unitPriceBdt, 0));
+      const [orders] = await db.select({ n: count() }).from(schema.orders).where(lte(schema.orders.subtotalBdt, 0));
+      const badLines = Number(lines?.n ?? 0);
+      const badOrders = Number(orders?.n ?? 0);
+      if (badLines > 0 || badOrders > 0)
+        return { status: "fail", detail: `${badLines} ৳0 order line(s), ${badOrders} ৳0-subtotal order(s) — the checkout price guard has been bypassed. Investigate immediately.` };
+      return { status: "ok", detail: "No ৳0 order lines or subtotals — the checkout guard is holding." };
+    },
+  },
+  {
+    id: "segments-stocked",
+    label: "Visible segments have live products",
+    category: "Data",
+    critical: false,
+    usesDb: true,
+    run: async () => {
+      const rows = await db.execute<{ id: string; n: number }>(sql`
+        select s.id, count(p.id)::int as n
+        from segments s
+        left join products p on p.segment_id = s.id and p.status = 'live'
+        where s.hidden = false
+        group by s.id
+      `);
+      const empty = rows.filter((r) => Number(r.n) === 0).map((r) => r.id);
+      if (rows.length === 0) return { status: "warn", detail: "No visible segments — the shop nav is empty." };
+      if (empty.length > 0) return { status: "warn", detail: `Visible segment(s) with zero live products: ${empty.join(", ")}` };
+      return { status: "ok", detail: `${rows.length} visible segment(s), all stocked with live products.` };
+    },
+  },
+  {
+    id: "returns-stuck",
+    label: "Return requests awaiting action",
+    category: "Data",
+    critical: false,
+    usesDb: true,
+    run: async () => {
+      // Zero bind params (cutoff computed in SQL) + one round trip — keeps
+      // this probe cheap under the dbGate that serializes the board's burst.
+      const [row] = await db.execute<{ open: number; stale: number }>(sql`
+        select count(*)::int as open,
+               sum(case when updated_at < now() - interval '7 days' then 1 else 0 end)::int as stale
+        from orders where status = 'return_requested'
+      `);
+      const staleN = Number(row?.stale ?? 0);
+      const openN = Number(row?.open ?? 0);
+      if (staleN > 0) return { status: "warn", detail: `${staleN} return request(s) untouched for over a week (of ${openN} open).` };
+      return { status: "ok", detail: `${openN} open return request(s), none older than a week.` };
+    },
+  },
+  {
+    id: "reviews-integrity",
+    label: "Review counters match approved reviews",
+    category: "Data",
+    critical: false,
+    usesDb: true,
+    run: async () => {
+      const mismatched = await db.execute<{ slug: string }>(sql`
+        select p.slug
+        from products p
+        left join (
+          select product_id, count(*)::int as n from reviews where status = 'approved' group by product_id
+        ) r on r.product_id = p.id
+        where coalesce(r.n, 0) <> p.review_count
+      `);
+      if (mismatched.length > 0)
+        return { status: "warn", detail: `review_count out of sync on: ${mismatched.map((m) => m.slug).join(", ")}` };
+      return { status: "ok", detail: "Every product's review counter matches its approved reviews." };
+    },
+  },
+  {
+    id: "quote-drift",
+    label: "Preorder quotes vs advertised estimates",
+    category: "Data",
+    critical: false,
+    usesDb: true,
+    run: async () => {
+      const quoted = await db.select({
+        id: schema.preorderRequests.id,
+        quoted: schema.preorderRequests.quotedPriceBdt,
+        advMax: schema.preorderRequests.advertisedMaxBdt,
+        advMin: schema.preorderRequests.advertisedMinBdt,
+      }).from(schema.preorderRequests).where(eq(schema.preorderRequests.status, "quoted"));
+      const drifted = quoted.filter((q) =>
+        q.quoted != null && q.advMax != null && (q.quoted > q.advMax * 1.5 || (q.advMin != null && q.quoted < q.advMin * 0.5)),
+      );
+      if (drifted.length > 0)
+        return { status: "warn", detail: `${drifted.length} quote(s) diverge >50% from the advertised estimate — customers saw a very different number.` };
+      return { status: "ok", detail: `${quoted.length} open quote(s), all within 50% of what was advertised.` };
+    },
+  },
+  {
+    id: "search-feature",
+    label: "Search returns live products",
+    category: "Features",
+    critical: false,
+    usesDb: true,
+    run: async () => {
+      // Exercises the REAL search path (same function the storefront calls).
+      const [probe] = await db.select({ name: schema.products.name }).from(schema.products)
+        .where(eq(schema.products.status, "live")).limit(1);
+      if (!probe) return { status: "warn", detail: "No live products to probe search with." };
+      const q = probe.name.slice(0, 4);
+      const hits = await searchProducts(q);
+      return hits.length > 0
+        ? { status: "ok", detail: `Search for "${q}" returns ${hits.length} result(s).` }
+        : { status: "fail", detail: `Search for "${q}" (a live product's own name) returned nothing.` };
+    },
+  },
+  {
+    id: "sitemap-feature",
+    label: "Sitemap serves product URLs",
+    category: "Features",
+    critical: false,
+    run: async () => {
+      const isLocal = SITE_URL.includes("localhost") || SITE_URL.includes("127.0.0.1");
+      try {
+        const res = await fetch(`${SITE_URL}/sitemap.xml`, { cache: "no-store" });
+        if (!res.ok) return { status: "fail", detail: `GET /sitemap.xml returned ${res.status} — Google can't discover the catalogue.` };
+        const body = await res.text();
+        if (!body.includes("/product/"))
+          return { status: "warn", detail: "Sitemap responds but lists no product URLs." };
+        return { status: "ok", detail: "Sitemap responds with product URLs." };
+      } catch (e) {
+        // Network-level failure: environmental noise on a dev box without a
+        // running server; a genuine outage signal in production.
+        return isLocal
+          ? { status: "warn", detail: `Could not reach ${SITE_URL} (no local server running?).` }
+          : { status: "fail", detail: `Fetch of ${SITE_URL}/sitemap.xml failed: ${e instanceof Error ? e.message : "network error"}` };
+      }
+    },
+  },
+  {
+    id: "events-liveness",
+    label: "Analytics events pipeline",
+    category: "Features",
+    critical: false,
+    usesDb: true,
+    run: async () => {
+      const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000);
+      const [recent] = await db.select({ n: count() }).from(schema.events)
+        .where(gt(schema.events.createdAt, cutoff));
+      const n = Number(recent?.n ?? 0);
+      if (n === 0) return { status: "warn", detail: "No events recorded in 48h — tracking may be broken (or genuinely zero traffic)." };
+      return { status: "ok", detail: `${n} event(s) in the last 48h — pipeline alive.` };
     },
   },
   {
@@ -229,7 +438,8 @@ async function runOne(def: CheckDef): Promise<HealthCheck> {
   const started = Date.now();
   let probe: Probe;
   try {
-    probe = await withTimeout(def.run(), def.timeoutMs ?? DEFAULT_TIMEOUT, def.label);
+    const running = def.usesDb ? dbGate(def.run) : def.run();
+    probe = await withTimeout(running, def.timeoutMs ?? DEFAULT_TIMEOUT, def.label);
   } catch (e) {
     probe = { status: "fail", detail: e instanceof Error ? e.message : String(e) };
   }

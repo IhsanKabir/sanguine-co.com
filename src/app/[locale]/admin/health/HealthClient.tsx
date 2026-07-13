@@ -21,7 +21,7 @@ const OVERALL: Record<HealthReport["overall"], { pill: string; word: string; blu
   },
 };
 
-const CATEGORIES: HealthCategory[] = ["Core", "Integrations", "Data", "Config"];
+const CATEGORIES: HealthCategory[] = ["Core", "Integrations", "Data", "Features", "Config"];
 
 export default function HealthClient({ initial }: { initial: HealthReport }) {
   const [report, setReport] = useState<HealthReport>(initial);

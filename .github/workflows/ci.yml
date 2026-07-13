@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Nightly journey run (03:00 Dhaka ≈ 21:00 UTC): catches drift that lands
+  # between deploys — dependency rot, external endpoints, flaky journeys.
+  schedule:
+    - cron: "0 21 * * *"
 
 # Cancel in-flight runs for the same PR / branch when a new commit lands.
 concurrency:
