@@ -54,7 +54,8 @@ export default function ReturnModal({ orderId, orderNumber, onClose }: Props) {
               Request received
             </h4>
             <p style={{ color: "var(--ink-soft)", fontSize: 13, lineHeight: 1.7, maxWidth: 320, margin: "0 auto 24px" }}>
-              Our team will be in touch within 1–2 business days to arrange collection at no extra charge.
+              Our team will be in touch within 1–2 business days to arrange collection. Return shipping
+              is free for defective or incorrect pieces; otherwise it is at your cost (see our returns policy).
             </p>
             <button className="btn btn-primary btn-sm" onClick={onClose}>Done</button>
           </div>
@@ -78,7 +79,8 @@ export default function ReturnModal({ orderId, orderNumber, onClose }: Props) {
                 />
               </div>
               <div style={{ background: "var(--purple-50)", border: "1px solid var(--line)", borderRadius: 2, padding: "12px 16px", marginTop: 16, fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.6 }}>
-                Returns accepted within 30 days of delivery. Items must be in their original condition and packaging.
+                Returns are accepted within each piece&apos;s return window (7 days of delivery unless
+                its page states otherwise). Items must be in their original condition and packaging.
               </div>
               {error && (
                 <p style={{ color: "var(--err)", fontSize: 12, marginTop: 12 }}>{error}</p>

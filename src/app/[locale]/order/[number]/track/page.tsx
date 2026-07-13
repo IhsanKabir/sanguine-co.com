@@ -42,6 +42,9 @@ const TIMELINE_BN = [
 
 const STATUS_INDEX: Record<string, number> = {
   pending: 0, cod_pending: 1, paid: 2, processing: 3, shipped: 4, delivered: 5,
+  // Post-delivery return states keep the timeline at "delivered" rather than
+  // resetting it to the start.
+  return_requested: 5, returned: 5,
 };
 
 /**
@@ -71,7 +74,13 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
   let ownerMatches = false;
   if (!tokenMatches) {
     const user = await getCurrentUser();
-    ownerMatches = !!user && !!order.customerId && user.id === order.customerId;
+    // guestEmail match mirrors returns.ts/account: storefront orders placed
+    // before customerId stamping (or while signed out) still belong to the
+    // signed-in customer with the same email.
+    ownerMatches = !!user && (
+      (!!order.customerId && user.id === order.customerId) ||
+      (!!order.guestEmail && !!user.email && order.guestEmail.toLowerCase() === user.email.toLowerCase())
+    );
   }
   if (!tokenMatches && !ownerMatches) notFound();
 

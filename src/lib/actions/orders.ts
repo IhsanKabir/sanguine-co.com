@@ -11,6 +11,7 @@ import { trackEvent } from "@/lib/events";
 import { validateCoupon, recordCouponRedemption } from "./coupons";
 import { formatBdt } from "@/lib/utils";
 import { logOrderEvent } from "@/lib/order-events";
+import { getCurrentUser } from "@/lib/auth-utils";
 
 import { SITE_URL } from "@/lib/site-url";
 
@@ -30,7 +31,12 @@ const inputSchema = z.object({
   customer: z.object({
     fullName: z.string().min(2).max(120),
     email: z.string().email(),
-    phone: z.string().min(10).max(20),
+    // Deliveries are BD-only (courier network): normalize and require a real
+    // Bangladeshi mobile — same rule the SMS gateway applies at send time.
+    phone: z.string().min(10).max(20).refine((raw) => {
+      const digits = raw.replace(/\D/g, "");
+      return /^(?:88)?01[3-9]\d{8}$/.test(digits);
+    }, "Enter a valid Bangladeshi mobile number (01XXXXXXXXX)"),
   }),
   shipping: z.object({
     line1: z.string().min(2).max(200),
@@ -136,11 +142,15 @@ export async function createCodOrder(input: CreateOrderInput) {
   // atomic guard inside this transaction throws `OUT_OF_STOCK:<name>` which
   // we surface as a friendly user-facing error.
   const trackingToken = randomBytes(16).toString("hex");
+  // Attach the signed-in customer when there is one — review eligibility,
+  // account ownership and the track-page gate all key off customerId.
+  const currentUser = await getCurrentUser().catch(() => null);
   let order: typeof schema.orders.$inferSelect;
   try {
     const result = await db.transaction(async (tx) => {
     const [o] = await tx.insert(schema.orders).values({
       number,
+      customerId: currentUser?.id ?? null,
       guestEmail: data.customer.email,
       guestPhone: data.customer.phone,
       status: "cod_pending",
@@ -276,5 +286,7 @@ export async function createCodOrder(input: CreateOrderInput) {
     path: "/checkout",
   }).catch(() => {});
 
-  return { ok: true as const, number, totalBdt: total };
+  // trackingToken lets the confirmation redirect carry ?t= so the (now
+  // ownership-gated) confirmation page opens for guests too.
+  return { ok: true as const, number, totalBdt: total, trackingToken };
 }

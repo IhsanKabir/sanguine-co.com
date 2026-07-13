@@ -13,6 +13,7 @@ type OrderRow = {
   createdAt: string | null;
   shippingCourier: string | null;
   shippingTracking: string | null;
+  trackingToken: string | null;
 };
 
 type Props = { orders: OrderRow[]; locale: "en" | "bn" };
@@ -41,12 +42,11 @@ const STATUS_LABEL: Record<string, string> = {
   return_requested: "Return Requested",
 };
 
-const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-
+// The exact window (per-product, anchored to delivery) is enforced server-side
+// in requestReturn — the button shows for any delivered order and the server
+// message states the precise window when it has closed.
 function canReturn(order: OrderRow) {
-  if (order.status !== "delivered") return false;
-  const age = Date.now() - (order.createdAt ? new Date(order.createdAt).getTime() : 0);
-  return age <= THIRTY_DAYS_MS;
+  return order.status === "delivered";
 }
 
 export default function AccountOrders({ orders, locale }: Props) {
@@ -109,7 +109,7 @@ export default function AccountOrders({ orders, locale }: Props) {
                 <td>
                   <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                     <Link
-                      href={`/order/${o.number}/track`}
+                      href={`/order/${o.number}/track${o.trackingToken ? `?t=${o.trackingToken}` : ""}`}
                       style={{ fontSize: 12, color: "var(--purple-800)", borderBottom: "1px solid var(--gold)", paddingBottom: 1 }}
                     >
                       Track

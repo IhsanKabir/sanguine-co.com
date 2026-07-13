@@ -16,10 +16,10 @@ import PreorderButton from "@/components/storefront/PreorderButton";
 import RecentlyViewedTracker from "@/components/storefront/RecentlyViewedTracker";
 import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
 import ProductViewTracker from "@/components/storefront/ProductViewTracker";
-import { listApprovedReviews } from "@/lib/actions/reviews";
+import { listApprovedReviews, findEligibleOrderId } from "@/lib/actions/reviews";
 import { getCurrentUser } from "@/lib/auth-utils";
 import { db, schema } from "@/lib/db";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { SITE_URL as BASE } from "@/lib/site-url";
 import { priceDisplay, priceDisplayText, schemaOrgOffer, effectiveDepositPct, effectiveReturnWindowDays } from "@/lib/pricing";
 import { getCommerceSettings } from "@/lib/commerce";
@@ -126,23 +126,16 @@ export default async function ProductPage({ params }: Props) {
   const offer = schemaOrgOffer(p);
 
   // Eligibility for writing a review: signed-in customer with a delivered order
-  // of this product, who has not already written one.
+  // of this product, who has not already written one. Same rule as submitReview
+  // (customerId OR guestEmail) via the shared helper.
   let canWriteReview = false;
   let signedInButIneligible = false;
   if (currentUser) {
-    const eligible = await db.execute<{ id: string }>(sql`
-      select ${schema.orders.id} as id
-      from ${schema.orders}
-      join ${schema.orderLines} on ${schema.orderLines.orderId} = ${schema.orders.id}
-      where ${schema.orders.customerId} = ${currentUser.id}
-        and ${schema.orders.status} = 'delivered'
-        and ${schema.orderLines.productId} = ${p.id}
-      limit 1
-    `).catch(() => []);
+    const eligibleOrderId = await findEligibleOrderId(currentUser.id, currentUser.email ?? null, p.id);
     const alreadyReviewed = await db.select({ id: schema.reviews.id }).from(schema.reviews)
       .where(and(eq(schema.reviews.customerId, currentUser.id), eq(schema.reviews.productId, p.id)))
       .limit(1).catch(() => []);
-    canWriteReview = eligible.length > 0 && alreadyReviewed.length === 0;
+    canWriteReview = !!eligibleOrderId && alreadyReviewed.length === 0;
     signedInButIneligible = !canWriteReview;
   }
 

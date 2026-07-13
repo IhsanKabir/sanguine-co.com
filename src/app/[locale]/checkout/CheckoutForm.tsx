@@ -115,7 +115,8 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
         return;
       }
       clear();
-      router.push(`/order/${res.number}`);
+      // ?t= lets the (ownership-gated) confirmation page open for guests.
+      router.push(`/order/${res.number}?t=${res.trackingToken}`);
     });
   };
 
