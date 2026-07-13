@@ -28,6 +28,7 @@ type AdminPath =
   | "/admin/editorial"
   | "/admin/audio"
   | "/admin/settings"
+  | "/admin/health"
   | "/admin/users";
 
 const NAV: Array<{
@@ -52,6 +53,7 @@ const NAV: Array<{
   { href: "/admin/editorial", name: "Editorial", icon: "feather", group: "House",    perm: "editorial" },
   { href: "/admin/audio",     name: "Audio",     icon: "feather", group: "House",    perm: "settings" },
   { href: "/admin/settings",  name: "Settings",  icon: "feather", group: "House",    perm: "settings" },
+  { href: "/admin/health",    name: "Health",    icon: "feather", group: "House",    perm: "settings" },
   { href: "/admin/users",     name: "Users",     icon: "user",    group: "Team",     perm: "users" },
 ];
 
