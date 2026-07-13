@@ -11,7 +11,7 @@ import RefundPanel from "./RefundPanel";
 
 type Props = { orders: Order[]; lines: OrderLine[] };
 
-const STATUSES = ["pending","cod_pending","paid","processing","shipped","delivered","cancelled","refunded"] as const;
+const STATUSES = ["pending","cod_pending","paid","processing","shipped","delivered","cancelled","refunded","return_requested","returned"] as const;
 
 export default function OrdersClient({ orders, lines }: Props) {
   const [filter, setFilter] = useState<string>("all");

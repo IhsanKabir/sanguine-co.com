@@ -54,6 +54,21 @@ export default async function AccountPage({ params }: Props) {
 
   // ── Data fetching with explicit error isolation ──────────────────────────
   type OrderSelect = typeof schema.orders.$inferSelect;
+  type PreorderSelect = typeof schema.preorderRequests.$inferSelect;
+
+  // Preorder requests + their quote state — previously the quote lived only
+  // in email; the customer could never see it in their account.
+  let preorders: PreorderSelect[] = [];
+  try {
+    preorders = await db.select()
+      .from(schema.preorderRequests)
+      .where(or(
+        eq(schema.preorderRequests.customerId, user.id as unknown as string),
+        eq(schema.preorderRequests.customerEmail, user.email ?? ""),
+      ))
+      .orderBy(desc(schema.preorderRequests.createdAt))
+      .limit(10);
+  } catch (e) { console.error("[account] preorders query failed:", e); }
   type AddressSelect = typeof schema.addresses.$inferSelect;
 
   let orders: OrderSelect[] = [];
@@ -207,10 +222,67 @@ export default async function AccountPage({ params }: Props) {
             createdAt: o.createdAt?.toISOString() ?? null,
             shippingCourier: o.shippingCourier ?? null,
             shippingTracking: o.shippingTracking ?? null,
+            trackingToken: o.trackingToken ?? null,
           }))}
           locale={loc}
         />
       </section>
+
+      {/* ─── Preorder requests — quote + deposit status ─────────────────── */}
+      {preorders.length > 0 && (
+        <section style={{ marginTop: 28 }}>
+          <h2 className="serif" style={{ fontSize: 22, fontWeight: 500, color: "var(--purple-900)", margin: "0 0 4px" }}>
+            Preorder requests
+          </h2>
+          <p style={{ fontSize: 13, color: "var(--ink-soft)", margin: "0 0 14px" }}>
+            When the atelier quotes your piece, the price and deposit appear here (and by email).
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {preorders.map((r) => {
+              const pill =
+                r.status === "quoted" ? "pill-info"
+                : r.status === "converted" ? "pill-ok"
+                : r.status === "rejected" ? "pill-err"
+                : "pill-warn";
+              const label =
+                r.status === "new" ? "Received"
+                : r.status === "reviewing" ? "In review"
+                : r.status === "quoted" ? "Quoted"
+                : r.status === "confirmed" ? "Confirmed"
+                : r.status === "converted" ? "Ordered"
+                : r.status === "rejected" ? "Declined"
+                : r.status;
+              return (
+                <div key={r.id} style={{ border: "1px solid var(--line)", background: "white", padding: "14px 18px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+                  <span className={`pill ${pill}`}>{label}</span>
+                  <div style={{ flex: 1, minWidth: 180 }}>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: "var(--purple-900)" }}>
+                      {r.description.length > 90 ? r.description.slice(0, 90) + "…" : r.description}
+                    </div>
+                    <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 2 }}>
+                      Qty {r.quantity} · {r.createdAt ? new Date(r.createdAt).toLocaleDateString(loc === "bn" ? "bn-BD" : "en-GB", { day: "numeric", month: "short", year: "numeric" }) : ""}
+                    </div>
+                  </div>
+                  {r.quotedPriceBdt ? (
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: "var(--purple-900)" }}>
+                        {formatBdt(r.quotedPriceBdt, loc)}{r.quantity > 1 ? ` × ${r.quantity} = ${formatBdt(r.quotedPriceBdt * r.quantity, loc)}` : ""}
+                      </div>
+                      {r.depositBdt ? (
+                        <div style={{ fontSize: 11, color: "var(--gold-deep)" }}>
+                          Deposit to confirm · {formatBdt(r.depositBdt, loc)}
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>Awaiting quote</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* ─── Loyalty ─────────────────────────────────────────────────────── */}
       <LoyaltyCard lifetimeSpend={lifetimeSpend} locale={loc} />

@@ -12,14 +12,18 @@ export default function robots(): MetadataRoute.Robots {
         // the image URL itself is crawlable. Longest-match precedence means
         // this allow rule wins for /api/og?slug=… on Google and Bing.
         allow: ["/", "/api/og"],
+        // Every customer-facing URL is locale-prefixed (/en/…, /bn/…) because
+        // next-intl uses localePrefix:"always" — a bare "/account" prefix rule
+        // never matches "/en/account", so each rule is emitted per locale too.
         disallow: [
-          "/admin",         // private operations area
-          "/api",           // server actions / webhook endpoints
-          "/auth",          // OAuth callback handlers
-          "/account",       // signed-in only
-          "/checkout",      // transactional, not indexable
-          "/preorder",      // signed-in bespoke request form
-          "/*?*",           // anything with query parameters (cart state etc)
+          "/admin", "/en/admin", "/bn/admin",           // private operations area
+          "/api",                                       // server actions / webhooks (not localized)
+          "/auth", "/en/auth", "/bn/auth",              // OAuth callback handlers
+          "/account", "/en/account", "/bn/account",     // signed-in only
+          "/checkout", "/en/checkout", "/bn/checkout",  // transactional, not indexable
+          "/preorder", "/en/preorder", "/bn/preorder",  // signed-in bespoke request form
+          "/order", "/en/order", "/bn/order",           // confirmation/tracking pages hold PII
+          "/*?*",                                       // anything with query parameters
         ],
       },
     ],

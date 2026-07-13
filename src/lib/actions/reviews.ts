@@ -19,23 +19,40 @@ const submitSchema = z.object({
   body: z.string().min(10, "Tell us a little more (10+ characters).").max(2000),
 });
 
+/**
+ * A delivered order containing the product, owned by the user — matched by
+ * customerId OR guestEmail, because storefront orders placed while signed out
+ * (or before checkout stamped customerId) only carry the email. Exported so
+ * the PDP review-CTA gate applies the exact same rule.
+ */
+export async function findEligibleOrderId(
+  userId: string,
+  userEmail: string | null,
+  productId: string,
+): Promise<string | null> {
+  const rows = await db.execute<{ order_id: string }>(sql`
+    select ${schema.orders.id} as order_id
+    from ${schema.orders}
+    join ${schema.orderLines} on ${schema.orderLines.orderId} = ${schema.orders.id}
+    where (
+        ${schema.orders.customerId} = ${userId}
+        or (${userEmail ?? ""} <> '' and lower(${schema.orders.guestEmail}) = lower(${userEmail ?? ""}))
+      )
+      and ${schema.orders.status} = 'delivered'
+      and ${schema.orderLines.productId} = ${productId}
+    limit 1
+  `).catch(() => [] as { order_id: string }[]);
+  return rows[0]?.order_id ?? null;
+}
+
 export async function submitReview(
   input: z.infer<typeof submitSchema>,
 ): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   const user = await requireUser();
   const data = submitSchema.parse(input);
 
-  // Eligibility check: a delivered order containing this product, owned by this user.
-  const eligible = await db.execute<{ order_id: string }>(sql`
-    select ${schema.orders.id} as order_id
-    from ${schema.orders}
-    join ${schema.orderLines} on ${schema.orderLines.orderId} = ${schema.orders.id}
-    where ${schema.orders.customerId} = ${user.id}
-      and ${schema.orders.status} = 'delivered'
-      and ${schema.orderLines.productId} = ${data.productId}
-    limit 1
-  `);
-  if (eligible.length === 0) {
+  const eligibleOrderId = await findEligibleOrderId(user.id, user.email ?? null, data.productId);
+  if (!eligibleOrderId) {
     return { ok: false as const, error: "Only customers with a delivered order of this piece may write a review." };
   }
 
@@ -50,7 +67,7 @@ export async function submitReview(
   const [row] = await db.insert(schema.reviews).values({
     productId: data.productId,
     customerId: user.id,
-    orderId: eligible[0].order_id,
+    orderId: eligibleOrderId,
     rating: data.rating,
     title: data.title?.trim() || null,
     body: data.body.trim(),

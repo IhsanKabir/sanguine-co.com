@@ -6,17 +6,38 @@ import { parseShippingAddress } from "@/lib/schema";
 import WaxSeal from "@/components/storefront/WaxSeal";
 import { eq } from "drizzle-orm";
 import { formatBdt } from "@/lib/utils";
+import { getCurrentUser } from "@/lib/auth-utils";
 
-type Props = { params: Promise<{ locale: string; number: string }> };
+type Props = {
+  params: Promise<{ locale: string; number: string }>;
+  searchParams: Promise<{ t?: string }>;
+};
 
-export default async function OrderConfirmation({ params }: Props) {
+// This page renders a full name, street address and phone — never indexable.
+export const metadata = { robots: { index: false, follow: false } };
+
+export default async function OrderConfirmation({ params, searchParams }: Props) {
   const { locale, number } = await params;
+  const sp = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations();
 
   const orders = await db.select().from(schema.orders).where(eq(schema.orders.number, number)).limit(1).catch(() => []);
   const order = orders[0];
   if (!order) notFound();
+
+  // Gate exactly like the track page: order numbers are low-entropy and this
+  // page shows PII, so require the tracking token (?t=, carried by the
+  // checkout redirect and the email link) OR an owning session.
+  const tokenMatches = !!sp.t && sp.t === order.trackingToken;
+  if (!tokenMatches) {
+    const user = await getCurrentUser().catch(() => null);
+    const ownerMatches = !!user && (
+      (!!order.customerId && user.id === order.customerId) ||
+      (!!order.guestEmail && !!user.email && order.guestEmail.toLowerCase() === user.email.toLowerCase())
+    );
+    if (!ownerMatches) notFound();
+  }
   const lines = await db.select().from(schema.orderLines).where(eq(schema.orderLines.orderId, order.id)).catch(() => []);
   const addr = parseShippingAddress(order.shippingAddress);
   const firstName = (addr.fullName ?? "").split(" ")[0] || "friend";
