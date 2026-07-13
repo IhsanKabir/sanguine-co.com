@@ -257,7 +257,10 @@
     });
     document.body.appendChild(b);
   }
-  mountMuteToggle();
+  // No mute toggle on touch: it sat fixed bottom-right on top of the cookie
+  // banner's Accept button and the PDP sticky Add-to-Bag — taps aimed at the
+  // buy CTA hit a pre-consent no-op instead. Audio is gesture-gated anyway.
+  if (!isTouch) mountMuteToggle();
   // Click-driven cues (button feedback, card hover) — gated on consent and mute.
   // Bail on the element test FIRST: this capture listener runs ahead of every
   // React handler on the page, so the common case (a click anywhere else)
@@ -481,9 +484,11 @@
       setTimeout(() => b.remove(), 600);
     }, true);
 
-    // Swipe-to-dismiss cart drawer
+    // Swipe-to-dismiss cart drawer. The React drawer renders as `.drawer`
+    // only while open (conditional render) — the old `.cart-drawer.open`
+    // selector matched nothing, so this entire feature was dead.
     const attachDrawerSwipe = () => {
-      const drawer = document.querySelector('.cart-drawer.open');
+      const drawer = document.querySelector('.drawer');
       if (!drawer || drawer.dataset.swipeBound) return;
       drawer.dataset.swipeBound = '1';
       // inject handle
@@ -508,7 +513,7 @@
         drawer.classList.remove('dragging');
         if (dy > 120) {
           drawer.style.transform = 'translateY(100%)';
-          const close = document.querySelector('.cart-overlay');
+          const close = document.querySelector('.overlay');
           if (close) close.click();
           setTimeout(() => drawer.style.transform = '', 400);
         } else {
