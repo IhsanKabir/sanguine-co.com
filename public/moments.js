@@ -178,6 +178,11 @@
 
   // ===== 4. TEXT MASK-REVEAL on section headings =====
   const maskReveal = () => {
+    // Bengali is a complex script: conjuncts and dependent vowel signs must
+    // shape with adjacent characters. Splitting into per-code-unit inline
+    // blocks renders dotted circles and broken letterforms — skip the effect
+    // entirely on the bn locale (headings appear normally).
+    if ((document.documentElement.lang || '').toLowerCase().startsWith('bn')) return;
     document.querySelectorAll('.section-hd h2:not(.mask-init)').forEach(h => {
       h.classList.add('mask-init');
       const text = h.textContent;

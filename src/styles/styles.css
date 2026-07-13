@@ -316,7 +316,9 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .chart-hd{display:flex;justify-content:space-between;align-items:start;margin-bottom:20px}
 .chart-hd h3{font-family:var(--serif);font-size:22px;margin:0;color:var(--purple-900);font-weight:500}
 
-.table{background:#fff;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+/* overflow-x:auto, not hidden: wide order/product tables were silently
+ * CLIPPED on narrow screens with no way to reach the cut-off columns. */
+.table{background:#fff;border:1px solid var(--line);border-radius:2px;overflow-x:auto}
 .table table{width:100%;border-collapse:collapse}
 .table th{background:var(--purple-50);padding:12px 14px;text-align:left;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;border-bottom:1px solid var(--line)}
 .table td{padding:14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
@@ -368,12 +370,19 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
   .grid-3{grid-template-columns:repeat(2,1fr)}
   .cat-grid{grid-template-columns:repeat(2,1fr)}
 
-  /* PDP */
+  /* PDP — thumbs sized explicitly: their 88px came only from the desktop
+   * grid track, so on phones they blew up to intrinsic image width (or
+   * collapsed to 0). Hero image renders first; the thumb strip follows. */
   .pdp{grid-template-columns:1fr;gap:28px;padding:20px 24px}
-  .pdp-gallery{grid-template-columns:1fr}
-  .pdp-thumbs{flex-direction:row;flex-wrap:wrap}
+  .pdp-gallery{grid-template-columns:1fr;display:grid}
+  .pdp-thumbs{flex-direction:row;flex-wrap:wrap;order:2}
+  .pdp-thumb{width:64px;height:64px;flex:0 0 64px}
+  .pdp-main-img{order:1}
   .pdp-info h1{font-size:32px}
   .pdp-feats{grid-template-columns:1fr}
+  /* iOS zooms any focused control under 16px — checkout/search/coupon
+   * inputs were 12-15px, leaving the page stuck zoomed after every focus. */
+  input,select,textarea{font-size:16px}
 
   /* Section chrome */
   .section{padding:48px 24px}
@@ -431,4 +440,34 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 
   /* Product card */
   .prod-name{font-size:16px}
+
+  /* Nav search: capped so brand + icons + expanded search can never overflow
+   * a 320-375px viewport (fixed 260px pushed the cart icon off-screen). */
+  .nav-search{width:min(260px, calc(100vw - 170px))}
+}
+
+/* ── Admin on small screens — usable, not just visible ─────────────────────
+ * The fixed 240px sidebar left ~135px for ALL content on a phone. The rail
+ * becomes a horizontally-scrollable strip and grids collapse. */
+@media (max-width: 900px) {
+  .admin-body{grid-template-columns:1fr}
+  .admin-side{flex-direction:row;align-items:center;overflow-x:auto;gap:2px;padding:10px 12px;position:sticky;top:0;z-index:50}
+  .admin-logo{font-size:18px;padding:4px 10px;white-space:nowrap}
+  .admin-logo small{display:none}
+  .admin-nav-group{display:none}
+  .admin-link{white-space:nowrap;padding:8px 10px}
+  .admin-content{padding:16px}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .chart-row{grid-template-columns:1fr}
+}
+
+/* ── iOS safe areas — fixed bottom bars must clear the home indicator ────── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .pdp-sticky-bar{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+}
+
+/* Cookie banner sits ABOVE the PDP sticky Add-to-Bag bar (it covered the
+ * primary purchase CTA on first visit at z-index 95 vs 90). */
+@media (max-width: 767px) {
+  .cookie-banner{bottom:calc(76px + env(safe-area-inset-bottom, 0px))}
 }

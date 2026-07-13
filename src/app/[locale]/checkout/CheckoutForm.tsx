@@ -137,26 +137,26 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
             <div className="row">
               <div className="field">
                 <label>{t("checkout.fullName")}</label>
-                <input value={c.fullName} onChange={(e) => { setC({ ...c, fullName: e.target.value }); setFieldErrors((fe) => ({ ...fe, fullName: "" })); }} placeholder="Adelaide Voss" aria-invalid={!!fieldErrors.fullName} />
+                <input autoComplete="name" value={c.fullName} onChange={(e) => { setC({ ...c, fullName: e.target.value }); setFieldErrors((fe) => ({ ...fe, fullName: "" })); }} placeholder="Adelaide Voss" aria-invalid={!!fieldErrors.fullName} />
                 {fieldErrors.fullName && <span className="field-err">{fieldErrors.fullName}</span>}
               </div>
               <div className="field">
                 <label>{t("checkout.email")}</label>
-                <input type="email" value={c.email} onChange={(e) => { setC({ ...c, email: e.target.value }); setFieldErrors((fe) => ({ ...fe, email: "" })); }} placeholder="you@mail.co" aria-invalid={!!fieldErrors.email} />
+                <input type="email" autoComplete="email" inputMode="email" value={c.email} onChange={(e) => { setC({ ...c, email: e.target.value }); setFieldErrors((fe) => ({ ...fe, email: "" })); }} placeholder="you@mail.co" aria-invalid={!!fieldErrors.email} />
                 {fieldErrors.email && <span className="field-err">{fieldErrors.email}</span>}
               </div>
             </div>
             <div className="row">
               <div className="field" style={{ gridColumn: "1/-1" }}>
                 <label>{t("checkout.phone")}</label>
-                <input value={c.phone} onChange={(e) => { setC({ ...c, phone: e.target.value }); setFieldErrors((fe) => ({ ...fe, phone: "" })); }} placeholder="+8801XXXXXXXXX" aria-invalid={!!fieldErrors.phone} />
+                <input type="tel" inputMode="tel" autoComplete="tel" value={c.phone} onChange={(e) => { setC({ ...c, phone: e.target.value }); setFieldErrors((fe) => ({ ...fe, phone: "" })); }} placeholder="+8801XXXXXXXXX" aria-invalid={!!fieldErrors.phone} />
                 {fieldErrors.phone && <span className="field-err">{fieldErrors.phone}</span>}
               </div>
             </div>
             <div className="row">
               <div className="field" style={{ gridColumn: "1/-1" }}>
                 <label>{t("checkout.address")}</label>
-                <input value={s.line1} onChange={(e) => { setS({ ...s, line1: e.target.value }); setFieldErrors((fe) => ({ ...fe, line1: "" })); }} placeholder="House 12, Road 5, Gulshan" aria-invalid={!!fieldErrors.line1} />
+                <input autoComplete="street-address" value={s.line1} onChange={(e) => { setS({ ...s, line1: e.target.value }); setFieldErrors((fe) => ({ ...fe, line1: "" })); }} placeholder="House 12, Road 5, Gulshan" aria-invalid={!!fieldErrors.line1} />
                 {fieldErrors.line1 && <span className="field-err">{fieldErrors.line1}</span>}
               </div>
             </div>
@@ -172,7 +172,7 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
               </div>
               <div className="field">
                 <label>{t("checkout.postcode")}</label>
-                <input value={s.postcode} onChange={(e) => setS({ ...s, postcode: e.target.value })} placeholder="1212" />
+                <input inputMode="numeric" autoComplete="postal-code" value={s.postcode} onChange={(e) => setS({ ...s, postcode: e.target.value })} placeholder="1212" />
               </div>
             </div>
             <div className="row"><div className="field" style={{ gridColumn: "1/-1" }}><label>Order notes (optional)</label>
