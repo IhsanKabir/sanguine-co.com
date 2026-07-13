@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useMemo, useTransition, useState } from "react";
+import { useMemo, useTransition, useState, useOptimistic } from "react";
 
 type Props = {
   segmentSlug: string;
@@ -36,19 +36,27 @@ export default function SegmentFilters(props: Props) {
   const [pending, startTransition] = useTransition();
   const [filterOpen, setFilterOpen] = useState(false);
 
-  const minActive = params.get("min") ?? "";
-  const maxActive = params.get("max") ?? "";
-  const tagActive = params.get("tag") ?? "";
-  const sortActive = params.get("sort") ?? "featured";
-  const colorList = useMemo(() => (params.get("color") ?? "").split(",").filter(Boolean), [params]);
-  const sizeList  = useMemo(() => (params.get("size") ?? "").split(",").filter(Boolean), [params]);
+  // Optimistic URL state: the tapped pill flips instantly while the RSC
+  // render is in flight (the URL stays the source of truth on settle). On BD
+  // mobile networks the old server-roundtrip-then-repaint made every filter
+  // tap look frozen.
+  const [optimisticQs, setOptimisticQs] = useOptimistic(params.toString());
+  const active = useMemo(() => new URLSearchParams(optimisticQs), [optimisticQs]);
+
+  const minActive = active.get("min") ?? "";
+  const maxActive = active.get("max") ?? "";
+  const tagActive = active.get("tag") ?? "";
+  const sortActive = active.get("sort") ?? "featured";
+  const colorList = useMemo(() => (active.get("color") ?? "").split(",").filter(Boolean), [active]);
+  const sizeList  = useMemo(() => (active.get("size") ?? "").split(",").filter(Boolean), [active]);
 
   const updateParam = (key: string, value: string | null) => {
-    const next = new URLSearchParams(params.toString());
+    const next = new URLSearchParams(active.toString());
     if (value === null || value === "") next.delete(key);
     else next.set(key, value);
     const qs = next.toString();
     startTransition(() => {
+      setOptimisticQs(qs);
       router.push(qs ? `${pathname}?${qs}` : pathname);
     });
   };
@@ -60,7 +68,10 @@ export default function SegmentFilters(props: Props) {
   };
 
   const clearAll = () => {
-    startTransition(() => router.push(pathname));
+    startTransition(() => {
+      setOptimisticQs("");
+      router.push(pathname);
+    });
     setFilterOpen(false);
   };
 
@@ -97,7 +108,7 @@ export default function SegmentFilters(props: Props) {
           <select
             value={sortActive}
             onChange={(e) => updateParam("sort", e.target.value === "featured" ? null : e.target.value)}
-            disabled={pending}
+            aria-busy={pending}
           >
             {SORT_OPTIONS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
           </select>
@@ -117,7 +128,7 @@ export default function SegmentFilters(props: Props) {
             <select
               value={sortActive}
               onChange={(e) => updateParam("sort", e.target.value === "featured" ? null : e.target.value)}
-              disabled={pending}
+              aria-busy={pending}
               className="filter-select"
             >
               {SORT_OPTIONS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
@@ -133,7 +144,7 @@ export default function SegmentFilters(props: Props) {
                   <button
                     key={t}
                     type="button"
-                    disabled={pending}
+                    aria-busy={pending}
                     onClick={() => updateParam("tag", tagActive === t ? null : t)}
                     className={"filter-pill " + (tagActive === t ? "active" : "")}
                   >
@@ -154,7 +165,7 @@ export default function SegmentFilters(props: Props) {
                   placeholder={`৳${props.priceMin}`}
                   value={minActive}
                   onChange={(e) => updateParam("min", e.target.value || null)}
-                  disabled={pending}
+                  aria-busy={pending}
                   className="filter-price-input"
                 />
                 <span className="filter-price-dash">–</span>
@@ -163,7 +174,7 @@ export default function SegmentFilters(props: Props) {
                   placeholder={`৳${props.priceMax}`}
                   value={maxActive}
                   onChange={(e) => updateParam("max", e.target.value || null)}
-                  disabled={pending}
+                  aria-busy={pending}
                   className="filter-price-input"
                 />
               </div>
@@ -179,7 +190,7 @@ export default function SegmentFilters(props: Props) {
                   <button
                     key={c}
                     type="button"
-                    disabled={pending}
+                    aria-busy={pending}
                     onClick={() => toggleListParam("color", c)}
                     className={"filter-pill " + (colorList.includes(c) ? "active" : "")}
                   >
@@ -199,7 +210,7 @@ export default function SegmentFilters(props: Props) {
                   <button
                     key={s}
                     type="button"
-                    disabled={pending}
+                    aria-busy={pending}
                     onClick={() => toggleListParam("size", s)}
                     className={"filter-pill " + (sizeList.includes(s) ? "active" : "")}
                     style={{ fontFamily: "var(--mono)" }}
@@ -218,7 +229,7 @@ export default function SegmentFilters(props: Props) {
             {hasAnyActive && (
               <button
                 type="button"
-                disabled={pending}
+                aria-busy={pending}
                 onClick={clearAll}
                 className="btn btn-ghost btn-sm"
                 style={{ padding: "4px 10px", fontSize: 11 }}

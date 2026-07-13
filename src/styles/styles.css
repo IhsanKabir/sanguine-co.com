@@ -263,8 +263,12 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
  * over .55s using the same `cubic-bezier(.16,.84,.32,1)` we use for hero rises,
  * so the motion grammar stays consistent across the site. Both honour
  * reduced-motion below. */
-.overlay{position:fixed;inset:0;background:oklch(0.22 0.06 220 / 0.42);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:100;animation:ssg-overlay-in .45s cubic-bezier(.16,.84,.32,1)}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:420px;background:#fff;z-index:101;display:flex;flex-direction:column;animation:ssg-drawer-in .55s cubic-bezier(.16,.84,.32,1);box-shadow:-30px 0 80px oklch(0.22 0.06 220 / 0.18)}
+/* Timings tightened from .45/.55s: interactions past ~200ms read as sluggish,
+ * and the full-viewport backdrop-blur forced expensive re-blurs every frame
+ * of the drawer slide on integrated GPUs — a slightly deeper veil reads the
+ * same without the per-frame cost. */
+.overlay{position:fixed;inset:0;background:oklch(0.22 0.06 220 / 0.5);z-index:100;animation:ssg-overlay-in .18s cubic-bezier(.16,.84,.32,1)}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:420px;background:#fff;z-index:101;display:flex;flex-direction:column;animation:ssg-drawer-in .28s cubic-bezier(.16,.84,.32,1);box-shadow:-30px 0 80px oklch(0.22 0.06 220 / 0.18)}
 @keyframes ssg-overlay-in{from{opacity:0}to{opacity:1}}
 @keyframes ssg-drawer-in{from{transform:translateX(100%);opacity:.6}to{transform:translateX(0);opacity:1}}
 @media (prefers-reduced-motion: reduce){

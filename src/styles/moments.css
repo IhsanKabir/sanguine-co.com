@@ -29,10 +29,9 @@
 /* Disable old hero h1/p/btn entrance — gold dust handles h1, others remain */
 .hero h1 { animation: none !important; }
 
-/* Loupe — actually magnifies via inverted scale on backdrop */
-#ssg-cursor[data-mode="loupe"] .cur-loupe {
-  backdrop-filter: blur(0) saturate(1.4) contrast(1.1);
-}
+/* Loupe — border + inner shadow only. The old backdrop-filter re-sampled the
+ * page under the cursor EVERY frame it moved, making the PDP (where Add to
+ * Bag lives) the most sluggish page on integrated GPUs. */
 #ssg-cursor[data-mode="loupe"] .cur-loupe::before {
   content: ""; position: absolute; inset: 8px;
   border-radius: 50%;

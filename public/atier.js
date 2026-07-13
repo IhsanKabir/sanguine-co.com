@@ -259,12 +259,18 @@
   }
   mountMuteToggle();
   // Click-driven cues (button feedback, card hover) — gated on consent and mute.
+  // Bail on the element test FIRST: this capture listener runs ahead of every
+  // React handler on the page, so the common case (a click anywhere else)
+  // must not touch localStorage or the audio pipeline at all.
   document.addEventListener('click', e => {
+    const t = e.target;
+    const wantsClick = !!(t.closest && t.closest('.btn-primary, .btn-gold'));
+    const wantsRustle = !wantsClick && !!(t.closest && t.closest('.cat-tile, .card'));
+    if (!wantsClick && !wantsRustle) return;
     if (!audioPermitted()) return;
     ensureAudio();
-    const t = e.target;
-    if (t.closest && t.closest('.btn-primary, .btn-gold')) window.SSG_SOUND.click();
-    else if (t.closest && t.closest('.cat-tile, .card')) window.SSG_SOUND.rustle();
+    if (wantsClick) window.SSG_SOUND.click();
+    else window.SSG_SOUND.rustle();
   }, true);
   // First gong on first user gesture — gated on consent. Pre-consent
   // visitors get a silent first paint, which is what PDPO/WCAG expect.

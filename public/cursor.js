@@ -86,9 +86,15 @@
   let mode = 'default';
   let down = false;
   let visible = false;
+  let pointerDirty = false;
+
+  // The stylesheet only hides the native cursor once this class exists —
+  // until the layer is actually live the user must never be cursor-less.
+  document.documentElement.classList.add('ssg-cursor-on');
 
   window.addEventListener('mousemove', e => {
     mx = e.clientX; my = e.clientY;
+    pointerDirty = true;
     if (!visible) { cx = mx; cy = my; visible = true; cur.classList.add('visible'); }
   });
   window.addEventListener('mousedown', (e) => {
@@ -166,7 +172,10 @@
     lastT = t;
 
     // Lerp toward mouse — dt-normalised so 144 Hz feels identical to 60 Hz.
-    const ease = Math.min((mode === 'admin' ? 1 : 0.28) * dt, 1);
+    // 0.65 keeps a hint of glide without the 4-6 frame trail users aim with:
+    // the visible cursor lagging the true hit point made every click feel
+    // late or mistargeted.
+    const ease = Math.min((mode === 'admin' ? 1 : 0.65) * dt, 1);
     cx += (mx - cx) * ease;
     cy += (my - cy) * ease;
 
@@ -176,9 +185,10 @@
 
     cur.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
 
-    // Hover detection every other frame (~30fps) inside the rAF loop so it
-    // doesn't compete with pointer events via a separate setInterval timer.
-    if (++hoverFrame % 2 === 0) updateHover();
+    // Hover detection every other frame (~30fps), and only when the pointer
+    // actually moved — elementFromPoint forces a style/hit-test flush, which
+    // is wasted main-thread work on an idle mouse.
+    if (pointerDirty && ++hoverFrame % 2 === 0) { updateHover(); pointerDirty = false; }
 
     // HUD coords for admin
     if (mode === 'admin') {
@@ -279,10 +289,18 @@
     }));
   };
   refreshMagnetic();
-  const magObs = new MutationObserver(refreshMagnetic);
+  // rAF-coalesced: scroll fires dozens of times a frame and every React
+  // commit triggers the observer — refreshing rects synchronously in both
+  // forced layout mid-scroll and mid-commit.
+  let magRaf = 0;
+  const scheduleRefreshMagnetic = () => {
+    if (magRaf) return;
+    magRaf = requestAnimationFrame(() => { magRaf = 0; refreshMagnetic(); });
+  };
+  const magObs = new MutationObserver(scheduleRefreshMagnetic);
   magObs.observe(document.body, { childList: true, subtree: true });
-  window.addEventListener('resize', refreshMagnetic, { passive: true });
-  window.addEventListener('scroll', refreshMagnetic, { passive: true });
+  window.addEventListener('resize', scheduleRefreshMagnetic, { passive: true });
+  window.addEventListener('scroll', scheduleRefreshMagnetic, { passive: true });
 
   document.addEventListener('mousemove', (e) => {
     for (const { el, rect } of magneticCache) {
