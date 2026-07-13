@@ -125,20 +125,33 @@ export function preorderReceivedEmail(d: PreorderEmailData) {
     </table>
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:24px 0 8px;">YOU WROTE</p>
     <p style="font-size:14px;color:#3a2a64;line-height:1.7;background:#f9f4ec;padding:14px 16px;border-left:2px solid #a07e2c;white-space:pre-wrap;margin:0;">${escapeHtml(d.description)}</p>
-    <p style="font-size:13px;color:#7a6a52;margin:32px 0 0;line-height:1.7;">No payment is due now. The maison will write back with a price and timeline; the piece is paid for on delivery.</p>
+    <p style="font-size:13px;color:#7a6a52;margin:32px 0 0;line-height:1.7;">No payment is due now. The maison will write back with a price and timeline; a small deposit confirms the commission and the remainder is paid on delivery.</p>
     <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">— The atelier</p>
   `;
   return { subject, html: SHELL(body) };
 }
 
-export function preorderQuoteEmail(d: PreorderEmailData & { quotedPriceBdt: number; adminNotes?: string | null }) {
+export function preorderQuoteEmail(
+  d: PreorderEmailData & {
+    quotedPriceBdt: number;          // PER-UNIT price (owner decision 2026-07-13)
+    depositBdt: number;              // prepayment that confirms the piece
+    depositPct: number;
+    adminNotes?: string | null;
+  },
+) {
   const subject = `A quote for your bespoke piece · ${d.segmentName}`;
+  const total = d.quotedPriceBdt * d.quantity;
+  // The math the customer agrees to must be the same math the conversion
+  // charges: unit × quantity = total, deposit up front, remainder on delivery.
+  const priceLine = d.quantity > 1
+    ? `${formatBdt(d.quotedPriceBdt)} <span style="font-size:16px;color:#7a6a52;">each</span> × ${d.quantity} = ${formatBdt(total)}`
+    : formatBdt(total);
   const body = `
     <p style="font-size:15px;margin:0 0 6px;">Dear ${d.customerName.split(" ")[0] || "friend"},</p>
-    <p style="font-size:15px;margin:0 0 24px;">We have considered your request and would be honoured to make this for you. The price for the piece, complete and delivered, is:</p>
-    <p style="text-align:center;font-family:Georgia,serif;font-size:36px;color:#2a1854;font-weight:400;margin:0 0 24px;">${formatBdt(d.quotedPriceBdt)}</p>
+    <p style="font-size:15px;margin:0 0 24px;">We have considered your request and would be honoured to make this for you. The price, complete and delivered, is:</p>
+    <p style="text-align:center;font-family:Georgia,serif;font-size:32px;color:#2a1854;font-weight:400;margin:0 0 24px;">${priceLine}</p>
     ${d.adminNotes ? `<p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:0 0 8px;">FROM THE ATELIER</p><p style="font-size:14px;color:#3a2a64;line-height:1.7;background:#f9f4ec;padding:14px 16px;border-left:2px solid #a07e2c;white-space:pre-wrap;margin:0 0 24px;">${escapeHtml(d.adminNotes)}</p>` : ""}
-    <p style="font-size:13px;color:#7a6a52;margin:0 0 24px;line-height:1.7;">Reply to this email to accept and we will begin. The piece is paid for in cash when our courier arrives at your door — no deposit required.</p>
+    <p style="font-size:13px;color:#7a6a52;margin:0 0 24px;line-height:1.7;">Reply to this email to accept. A deposit of <b style="color:#2a1854;">${formatBdt(d.depositBdt)}</b> (${d.depositPct}%) confirms the commission — we will send a bKash prepayment request. The remainder, ${formatBdt(Math.max(0, total - d.depositBdt))}, is paid in cash when our courier arrives at your door.</p>
     <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">— The atelier</p>
   `;
   return { subject, html: SHELL(body) };

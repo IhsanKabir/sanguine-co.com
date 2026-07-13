@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Link } from "@/i18n/routing";
+import { updateCommerceSettings } from "@/lib/actions/admin";
+import type { CommerceSettings } from "@/lib/commerce";
 
 type Brand = { name: string; tagline?: string; email?: string; announcement?: string };
 
@@ -18,7 +20,26 @@ type StoreConfig = {
   acceptRocket: boolean;
 };
 
-export default function SettingsClient({ initialBrand }: { initialBrand: Brand }) {
+export default function SettingsClient({ initialBrand, initialCommerce }: { initialBrand: Brand; initialCommerce: CommerceSettings }) {
+  const [commerce, setCommerce] = useState({
+    preorderDepositPct: String(initialCommerce.preorderDepositPct),
+    returnWindowDays: String(initialCommerce.returnWindowDays),
+  });
+  const [commerceMsg, setCommerceMsg] = useState<string | null>(null);
+  const [commercePending, startCommerce] = useTransition();
+
+  const saveCommerce = () => {
+    const pct = parseInt(commerce.preorderDepositPct);
+    const days = parseInt(commerce.returnWindowDays);
+    if (isNaN(pct) || pct < 1 || pct > 100) { setCommerceMsg("Deposit % must be 1–100."); return; }
+    if (isNaN(days) || days < 0 || days > 365) { setCommerceMsg("Return window must be 0–365 days."); return; }
+    setCommerceMsg(null);
+    startCommerce(async () => {
+      const res = await updateCommerceSettings({ preorderDepositPct: pct, returnWindowDays: days });
+      setCommerceMsg(res.ok ? "Saved — live across the storefront." : "Save failed.");
+    });
+  };
+
   const [c, setC] = useState<StoreConfig>({
     freeShippingThresholdBdt: 3000,
     flatShippingDhakaBdt: 80,
@@ -49,6 +70,39 @@ export default function SettingsClient({ initialBrand }: { initialBrand: Brand }
           <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 10 }}>
             Currently saved contact email: <b style={{ color: "var(--purple-900)" }}>{initialBrand.email || "—"}</b>
           </p>
+        </div>
+
+        {/* Quotation-driven pricing — the two live levers of the preorder model */}
+        <div className="panel">
+          <h3>Preorders & returns</h3>
+          <div className="row">
+            <div className="field">
+              <label>Preorder deposit (%)</label>
+              <input
+                type="number" min={1} max={100}
+                value={commerce.preorderDepositPct}
+                onChange={(e) => setCommerce({ ...commerce, preorderDepositPct: e.target.value })}
+              />
+            </div>
+            <div className="field">
+              <label>Default return window (days)</label>
+              <input
+                type="number" min={0} max={365}
+                value={commerce.returnWindowDays}
+                onChange={(e) => setCommerce({ ...commerce, returnWindowDays: e.target.value })}
+              />
+            </div>
+          </div>
+          <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 10, lineHeight: 1.6 }}>
+            The deposit is the percentage of a quoted price the customer prepays to confirm a
+            preorder. Both values can be overridden per product in the product editor.
+          </p>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 8 }}>
+            <button className="btn btn-primary btn-sm" onClick={saveCommerce} disabled={commercePending}>
+              {commercePending ? "Saving…" : "Save"}
+            </button>
+            {commerceMsg && <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{commerceMsg}</span>}
+          </div>
         </div>
 
         {/* Shipping & tax */}

@@ -21,6 +21,8 @@ import { getCurrentUser } from "@/lib/auth-utils";
 import { db, schema } from "@/lib/db";
 import { and, eq, sql } from "drizzle-orm";
 import { SITE_URL as BASE } from "@/lib/site-url";
+import { priceDisplay, priceDisplayText, schemaOrgOffer, effectiveDepositPct, effectiveReturnWindowDays } from "@/lib/pricing";
+import { getCommerceSettings } from "@/lib/commerce";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -44,6 +46,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     { url: ogCard, width: 1200, height: 630, alt: name },
     ...(photo ? [{ url: photo, alt: name }] : []),
   ];
+  // Quotation model: never advertise a ৳0 price. Ranges surface their ceiling
+  // (Facebook's product meta takes a single amount); quote-only pieces omit
+  // the price meta entirely.
+  const offerMeta = schemaOrgOffer(p);
+  const otherMeta: Record<string, string> = {
+    "og:type": "product",
+    "product:availability": p.preorderOnly
+      ? "available for order"
+      : p.stock > 0 ? "in stock" : "out of stock",
+  };
+  const metaAmount = offerMeta?.price ?? offerMeta?.highPrice;
+  if (metaAmount) {
+    otherMeta["product:price:amount"] = metaAmount;
+    otherMeta["product:price:currency"] = "BDT";
+  }
   return {
     title: name,
     description,
@@ -68,12 +85,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // doesn't list "product" as an enum value, so we override the meta
     // tag through `other`. The `type: "website"` above only seeds defaults
     // — when both are present, the explicit `og:type` wins in the head.
-    other: {
-      "og:type": "product",
-      "product:price:amount": String(p.priceBdt),
-      "product:price:currency": "BDT",
-      "product:availability": p.stock > 0 ? "in stock" : "out of stock",
-    },
+    other: otherMeta,
     twitter: {
       card: "summary_large_image",
       title: name,
@@ -103,6 +115,15 @@ export default async function ProductPage({ params }: Props) {
   const lookHeroImages = lookItems.length > 0
     ? await getHeroImagesFor(lookItems.map((i) => i.id)).catch(() => new Map())
     : new Map();
+
+  // Quotation-driven pricing state (Phase 1): what the customer sees and what
+  // structured data may claim both come from the same helper — no surface may
+  // ever render the ৳0 placeholder again.
+  const commerce = await getCommerceSettings();
+  const display = priceDisplay(p);
+  const depositPct = effectiveDepositPct(p.preorderDepositPct, commerce.preorderDepositPct);
+  const returnDays = effectiveReturnWindowDays(p.returnWindowDays, commerce.returnWindowDays);
+  const offer = schemaOrgOffer(p);
 
   // Eligibility for writing a review: signed-in customer with a delivered order
   // of this product, who has not already written one.
@@ -144,11 +165,14 @@ export default async function ProductPage({ params }: Props) {
     sku: p.sku,
     description,
     image: photos.length > 0 ? photos.map((ph) => ph.url) : undefined,
-    offers: {
-      "@type": "Offer",
+    // Quote-only pieces get NO offers block — a priced Offer would be a lie
+    // and Google penalizes page/JSON-LD price mismatches.
+    offers: offer ? {
+      "@type": offer.type,
       priceCurrency: "BDT",
-      price: p.priceBdt,
-      availability: p.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      ...(offer.price ? { price: offer.price } : {}),
+      ...(offer.lowPrice ? { lowPrice: offer.lowPrice, highPrice: offer.highPrice } : {}),
+      availability: offer.availability,
       url: `${BASE}/${locale}/product/${p.slug}`,
       seller: { "@type": "Organization", name: "Sanguine" },
       shippingDetails: {
@@ -172,11 +196,11 @@ export default async function ProductPage({ params }: Props) {
         "@type": "MerchantReturnPolicy",
         applicableCountry: "BD",
         returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-        merchantReturnDays: 7,
+        merchantReturnDays: returnDays,
         returnMethod: "https://schema.org/ReturnByMail",
         returnFees: "https://schema.org/FreeReturn",
       },
-    },
+    } : undefined,
     aggregateRating: p.reviewCount > 0 ? {
       "@type": "AggregateRating",
       ratingValue: Number(p.rating),
@@ -235,22 +259,34 @@ export default async function ProductPage({ params }: Props) {
         <div className="pdp-info">
           <div className="collection">{(segTag || "").toUpperCase()} · {p.sku}</div>
           <h1>{name}</h1>
-          <div className="pdp-rating">
-            <span className="stars">{"★★★★★".slice(0, Math.round(Number(p.rating)))}{"☆☆☆☆☆".slice(0, 5 - Math.round(Number(p.rating)))}</span>
-            <span>{Number(p.rating).toFixed(1)}</span>
-            <span>·</span>
-            <span>{p.reviewCount} {p.reviewCount === 1 ? t("pdp.review") : t("pdp.reviews")}</span>
-          </div>
+          {/* A "0.0 · 0 reviews" row reads as a damning score — render only with real reviews. */}
+          {p.reviewCount > 0 && (
+            <div className="pdp-rating">
+              <span className="stars">{"★★★★★".slice(0, Math.round(Number(p.rating)))}{"☆☆☆☆☆".slice(0, 5 - Math.round(Number(p.rating)))}</span>
+              <span>{Number(p.rating).toFixed(1)}</span>
+              <span>·</span>
+              <span>{p.reviewCount} {p.reviewCount === 1 ? t("pdp.review") : t("pdp.reviews")}</span>
+            </div>
+          )}
           {velocity > 10 && (
             <div className="pdp-velocity">{velocity}+ ordered in the past 30 days</div>
           )}
           <div className="pdp-price">
-            <span className="now">{formatBdt(p.priceBdt, locale as "en" | "bn")}</span>
-            {p.wasBdt && <span className="was">{formatBdt(p.wasBdt, locale as "en" | "bn")}</span>}
-            {p.wasBdt && (
-              <span className="save">
-                Save {Math.round((1 - p.priceBdt / p.wasBdt) * 100)}%
-              </span>
+            {display.kind === "quote" ? (
+              <span className="now">{t("pdp.priceOnQuote")}</span>
+            ) : (
+              <span className="now">{priceDisplayText(display, locale as "en" | "bn")}</span>
+            )}
+            {display.kind === "estimate" && (
+              <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>· {t("pdp.estimated")}</span>
+            )}
+            {display.kind === "fixed" && p.wasBdt && p.wasBdt > display.amountBdt && (
+              <>
+                <span className="was">{formatBdt(p.wasBdt, locale as "en" | "bn")}</span>
+                <span className="save">
+                  Save {Math.round((1 - display.amountBdt / p.wasBdt) * 100)}%
+                </span>
+              </>
             )}
           </div>
           <div style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.7, marginBottom: p.modelNote ? 12 : 24 }}>
@@ -265,8 +301,8 @@ export default async function ProductPage({ params }: Props) {
             <PreorderButton
               slug={p.slug}
               estimatedDelivery={p.estimatedDelivery}
-              preorderPriceBdt={p.preorderPriceBdt}
-              priceBdt={p.priceBdt}
+              display={display}
+              depositPct={depositPct}
               locale={locale}
             />
           ) : p.stock > 0 ? (
@@ -287,8 +323,8 @@ export default async function ProductPage({ params }: Props) {
                 <PreorderButton
                   slug={p.slug}
                   estimatedDelivery={p.estimatedDelivery}
-                  preorderPriceBdt={p.preorderPriceBdt}
-                  priceBdt={p.priceBdt}
+                  display={display}
+                  depositPct={depositPct}
                   locale={locale}
                   variant="secondary"
                 />
@@ -298,8 +334,8 @@ export default async function ProductPage({ params }: Props) {
             <PreorderButton
               slug={p.slug}
               estimatedDelivery={p.estimatedDelivery}
-              preorderPriceBdt={p.preorderPriceBdt}
-              priceBdt={p.priceBdt}
+              display={display}
+              depositPct={depositPct}
               locale={locale}
             />
           ) : (
@@ -310,22 +346,23 @@ export default async function ProductPage({ params }: Props) {
             />
           )}
 
-          {/* Scarcity signal — only when stock is genuinely low */}
-          {p.stock > 0 && p.stock <= 5 && (
+          {/* Scarcity signals describe sellable stock — meaningless (and
+              contradictory) on preorder-only pieces, so they're gated out. */}
+          {!p.preorderOnly && p.stock > 0 && p.stock <= 5 && (
             <div className="pdp-scarcity">
               <span className="pdp-scarcity__dot" />
               Only {p.stock} left — order soon
             </div>
           )}
-          {p.stock > 5 && p.stock < 10 && (
+          {!p.preorderOnly && p.stock > 5 && p.stock < 10 && (
             <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>
               {t("pdp.remaining", { count: p.stock })}
             </div>
           )}
-          {p.stock === 0 && !p.preorderEnabled && (
+          {!p.preorderOnly && p.stock === 0 && !p.preorderEnabled && (
             <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>Currently out of stock</div>
           )}
-          {p.stock === 0 && p.preorderEnabled && (
+          {!p.preorderOnly && p.stock === 0 && p.preorderEnabled && (
             <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>Out of stock — preorder available</div>
           )}
           {p.preorderOnly && (
@@ -339,7 +376,7 @@ export default async function ProductPage({ params }: Props) {
           </div>
 
           <div className="pdp-feats">
-            <div className="pdp-feat"><Icon name="check" size={18} /><div><b>7-day returns</b> Free courier pickup within 7 days of delivery</div></div>
+            <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{returnDays}-day returns</b> Free courier pickup within {returnDays} days of delivery</div></div>
             <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.codTitle")}</b>{t("pdp.codNote")}</div></div>
             <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.authentic")}</b>{t("pdp.authenticNote")}</div></div>
             <div className="pdp-feat"><Icon name="feather" size={18} /><div><b>{t("pdp.giftService")}</b>{t("pdp.giftServiceNote")}</div></div>

@@ -2,9 +2,10 @@
 
 import type { Product } from "@/lib/schema";
 import { Link } from "@/i18n/routing";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { formatBdt } from "@/lib/utils";
+import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import Composition from "./Composition";
 import WishHeart from "./WishHeart";
 import QuickView from "./QuickView";
@@ -37,10 +38,15 @@ type Props = {
 
 export default function ProductCard({ product: p, segmentTag, heroImage, quickView = true }: Props) {
   const locale = useLocale() as "en" | "bn";
+  const t = useTranslations();
   const name = (locale === "bn" && p.nameBn) || p.name;
   const colors = (p.colors as string[] | null) ?? [];
 
-  const showQuickView = quickView && p.stock > 0;
+  // Preorder-only pieces must go through the PDP's preorder flow — the
+  // quick-view Add-to-bag would sell them at the ৳0/list price placeholder.
+  const showQuickView = quickView && p.stock > 0 && !p.preorderOnly;
+  const display = priceDisplay(p);
+  const priceText = priceDisplayText(display, locale);
 
   return (
     <article className="card" style={{ position: "relative" }}>
@@ -106,8 +112,15 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
           {segmentTag && <div className="prod-meta">{segmentTag}</div>}
           <h3 className="prod-name">{name}</h3>
           <div className="prod-price">
-            {p.wasBdt ? <span className="strike">{formatBdt(p.wasBdt, locale)}</span> : null}
-            {formatBdt(p.priceBdt, locale)}
+            {p.preorderOnly && (
+              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--gold-deep)", marginRight: 8 }}>
+                Preorder
+              </span>
+            )}
+            {display.kind === "fixed" && p.wasBdt && p.wasBdt > display.amountBdt ? (
+              <span className="strike">{formatBdt(p.wasBdt, locale)}</span>
+            ) : null}
+            {display.kind === "quote" ? t("pdp.priceOnQuote") : priceText}
           </div>
           {colors.length > 0 && (
             <div className="card-color-dots">

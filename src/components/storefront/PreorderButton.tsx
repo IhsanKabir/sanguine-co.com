@@ -1,11 +1,13 @@
 import { Link } from "@/i18n/routing";
-import { formatBdt } from "@/lib/utils";
+import { priceDisplayText, type PriceDisplay } from "@/lib/pricing";
 
 type Props = {
   slug: string;
   estimatedDelivery?: string | null;
-  preorderPriceBdt?: number | null;
-  priceBdt: number;
+  /** Quotation-model price state — fixed / estimate range / quote-only. */
+  display: PriceDisplay;
+  /** Effective deposit % (product override ?? global setting). */
+  depositPct: number;
   locale: string;
   variant?: "primary" | "secondary";
 };
@@ -13,13 +15,12 @@ type Props = {
 export default function PreorderButton({
   slug,
   estimatedDelivery,
-  preorderPriceBdt,
-  priceBdt,
+  display,
+  depositPct,
   locale,
   variant = "primary",
 }: Props) {
-  const displayPrice = preorderPriceBdt ?? priceBdt;
-  const hasDifferentPrice = preorderPriceBdt && preorderPriceBdt !== priceBdt;
+  const priceText = priceDisplayText(display, locale as "en" | "bn");
 
   return (
     <div style={{ marginBottom: 24 }}>
@@ -31,12 +32,17 @@ export default function PreorderButton({
         Preorder this piece
       </Link>
       <div style={{ marginTop: 8, fontSize: 12, color: "var(--ink-soft)", textAlign: "center", lineHeight: 1.6 }}>
-        {hasDifferentPrice && (
+        {priceText ? (
           <div style={{ color: "var(--gold-deep)", fontWeight: 500 }}>
-            Preorder · {formatBdt(displayPrice, locale as "en" | "bn")}
-            {" "}<span style={{ fontWeight: 400, opacity: 0.7 }}>(regular {formatBdt(priceBdt, locale as "en" | "bn")})</span>
+            Preorder · {priceText}
+            {display.kind === "estimate" && (
+              <span style={{ fontWeight: 400, opacity: 0.7 }}> (estimated)</span>
+            )}
           </div>
+        ) : (
+          <div style={{ color: "var(--gold-deep)", fontWeight: 500 }}>Final price confirmed by quotation</div>
         )}
+        <div>Reserve with a {depositPct}% deposit of the quoted price</div>
         {estimatedDelivery && (
           <div>Estimated delivery · {estimatedDelivery}</div>
         )}

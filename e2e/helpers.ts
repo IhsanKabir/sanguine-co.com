@@ -17,3 +17,21 @@ export function skipWithoutDb(): void {
 
 /** Slug that the seed data ships and the soft-launch catalogue keeps live. */
 export const KNOWN_PRODUCT_SLUG = "the-100-rose-special";
+
+/** The only non-hidden segment in the soft-launch catalogue. */
+export const KNOWN_SEGMENT_ID = "flowers";
+
+/**
+ * A localStorage cart line matching cart-context's CartItem shape — lets
+ * cart/checkout specs render a deterministic bag without depending on any
+ * add-to-bag UI path (which varies by product preorder state).
+ */
+export const SEEDED_CART_ITEM = {
+  productId: "e2e-seeded-product",
+  slug: "e2e-seeded-product",
+  sku: "SSG-E2E-1",
+  name: "E2E Seeded Piece",
+  priceBdt: 1234,
+  cat: "flowers",
+  qty: 2,
+};
