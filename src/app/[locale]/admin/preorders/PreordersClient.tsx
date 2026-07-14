@@ -345,7 +345,11 @@ function DetailDrawer({
                 disabled={pending}
                 onClick={() => startTransition(async () => {
                   const res = await markPreorderDepositReceived(request.id);
-                  if (res && "error" in res && res.error) alert(res.error);
+                  if (res && "error" in res && res.error) { alert(res.error); return; }
+                  // House pattern (quote/convert/reject do the same): close on
+                  // success — the revalidated list shows the CONFIRMED pill.
+                  // Leaving the dialog open rendered stale quoted-state UI.
+                  onClose();
                 })}
               >
                 Deposit received
