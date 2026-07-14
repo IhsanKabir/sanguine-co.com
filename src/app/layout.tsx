@@ -63,6 +63,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
+      // Google Search only shows a SERP favicon that is >=48px (multiple of
+      // 48) or SVG — the .ico ships 16/32px layers only, which is why results
+      // showed the generic globe next to competitors' logos. SVG qualifies.
+      { url: "/favicon-source.svg", type: "image/svg+xml" },
       { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
@@ -100,7 +104,10 @@ const organizationLd = {
 const websiteLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  // name drives Google's SERP "site name" (shows "Sanguine" instead of the
+  // bare domain); alternateName covers domain-shaped brand queries.
   name: "Sanguine",
+  alternateName: "sanguine-co",
   url: BASE,
   inLanguage: ["en-BD", "bn-BD"],
 };
