@@ -1,3 +1,4 @@
 {
-  "regions": ["sin1"]
+  "_comment": "bom1 co-locates functions with the Supabase DB (aws-ap-south-1, Mumbai). Every page fires multiple queries; from sin1 each paid a ~60ms cross-region roundtrip — the main driver of the 0.87s TTFB and the low Speed Insights scores on DB-heavy routes.",
+  "regions": ["bom1"]
 }
