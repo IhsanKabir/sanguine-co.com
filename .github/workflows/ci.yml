@@ -11,8 +11,10 @@ on:
     - cron: "0 21 * * *"
 
 # Cancel in-flight runs for the same PR / branch when a new commit lands.
+# Scheduled runs get their own group so a nightly can neither cancel nor be
+# cancelled by a push run on main.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name == 'schedule' && 'nightly' || 'push' }}
   cancel-in-progress: true
 
 jobs:

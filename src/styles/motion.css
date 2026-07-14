@@ -7,7 +7,10 @@
   html.ssg-cursor-on body, html.ssg-cursor-on body * { cursor: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
-  body, body * { cursor: auto !important; }
+  /* Must out-specificity the html.ssg-cursor-on rule above, or reduced-motion
+   * users get cursor:none with the replacement layer display:none'd. */
+  body, body *,
+  html.ssg-cursor-on body, html.ssg-cursor-on body * { cursor: auto !important; }
   #ssg-cursor-root { display: none !important; }
   /* Pause every named animation we add for the oceanic register. */
   .ssg-ornament svg,

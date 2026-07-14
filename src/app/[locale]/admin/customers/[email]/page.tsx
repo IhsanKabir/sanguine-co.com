@@ -41,7 +41,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
 
   if (orders.length === 0) notFound();
 
-  const totalSpent = orders.reduce((s, o) => s + o.totalBdt, 0);
+  const totalSpent = orders.reduce((s, o) => s + o.totalBdt + (o.depositPaidBdt ?? 0), 0);
   const tier = tierFor(totalSpent);
   const firstAddr = parseShippingAddress(orders[0].shippingAddress);
   const customerName = firstAddr.fullName ?? null;

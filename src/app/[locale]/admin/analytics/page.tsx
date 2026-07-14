@@ -12,13 +12,13 @@ export default async function AdminAnalyticsPage() {
   }>(sql`
     select
       count(*)::int as total_orders,
-      coalesce(sum(${schema.orders.totalBdt}), 0)::int as total_revenue,
+      coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total_revenue,
       coalesce(round(avg(${schema.orders.totalBdt}))::int, 0) as aov
     from ${schema.orders}
   `).catch(() => [{ total_orders: 0, total_revenue: 0, aov: 0 }]);
 
   const statusBreakdown = await db.execute<{ status: string; count: number; total: number }>(sql`
-    select ${schema.orders.status} as status, count(*)::int as count, coalesce(sum(${schema.orders.totalBdt}), 0)::int as total
+    select ${schema.orders.status} as status, count(*)::int as count, coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total
     from ${schema.orders}
     group by ${schema.orders.status}
   `).catch(() => []);

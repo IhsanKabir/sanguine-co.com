@@ -9,7 +9,7 @@ export default async function AdminDashboard() {
   const canSeeRevenue = ctx.has("revenue");
   // Aggregate KPIs from real data
   const [{ count: orderCount = 0 } = { count: 0 }] = await db.select({ count: sql<number>`count(*)::int` }).from(schema.orders).catch(() => [{ count: 0 }] as never);
-  const [{ revenue = 0 } = { revenue: 0 }] = await db.select({ revenue: sql<number>`coalesce(sum(${schema.orders.totalBdt}), 0)::int` }).from(schema.orders).catch(() => [{ revenue: 0 }] as never);
+  const [{ revenue = 0 } = { revenue: 0 }] = await db.select({ revenue: sql<number>`coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int` }).from(schema.orders).catch(() => [{ revenue: 0 }] as never);
   const [{ count: productCount = 0 } = { count: 0 }] = await db.select({ count: sql<number>`count(*)::int` }).from(schema.products).catch(() => [{ count: 0 }] as never);
   const [{ count: lowStock = 0 } = { count: 0 }] = await db.select({ count: sql<number>`count(*)::int` })
     .from(schema.products).where(sql`${schema.products.stock} < 5`).catch(() => [{ count: 0 }] as never);

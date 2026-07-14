@@ -33,9 +33,13 @@ export async function issueRefund(input: z.infer<typeof refundSchema>) {
 
       const [existing] = await tx.select({ total: sum(schema.refunds.amountBdt) }).from(schema.refunds)
         .where(eq(schema.refunds.orderId, data.orderId));
+      // Refund ceiling = everything the customer actually paid: the COD total
+      // PLUS any prepaid preorder deposit. Capping at totalBdt alone made the
+      // deposit portion permanently unrefundable.
+      const maxRefundable = order.totalBdt + (order.depositPaidBdt ?? 0);
       const alreadyRefunded = Number(existing?.total ?? 0);
-      if (alreadyRefunded + data.amountBdt > order.totalBdt) {
-        throw new Error(`OVER_REFUND:${alreadyRefunded}:${order.totalBdt}`);
+      if (alreadyRefunded + data.amountBdt > maxRefundable) {
+        throw new Error(`OVER_REFUND:${alreadyRefunded}:${maxRefundable}`);
       }
 
       await tx.insert(schema.refunds).values({

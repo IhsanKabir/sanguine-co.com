@@ -21,7 +21,7 @@ export async function getSalesData(range: DateRange) {
   const [{ orders, revenue, units }] = await db.execute<{ orders: number; revenue: number; units: number }>(sql`
     select
       count(*)::int as orders,
-      coalesce(sum(${schema.orders.totalBdt}), 0)::int as revenue,
+      coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as revenue,
       coalesce((select sum(${schema.orderLines.qty})::int
         from ${schema.orderLines}
         where ${schema.orderLines.orderId} in (select id from ${schema.orders} where ${cond})
@@ -33,7 +33,7 @@ export async function getSalesData(range: DateRange) {
   const aov = orders > 0 ? Math.round(revenue / orders) : 0;
 
   const byStatus = await db.execute<{ status: string; count: number; total: number }>(sql`
-    select ${schema.orders.status} as status, count(*)::int as count, coalesce(sum(${schema.orders.totalBdt}), 0)::int as total
+    select ${schema.orders.status} as status, count(*)::int as count, coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total
     from ${schema.orders}
     where ${cond}
     group by status
@@ -41,7 +41,7 @@ export async function getSalesData(range: DateRange) {
   `);
 
   const byPayment = await db.execute<{ method: string; count: number; total: number }>(sql`
-    select ${schema.orders.paymentMethod} as method, count(*)::int as count, coalesce(sum(${schema.orders.totalBdt}), 0)::int as total
+    select ${schema.orders.paymentMethod} as method, count(*)::int as count, coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total
     from ${schema.orders}
     where ${cond}
     group by method
@@ -66,7 +66,7 @@ export async function getSalesData(range: DateRange) {
   const byCity = await db.execute<{ city: string; count: number; total: number }>(sql`
     select coalesce(${schema.orders.shippingAddress}->>'city', '—') as city,
            count(*)::int as count,
-           coalesce(sum(${schema.orders.totalBdt}), 0)::int as total
+           coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total
     from ${schema.orders}
     where ${cond}
     group by city
@@ -77,7 +77,7 @@ export async function getSalesData(range: DateRange) {
   const byDay = await db.execute<{ day: string; count: number; total: number }>(sql`
     select to_char(${schema.orders.createdAt}, 'YYYY-MM-DD') as day,
            count(*)::int as count,
-           coalesce(sum(${schema.orders.totalBdt}), 0)::int as total
+           coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total
     from ${schema.orders}
     where ${cond}
     group by day
@@ -133,7 +133,7 @@ export async function getCodReconciliation(range: DateRange) {
     select coalesce(${schema.orders.shippingCourier}, '— not booked') as courier,
            ${schema.orders.status} as status,
            count(*)::int as count,
-           coalesce(sum(${schema.orders.totalBdt}), 0)::int as total
+           coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total
     from ${schema.orders}
     where ${cond}
     group by courier, status

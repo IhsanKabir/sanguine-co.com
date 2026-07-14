@@ -90,13 +90,19 @@
 
   // The stylesheet only hides the native cursor once this class exists —
   // until the layer is actually live the user must never be cursor-less.
-  document.documentElement.classList.add('ssg-cursor-on');
+  // Reduced-motion users keep the NATIVE cursor entirely: their replacement
+  // layer is display:none'd by motion.css, so hiding the real one would
+  // leave them with no pointer at all.
+  if (!reduced) document.documentElement.classList.add('ssg-cursor-on');
 
   window.addEventListener('mousemove', e => {
     mx = e.clientX; my = e.clientY;
     pointerDirty = true;
     if (!visible) { cx = mx; cy = my; visible = true; cur.classList.add('visible'); }
   });
+  // Scroll moves the page under a stationary pointer — hover state must
+  // re-evaluate even though no mousemove fires.
+  window.addEventListener('scroll', () => { pointerDirty = true; }, { passive: true });
   window.addEventListener('mousedown', (e) => {
     down = true; cur.classList.add('down');
     if (mode === 'seal') {

@@ -467,7 +467,8 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 }
 
 /* Cookie banner sits ABOVE the PDP sticky Add-to-Bag bar (it covered the
- * primary purchase CTA on first visit at z-index 95 vs 90). */
+ * primary purchase CTA on first visit at z-index 95 vs 90). Scoped with :has
+ * so non-PDP pages keep the banner at its normal bottom position. */
 @media (max-width: 767px) {
-  .cookie-banner{bottom:calc(76px + env(safe-area-inset-bottom, 0px))}
+  body:has(.pdp-sticky-bar) .cookie-banner{bottom:calc(76px + env(safe-area-inset-bottom, 0px))}
 }

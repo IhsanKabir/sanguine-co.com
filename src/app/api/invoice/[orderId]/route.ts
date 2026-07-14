@@ -67,6 +67,13 @@ export async function GET(
       ? `<tr><td colspan="3" style="text-align:right;padding:6px 0;font-size:13px;color:#666">Discount${order.couponCode ? ` · ${order.couponCode}` : ""}</td><td style="text-align:right;padding:6px 0;font-size:13px;color:#2d7d46">− ${fmt(order.couponDiscountBdt)}</td></tr>`
       : "";
 
+  // Prepaid preorder deposit — a payment already received, shown between
+  // subtotal and the COD total so the arithmetic reads honestly.
+  const depositRow =
+    order.depositPaidBdt && order.depositPaidBdt > 0
+      ? `<tr><td colspan="3" style="text-align:right;padding:6px 0;font-size:13px;color:#666">Deposit (prepaid)</td><td style="text-align:right;padding:6px 0;font-size:13px;color:#2d7d46">− ${fmt(order.depositPaidBdt)}</td></tr>`
+      : "";
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -141,6 +148,7 @@ export async function GET(
     <tbody>
       <tr><td colspan="3" style="text-align:right;padding:4px 0;font-size:13px;color:#666">Subtotal</td><td style="text-align:right;padding:4px 0;font-size:13px;width:120px">${fmt(order.subtotalBdt)}</td></tr>
       ${discountRow}
+      ${depositRow}
       <tr><td colspan="3" style="text-align:right;padding:4px 0;font-size:13px;color:#666">Shipping</td><td style="text-align:right;padding:4px 0;font-size:13px">${order.shippingBdt === 0 ? "Free" : fmt(order.shippingBdt)}</td></tr>
       <tr style="border-top:2px solid #2d1b4e">
         <td colspan="3" style="text-align:right;padding:12px 0 4px;font-size:15px;font-weight:600;color:#2d1b4e">Total</td>
