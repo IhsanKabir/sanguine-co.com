@@ -79,10 +79,11 @@ const organizationLd = {
     addressLocality: "Dhaka",
     addressCountry: "BD",
   },
-  // Empty until the real Sanguine accounts exist — emitting unclaimed or
-  // placeholder handles muddies Knowledge Panel disambiguation. Add claimed
-  // URLs here then, e.g. "https://www.instagram.com/<handle>".
-  sameAs: [] as string[],
+  // Only CLAIMED profiles — unclaimed handles muddy Knowledge Panel
+  // disambiguation. Add more (Instagram etc.) as the accounts are created.
+  sameAs: [
+    "https://www.facebook.com/profile.php?id=61591619233431",
+  ],
 };
 
 // SearchAction removed 2026-05-03 — the query-string URL template
