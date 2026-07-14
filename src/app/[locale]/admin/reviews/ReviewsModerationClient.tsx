@@ -128,6 +128,24 @@ export default function ReviewsModerationClient({ status, counts, reviews, produ
                   </button>
                 </div>
               )}
+
+              {/* Approved notes must be removable too (mistaken approvals,
+                  test data) — moderateReview re-aggregates the product's
+                  rating and count from approved rows, so pulling one down
+                  keeps the PDP honest. */}
+              {r.status === "approved" && (
+                <div style={{ marginTop: 14 }}>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    style={{ borderColor: "var(--err)", color: "var(--err)" }}
+                    disabled={busyId === r.id}
+                    onClick={() => setRejecting({ id: r.id, reason: "" })}
+                  >
+                    Remove from storefront
+                  </button>
+                </div>
+              )}
             </article>
           ))}
         </div>
