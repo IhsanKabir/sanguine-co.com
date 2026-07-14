@@ -73,6 +73,25 @@ export async function createCodOrder(input: CreateOrderInput) {
   }
   const data = parsed.data;
 
+  // 1b. Burst guard — createCodOrder is a public unauthenticated action.
+  // Three orders per email/phone per 10 minutes stops accidental double-fires
+  // and naive scripted abuse without inconveniencing a real customer
+  // (legitimate repeat buyers can always write to the concierge).
+  const RATE_WINDOW_MIN = 10;
+  const RATE_MAX_ORDERS = 3;
+  const windowStart = new Date(Date.now() - RATE_WINDOW_MIN * 60 * 1000);
+  const [recent] = await db.select({ n: sql<number>`count(*)::int` }).from(schema.orders)
+    .where(and(
+      sql`${schema.orders.createdAt} > ${windowStart.toISOString()}::timestamptz`,
+      sql`(${schema.orders.guestEmail} = ${data.customer.email} or ${schema.orders.guestPhone} = ${data.customer.phone})`,
+    ));
+  if (Number(recent?.n ?? 0) >= RATE_MAX_ORDERS) {
+    return {
+      ok: false as const,
+      error: "We have received several orders from you in the last few minutes. Please wait a little, or write to concierge@sanguine-co.com and we will take care of it personally.",
+    };
+  }
+
   // 2. Re-fetch product prices from DB (anti-tampering — never trust client price)
   const productIds = data.items.map((i) => i.productId);
   const products = await db.select().from(schema.products).where(inArray(schema.products.id, productIds));

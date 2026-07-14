@@ -158,6 +158,9 @@ export async function searchProducts(query: string, limit = 8) {
       inArray(products.segmentId, visibleSegmentIds),
       or(
         ilike(products.name, `%${escaped}%`),
+        // Bengali-locale customers search Bengali product names — matching
+        // only the Latin name returned nothing for them.
+        ilike(products.nameBn, `%${escaped}%`),
         ilike(products.sku, `%${escaped}%`),
       ),
     ),

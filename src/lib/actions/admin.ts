@@ -350,13 +350,44 @@ export async function getOrderTimeline(orderId: string) {
 
 export async function updateOrderStatus(orderId: string, status: typeof validStatuses[number]) {
   await requireAdmin();
-  const [before] = await db.select({ status: schema.orders.status }).from(schema.orders).where(eq(schema.orders.id, orderId));
+  const [before] = await db.select({ status: schema.orders.status, number: schema.orders.number })
+    .from(schema.orders).where(eq(schema.orders.id, orderId));
   await db.update(schema.orders).set({ status }).where(eq(schema.orders.id, orderId));
   await logOrderEvent({
     orderId,
     type: "status_changed",
     payload: { from: before?.status ?? null, to: status },
   });
+
+  // Cancelled storefront orders give their stock back (COD cancellations are
+  // routine in Bangladesh — without this every cancellation silently shrank
+  // inventory). Guards: only on the FIRST transition into cancelled, and only
+  // for orders that decremented stock at creation — converted preorders
+  // (SSG-PO-) and manual orders (SSG-MX-) never did, so restoring for them
+  // would inflate inventory.
+  const decrementedAtCreation =
+    !!before?.number && !before.number.startsWith("SSG-PO-") && !before.number.startsWith("SSG-MX-");
+  if (
+    status === "cancelled" &&
+    before && !["cancelled", "refunded", "returned"].includes(before.status) &&
+    decrementedAtCreation
+  ) {
+    const lines = await db.select({ productId: schema.orderLines.productId, qty: schema.orderLines.qty })
+      .from(schema.orderLines).where(eq(schema.orderLines.orderId, orderId));
+    for (const l of lines) {
+      if (!l.productId) continue;
+      await db.update(schema.products)
+        .set({ stock: sql`${schema.products.stock} + ${l.qty}` })
+        .where(eq(schema.products.id, l.productId));
+      await db.insert(schema.inventoryLog).values({
+        productId: l.productId,
+        delta: l.qty,
+        reason: "restock",
+        referenceId: `cancel:${before.number}`,
+      });
+    }
+    revalidateAllLocales(); // stock badges on PDP/grid reflect the restore
+  }
 
   // Send review request when an order transitions into delivered for the first time.
   if (status === "delivered" && before?.status !== "delivered") {

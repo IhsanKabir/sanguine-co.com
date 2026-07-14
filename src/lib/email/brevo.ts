@@ -13,6 +13,25 @@ type SendArgs = {
   replyTo?: string;
 };
 
+/**
+ * True if the address already exists as a Brevo contact. Returns false on
+ * any error/missing config — callers use this to SKIP duplicate welcome
+ * emails, and "unknown" must not suppress a legitimate first welcome.
+ */
+export async function brevoContactExists(email: string): Promise<boolean> {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) return false;
+  try {
+    const res = await fetch(`https://api.brevo.com/v3/contacts/${encodeURIComponent(email)}`, {
+      headers: { "api-key": apiKey, accept: "application/json" },
+      cache: "no-store",
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 /** Add a contact to a Brevo list. Silently skips if config is missing. */
 export async function addBrevoContact(email: string, listId: number): Promise<void> {
   const apiKey = process.env.BREVO_API_KEY;
