@@ -265,9 +265,20 @@ export async function quotePreorderRequest(input: z.infer<typeof quoteSchema>) {
   const [existing] = await db.select().from(schema.preorderRequests)
     .where(eq(schema.preorderRequests.id, data.id)).limit(1);
   if (!existing) return { ok: false as const, error: "Request not found" };
+  // Terminal/paid states must not be silently re-quoted: converted already
+  // has a real order, rejected was closed, confirmed has money on record.
+  if (existing.status === "converted" || existing.status === "rejected") {
+    return { ok: false as const, error: `This request is already ${existing.status} — it cannot be re-quoted.` };
+  }
+  if (existing.status === "confirmed") {
+    return { ok: false as const, error: "Deposit already received on the current quote — convert it, or refund the deposit before re-quoting." };
+  }
   const commerce = await getCommerceSettings();
   const depositPct = existing.advertisedDepositPct ?? effectiveDepositPct(null, commerce.preorderDepositPct);
-  const depositBdt = depositForQuote(data.quotedPriceBdt, depositPct);
+  // Deposit secures the whole commission: pct × (per-unit quote × quantity).
+  // Computing it per-unit made the quote email read "deposit ৳2,000 (20%)"
+  // under a ৳30,000 three-piece total — 6.7% in reality.
+  const depositBdt = depositForQuote(data.quotedPriceBdt * existing.quantity, depositPct);
 
   const [row] = await db.update(schema.preorderRequests)
     .set({
@@ -321,6 +332,28 @@ export async function rejectPreorderRequest(input: z.infer<typeof rejectSchema>)
   return { ok: true as const };
 }
 
+/**
+ * Record that the bKash deposit actually arrived. Nothing else may flip a
+ * request to 'confirmed' — the conversion only deducts the deposit from the
+ * COD total when this state is set, so a quoted-but-unpaid request can never
+ * silently lose the deposit amount.
+ */
+export async function markPreorderDepositReceived(id: string) {
+  await requirePermission("preorders");
+  const [req] = await db.select().from(schema.preorderRequests)
+    .where(eq(schema.preorderRequests.id, id)).limit(1);
+  if (!req) return { ok: false as const, error: "Request not found" };
+  if (req.status !== "quoted") {
+    return { ok: false as const, error: `Only quoted requests can be marked deposit-received (this one is '${req.status}').` };
+  }
+  if (!req.depositBdt) return { ok: false as const, error: "No deposit amount on record — re-quote first." };
+  await db.update(schema.preorderRequests)
+    .set({ status: "confirmed", updatedAt: new Date() })
+    .where(eq(schema.preorderRequests.id, id));
+  revalidatePath("/[locale]/admin/preorders", "page");
+  return { ok: true as const };
+}
+
 const convertSchema = z.object({
   id: z.string().uuid(),
 });
@@ -350,11 +383,13 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
 
   const number = `SSG-PO-${Date.now().toString(36).toUpperCase()}`;
   const subtotal = req.quotedPriceBdt * req.quantity;   // per-unit quote × qty
-  // The deposit was prepaid to confirm the commission (see preorderQuoteEmail:
-  // "the remainder is paid in cash on delivery") — the COD total must deduct
-  // it or the courier double-collects. Recorded in couponDiscountBdt so the
-  // invoice/email arithmetic (subtotal − discount = total) stays consistent.
-  const depositPaid = Math.min(req.depositBdt ?? 0, subtotal);
+  // The deposit is deducted from the COD total ONLY when it was actually
+  // received (status 'confirmed', set by markPreorderDepositReceived). A
+  // 'quoted' request converts at the full subtotal — assuming payment that
+  // never arrived would silently gift the deposit amount. Recorded in its
+  // own depositPaidBdt column: it is a PAYMENT, not a discount (refund cap
+  // and revenue both count it; the courier collects totalBdt).
+  const depositPaid = req.status === "confirmed" ? Math.min(req.depositBdt ?? 0, subtotal) : 0;
   const trackingToken = randomBytes(16).toString("hex");
 
   const newOrderId = await db.transaction(async (tx) => {
@@ -368,7 +403,7 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
       subtotalBdt: subtotal,
       shippingBdt: 0,
       codFeeBdt: 0,
-      couponDiscountBdt: depositPaid,
+      depositPaidBdt: depositPaid,
       totalBdt: subtotal - depositPaid,
       shippingAddress: { fullName: req.customerName, phone: req.customerPhone, ...(req.deliveryAddress as object) },
       trackingToken,

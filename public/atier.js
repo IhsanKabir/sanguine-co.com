@@ -146,6 +146,10 @@
     } catch { return null; }
   }
   function audioPermitted() {
+    // No audio on touch: the mute toggle no longer mounts there (it fought
+    // the cookie banner and sticky Add-to-Bag for the same corner), and
+    // sound without a mute control is worse than silence.
+    if (isTouch) return false;
     const consent = readConsent();
     if (consent === 'accept') return true;
     // Grandfather: someone who previously unmuted before consent was a thing.
@@ -498,7 +502,11 @@
       }
       let sy = 0, dy = 0, dragging = false;
       drawer.addEventListener('touchstart', e => {
-        if (drawer.scrollTop > 0) return;
+        // The drawer itself never scrolls — .drawer-body is the scroll
+        // container. Guarding on the wrong element let drags start while the
+        // cart list was mid-scroll, dismissing the drawer on scroll-up.
+        const scroller = drawer.querySelector('.drawer-body');
+        if (scroller && scroller.scrollTop > 0) return;
         sy = e.touches[0].clientY; dragging = true; dy = 0;
         drawer.classList.add('dragging');
       }, { passive: true });

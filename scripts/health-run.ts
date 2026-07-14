@@ -13,7 +13,10 @@ const main = async () => {
     console.log(`[${c.status.padEnd(4)}] ${String(c.latencyMs).padStart(5)}ms ${c.id.padEnd(22)} ${c.detail.slice(0, 110)}`);
   }
   console.log("OVERALL:", r.overall, `(${r.durationMs}ms)`);
-  process.exit(r.overall === "down" ? 1 : 0);
+  // Any FAIL is alert-worthy for a cron canary — the data tripwires
+  // (zero-price orders, pricing invariants) are deliberately critical:false
+  // so they don't mark the whole site "down", but they must still exit red.
+  process.exit(r.overall === "down" || r.counts.fail > 0 ? 1 : 0);
 };
 
 main().catch((e) => {

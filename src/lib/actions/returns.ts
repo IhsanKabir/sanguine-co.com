@@ -35,10 +35,13 @@ async function orderReturnWindow(orderId: string): Promise<number> {
     .from(schema.products)
     .where(inArray(schema.products.id, productIds))
     .catch(() => []);
-  return prods.reduce(
-    (max, p) => Math.max(max, p.returnWindowDays ?? commerce.returnWindowDays),
-    commerce.returnWindowDays,
-  );
+  if (prods.length === 0) return commerce.returnWindowDays;
+  // Each line's effective window is its own override ?? global; the order
+  // takes the most generous line. Seeding the max with the global default
+  // made short overrides (returnWindowDays = 0 → final sale) unenforceable —
+  // the PDP advertised "0-day returns" while the server accepted 7.
+  const windows = prods.map((p) => p.returnWindowDays ?? commerce.returnWindowDays);
+  return Math.max(...windows);
 }
 
 /** Timestamp the order became `delivered`, from the order-events timeline. */

@@ -84,7 +84,10 @@ function makeGate(max: number) {
     }
   };
 }
-const dbGate = makeGate(4);
+// NOTE: the gate is created PER RUN (see runHealthChecks) — a module-level
+// gate would leak slots forever when a wedged query never settles, degrading
+// every subsequent board run in the same server process.
+type DbGate = ReturnType<typeof makeGate>;
 
 /** Returns the subset of env var names that are missing/empty. */
 function missingEnv(...names: string[]): string[] {
@@ -212,10 +215,10 @@ const CHECKS: CheckDef[] = [
     critical: false,
     usesDb: true,
     run: async () => {
-      const [[p], [s]] = await Promise.all([
-        db.select({ n: count() }).from(schema.products),
-        db.select({ n: count() }).from(schema.segments),
-      ]);
+      // Sequential on purpose: the dbGate budgets one query per slot — a
+      // Promise.all here would burst past the gate's accounting.
+      const [p] = await db.select({ n: count() }).from(schema.products);
+      const [s] = await db.select({ n: count() }).from(schema.segments);
       const products = Number(p?.n ?? 0);
       const segments = Number(s?.n ?? 0);
       if (products === 0) return { status: "warn", detail: `No products published (${segments} segment(s)).` };
@@ -367,9 +370,16 @@ const CHECKS: CheckDef[] = [
     usesDb: true,
     run: async () => {
       // Exercises the REAL search path (same function the storefront calls).
-      const [probe] = await db.select({ name: schema.products.name }).from(schema.products)
-        .where(eq(schema.products.status, "live")).limit(1);
-      if (!probe) return { status: "warn", detail: "No live products to probe search with." };
+      // The probe product must be one search can actually find: live AND in a
+      // non-hidden segment — an arbitrary live product in a hidden segment
+      // would produce a false FAIL.
+      const [probe] = await db.execute<{ name: string }>(sql`
+        select p.name from products p
+        join segments s on s.id = p.segment_id and s.hidden = false
+        where p.status = 'live'
+        limit 1
+      `);
+      if (!probe) return { status: "warn", detail: "No live products in visible segments to probe search with." };
       const q = probe.name.slice(0, 4);
       const hits = await searchProducts(q);
       return hits.length > 0
@@ -434,7 +444,7 @@ const CHECKS: CheckDef[] = [
   },
 ];
 
-async function runOne(def: CheckDef): Promise<HealthCheck> {
+async function runOne(def: CheckDef, dbGate: DbGate): Promise<HealthCheck> {
   const started = Date.now();
   let probe: Probe;
   try {
@@ -457,7 +467,8 @@ async function runOne(def: CheckDef): Promise<HealthCheck> {
 /** Run every check in parallel and roll them up into an overall verdict. */
 export async function runHealthChecks(): Promise<HealthReport> {
   const started = Date.now();
-  const checks = await Promise.all(CHECKS.map(runOne));
+  const dbGate = makeGate(4);   // fresh per run — see note on makeGate
+  const checks = await Promise.all(CHECKS.map((def) => runOne(def, dbGate)));
   const counts = {
     ok: checks.filter((c) => c.status === "ok").length,
     warn: checks.filter((c) => c.status === "warn").length,

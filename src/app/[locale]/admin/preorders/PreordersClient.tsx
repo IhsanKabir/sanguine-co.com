@@ -6,6 +6,7 @@ import {
   quotePreorderRequest,
   rejectPreorderRequest,
   convertPreorderToOrder,
+  markPreorderDepositReceived,
   getPreorderAttachmentUrls,
 } from "@/lib/actions/preorders";
 import type { PreorderRequest, Segment } from "@/lib/schema";
@@ -328,12 +329,40 @@ function DetailDrawer({
             </div>
           )}
 
-          {/* Convert action — only if quoted */}
-          {request.status === "quoted" && request.quotedPriceBdt && (
+          {/* Deposit gate — a quoted request converts at FULL price until the
+              bKash deposit is marked received; 'confirmed' deducts it. */}
+          {request.status === "quoted" && request.quotedPriceBdt && request.depositBdt ? (
+            <div style={{ marginTop: 16, padding: 18, background: "#fdf6e8", border: "1px solid #e8d8a8" }}>
+              <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "#a07e2c", marginBottom: 8 }}>DEPOSIT · {formatBdt(request.depositBdt)}</div>
+              <p style={{ fontSize: 13, color: "#6b5a2a", margin: "0 0 12px", lineHeight: 1.6 }}>
+                Once the customer&apos;s bKash prepayment of {formatBdt(request.depositBdt)} arrives, mark it received —
+                the converted order will then collect {formatBdt(request.quotedPriceBdt * request.quantity - request.depositBdt)} on delivery.
+                Converting <b>without</b> marking it charges the full {formatBdt(request.quotedPriceBdt * request.quantity)} COD.
+              </p>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                disabled={pending}
+                onClick={() => startTransition(async () => {
+                  const res = await markPreorderDepositReceived(request.id);
+                  if (res && "error" in res && res.error) alert(res.error);
+                })}
+              >
+                Deposit received
+              </button>
+            </div>
+          ) : null}
+
+          {/* Convert action — quoted (full COD) or confirmed (deposit deducted) */}
+          {(request.status === "quoted" || request.status === "confirmed") && request.quotedPriceBdt && (
             <div style={{ marginTop: 16, padding: 18, background: "#eef7ee", border: "1px solid #4caf50" }}>
-              <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "#2e7d32", marginBottom: 8 }}>CUSTOMER ACCEPTED?</div>
+              <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "#2e7d32", marginBottom: 8 }}>
+                {request.status === "confirmed" ? "DEPOSIT RECEIVED — READY TO CONVERT" : "CUSTOMER ACCEPTED?"}
+              </div>
               <p style={{ fontSize: 13, color: "#2e4f33", margin: "0 0 12px", lineHeight: 1.6 }}>
-                Click below to convert this request into a real COD order. The customer will appear in your Orders queue and the piece will be paid for on delivery.
+                {request.status === "confirmed"
+                  ? `The deposit is on record — the courier will collect the remainder on delivery.`
+                  : `Click below to convert this request into a real COD order. The customer will appear in your Orders queue and the piece will be paid for on delivery.`}
               </p>
               {showConvertConfirm ? (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13 }}>
@@ -343,7 +372,11 @@ function DetailDrawer({
                 </span>
               ) : (
                 <button type="button" className="btn btn-primary btn-sm" onClick={onConvert} disabled={pending}>
-                  Convert to COD order ({formatBdt(request.quotedPriceBdt * request.quantity)})
+                  Convert to COD order (
+                  {request.status === "confirmed"
+                    ? `collect ${formatBdt(Math.max(0, request.quotedPriceBdt * request.quantity - (request.depositBdt ?? 0)))}`
+                    : formatBdt(request.quotedPriceBdt * request.quantity)}
+                  )
                 </button>
               )}
             </div>

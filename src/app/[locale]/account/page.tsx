@@ -2,7 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth-utils";
 import { db, schema } from "@/lib/db";
-import { eq, desc, or, count } from "drizzle-orm";
+import { eq, desc, or, count, sql } from "drizzle-orm";
 import { formatBdt } from "@/lib/utils";
 import { listMyAddresses } from "@/lib/actions/addresses";
 import { ensureReferralCode } from "@/lib/actions/profile";
@@ -60,12 +60,17 @@ export default async function AccountPage({ params }: Props) {
   // in email; the customer could never see it in their account.
   let preorders: PreorderSelect[] = [];
   try {
+    // Email clause only when the session actually has an email — matching
+    // "" against any legacy empty customerEmail row would leak requests.
+    const emailClause = user.email
+      ? or(
+          eq(schema.preorderRequests.customerId, user.id as unknown as string),
+          sql`lower(${schema.preorderRequests.customerEmail}) = lower(${user.email})`,
+        )
+      : eq(schema.preorderRequests.customerId, user.id as unknown as string);
     preorders = await db.select()
       .from(schema.preorderRequests)
-      .where(or(
-        eq(schema.preorderRequests.customerId, user.id as unknown as string),
-        eq(schema.preorderRequests.customerEmail, user.email ?? ""),
-      ))
+      .where(emailClause)
       .orderBy(desc(schema.preorderRequests.createdAt))
       .limit(10);
   } catch (e) { console.error("[account] preorders query failed:", e); }
@@ -105,7 +110,7 @@ export default async function AccountPage({ params }: Props) {
   } catch (e) { console.error("[account] wishlists query failed:", e); }
 
   const profile = profileRows[0] ?? null;
-  const lifetimeSpend = orders.reduce((s, o) => s + o.totalBdt, 0);
+  const lifetimeSpend = orders.reduce((s, o) => s + o.totalBdt + (o.depositPaidBdt ?? 0), 0);
   const wishlistCount = wishlistTotal;
   const initials = monogram(profile?.fullName, user.email ?? "");
   const memberYear = user.created_at

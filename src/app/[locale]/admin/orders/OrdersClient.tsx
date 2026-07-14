@@ -312,7 +312,7 @@ export default function OrdersClient({ orders, lines }: Props) {
 
               <RefundPanel
                 orderId={selected.id}
-                orderTotalBdt={selected.totalBdt}
+                orderTotalBdt={selected.totalBdt + (selected.depositPaidBdt ?? 0)}
                 onIssued={() => {
                   // Refresh the timeline so the new refund event appears.
                   getOrderTimeline(selected.id).then(setTimeline).catch(() => {});

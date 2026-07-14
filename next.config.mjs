@@ -23,6 +23,21 @@ const nextConfig = {
   outputFileTracingIncludes: {
     "/api/og": ["./src/app/api/og/_fonts/*.ttf"],
   },
+  // Order confirmation/tracking URLs carry ?t= access tokens — the referrer
+  // policy keeps them from leaking to external destinations a customer might
+  // click through to (couriers, WhatsApp web, etc.).
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+        ],
+      },
+    ];
+  },
 };
 
 // Sentry build-time options. Source maps are uploaded only when both

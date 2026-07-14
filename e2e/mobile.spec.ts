@@ -22,8 +22,11 @@ test.describe("mobile · 390px touch profile", () => {
     await page.goto(`/en/shop/${KNOWN_SEGMENT_ID}`);
     // Dismiss the cookie banner first — it overlays the lower viewport (and
     // the first failure screenshot showed the tap landing on it, which is
-    // the layer-stacking class of bug this suite exists to catch).
-    await page.getByRole("button", { name: /essential only/i }).click({ timeout: 10_000 }).catch(() => {});
+    // the layer-stacking class of bug this suite exists to catch). Wait for
+    // it to actually leave before computing tap coordinates.
+    const consent = page.getByRole("button", { name: /essential only/i });
+    await consent.click({ timeout: 10_000 }).catch(() => {});
+    await consent.waitFor({ state: "hidden", timeout: 5_000 }).catch(() => {});
     const cover = page.locator(".card-cover").first();
     await cover.scrollIntoViewIfNeeded();
     const box = await cover.boundingBox();

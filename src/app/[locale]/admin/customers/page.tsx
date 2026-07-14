@@ -42,7 +42,7 @@ async function getCustomers(): Promise<CustomerRow[]> {
       coalesce(${schema.orders.guestPhone}, ${schema.orders.shippingAddress}->>'phone') as phone,
       (${schema.orders.shippingAddress}->>'city') as city,
       count(*)::int as order_count,
-      sum(${schema.orders.totalBdt})::int as total_spent,
+      sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt})::int as total_spent,
       max(${schema.orders.createdAt}) as last_order_at
     from ${schema.orders}
     where ${schema.orders.guestEmail} is not null
