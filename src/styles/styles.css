@@ -152,14 +152,26 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .footer-bottom{display:flex;justify-content:space-between;padding-top:24px;font-size:12px;color:var(--purple-400);letter-spacing:.1em}
 
 .crumbs{max-width:1400px;margin:0 auto;padding:24px 32px 0;font-size:12px;letter-spacing:.1em;color:var(--ink-soft);text-transform:uppercase}
-.crumbs span+span::before{content:"/";margin:0 10px;color:var(--line)}
+/* Separator between ANY adjacent crumbs — the old span+span selector skipped
+ * link+span pairs, gluing "Maison" to the next crumb ("MAISONORDER…"). */
+.crumbs > * + *::before{content:"/";margin:0 10px;color:var(--line)}
 .crumbs .current{color:var(--purple-900)}
 
 .pdp{max-width:1400px;margin:0 auto;padding:32px;display:grid;grid-template-columns:1.618fr 1fr;gap:64px}
 .pdp-gallery{display:grid;grid-template-columns:88px 1fr;gap:12px}
 .pdp-thumbs{display:flex;flex-direction:column;gap:8px}
-.pdp-thumb{aspect-ratio:1;border:1px solid var(--line);cursor:pointer}.pdp-thumb.active{border-color:var(--purple-800)}
-.pdp-main-img{aspect-ratio:3/4}
+.pdp-thumb{aspect-ratio:1;border:1px solid var(--line);cursor:pointer;overflow:hidden;transition:border-color .12s,box-shadow .12s}
+/* Selection must read instantly — the 1px border change was invisible while
+ * the (slow) full-size photo loaded, so clicks felt like they did nothing. */
+.pdp-thumb.active{border:2px solid var(--purple-800);box-shadow:0 0 0 2px oklch(0.45 0.18 300 / 0.25)}
+/* overflow:hidden + object-fit (set on the img) clip uploads of ANY aspect
+ * ratio to the 3:4 frame — a portrait photo taller than 3:4 previously
+ * overflowed the grid row and spilled across the info column. */
+.pdp-main-img{aspect-ratio:3/4;overflow:hidden;position:relative;background:var(--purple-50)}
+.pdp-img-veil{position:absolute;inset:0;display:grid;place-items:center;background:oklch(0.98 0.005 90 / 0.55);z-index:2}
+.pdp-img-veil::after{content:"";width:28px;height:28px;border-radius:50%;border:2px solid var(--purple-300);border-top-color:var(--purple-800);animation:pdpSpin .7s linear infinite}
+@keyframes pdpSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.pdp-img-veil::after{animation:none}}
 .pdp-info{padding:16px 0}
 .pdp-info .collection{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-text)}
 .pdp-info h1{font-family:var(--serif);font-size:44px;font-weight:500;margin:8px 0 12px;color:var(--purple-900);line-height:1.05}

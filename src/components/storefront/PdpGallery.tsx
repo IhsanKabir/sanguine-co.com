@@ -23,6 +23,10 @@ type Props = {
 export default function PdpGallery({ photos, fallback, activeIndex, onIndexChange }: Props) {
   const { activePhotoIndex, setActivePhotoIndex } = usePdpState();
   const [imgKey, setImgKey] = useState(0);
+  // Swapping photos remounts the Image (for the fade), which blanks the frame
+  // until the full-size file arrives — seconds on first load. The veil gives
+  // the click immediate, visible acknowledgement.
+  const [loading, setLoading] = useState(false);
   const prev = useRef(0);
   const touchStartX = useRef(0);
 
@@ -43,9 +47,10 @@ export default function PdpGallery({ photos, fallback, activeIndex, onIndexChang
   useEffect(() => {
     if (prev.current !== active) {
       setImgKey((k) => k + 1);
+      if (photos.length > 0) setLoading(true);
       prev.current = active;
     }
-  }, [active]);
+  }, [active, photos.length]);
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     touchStartX.current = e.changedTouches[0].clientX;
@@ -90,17 +95,24 @@ export default function PdpGallery({ photos, fallback, activeIndex, onIndexChang
         onTouchEnd={handleTouchEnd}
       >
         {hasPhotos && current ? (
-          <Image
-            key={imgKey}
-            src={current.url}
-            alt={current.alt ?? fallback.name}
-            width={900}
-            height={1200}
-            priority
-            sizes="(max-width: 768px) 100vw, 50vw"
-            style={{ width: "100%", height: "auto", display: "block" }}
-            className="pdp-img-fade"
-          />
+          <>
+            <Image
+              key={imgKey}
+              src={current.url}
+              alt={current.alt ?? fallback.name}
+              width={900}
+              height={1200}
+              priority
+              sizes="(max-width: 768px) 100vw, 50vw"
+              // height:100% + cover clips ANY upload shape to the 3:4 frame —
+              // height:auto let portrait photos overflow across the info column.
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              className="pdp-img-fade"
+              onLoad={() => setLoading(false)}
+              onError={() => setLoading(false)}
+            />
+            {loading && <div className="pdp-img-veil" aria-hidden="true" />}
+          </>
         ) : (
           <Composition
             cat={fallback.cat}
