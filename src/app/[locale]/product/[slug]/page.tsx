@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getProductBySlug, getSegmentBySlug, getRelatedProducts, getProductImages, getProductSalesVelocity, getHeroImagesFor, getProductsByIds } from "@/lib/queries";
 import { Link } from "@/i18n/routing";
-import { formatBdt } from "@/lib/utils";
+import { formatBdt, normalizeBdWhatsApp } from "@/lib/utils";
 import Icon from "@/components/storefront/Icon";
 import ProductCard from "@/components/storefront/ProductCard";
 import PdpActionsClient from "@/components/storefront/PdpActionsClient";
@@ -376,7 +376,7 @@ export default async function ProductPage({ params }: Props) {
           </div>
           {process.env.NEXT_PUBLIC_WHATSAPP_NUMBER && (
             <a
-              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hello, I'm interested in ${name} — ${BASE}/${locale}/product/${p.slug}`)}`}
+              href={`https://wa.me/${normalizeBdWhatsApp(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "")}?text=${encodeURIComponent(`Hello, I'm interested in ${name} — ${BASE}/${locale}/product/${p.slug}`)}`}
               style={{ display: "inline-block", fontSize: 12, color: "var(--ink-soft)", marginTop: 14, textDecoration: "none" }}
               target="_blank"
               rel="noopener noreferrer"

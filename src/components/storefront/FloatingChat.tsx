@@ -1,9 +1,12 @@
 "use client";
 
+import { normalizeBdWhatsApp } from "@/lib/utils";
+
 /**
  * Floating WhatsApp + Messenger buttons (BD-essential per research).
  * Configure via env: NEXT_PUBLIC_WHATSAPP_NUMBER, NEXT_PUBLIC_MESSENGER_PAGE.
- * Hidden if both are unset.
+ * Hidden if both are unset. Local-format numbers (01XXXXXXXXX) are normalized
+ * to international for wa.me — a local-format link points at nothing.
  */
 const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;   // e.g. 8801XXXXXXXXX
 const MESSENGER = process.env.NEXT_PUBLIC_MESSENGER_PAGE;   // e.g. sanguine
@@ -15,7 +18,7 @@ export default function FloatingChat() {
     <div className="floating-chat" aria-label="Chat with the maison">
       {WHATSAPP && (
         <a
-          href={`https://wa.me/${WHATSAPP.replace(/\D/g, "")}?text=${greeting}`}
+          href={`https://wa.me/${normalizeBdWhatsApp(WHATSAPP)}?text=${greeting}`}
           target="_blank"
           rel="noopener noreferrer"
           className="fc-btn fc-whatsapp"
