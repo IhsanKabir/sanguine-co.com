@@ -32,7 +32,14 @@ export const metadata: Metadata = {
   title: { default: "Sanguine", template: "%s · Sanguine" },
   description: "Garments, flora & small ceremonies for the violet hour. A Bangladeshi maison, slowly assembled.",
   applicationName: "Sanguine",
-  verification: { google: "ZKS_JSSguTq9M5qdH24Y4p8m5XKUXnHuvXI2CNMQPdM" },
+  // Both tokens stay: the first is the original May property, the second is
+  // the owner's live Search Console property for sanguine-co.com (2026-07-14).
+  verification: {
+    google: [
+      "ZKS_JSSguTq9M5qdH24Y4p8m5XKUXnHuvXI2CNMQPdM",
+      "OheUYwamOmq0R_NxVHeQfisToMNucm4RvpF4xotnp7A",
+    ],
+  },
   // No `keywords` — Google has ignored meta keywords since 2009 and Bing
   // treats large keyword lists as a weak spam signal. Targeting lives in
   // page-level title / description copy.
