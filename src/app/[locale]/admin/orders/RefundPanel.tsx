@@ -7,7 +7,10 @@ import { formatBdt, formatDate } from "@/lib/utils";
 
 type Props = {
   orderId: string;
+  /** Everything the customer paid: COD total + any prepaid deposit. */
   orderTotalBdt: number;
+  /** Prepaid preorder deposit portion (0 for regular orders). */
+  depositPaidBdt?: number;
   onIssued?: () => void;
 };
 
@@ -18,7 +21,7 @@ const METHODS: { id: "bkash" | "bank" | "cash" | "card"; label: string }[] = [
   { id: "card",  label: "Card" },
 ];
 
-export default function RefundPanel({ orderId, orderTotalBdt, onIssued }: Props) {
+export default function RefundPanel({ orderId, orderTotalBdt, depositPaidBdt = 0, onIssued }: Props) {
   const [refunds, setRefunds] = useState<Refund[]>([]);
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");
@@ -106,6 +109,11 @@ export default function RefundPanel({ orderId, orderTotalBdt, onIssued }: Props)
             <div className="field">
               <label>Amount (৳, max {formatBdt(remaining)})</label>
               <input type="number" min={1} max={remaining} value={amount} onChange={(e) => setAmount(e.target.value)} required />
+              {depositPaidBdt > 0 && (
+                <span style={{ fontSize: 11, color: "var(--ink-soft)", display: "block", marginTop: 4 }}>
+                  Paid as {formatBdt(orderTotalBdt - depositPaidBdt)} cash on delivery + {formatBdt(depositPaidBdt)} prepaid deposit (bKash) — refund each portion by its original method.
+                </span>
+              )}
             </div>
             <div className="field">
               <label>Method</label>

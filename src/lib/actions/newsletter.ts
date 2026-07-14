@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { sendEmail, addBrevoContact } from "@/lib/email/brevo";
+import { sendEmail, addBrevoContact, brevoContactExists } from "@/lib/email/brevo";
 import { newsletterWelcomeEmail } from "@/lib/email/templates";
 import { captureError } from "@/lib/monitoring";
 
@@ -16,14 +16,19 @@ export async function subscribeNewsletter(input: { email: string }): Promise<{ o
     ? parseInt(process.env.BREVO_NEWSLETTER_LIST_ID, 10)
     : null;
 
-  // Fire both in parallel; neither blocks the other.
-  const tasks: Promise<unknown>[] = [
-    sendEmail({
+  // Existing contacts don't get a second welcome letter — unconditionally
+  // sending made this public action an unlimited email-anyone endpoint.
+  // List membership is still refreshed below (idempotent upsert).
+  const alreadySubscribed = await brevoContactExists(email);
+
+  const tasks: Promise<unknown>[] = [];
+  if (!alreadySubscribed) {
+    tasks.push(sendEmail({
       to: email,
       subject: newsletterWelcomeEmail(SITE_URL).subject,
       html: newsletterWelcomeEmail(SITE_URL).html,
-    }),
-  ];
+    }));
+  }
 
   if (listId && !isNaN(listId)) {
     tasks.push(addBrevoContact(email, listId));
