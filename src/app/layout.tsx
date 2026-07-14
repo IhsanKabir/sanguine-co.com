@@ -93,7 +93,7 @@ const organizationLd = {
   // Only CLAIMED profiles — unclaimed handles muddy Knowledge Panel
   // disambiguation. Add more (Instagram etc.) as the accounts are created.
   sameAs: [
-    "https://www.facebook.com/profile.php?id=61591619233431",
+    "https://www.facebook.com/TheSanguineCo",
   ],
 };
 
