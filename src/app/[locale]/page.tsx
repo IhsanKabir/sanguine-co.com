@@ -12,6 +12,13 @@ import Ornament from "@/components/storefront/Ornament";
 import JsonLd from "@/components/seo/JsonLd";
 import { SITE_URL as BASE } from "@/lib/site-url";
 
+// ISR: the homepage fires several catalogue queries per request and reads no
+// cookies/auth — cache the rendered page. Admin edits still appear instantly
+// because every admin action calls revalidateAllLocales() (revalidatePath
+// purges this cache); 300s is only the safety net. Speed Insights showed the
+// query-heavy routes gating FCP/LCP (home RES 72).
+export const revalidate = 300;
+
 type Props = { params: Promise<{ locale: string }> };
 
 /**
