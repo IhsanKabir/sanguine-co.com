@@ -1,31 +1,7 @@
 import type { Metadata } from "next";
-import { Inter, Cormorant_Garamond, JetBrains_Mono } from "next/font/google";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/next";
-import { getLocale } from "next-intl/server";
 import "./globals.css";
-import JsonLd from "@/components/seo/JsonLd";
 
 import { SITE_URL as BASE } from "@/lib/site-url";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-});
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-serif",
-  display: "swap",
-});
-const jbMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
@@ -74,58 +50,11 @@ export const metadata: Metadata = {
   formatDetection: { email: false, address: false, telephone: false },
 };
 
-// Canonical entity name is "Sanguine" everywhere — JSON-LD, OG,
-// manifest, brand copy. Inconsistent naming delays Google Knowledge Panel
-// disambiguation. `sameAs` lists only *claimed* external profiles for the brand.
-const organizationLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "Sanguine",
-  url: BASE,
-  logo: `${BASE}/logo.png`,
-  description: "A Bangladeshi maison for perfume, flora, books and small ceremonies — slowly assembled with the patience of a florist.",
-  email: "concierge@sanguine-co.com",
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Dhaka",
-    addressCountry: "BD",
-  },
-  // Only CLAIMED profiles — unclaimed handles muddy Knowledge Panel
-  // disambiguation. Add more (Instagram etc.) as the accounts are created.
-  sameAs: [
-    "https://www.facebook.com/TheSanguineCo",
-  ],
-};
-
-// SearchAction removed 2026-05-03 — the query-string URL template
-// (`/en/shop?q=`) is disallowed by robots.txt's `/*?*` rule, so emitting
-// it as a SearchAction was inaccurate. Restore once we have a stable
-// crawlable search results URL.
-const websiteLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  // name drives Google's SERP "site name" (shows "Sanguine" instead of the
-  // bare domain); alternateName covers domain-shaped brand queries.
-  name: "Sanguine",
-  alternateName: "sanguine-co",
-  url: BASE,
-  inLanguage: ["en-BD", "bn-BD"],
-};
-
-// `lang` is sourced from next-intl's `getLocale()` so SSR / SSG / Googlebot
-// see the correct `lang="bn"` for Bengali pages on first paint. Previously
-// `HtmlLangSync` patched it client-side after hydration, which crawlers
-// never see. WCAG 3.1.1 also requires this to be correct.
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale();
-  return (
-    <html lang={locale} className={`${inter.variable} ${cormorant.variable} ${jbMono.variable}`} suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        <JsonLd data={[organizationLd, websiteLd]} />
-        {children}
-        <Analytics />
-        <SpeedInsights />
-      </body>
-    </html>
-  );
+// Pass-through: <html>/<body> live in [locale]/layout.tsx, which knows its
+// locale STATICALLY from params. Reading the locale here (via next-intl's
+// getLocale) required request headers, which forced every route in the app
+// into dynamic rendering — no page ever served from the static/ISR cache.
+// The root not-found document renders its own <html> for the same reason.
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }
