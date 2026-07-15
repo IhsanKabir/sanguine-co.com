@@ -10,6 +10,12 @@ import { priceSortValue } from "@/lib/pricing";
 
 import { SITE_URL as BASE } from "@/lib/site-url";
 
+// ISR: filtering/sorting happens client-side in ShopGrid over the full item
+// list (the server render never reads searchParams), and the page reads no
+// cookies — so the HTML is cacheable per segment. Admin edits purge it via
+// revalidateAllLocales(); 300s is the safety net.
+export const revalidate = 300;
+
 type Props = {
   params: Promise<{ locale: string; segment: string }>;
   searchParams?: Promise<Record<string, string | undefined>>;

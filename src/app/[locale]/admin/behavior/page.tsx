@@ -30,7 +30,11 @@ export default async function AdminBehaviorPage({
   await requirePermission("behavior");
   const sp = await searchParams;
   const days = parseInt(sp.days || "30") || 30;
-  const since = new Date(Date.now() - days * 86400_000);
+  // ISO string, NOT a Date: drizzle's raw sql template passes params
+  // unserialized to postgres.js, whose wire encoder rejects Date objects —
+  // every query below silently failed into its empty fallback, rendering the
+  // whole page as zeros. (Same root cause isolated in the health board.)
+  const since = new Date(Date.now() - days * 86400_000).toISOString();
 
   const funnelRows = await db.execute<{
     sessions: number; product_views: number; adds: number; checkouts: number; orders: number;
@@ -42,7 +46,7 @@ export default async function AdminBehaviorPage({
       count(*) filter (where type = 'checkout_start')::int  as checkouts,
       count(*) filter (where type = 'order_placed')::int    as orders
     from events
-    where created_at >= ${since}
+    where created_at >= ${since}::timestamptz
   `).catch(logAndFallback("funnel", [{ sessions: 0, product_views: 0, adds: 0, checkouts: 0, orders: 0 }] as Array<{
     sessions: number; product_views: number; adds: number; checkouts: number; orders: number;
   }>));
@@ -59,7 +63,7 @@ export default async function AdminBehaviorPage({
       sum(case when (payload->>'zero_result')::boolean then 1 else 0 end)::int as zero_results
     from events
     where type = 'search'
-      and created_at >= ${since}
+      and created_at >= ${since}::timestamptz
       and payload->>'query' is not null
     group by query
     order by count desc
@@ -74,7 +78,7 @@ export default async function AdminBehaviorPage({
       (select name from products where slug = coalesce(events.product_id, replace(events.path, '/product/', '')) limit 1) as name
     from events
     where type = 'product_view'
-      and created_at >= ${since}
+      and created_at >= ${since}::timestamptz
     group by product_id
     order by views desc
     limit 10
@@ -85,7 +89,7 @@ export default async function AdminBehaviorPage({
     select path, count(*)::int as views
     from events
     where type = 'page_view'
-      and created_at >= ${since}
+      and created_at >= ${since}::timestamptz
       and path is not null
     group by path
     order by views desc
@@ -98,7 +102,7 @@ export default async function AdminBehaviorPage({
            count(*) filter (where type = 'session_start')::int as sessions,
            count(*) filter (where type = 'order_placed')::int as orders
     from events
-    where created_at >= ${since}
+    where created_at >= ${since}::timestamptz
     group by day
     order by day asc
   `).catch(logAndFallback("dailyVolume", [] as Array<{ day: string; sessions: number; orders: number }>));
