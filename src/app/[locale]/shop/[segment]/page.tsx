@@ -16,6 +16,14 @@ import { SITE_URL as BASE } from "@/lib/site-url";
 // revalidateAllLocales(); 300s is the safety net.
 export const revalidate = 300;
 
+// Without generateStaticParams a dynamic segment renders per-request and
+// `revalidate` is ignored. Returning [] (segments live in the DB, which we
+// don't query at build) still opts the route into on-demand ISR: the first
+// visit renders and caches, subsequent visits are edge HITs.
+export function generateStaticParams(): Array<{ segment: string }> {
+  return [];
+}
+
 type Props = {
   params: Promise<{ locale: string; segment: string }>;
   searchParams?: Promise<Record<string, string | undefined>>;
