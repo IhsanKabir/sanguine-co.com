@@ -2,7 +2,12 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import { routing } from "@/i18n/routing";
+import { fontClasses } from "@/app/fonts";
+import { organizationLd, websiteLd } from "@/lib/site-ld";
+import JsonLd from "@/components/seo/JsonLd";
 import { getAudioSettings } from "@/lib/audio-settings";
 import TopNav from "@/components/storefront/TopNav";
 import Footer from "@/components/storefront/Footer";
@@ -41,9 +46,16 @@ export default async function LocaleLayout({
   if (audio.chime) audioUrls.chime = audio.chime.url;
   if (audio.seal) audioUrls.seal = audio.seal.url;
 
+  // This layout owns <html> (the root layout is a pass-through): `lang` comes
+  // statically from the [locale] param, so crawlers get the correct lang="bn"
+  // on first paint WITHOUT the request-time getLocale() read that used to
+  // force the whole app into dynamic rendering.
   return (
-    <NextIntlClientProvider messages={messages}>
-      <SessionTracker />
+    <html lang={locale} className={fontClasses} suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <JsonLd data={[organizationLd, websiteLd]} />
+        <NextIntlClientProvider messages={messages}>
+          <SessionTracker />
       <a href="#main" className="skip-link">Skip to content</a>
       <CartProvider>
         <WishlistProvider>
@@ -69,13 +81,17 @@ export default async function LocaleLayout({
           }}
         />
       )}
-      {/* Atelier motion + custom cursor (ported verbatim from prototype). */}
-      <Script src="/cursor.js" strategy="afterInteractive" />
-      <Script src="/moments.js" strategy="afterInteractive" />
-      <Script src="/atier.js" strategy="afterInteractive" />
-      {/* Cloudflare Analytics removed 2026-05-03 — Vercel Analytics +
-       *   Speed Insights are now the canonical telemetry stack. Two
-       *   beacons per pageview is wasteful at our scale. */}
-    </NextIntlClientProvider>
+          {/* Atelier motion + custom cursor (ported verbatim from prototype). */}
+          <Script src="/cursor.js" strategy="afterInteractive" />
+          <Script src="/moments.js" strategy="afterInteractive" />
+          <Script src="/atier.js" strategy="afterInteractive" />
+          {/* Cloudflare Analytics removed 2026-05-03 — Vercel Analytics +
+           *   Speed Insights are now the canonical telemetry stack. Two
+           *   beacons per pageview is wasteful at our scale. */}
+        </NextIntlClientProvider>
+        <Analytics />
+        <SpeedInsights />
+      </body>
+    </html>
   );
 }
