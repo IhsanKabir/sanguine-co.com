@@ -255,9 +255,11 @@
         b.title = 'Accept cookies to enable sound';
         return;
       }
-      ensureAudio();
       setMuted(!muted);
-      if (!muted) window.SSG_SOUND.chime();
+      // Same INP guard as the other input handlers: device init off-thread.
+      setTimeout(() => {
+        if (!muted) { ensureAudio(); window.SSG_SOUND.chime(); }
+      }, 0);
     });
     document.body.appendChild(b);
   }
@@ -275,9 +277,16 @@
     const wantsRustle = !wantsClick && !!(t.closest && t.closest('.cat-tile, .card'));
     if (!wantsClick && !wantsRustle) return;
     if (!audioPermitted()) return;
-    ensureAudio();
-    if (wantsClick) window.SSG_SOUND.click();
-    else window.SSG_SOUND.rustle();
+    // Deferred: creating the AudioContext opens the OS audio device, which
+    // blocks the main thread 100ms+ on Windows — inside a click handler that
+    // cost lands directly on INP (and on the Add-to-Bag button, this IS the
+    // buy click). Web Audio needs only sticky activation, so init in a
+    // macrotask after the frame paints; a ~10ms-late cue is imperceptible.
+    setTimeout(() => {
+      ensureAudio();
+      if (wantsClick) window.SSG_SOUND.click();
+      else window.SSG_SOUND.rustle();
+    }, 0);
   }, true);
   // First gong on first user gesture — gated on consent. Pre-consent
   // visitors get a silent first paint, which is what PDPO/WCAG expect.
@@ -286,8 +295,11 @@
     if (gongPlayed) return;
     if (!audioPermitted()) return;
     gongPlayed = true;
-    ensureAudio();
-    setTimeout(() => window.SSG_SOUND.gong(), 100);
+    // ensureAudio lives INSIDE the timeout: AudioContext creation blocks the
+    // main thread 100ms+ on Windows, and this handler runs on the very first
+    // keydown/pointerdown — it was the page's worst INP interaction (156ms
+    // measured). Sticky activation keeps the deferred resume() gesture-legal.
+    setTimeout(() => { ensureAudio(); window.SSG_SOUND.gong(); }, 100);
   };
   window.addEventListener('pointerdown', playGong, { once: true });
   window.addEventListener('keydown', playGong, { once: true });
