@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { fetchProductsLite, type StorefrontProductLite } from "@/lib/actions/storefront-fetch";
+import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import { formatBdt } from "@/lib/utils";
 import Composition from "./Composition";
 import { readRecentlyViewed } from "./RecentlyViewedTracker";
@@ -16,6 +17,7 @@ type Props = {
 
 export default function RecentlyViewedStrip({ excludeId }: Props) {
   const locale = useLocale() as "en" | "bn";
+  const t = useTranslations();
   const [items, setItems] = useState<StorefrontProductLite[] | null>(null);
 
   useEffect(() => {
@@ -41,6 +43,9 @@ export default function RecentlyViewedStrip({ excludeId }: Props) {
       <div className="grid grid-4">
         {items.map((p) => {
           const name = (locale === "bn" && p.nameBn) || p.name;
+          // Same pricing rules as ProductCard — raw priceBdt would show ৳0
+          // for quotation/preorder products.
+          const display = priceDisplay(p);
           return (
             <article key={p.id} className="card">
               <Link href={`/product/${p.slug}`}>
@@ -66,8 +71,10 @@ export default function RecentlyViewedStrip({ excludeId }: Props) {
                 <div className="prod-body">
                   <h3 className="prod-name">{name}</h3>
                   <div className="prod-price">
-                    {p.wasBdt ? <span className="strike">{formatBdt(p.wasBdt, locale)}</span> : null}
-                    {formatBdt(p.priceBdt, locale)}
+                    {display.kind === "fixed" && p.wasBdt && p.wasBdt > display.amountBdt ? (
+                      <span className="strike">{formatBdt(p.wasBdt, locale)}</span>
+                    ) : null}
+                    {display.kind === "quote" ? t("pdp.priceOnQuote") : priceDisplayText(display, locale)}
                   </div>
                 </div>
               </Link>

@@ -14,6 +14,11 @@ export type StorefrontProductLite = {
   nameBn: string | null;
   priceBdt: number;
   wasBdt: number | null;
+  // Quotation-pricing fields — without them client cards render raw ৳0 for
+  // preorder/estimate products instead of the range / on-request label.
+  preorderOnly: boolean;
+  priceMinBdt: number | null;
+  priceMaxBdt: number | null;
   segmentId: string | null;
   tag: string | null;
   heroImage: { url: string; alt: string | null } | null;
@@ -38,6 +43,9 @@ export async function fetchProductsLite(ids: string[]): Promise<StorefrontProduc
     nameBn: p.nameBn ?? null,
     priceBdt: p.priceBdt,
     wasBdt: p.wasBdt ?? null,
+    preorderOnly: p.preorderOnly ?? false,
+    priceMinBdt: p.priceMinBdt ?? null,
+    priceMaxBdt: p.priceMaxBdt ?? null,
     segmentId: p.segmentId ?? null,
     tag: p.tag ?? null,
     heroImage: heroes.get(p.id) ?? null,
