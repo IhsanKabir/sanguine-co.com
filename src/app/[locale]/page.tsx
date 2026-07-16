@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import { Link } from "@/i18n/routing";
 import { getVisibleSegments, getLiveProducts, getHeroImagesFor } from "@/lib/queries";
 import Composition from "@/components/storefront/Composition";
@@ -273,6 +274,9 @@ export default async function Home({ params }: Props) {
             {bento.map((p, i) => {
               const cls = ["b-1", "b-2", "b-3", "b-4", "b-3", "b-5"][i] || "b-3";
               const seg = segs.find((s) => s.id === p.segmentId);
+              // Pricing rules, not raw priceBdt — quotation/preorder pieces
+              // showed ৳0 here (and the hardcoded en-IN ignored bn).
+              const display = priceDisplay(p);
               return (
                 <Link
                   key={p.id}
@@ -284,7 +288,9 @@ export default async function Home({ params }: Props) {
                   <div className="b-overlay">
                     <div className="b-kicker">{seg?.tag}</div>
                     <h3 className="b-name">{p.name}</h3>
-                    <div className="b-price">৳{p.priceBdt.toLocaleString("en-IN")}</div>
+                    <div className="b-price">
+                      {display.kind === "quote" ? t("pdp.priceOnQuote") : priceDisplayText(display, locale as "en" | "bn")}
+                    </div>
                   </div>
                 </Link>
               );
