@@ -11,7 +11,8 @@ export type OrderEventType =
   | "note_added"
   | "email_sent"
   | "sms_sent"
-  | "payment_received";
+  | "payment_received"
+  | "courier_status";   // a new status reported by the courier sync (payload: courier, status, outcome)
 
 /**
  * Log a material event against an order. Append-only — never throws on a

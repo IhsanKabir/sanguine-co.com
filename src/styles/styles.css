@@ -316,6 +316,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .admin-content{padding:32px}
 .admin-h1{font-family:var(--serif);font-size:36px;margin:0 0 6px;color:var(--purple-900);font-weight:500}
 .admin-sub{color:var(--ink-soft);margin:0 0 28px;font-size:14px}
+.courier-sync-result{position:absolute;right:0;top:calc(100% + 8px);z-index:20;width:min(460px,90vw);padding:12px 14px;background:#fff;border:1px solid var(--purple-200);box-shadow:var(--shadow-lg);font-size:12px;line-height:1.5;display:flex;align-items:flex-start;justify-content:space-between}
 
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
 .stat{background:#fff;border:1px solid var(--line);padding:22px;display:flex;flex-direction:column;gap:8px;border-radius:2px}

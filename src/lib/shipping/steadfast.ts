@@ -44,15 +44,22 @@ export async function createSteadfastOrder(input: SteadfastOrderInput): Promise<
   };
 }
 
+/**
+ * Delivery status by tracking code: pending, in_review, hold, delivered,
+ * partial_delivered, cancelled, unknown, and the *_approval_pending variants
+ * (the rider has reported an outcome Steadfast has not confirmed yet).
+ */
 export async function getSteadfastStatus(trackingCode: string): Promise<string> {
   const base = process.env.STEADFAST_BASE_URL;
-  const res = await fetch(`${base}/status_by_trackingcode/${trackingCode}`, {
-    headers: {
-      "Api-Key": process.env.STEADFAST_API_KEY!,
-      "Secret-Key": process.env.STEADFAST_SECRET_KEY!,
-    },
+  const apiKey = process.env.STEADFAST_API_KEY;
+  const secret = process.env.STEADFAST_SECRET_KEY;
+  if (!base || !apiKey || !secret) throw new Error("Steadfast credentials not configured");
+  const res = await fetch(`${base}/status_by_trackingcode/${encodeURIComponent(trackingCode)}`, {
+    headers: { "Api-Key": apiKey, "Secret-Key": secret },
+    cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
   });
-  if (!res.ok) throw new Error(`Steadfast status failed: ${await res.text()}`);
+  if (!res.ok) throw new Error(`Steadfast status failed ${res.status}: ${await res.text()}`);
   const data = await res.json();
   return data.delivery_status || "unknown";
 }

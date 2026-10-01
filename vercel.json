@@ -1,3 +1,6 @@
 {
-  "regions": ["bom1"]
+  "regions": ["bom1"],
+  "crons": [
+    { "path": "/api/cron/courier-sync", "schedule": "30 3 * * *" }
+  ]
 }
