@@ -2,8 +2,10 @@
 
 import { signOut } from "@/lib/actions/auth";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 export default function SignOutButton() {
+  const t = useTranslations();
   const [hover, setHover] = useState(false);
 
   return (
@@ -22,7 +24,7 @@ export default function SignOutButton() {
           opacity: hover ? 1 : 0.75,
         }}
       >
-        Sign out
+        {t("account.signOut")}
       </button>
     </form>
   );

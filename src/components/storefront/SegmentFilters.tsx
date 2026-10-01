@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useMemo, useTransition, useState, useOptimistic } from "react";
+import { useTranslations } from "next-intl";
 
 type Props = {
   segmentSlug: string;
@@ -14,22 +15,24 @@ type Props = {
   totalCount: number;
 };
 
+// Labels are message keys (filters.*), resolved per locale at render.
 const SORT_OPTIONS: { id: string; label: string }[] = [
-  { id: "featured",    label: "Featured" },
-  { id: "newest",      label: "Newest" },
-  { id: "price-asc",   label: "Price · low → high" },
-  { id: "price-desc",  label: "Price · high → low" },
-  { id: "rating",      label: "Most loved" },
+  { id: "featured",    label: "filters.featured" },
+  { id: "newest",      label: "filters.newest" },
+  { id: "price-asc",   label: "filters.priceAsc" },
+  { id: "price-desc",  label: "filters.priceDesc" },
+  { id: "rating",      label: "filters.rating" },
 ];
 
 const TAG_LABELS: Record<string, string> = {
-  new: "New",
-  sale: "On sale",
-  limited: "Limited",
-  "staff-pick": "Staff pick",
+  new: "filters.tagNew",
+  sale: "filters.tagSale",
+  limited: "filters.tagLimited",
+  "staff-pick": "filters.tagStaffPick",
 };
 
 export default function SegmentFilters(props: Props) {
+  const tr = useTranslations();
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -101,7 +104,7 @@ export default function SegmentFilters(props: Props) {
             <line x1="6" y1="10" x2="14" y2="10" />
             <line x1="8" y1="14" x2="12" y2="14" />
           </svg>
-          Filters{activeCount > 0 ? ` (${activeCount})` : ""}
+          {tr("filters.filters")}{activeCount > 0 ? ` (${activeCount})` : ""}
         </button>
 
         <label className="filter-sort-inline">
@@ -110,12 +113,12 @@ export default function SegmentFilters(props: Props) {
             onChange={(e) => updateParam("sort", e.target.value === "featured" ? null : e.target.value)}
             aria-busy={pending}
           >
-            {SORT_OPTIONS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+            {SORT_OPTIONS.map((s) => <option key={s.id} value={s.id}>{tr(s.label)}</option>)}
           </select>
         </label>
 
         <span className="filter-count-inline">
-          {props.shownCount} of {props.totalCount}{pending ? " …" : ""}
+          {tr("filters.shownOf", { shown: props.shownCount, total: props.totalCount })}{pending ? " …" : ""}
         </span>
       </div>
 
@@ -124,21 +127,21 @@ export default function SegmentFilters(props: Props) {
         <div className="filter-body-inner">
           {/* Sort — desktop only (mobile has inline select above) */}
           <label className="filter-group filter-sort-desktop">
-            <span className="filter-label">Sort</span>
+            <span className="filter-label">{tr("filters.sort")}</span>
             <select
               value={sortActive}
               onChange={(e) => updateParam("sort", e.target.value === "featured" ? null : e.target.value)}
               aria-busy={pending}
               className="filter-select"
             >
-              {SORT_OPTIONS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+              {SORT_OPTIONS.map((s) => <option key={s.id} value={s.id}>{tr(s.label)}</option>)}
             </select>
           </label>
 
           {/* Tag */}
           {props.availableTags.length > 0 && (
             <div className="filter-group">
-              <span className="filter-label">Tag</span>
+              <span className="filter-label">{tr("filters.tag")}</span>
               <div className="filter-chips">
                 {props.availableTags.map((t) => (
                   <button
@@ -148,7 +151,7 @@ export default function SegmentFilters(props: Props) {
                     onClick={() => updateParam("tag", tagActive === t ? null : t)}
                     className={"filter-pill " + (tagActive === t ? "active" : "")}
                   >
-                    {TAG_LABELS[t] ?? t}
+                    {TAG_LABELS[t] ? tr(TAG_LABELS[t]) : t}
                   </button>
                 ))}
               </div>
@@ -158,7 +161,7 @@ export default function SegmentFilters(props: Props) {
           {/* Price */}
           {props.priceMax > props.priceMin && (
             <div className="filter-group">
-              <span className="filter-label">Price</span>
+              <span className="filter-label">{tr("common.price")}</span>
               <div className="filter-price">
                 <input
                   type="number"
@@ -184,7 +187,7 @@ export default function SegmentFilters(props: Props) {
           {/* Colours */}
           {props.availableColors.length > 0 && (
             <div className="filter-group">
-              <span className="filter-label">Colour</span>
+              <span className="filter-label">{tr("common.colour")}</span>
               <div className="filter-chips">
                 {props.availableColors.map((c) => (
                   <button
@@ -204,7 +207,7 @@ export default function SegmentFilters(props: Props) {
           {/* Sizes */}
           {props.availableSizes.length > 0 && (
             <div className="filter-group">
-              <span className="filter-label">Size</span>
+              <span className="filter-label">{tr("common.size")}</span>
               <div className="filter-chips">
                 {props.availableSizes.map((s) => (
                   <button
@@ -224,7 +227,7 @@ export default function SegmentFilters(props: Props) {
 
           <div className="filter-footer">
             <span className="filter-count-desktop">
-              {props.shownCount} of {props.totalCount}{pending ? " …" : ""}
+              {tr("filters.shownOf", { shown: props.shownCount, total: props.totalCount })}{pending ? " …" : ""}
             </span>
             {hasAnyActive && (
               <button
@@ -234,7 +237,7 @@ export default function SegmentFilters(props: Props) {
                 className="btn btn-ghost btn-sm"
                 style={{ padding: "4px 10px", fontSize: 11 }}
               >
-                Clear all
+                {tr("filters.clearAll")}
               </button>
             )}
           </div>

@@ -38,37 +38,38 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// kicker / title / excerpt / season are message keys (journal.*).
 const ISSUES = [
   {
     issue: "I.",
-    kicker: "Atelier · Note",
-    title: "On the cutting of velvet at dusk, and the patience it asks of the hand",
-    excerpt: "The first cut is never the deepest. We learned this from an aunt — who learned it from her own — that velvet asks for the slow knife, the one that waits for the nap to settle before it commits.",
-    season: "Spring · MMXXVI",
+    kicker: "journal.i1Kicker",
+    title: "journal.i1Title",
+    excerpt: "journal.i1Excerpt",
+    season: "journal.season",
     href: "/shop/clothing" as const,
   },
   {
     issue: "II.",
-    kicker: "Garden · Dispatch",
-    title: "The iris will not open if you watch it too closely",
-    excerpt: "There is something instructive about a flower that refuses to perform on your schedule. The iris opens when it is ready — the arrangement adjusts, not the bloom.",
-    season: "Spring · MMXXVI",
+    kicker: "journal.i2Kicker",
+    title: "journal.i2Title",
+    excerpt: "journal.i2Excerpt",
+    season: "journal.season",
     href: "/shop/flowers" as const,
   },
   {
     issue: "III.",
-    kicker: "Horology · Aside",
-    title: "A watch that belongs to no one yet finds its owner in the turning of a crown",
-    excerpt: "The cabochon crown is the last thing a watchmaker touches. It is the hinge between mechanism and wearer — and it is, quietly, the part that introduces the two.",
-    season: "Spring · MMXXVI",
+    kicker: "journal.i3Kicker",
+    title: "journal.i3Title",
+    excerpt: "journal.i3Excerpt",
+    season: "journal.season",
     href: "/shop/watches" as const,
   },
   {
     issue: "IV.",
-    kicker: "Bibliophile · Letter",
-    title: "Notes on first editions and the particular smell of their commitment",
-    excerpt: "A first edition is not a book so much as a decision — someone chose to hold back a copy at the moment of highest uncertainty. That hesitation, that act of faith, is what you are really buying.",
-    season: "Spring · MMXXVI",
+    kicker: "journal.i4Kicker",
+    title: "journal.i4Title",
+    excerpt: "journal.i4Excerpt",
+    season: "journal.season",
     href: "/shop/books" as const,
   },
 ];
@@ -76,14 +77,15 @@ const ISSUES = [
 export default async function JournalPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations();
 
   return (
     <>
       <div className="ed-hero">
-        <div className="kicker">Notes from the Maison</div>
-        <h1>The Journal</h1>
+        <div className="kicker">{t("journal.kicker")}</div>
+        <h1>{t("journal.title")}</h1>
         <p className="ed-lede">
-          On cloth, scent, time, and the small ceremonies that make a life worth living.
+          {t("journal.lede")}
         </p>
       </div>
 
@@ -93,15 +95,15 @@ export default async function JournalPage({ params }: Props) {
         <div className="jnl-grid">
           {ISSUES.map((entry) => (
             <Link key={entry.issue} href={entry.href} className="jnl-entry">
-              <div className="jnl-entry-kicker">{entry.kicker}</div>
+              <div className="jnl-entry-kicker">{t(entry.kicker)}</div>
               <div className="jnl-issue" aria-hidden="true">{entry.issue}</div>
-              <h2>{entry.title}</h2>
-              <p className="jnl-excerpt">{entry.excerpt}</p>
-              <span className="jnl-meta">{entry.season}</span>
+              <h2>{t(entry.title)}</h2>
+              <p className="jnl-excerpt">{t(entry.excerpt)}</p>
+              <span className="jnl-meta">{t(entry.season)}</span>
             </Link>
           ))}
           <div className="jnl-future">
-            <p>Further notes are in the making.<br />The journal updates each season.</p>
+            <p>{t.rich("journal.future", { br: () => <br /> })}</p>
           </div>
         </div>
       </div>

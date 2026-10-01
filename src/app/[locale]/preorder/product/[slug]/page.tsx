@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { db, schema } from "@/lib/db";
 import { eq } from "drizzle-orm";
@@ -17,6 +17,7 @@ type Props = {
 export default async function ProductPreorderPage({ params }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations();
 
   const [product] = await db.select().from(schema.products)
     .where(eq(schema.products.slug, slug)).limit(1);
@@ -44,10 +45,10 @@ export default async function ProductPreorderPage({ params }: Props) {
   return (
     <>
       <div className="crumbs">
-        <Link href="/">Maison</Link>
+        <Link href="/">{t("nav.maison")}</Link>
         {seg && <Link href={`/shop/${seg.id}`}>{segName}</Link>}
         <Link href={`/product/${slug}`}>{name}</Link>
-        <span className="current">Preorder</span>
+        <span className="current">{t("preorderPage.crumb")}</span>
       </div>
       <section className="section" style={{ paddingTop: 28, maxWidth: 880 }}>
         <div className={"preorder-product-hd" + (photos[0] ? " has-photo" : "")} style={{ marginBottom: 36, paddingBottom: 24, borderBottom: "1px solid var(--line)" }}>
@@ -57,7 +58,7 @@ export default async function ProductPreorderPage({ params }: Props) {
           )}
           <div>
             <div style={{ fontSize: 11, letterSpacing: ".3em", color: "var(--gold-deep)", marginBottom: 8 }}>
-              PREORDER
+              {t("preorderPage.kicker")}
             </div>
             <h1 className="serif page-h1-sm" style={{ margin: "0 0 10px", color: "var(--purple-900)", fontWeight: 400, lineHeight: 1.05 }}>
               {name}
@@ -66,21 +67,20 @@ export default async function ProductPreorderPage({ params }: Props) {
               {formatBdt(displayPrice, locale as "en" | "bn")}
               {hasDifferentPrice && (
                 <span style={{ fontSize: 13, color: "var(--ink-soft)", marginLeft: 10, fontWeight: 400 }}>
-                  preorder price · regular {formatBdt(product.priceBdt, locale as "en" | "bn")}
+                  {t("preorderPage.priceNote", { price: formatBdt(product.priceBdt, locale as "en" | "bn") })}
                 </span>
               )}
             </div>
             {product.estimatedDelivery && (
               <div style={{ fontSize: 13, color: "var(--gold-deep)" }}>
-                Estimated delivery · {product.estimatedDelivery}
+                {t("preorder.estimatedDelivery", { when: product.estimatedDelivery })}
               </div>
             )}
           </div>
         </div>
 
         <p style={{ fontSize: 15, color: "var(--ink-soft)", lineHeight: 1.7, marginBottom: 32, maxWidth: 620 }}>
-          Fill in the details below and the maison will confirm your preorder by email within a day or two.
-          A prepayment via bKash will be arranged to secure the piece.
+          {t("preorderPage.intro")}
         </p>
 
         <ProductPreorderForm

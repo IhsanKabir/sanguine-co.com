@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 type Tier = {
   key: string;
   name: string;
@@ -7,7 +9,7 @@ type Tier = {
   color: string;
   min: number;
   max: number | null;
-  perks: string[];
+  perks: string[]; // message keys (loyalty.perks.*)
 };
 
 const TIERS: Tier[] = [
@@ -19,9 +21,9 @@ const TIERS: Tier[] = [
     min: 0,
     max: 9999,
     perks: [
-      "Free shipping over ৳5,000",
-      "Sanguine seasonal newsletter",
-      "Member-only sale access",
+      "loyalty.perks.freeShipping",
+      "loyalty.perks.newsletter",
+      "loyalty.perks.memberSale",
     ],
   },
   {
@@ -32,9 +34,9 @@ const TIERS: Tier[] = [
     min: 10000,
     max: 49999,
     perks: [
-      "All Maison Initié perks",
-      "Early access to new arrivals",
-      "5% birthday discount",
+      "loyalty.perks.allInitie",
+      "loyalty.perks.earlyAccess",
+      "loyalty.perks.birthday5",
     ],
   },
   {
@@ -45,10 +47,10 @@ const TIERS: Tier[] = [
     min: 50000,
     max: 149999,
     perks: [
-      "All Atelier Guest perks",
-      "Complimentary gift wrapping",
-      "Priority concierge",
-      "10% birthday discount",
+      "loyalty.perks.allAtelier",
+      "loyalty.perks.giftWrap",
+      "loyalty.perks.priority",
+      "loyalty.perks.birthday10",
     ],
   },
   {
@@ -59,11 +61,11 @@ const TIERS: Tier[] = [
     min: 150000,
     max: null,
     perks: [
-      "All Patron de Maison perks",
-      "Personal styling consultation",
-      "Exclusive pre-releases",
-      "15% birthday discount",
-      "Annual curated gift",
+      "loyalty.perks.allPatron",
+      "loyalty.perks.styling",
+      "loyalty.perks.preReleases",
+      "loyalty.perks.birthday15",
+      "loyalty.perks.annualGift",
     ],
   },
 ];
@@ -82,7 +84,8 @@ function getCurrentTier(spend: number): { current: Tier; currentIndex: number } 
   return { current: TIERS[0], currentIndex: 0 };
 }
 
-export default function LoyaltyCard({ lifetimeSpend, locale }: Props) {
+export default function LoyaltyCard({ lifetimeSpend }: Props) {
+  const t = useTranslations();
   const formatter = new Intl.NumberFormat("en-IN");
   const { current, currentIndex } = getCurrentTier(lifetimeSpend);
   const next = currentIndex < TIERS.length - 1 ? TIERS[currentIndex + 1] : null;
@@ -95,7 +98,7 @@ export default function LoyaltyCard({ lifetimeSpend, locale }: Props) {
   })();
 
   const remaining = next ? Math.max(0, next.min - lifetimeSpend) : 0;
-  const heading = locale === "bn" ? "Membership / Loyalty" : "Membership / Loyalty";
+  const heading = t("loyalty.heading");
 
   return (
     <section style={{ marginTop: 48, paddingTop: 40, borderTop: "1px solid var(--line)" }}>
@@ -160,7 +163,7 @@ export default function LoyaltyCard({ lifetimeSpend, locale }: Props) {
               marginBottom: 16,
             }}
           >
-            ৳{formatter.format(lifetimeSpend)} lifetime
+            {t("loyalty.lifetime", { amount: `৳${formatter.format(lifetimeSpend)}` })}
           </div>
 
           {next ? (
@@ -198,7 +201,7 @@ export default function LoyaltyCard({ lifetimeSpend, locale }: Props) {
                 }}
               >
                 <span>{progressPct}%</span>
-                <span>৳{formatter.format(remaining)} to {next.name}</span>
+                <span>{t("loyalty.toNext", { amount: `৳${formatter.format(remaining)}`, tier: next.name })}</span>
               </div>
             </>
           ) : (
@@ -212,7 +215,7 @@ export default function LoyaltyCard({ lifetimeSpend, locale }: Props) {
                 marginBottom: 18,
               }}
             >
-              ✦ Pinnacle of the Maison
+              {t("loyalty.pinnacle")}
             </div>
           )}
 
@@ -249,14 +252,14 @@ export default function LoyaltyCard({ lifetimeSpend, locale }: Props) {
                     transform: "translateY(-2px)",
                   }}
                 />
-                {perk}
+                {t(perk)}
               </li>
             ))}
           </ul>
         </div>
 
         {/* RIGHT: Tier ladder */}
-        <ol className="loyalty-tiers" aria-label="Tier ladder">
+        <ol className="loyalty-tiers" aria-label={t("loyalty.ladder")}>
           {TIERS.map((tier, i) => {
             const achieved = i <= currentIndex;
             const isCurrent = i === currentIndex;

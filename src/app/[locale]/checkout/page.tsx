@@ -60,7 +60,7 @@ export default async function CheckoutPage({ params }: Props) {
   return (
     <div className="section" style={{ maxWidth: 1200 }}>
       <div className="crumbs" style={{ padding: "0 0 24px", maxWidth: "none" }}>
-        <Link href="/">Maison</Link>
+        <Link href="/">{t("nav.maison")}</Link>
         <span className="current">{t("checkout.title")}</span>
       </div>
       <h1 className="serif page-h1" style={{ margin: "0 0 28px", color: "var(--purple-900)", fontWeight: 400 }}>

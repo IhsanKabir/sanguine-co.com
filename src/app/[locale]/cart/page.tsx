@@ -19,7 +19,7 @@ export default function CartPage() {
   const afterDiscount = Math.max(0, subtotalBdt - discount);
 
   if (!hydrated) {
-    return <section className="section"><p>Loading…</p></section>;
+    return <section className="section"><p>{t("common.loading")}</p></section>;
   }
 
   if (items.length === 0) {
@@ -37,7 +37,7 @@ export default function CartPage() {
     );
   }
 
-  const shippingNote = subtotalBdt >= FREE_THRESHOLD ? t("cart.shippingFree") : "calculated at checkout";
+  const shippingNote = subtotalBdt >= FREE_THRESHOLD ? t("cart.shippingFree") : t("cart.calculatedAtCheckout");
 
   return (
     <section className="section" style={{ maxWidth: 1100 }}>
@@ -56,9 +56,9 @@ export default function CartPage() {
                   <Link href={`/product/${i.slug}`} className="name">{i.name}</Link>
                   <div className="meta">{i.color || ""}{i.size ? ` · ${i.size}` : ""}</div>
                   <div className="qty qty-sm" style={{ marginTop: 10 }}>
-                    <button onClick={() => dec(k)} aria-label="Decrease">−</button>
+                    <button onClick={() => dec(k)} aria-label={t("common.decrease")}>−</button>
                     <span>{i.qty}</span>
-                    <button onClick={() => inc(k)} aria-label="Increase">+</button>
+                    <button onClick={() => inc(k)} aria-label={t("common.increase")}>+</button>
                   </div>
                   <div className="rm" onClick={() => remove(k)} role="button" tabIndex={0}>{t("cart.remove")}</div>
                 </div>
@@ -68,13 +68,13 @@ export default function CartPage() {
           })}
         </div>
         <div className="panel cart-panel">
-          <h3>Order Summary</h3>
+          <h3>{t("cart.orderSummary")}</h3>
           <CouponInput />
           <div className="totals" style={{ marginTop: 16 }}>
             <div className="r"><span>{t("cart.subtotal")}</span><span>{formatBdt(subtotalBdt, locale)}</span></div>
             {discount > 0 && (
               <div className="r" style={{ color: "oklch(0.45 0.14 145)" }}>
-                <span>Discount · {coupon?.code}</span>
+                <span>{t("cart.discountLine", { code: coupon?.code ?? "" })}</span>
                 <span>− {formatBdt(discount, locale)}</span>
               </div>
             )}

@@ -79,7 +79,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
       )}
       {colors.length > 0 && (
         <>
-          <div className="pdp-label">Option — {color}</div>
+          <div className="pdp-label">{t("pdp.optionLabel", { value: color })}</div>
           <div className="swatch-row">
             {colors.map((c) => (
               <div
@@ -98,7 +98,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
       )}
       {sizes.length > 0 && (
         <>
-          <div className="pdp-label">Size — {size}</div>
+          <div className="pdp-label">{t("pdp.sizeLabel", { value: size })}</div>
           <div className="swatch-row">
             {sizes.map((s) => (
               <div
@@ -115,16 +115,16 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
           </div>
         </>
       )}
-      <div className="pdp-label">Quantity</div>
+      <div className="pdp-label">{t("common.quantity")}</div>
       <div className="qty">
-        <button onClick={() => setQty(Math.max(1, qty - 1))} aria-label="Decrease">−</button>
+        <button onClick={() => setQty(Math.max(1, qty - 1))} aria-label={t("common.decrease")}>−</button>
         <span aria-live="polite">{qty}</span>
-        <button onClick={() => setQty(qty + 1)} aria-label="Increase">+</button>
+        <button onClick={() => setQty(qty + 1)} aria-label={t("common.increase")}>+</button>
       </div>
       <div className="pdp-actions" ref={actionsRef}>
         <button ref={btnRef} className="btn btn-primary btn-block" onClick={doAdd}>
           <Icon name={added ? "check" : "bag"} size={14} />
-          {added ? "Added" : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
+          {added ? t("pdp.added") : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
         </button>
       </div>
 
@@ -139,7 +139,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
           tabIndex={stickyVisible ? 0 : -1}
         >
           <Icon name={added ? "check" : "bag"} size={14} />
-          {added ? "Added" : formatBdt(product.priceBdt * qty, locale)}
+          {added ? t("pdp.added") : formatBdt(product.priceBdt * qty, locale)}
         </button>
       </div>
     </>

@@ -79,7 +79,7 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
               sku={p.sku}
               name={p.name}
               tag={p.tag}
-              ribbon={p.tag === "new" ? "New" : null}
+              ribbon={p.tag === "new" ? t("pdp.newRibbon") : null}
               sale={p.tag === "sale"}
               style={{ aspectRatio: "3/4" }}
             />

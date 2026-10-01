@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 const DISMISS_KEY = "ssg-announcement-dismissed-v1";
 
@@ -43,6 +44,7 @@ export default function AnnouncementBar({
   // effect runs we render exactly the server verdict (no flash, markup
   // matches the SSG HTML); after it runs, the client's own window +
   // dismissal evaluation is authoritative.
+  const t = useTranslations();
   const [clientVerdict, setClientVerdict] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -80,7 +82,7 @@ export default function AnnouncementBar({
         <button
           type="button"
           className="topbar-dismiss"
-          aria-label="Dismiss announcement"
+          aria-label={t("topbar.dismiss")}
           onClick={dismiss}
           onKeyDown={(e) => {
             // Escape on the focused control mirrors the plan's a11y spec; a

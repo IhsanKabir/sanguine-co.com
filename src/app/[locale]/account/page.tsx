@@ -1,4 +1,4 @@
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth-utils";
 import { db, schema } from "@/lib/db";
@@ -49,6 +49,7 @@ function monogram(name: string | null | undefined, email: string): string {
 export default async function AccountPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations();
   const user = await requireUser();
   const loc = locale as "en" | "bn";
 
@@ -116,7 +117,7 @@ export default async function AccountPage({ params }: Props) {
   const memberYear = user.created_at
     ? new Date(user.created_at).getFullYear()
     : new Date().getFullYear();
-  const displayName = profile?.fullName || user.email || "Guest";
+  const displayName = profile?.fullName || user.email || t("accountPage.guest");
   const tier = getTierName(lifetimeSpend);
 
   // Ensure referral code exists (generates + saves on first visit)
@@ -163,7 +164,7 @@ export default async function AccountPage({ params }: Props) {
                 {tier.name}
               </span>
               <span style={{ fontSize: 11, color: "var(--purple-400)", fontFamily: "var(--mono)" }}>
-                since {memberYear}
+                {t("accountPage.since", { year: memberYear })}
               </span>
             </div>
           </div>
@@ -175,10 +176,10 @@ export default async function AccountPage({ params }: Props) {
       {/* ─── Stats strip ────────────────────────────────────────────────── */}
       <div className="acct-stats">
         {[
-          { k: "Orders placed",   v: String(orders.length) },
-          { k: "Lifetime spend",  v: lifetimeSpend > 0 ? formatBdt(lifetimeSpend, loc) : "—" },
-          { k: "Loyalty tier",    v: tier.name },
-          { k: "Wishlist",        v: wishlistCount > 0 ? `${wishlistCount} piece${wishlistCount !== 1 ? "s" : ""}` : "Empty" },
+          { k: t("accountPage.ordersPlaced"),  v: String(orders.length) },
+          { k: t("accountPage.lifetimeSpend"), v: lifetimeSpend > 0 ? formatBdt(lifetimeSpend, loc) : "—" },
+          { k: t("accountPage.loyaltyTier"),   v: tier.name },
+          { k: t("accountPage.wishlist"),      v: wishlistCount > 0 ? t("accountPage.wishlistCount", { count: wishlistCount }) : t("accountPage.empty") },
         ].map(({ k, v }) => (
           <div key={k} style={{ background: "var(--cream)", padding: "22px 28px" }}>
             <div style={{
@@ -202,9 +203,9 @@ export default async function AccountPage({ params }: Props) {
             <div style={{
               fontSize: 10, letterSpacing: ".18em", color: "var(--gold-text)",
               textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 4,
-            }}>Order history</div>
+            }}>{t("accountPage.orderHistory")}</div>
             <h2 className="serif" style={{ fontSize: 28, color: "var(--purple-900)", fontWeight: 500, margin: 0 }}>
-              Orders
+              {t("accountPage.orders")}
             </h2>
           </div>
           <Link
@@ -214,7 +215,7 @@ export default async function AccountPage({ params }: Props) {
               color: "var(--purple-800)", borderBottom: "1px solid var(--gold)", paddingBottom: 2,
             }}
           >
-            View wishlist →
+            {t("accountPage.viewWishlist")}
           </Link>
         </div>
 
@@ -237,10 +238,10 @@ export default async function AccountPage({ params }: Props) {
       {preorders.length > 0 && (
         <section style={{ marginTop: 28 }}>
           <h2 className="serif" style={{ fontSize: 22, fontWeight: 500, color: "var(--purple-900)", margin: "0 0 4px" }}>
-            Preorder requests
+            {t("accountPage.preorders")}
           </h2>
           <p style={{ fontSize: 13, color: "var(--ink-soft)", margin: "0 0 14px" }}>
-            When the atelier quotes your piece, the price and deposit appear here (and by email).
+            {t("accountPage.preordersNote")}
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {preorders.map((r) => {
@@ -250,13 +251,7 @@ export default async function AccountPage({ params }: Props) {
                 : r.status === "rejected" ? "pill-err"
                 : "pill-warn";
               const label =
-                r.status === "new" ? "Received"
-                : r.status === "reviewing" ? "In review"
-                : r.status === "quoted" ? "Quoted"
-                : r.status === "confirmed" ? "Confirmed"
-                : r.status === "converted" ? "Ordered"
-                : r.status === "rejected" ? "Declined"
-                : r.status;
+                t.has(`preorderStatus.${r.status}`) ? t(`preorderStatus.${r.status}`) : r.status;
               return (
                 <div key={r.id} style={{ border: "1px solid var(--line)", background: "white", padding: "14px 18px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
                   <span className={`pill ${pill}`}>{label}</span>
@@ -265,7 +260,7 @@ export default async function AccountPage({ params }: Props) {
                       {r.description.length > 90 ? r.description.slice(0, 90) + "…" : r.description}
                     </div>
                     <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 2 }}>
-                      Qty {r.quantity} · {r.createdAt ? new Date(r.createdAt).toLocaleDateString(loc === "bn" ? "bn-BD" : "en-GB", { day: "numeric", month: "short", year: "numeric" }) : ""}
+                      {t("accountPage.qty", { qty: r.quantity })} · {r.createdAt ? new Date(r.createdAt).toLocaleDateString(loc === "bn" ? "bn-BD" : "en-GB", { day: "numeric", month: "short", year: "numeric" }) : ""}
                     </div>
                   </div>
                   {r.quotedPriceBdt ? (
@@ -275,12 +270,12 @@ export default async function AccountPage({ params }: Props) {
                       </div>
                       {r.depositBdt ? (
                         <div style={{ fontSize: 11, color: "var(--gold-deep)" }}>
-                          Deposit to confirm · {formatBdt(r.depositBdt, loc)}
+                          {t("accountPage.depositToConfirm", { amount: formatBdt(r.depositBdt, loc) })}
                         </div>
                       ) : null}
                     </div>
                   ) : (
-                    <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>Awaiting quote</div>
+                    <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>{t("accountPage.awaitingQuote")}</div>
                   )}
                 </div>
               );
@@ -332,10 +327,10 @@ export default async function AccountPage({ params }: Props) {
       <div style={{ marginTop: 56, paddingTop: 40, borderTop: "1px solid var(--line)" }}>
         <div style={{ marginBottom: 24 }}>
           <div style={{ fontSize: 10, letterSpacing: ".18em", color: "var(--gold-text)", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 4 }}>
-            Your browsing
+            {t("accountPage.yourBrowsing")}
           </div>
           <h2 className="serif" style={{ fontSize: 28, color: "var(--purple-900)", fontWeight: 500, margin: 0 }}>
-            Recently Viewed
+            {t("accountPage.recentlyViewed")}
           </h2>
         </div>
         <RecentlyViewedStrip />

@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { submitReview } from "@/lib/actions/reviews";
 
 type Review = {
@@ -24,28 +25,32 @@ type Props = {
   signInHref: string;
 };
 
-const Stars = ({ n }: { n: number }) => (
-  <span aria-label={`${n} of 5 stars`} style={{ letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
+const Stars = ({ n }: { n: number }) => {
+  const t = useTranslations();
+  return (
+  <span aria-label={t("reviews.starsOf5", { n })} style={{ letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
     {"★★★★★".slice(0, n)}
     <span style={{ color: "var(--line)" }}>{"★★★★★".slice(0, 5 - n)}</span>
   </span>
-);
+  );
+};
 
 export default function ReviewsSection({ productId, reviews, canWrite, signedInButIneligible, signInHref }: Props) {
+  const t = useTranslations();
   const [showForm, setShowForm] = useState(false);
 
   return (
     <section style={{ marginTop: 56, paddingTop: 32, borderTop: "1px solid var(--line)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 11, letterSpacing: ".3em", color: "var(--gold-deep)" }}>NOTES FROM CUSTOMERS</div>
+          <div style={{ fontSize: 11, letterSpacing: ".3em", color: "var(--gold-deep)" }}>{t("reviews.kicker")}</div>
           <h2 className="serif" style={{ fontSize: 32, margin: "8px 0 0", color: "var(--purple-900)", fontWeight: 400 }}>
-            {reviews.length === 0 ? "Be the first to write a note." : `${reviews.length} note${reviews.length === 1 ? "" : "s"}.`}
+            {reviews.length === 0 ? t("reviews.beFirst") : t("reviews.count", { count: reviews.length })}
           </h2>
         </div>
         {canWrite && !showForm && (
           <button className="btn btn-ghost btn-sm" onClick={() => setShowForm(true)}>
-            Write a note
+            {t("reviews.write")}
           </button>
         )}
       </div>
@@ -56,8 +61,8 @@ export default function ReviewsSection({ productId, reviews, canWrite, signedInB
 
       {!canWrite && !signedInButIneligible && (
         <p style={{ fontSize: 13, color: "var(--ink-soft)", margin: "0 0 24px" }}>
-          Reviews are written by customers who have received the piece.{" "}
-          <a href={signInHref} style={{ color: "var(--purple-900)" }}>Sign in</a> if you have an order with us.
+          {t("reviews.whoCanWrite")}{" "}
+          {t.rich("reviews.signInPrompt", { a: (chunks) => <a href={signInHref} style={{ color: "var(--purple-900)" }}>{chunks}</a> })}
         </p>
       )}
 
@@ -68,7 +73,7 @@ export default function ReviewsSection({ productId, reviews, canWrite, signedInB
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                 <Stars n={r.rating} />
                 <time style={{ fontSize: 11, color: "var(--ink-soft)", fontFamily: "var(--mono)" }}>
-                  {new Date(r.createdAt).toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" })}
+                  {new Date(r.createdAt).toLocaleDateString(t("common.dateLocale"), { year: "numeric", month: "short", day: "numeric" })}
                 </time>
               </div>
               {r.title && (
@@ -88,7 +93,7 @@ export default function ReviewsSection({ productId, reviews, canWrite, signedInB
                       style={{ display: "block", width: 72, height: 72, flexShrink: 0, overflow: "hidden", border: "1px solid var(--line)", borderRadius: 2 }}>
                       <Image
                         src={url}
-                        alt={`Customer photo ${i + 1}`}
+                        alt={t("reviews.photoAlt", { n: i + 1 })}
                         width={72}
                         height={72}
                         style={{ objectFit: "cover", width: "100%", height: "100%" }}
@@ -106,6 +111,7 @@ export default function ReviewsSection({ productId, reviews, canWrite, signedInB
 }
 
 function ReviewForm({ productId, onClose }: { productId: string; onClose: () => void }) {
+  const t = useTranslations();
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -131,12 +137,12 @@ function ReviewForm({ productId, onClose }: { productId: string; onClose: () => 
   if (done) {
     return (
       <div style={{ padding: 20, marginBottom: 24, background: "#f9f4ec", border: "1px solid var(--gold-deep)" }}>
-        <h3 className="serif" style={{ fontSize: 22, color: "var(--purple-900)", margin: 0 }}>Received with thanks.</h3>
+        <h3 className="serif" style={{ fontSize: 22, color: "var(--purple-900)", margin: 0 }}>{t("reviews.thanksTitle")}</h3>
         <p style={{ fontSize: 14, color: "var(--ink-soft)", margin: "8px 0 0", lineHeight: 1.6 }}>
-          The maison reads every note. Once approved it will appear here for other customers.
+          {t("reviews.thanksBody")}
         </p>
         <div style={{ marginTop: 12 }}>
-          <button className="btn btn-ghost btn-sm" onClick={onClose}>Close</button>
+          <button className="btn btn-ghost btn-sm" onClick={onClose}>{t("common.close")}</button>
         </div>
       </div>
     );
@@ -145,18 +151,18 @@ function ReviewForm({ productId, onClose }: { productId: string; onClose: () => 
   return (
     <form onSubmit={onSubmit} style={{ marginBottom: 24, padding: 20, background: "#fcfaf6", border: "1px solid var(--line)" }}>
       <h3 className="serif" style={{ fontSize: 20, margin: "0 0 12px", color: "var(--purple-900)", fontWeight: 500 }}>
-        Write a note about this piece
+        {t("reviews.formTitle")}
       </h3>
 
       <div className="field">
-        <label>Your rating</label>
+        <label>{t("reviews.yourRating")}</label>
         <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
           {[1, 2, 3, 4, 5].map((n) => (
             <button
               key={n}
               type="button"
               onClick={() => setRating(n)}
-              aria-label={`${n} star${n > 1 ? "s" : ""}`}
+              aria-label={t("reviews.starButton", { n })}
               style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: 24, color: n <= rating ? "var(--gold-deep)" : "var(--line)", padding: 0 }}
             >
               ★
@@ -166,12 +172,12 @@ function ReviewForm({ productId, onClose }: { productId: string; onClose: () => 
       </div>
 
       <div className="field" style={{ marginTop: 12 }}>
-        <label>Title (optional)</label>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} placeholder="A line that captures it" />
+        <label>{t("reviews.titleLabel")}</label>
+        <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} placeholder={t("reviews.titlePlaceholder")} />
       </div>
 
       <div className="field" style={{ marginTop: 12 }}>
-        <label>Your note</label>
+        <label>{t("reviews.bodyLabel")}</label>
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
@@ -179,7 +185,7 @@ function ReviewForm({ productId, onClose }: { productId: string; onClose: () => 
           minLength={10}
           maxLength={2000}
           rows={5}
-          placeholder="Tell us about the fit, the feel, the way it arrives. Specifics help."
+          placeholder={t("reviews.bodyPlaceholder")}
           style={{ width: "100%", padding: 10, fontFamily: "inherit", fontSize: 14, lineHeight: 1.6, border: "1px solid var(--line)", background: "white", resize: "vertical" }}
         />
         <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4 }}>{body.length} / 2000</div>
@@ -189,14 +195,14 @@ function ReviewForm({ productId, onClose }: { productId: string; onClose: () => 
 
       <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
         <button type="submit" className="btn btn-primary btn-sm" disabled={pending}>
-          {pending ? "Sending…" : "Submit note"}
+          {pending ? t("reviews.sending") : t("reviews.submit")}
         </button>
         <button type="button" className="btn btn-ghost btn-sm" onClick={onClose} disabled={pending}>
-          Cancel
+          {t("common.cancel")}
         </button>
       </div>
       <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 12 }}>
-        Notes are reviewed by the maison before they appear publicly. We do not edit content; we only decline notes that are abusive or off-topic.
+        {t("reviews.moderation")}
       </p>
     </form>
   );

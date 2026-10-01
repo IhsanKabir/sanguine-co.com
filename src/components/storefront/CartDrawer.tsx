@@ -52,7 +52,7 @@ export default function CartDrawer() {
       <aside className="drawer" role="dialog" aria-label={t("cart.title")}>
         <div className="drawer-hd">
           <h3>{t("cart.title")} · {items.length}</h3>
-          <button className="icon-btn" onClick={closeDrawer} aria-label="Close">
+          <button className="icon-btn" onClick={closeDrawer} aria-label={t("common.close")}>
             <Icon name="x" />
           </button>
         </div>
@@ -70,8 +70,8 @@ export default function CartDrawer() {
                 <div className="top">
                   <span>
                     {met
-                      ? "Complimentary delivery — unlocked"
-                      : `${formatBdt(remaining, locale)} to free delivery`}
+                      ? t("cart.freeUnlocked")
+                      : t("cart.toFree", { amount: formatBdt(remaining, locale) })}
                   </span>
                   <b>{formatBdt(subtotalBdt, locale)} / {formatBdt(FREE_THRESHOLD, locale)}</b>
                 </div>
@@ -91,15 +91,15 @@ export default function CartDrawer() {
                       <div className="meta">{i.color || ""}{i.size ? ` · ${i.size}` : ""}</div>
                       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10 }}>
                         <div className="qty qty-sm">
-                          <button onClick={() => dec(k)} aria-label="Decrease">−</button>
+                          <button onClick={() => dec(k)} aria-label={t("common.decrease")}>−</button>
                           <span>{i.qty}</span>
-                          <button onClick={() => inc(k)} aria-label="Increase">+</button>
+                          <button onClick={() => inc(k)} aria-label={t("common.increase")}>+</button>
                         </div>
                       </div>
                       <div style={{ display: "flex", gap: 12, marginTop: 6 }}>
                         <div className="rm" onClick={() => animateAway(k, remove)} role="button" tabIndex={0}>{t("cart.remove")}</div>
                         <div className="rm" onClick={() => animateAway(k, saveForLater)} role="button" tabIndex={0} style={{ color: "var(--purple-700)" }}>
-                          Save for later
+                          {t("cart.saveForLater")}
                         </div>
                       </div>
                     </div>
@@ -113,7 +113,7 @@ export default function CartDrawer() {
           {saved.length > 0 && (
             <div style={{ marginTop: 24, paddingTop: 16, borderTop: "1px solid var(--line)" }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".15em", color: "var(--ink-soft)", textTransform: "uppercase", marginBottom: 10 }}>
-                Saved for later · {saved.length}
+                {t("cart.savedForLater", { count: saved.length })}
               </div>
               {saved.map((i) => {
                 const k = itemKey(i);
@@ -126,9 +126,9 @@ export default function CartDrawer() {
                       <div className="meta">{i.color || ""}{i.size ? ` · ${i.size}` : ""}</div>
                       <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
                         <div className="rm" onClick={() => animateAway(k, moveToCart)} role="button" tabIndex={0} style={{ color: "var(--purple-900)" }}>
-                          Move to bag
+                          {t("cart.moveToBag")}
                         </div>
-                        <div className="rm" onClick={() => animateAway(k, removeSaved)} role="button" tabIndex={0}>Remove</div>
+                        <div className="rm" onClick={() => animateAway(k, removeSaved)} role="button" tabIndex={0}>{t("cart.remove")}</div>
                       </div>
                     </div>
                     <div className="price" style={{ color: "var(--ink-soft)" }}>{formatBdt(i.priceBdt, locale)}</div>
@@ -151,14 +151,14 @@ export default function CartDrawer() {
               </div>
               {discount > 0 && (
                 <div className="r" style={{ color: "oklch(0.45 0.14 145)" }}>
-                  <span>Discount · {coupon?.code}</span>
+                  <span>{t("cart.discountLine", { code: coupon?.code ?? "" })}</span>
                   <span>− {formatBdt(discount, locale)}</span>
                 </div>
               )}
               <div className="r">
                 <span>{t("cart.shipping")}</span>
                 <span>
-                  {coupon?.freeShipping ? t("cart.shippingFree") : (met ? t("cart.shippingFree") : "calculated at checkout")}
+                  {coupon?.freeShipping ? t("cart.shippingFree") : (met ? t("cart.shippingFree") : t("cart.calculatedAtCheckout"))}
                 </span>
               </div>
               <div className="r grand">

@@ -33,7 +33,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const photos = await getProductImages(p.id).catch(() => []);
   const isBn = locale === "bn";
   const name = (isBn && p.nameBn) || p.name;
-  const description = (isBn && p.descriptionBn) || p.description || "A piece from the maison.";
+  const tm = await getTranslations({ locale });
+  const description = (isBn && p.descriptionBn) || p.description || tm("pdp.descriptionFallback");
   const url = `${BASE}/${locale}/product/${slug}`;
   // Branded 1200×630 card from /api/og — it overlays the first product photo
   // when one exists and falls back to the maison card when none does, so
@@ -204,7 +205,7 @@ export default async function ProductPage({ params }: Props) {
   };
 
   const crumbItems: Record<string, unknown>[] = [
-    { "@type": "ListItem", position: 1, name: "Maison", item: `${BASE}/${locale}` },
+    { "@type": "ListItem", position: 1, name: t("nav.maison"), item: `${BASE}/${locale}` },
   ];
   if (seg) {
     crumbItems.push({ "@type": "ListItem", position: 2, name: segName, item: `${BASE}/${locale}/shop/${seg.id}` });
@@ -231,7 +232,7 @@ export default async function ProductPage({ params }: Props) {
       <RecentlyViewedTracker productId={p.id} />
       <ProductViewTracker productId={p.id} path={`/product/${p.slug}`} />
       <div className="crumbs">
-        <Link href="/">Maison</Link>
+        <Link href="/">{t("nav.maison")}</Link>
         {seg && (
           <Link href={`/shop/${seg.id}`}>
             {segName}
@@ -263,7 +264,7 @@ export default async function ProductPage({ params }: Props) {
             </div>
           )}
           {velocity > 10 && (
-            <div className="pdp-velocity">{velocity}+ ordered in the past 30 days</div>
+            <div className="pdp-velocity">{t("pdp.velocity", { count: velocity })}</div>
           )}
           <div className="pdp-price">
             {display.kind === "quote" ? (
@@ -278,7 +279,7 @@ export default async function ProductPage({ params }: Props) {
               <>
                 <span className="was">{formatBdt(p.wasBdt, locale as "en" | "bn")}</span>
                 <span className="save">
-                  Save {Math.round((1 - display.amountBdt / p.wasBdt) * 100)}%
+                  {t("pdp.save", { pct: Math.round((1 - display.amountBdt / p.wasBdt) * 100) })}
                 </span>
               </>
             )}
@@ -345,7 +346,7 @@ export default async function ProductPage({ params }: Props) {
           {!p.preorderOnly && p.stock > 0 && p.stock <= 5 && (
             <div className="pdp-scarcity">
               <span className="pdp-scarcity__dot" />
-              Only {p.stock} left — order soon
+              {t("pdp.scarcity", { count: p.stock })}
             </div>
           )}
           {!p.preorderOnly && p.stock > 5 && p.stock < 10 && (
@@ -354,35 +355,35 @@ export default async function ProductPage({ params }: Props) {
             </div>
           )}
           {!p.preorderOnly && p.stock === 0 && !p.preorderEnabled && (
-            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>Currently out of stock</div>
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>{t("pdp.outOfStock")}</div>
           )}
           {!p.preorderOnly && p.stock === 0 && p.preorderEnabled && (
-            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>Out of stock — preorder available</div>
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>{t("pdp.outOfStockPreorder")}</div>
           )}
           {p.preorderOnly && (
-            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>Available by preorder only</div>
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>{t("pdp.preorderOnly")}</div>
           )}
 
           {/* Shipping estimate */}
           <div className="pdp-shipping-note">
             <Icon name="arrow" size={13} />
-            Free delivery on orders over ৳5,000 · Standard ৳80–150
+            {t("pdp.shippingNote")}
           </div>
 
           <div className="pdp-feats">
-            <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{returnDays}-day returns</b> We arrange the courier pickup within {returnDays} days of delivery</div></div>
+            <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.returnsTitle", { days: returnDays })}</b> {t("pdp.returnsNote", { days: returnDays })}</div></div>
             <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.codTitle")}</b>{t("pdp.codNote")}</div></div>
             <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.authentic")}</b>{t("pdp.authenticNote")}</div></div>
             <div className="pdp-feat"><Icon name="feather" size={18} /><div><b>{t("pdp.giftService")}</b>{t("pdp.giftServiceNote")}</div></div>
           </div>
           {process.env.NEXT_PUBLIC_WHATSAPP_NUMBER && (
             <a
-              href={`https://wa.me/${normalizeBdWhatsApp(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "")}?text=${encodeURIComponent(`Hello, I'm interested in ${name} — ${BASE}/${locale}/product/${p.slug}`)}`}
+              href={`https://wa.me/${normalizeBdWhatsApp(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "")}?text=${encodeURIComponent(t("pdp.whatsappText", { name, url: `${BASE}/${locale}/product/${p.slug}` }))}`}
               style={{ display: "inline-block", fontSize: 12, color: "var(--ink-soft)", marginTop: 14, textDecoration: "none" }}
               target="_blank"
               rel="noopener noreferrer"
             >
-              Questions about this piece? Chat on WhatsApp →
+              {t("pdp.whatsappLink")}
             </a>
           )}
         </div>
@@ -399,8 +400,8 @@ export default async function ProductPage({ params }: Props) {
         <section className="section">
           <div className="section-hd">
             <div>
-              <div className="kicker">STYLE IT WITH</div>
-              <h2>Complete the look</h2>
+              <div className="kicker">{t("pdp.styleKicker")}</div>
+              <h2>{t("pdp.completeLook")}</h2>
             </div>
           </div>
           <div className="grid grid-4">

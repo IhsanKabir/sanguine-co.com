@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { usePathname } from "next/navigation";
 import Icon from "./Icon";
@@ -9,6 +10,7 @@ import LocaleSwitcher from "./LocaleSwitcher";
 type Segment = { id: string; name: string };
 
 export default function MobileMenuButton({ segments }: { segments: Segment[] }) {
+  const t = useTranslations();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -24,7 +26,7 @@ export default function MobileMenuButton({ segments }: { segments: Segment[] }) 
       <button
         className="nav-menu-btn icon-btn"
         onClick={() => setOpen(true)}
-        aria-label="Open navigation menu"
+        aria-label={t("nav.openMenu")}
         aria-expanded={open}
         aria-controls="mobile-nav"
       >
@@ -44,20 +46,20 @@ export default function MobileMenuButton({ segments }: { segments: Segment[] }) 
         className={`mobile-drawer${open ? " open" : ""}`}
         role="dialog"
         aria-modal="true"
-        aria-label="Site navigation"
+        aria-label={t("nav.siteNavigation")}
       >
         <div className="mobile-drawer-hd">
-          <span className="mobile-drawer-brand">Sanguine</span>
+          <span className="mobile-drawer-brand">{t("brand.name")}</span>
           <button
             className="icon-btn"
             onClick={() => setOpen(false)}
-            aria-label="Close navigation menu"
+            aria-label={t("nav.closeMenu")}
           >
             <Icon name="close" size={20} />
           </button>
         </div>
 
-        <nav className="mobile-drawer-nav" aria-label="Categories">
+        <nav className="mobile-drawer-nav" aria-label={t("nav.categories")}>
           {segments.map((s) => (
             <Link key={s.id} href={`/shop/${s.id}`} className="mobile-nav-link">
               {s.name}
@@ -65,17 +67,17 @@ export default function MobileMenuButton({ segments }: { segments: Segment[] }) 
           ))}
           {segments.length === 0 && (
             <span className="mobile-nav-link" style={{ color: "var(--ink-soft)", pointerEvents: "none" }}>
-              No categories yet
+              {t("nav.noCategories")}
             </span>
           )}
         </nav>
 
         <div className="mobile-drawer-links">
           <Link href="/account" className="mobile-nav-link mobile-nav-secondary">
-            <Icon name="user" size={16} /> Account
+            <Icon name="user" size={16} /> {t("nav.account")}
           </Link>
           <Link href="/wishlist" className="mobile-nav-link mobile-nav-secondary">
-            <Icon name="heart" size={16} /> Wishlist
+            <Icon name="heart" size={16} /> {t("nav.wishlist")}
           </Link>
         </div>
 

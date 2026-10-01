@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Composition from "./Composition";
 import { usePdpState } from "./PdpStateContext";
@@ -21,6 +22,7 @@ type Props = {
 };
 
 export default function PdpGallery({ photos, fallback, activeIndex, onIndexChange }: Props) {
+  const t = useTranslations();
   const { activePhotoIndex, setActivePhotoIndex } = usePdpState();
   const [imgKey, setImgKey] = useState(0);
   // Swapping photos remounts the Image (for the fade), which blanks the frame
@@ -76,7 +78,7 @@ export default function PdpGallery({ photos, fallback, activeIndex, onIndexChang
                 type="button"
                 onClick={() => setActive(i)}
                 className={"pdp-thumb " + (i === active ? "active" : "")}
-                aria-label={`View photo ${i + 1}`}
+                aria-label={t("pdp.viewPhoto", { n: i + 1 })}
                 style={{ padding: 0, border: "none", cursor: "pointer", background: "transparent" }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -119,7 +121,7 @@ export default function PdpGallery({ photos, fallback, activeIndex, onIndexChang
             sku={fallback.sku}
             name={fallback.name}
             tag={fallback.tag}
-            ribbon={fallback.tag === "new" ? "New" : null}
+            ribbon={fallback.tag === "new" ? t("pdp.newRibbon") : null}
             sale={fallback.tag === "sale"}
           />
         )}

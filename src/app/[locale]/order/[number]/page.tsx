@@ -57,7 +57,7 @@ export default async function OrderConfirmation({ params, searchParams }: Props)
         {t("checkout.orderId")} <b style={{ color: "var(--purple-900)" }}>{order.number}</b>. {t("checkout.haveCash")}
       </p>
       <div className="divider-ornament">
-        <span className="mono" style={{ fontSize: 10, letterSpacing: ".3em", color: "var(--gold-deep)" }}>CEREMONY COMPLETE</span>
+        <span className="mono" style={{ fontSize: 10, letterSpacing: ".3em", color: "var(--gold-deep)" }}>{t("order.ceremonyComplete")}</span>
       </div>
       <div className="order-confirm-stats">
         <div>
@@ -65,17 +65,17 @@ export default async function OrderConfirmation({ params, searchParams }: Props)
           <div className="serif" style={{ fontSize: 24, color: "var(--purple-900)" }}>{formatBdt(order.totalBdt, locale as "en"|"bn")}</div>
         </div>
         <div>
-          <div className="pdp-label">Items</div>
+          <div className="pdp-label">{t("order.items")}</div>
           <div className="serif" style={{ fontSize: 24, color: "var(--purple-900)" }}>{lines.length}</div>
         </div>
         <div>
-          <div className="pdp-label">Method</div>
-          <div className="serif" style={{ fontSize: 24, color: "var(--purple-900)" }}>COD</div>
+          <div className="pdp-label">{t("order.method")}</div>
+          <div className="serif" style={{ fontSize: 24, color: "var(--purple-900)" }}>{t("order.methodCod")}</div>
         </div>
       </div>
       {(addr.fullName || addr.line1 || addr.city) && (
         <div style={{ textAlign: "left", maxWidth: 460, margin: "0 auto 32px", padding: "20px 24px", background: "var(--purple-50)", border: "1px solid var(--purple-200)" }}>
-          <div className="pdp-label">Delivering to</div>
+          <div className="pdp-label">{t("order.deliveringTo")}</div>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "var(--purple-900)" }}>
             {addr.fullName ?? "—"}<br/>{addr.line1 ?? ""}<br/>{addr.area ? addr.area + ", " : ""}{addr.city ?? ""}{addr.postcode ? " — " + addr.postcode : ""}<br/>{addr.phone ?? ""}
           </p>

@@ -3,7 +3,7 @@
 import { Suspense, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter, usePathname, routing, type Locale } from "@/i18n/routing";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 function LocaleSwitcherInner() {
   const router = useRouter();
@@ -13,6 +13,7 @@ function LocaleSwitcherInner() {
   // shop filters / search context reset.
   const searchParams = useSearchParams();
   const current = useLocale() as Locale;
+  const t = useTranslations();
   const [isPending, startTransition] = useTransition();
 
   const switchTo = (next: Locale) => {
@@ -23,7 +24,7 @@ function LocaleSwitcherInner() {
   };
 
   return (
-    <div className="locale-switch" role="group" aria-label="Language">
+    <div className="locale-switch" role="group" aria-label={t("common.language")}>
       {routing.locales.map((loc) => (
         <button
           key={loc}

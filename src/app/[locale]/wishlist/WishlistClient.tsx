@@ -16,7 +16,7 @@ export default function WishlistClient({ products, segments }: { products: Produ
   const segMap = useMemo(() => new Map(segments.map((s) => [s.id, s])), [segments]);
   const list = useMemo(() => products.filter((p) => items.has(p.id)), [products, items]);
 
-  if (!hydrated) return <p>Loading…</p>;
+  if (!hydrated) return <p>{t("common.loading")}</p>;
 
   return (
     <>

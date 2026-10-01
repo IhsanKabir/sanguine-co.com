@@ -42,6 +42,12 @@ jobs:
       - name: ESLint
         run: npx eslint . --max-warnings 0
 
+      # en.json and bn.json must hold the same keys, and every literal
+      # t("…") key in the storefront must exist — otherwise the Bangla site
+      # shows raw keys or English.
+      - name: Translation check
+        run: node scripts/check-i18n.mjs
+
   e2e-smoke:
     name: Playwright smoke
     runs-on: ubuntu-latest

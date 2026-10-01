@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import { useTranslations } from "next-intl";
 import { seed } from "@/lib/utils";
 
 type Props = {
@@ -34,6 +35,7 @@ export default function Composition({
   style,
   image,
 }: Props) {
+  const t = useTranslations();
   const initial = (name || sku || "S").trim().charAt(0).toUpperCase();
   const h = (seed((sku || name || cat || "x") + variant) % 60) - 30;
 
@@ -71,7 +73,7 @@ export default function Composition({
         </>
       )}
       {ribbon && <span className="ribbon">{ribbon}</span>}
-      {sale && <span className="ribbon sale">Sale</span>}
+      {sale && <span className="ribbon sale">{t("common.sale")}</span>}
     </div>
   );
 }

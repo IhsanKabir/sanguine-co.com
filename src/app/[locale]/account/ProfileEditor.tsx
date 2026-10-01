@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { updateProfile } from "@/lib/actions/profile";
 
 type Props = {
@@ -18,6 +19,7 @@ export default function ProfileEditor({
   initialBirthday,
   initialAnniversary,
 }: Props) {
+  const t = useTranslations();
   const [name, setName] = useState(initialName);
   const [phone, setPhone] = useState(initialPhone);
   const [marketing, setMarketing] = useState(initialMarketing);
@@ -28,7 +30,7 @@ export default function ProfileEditor({
   const [pending, startTransition] = useTransition();
 
   const onSave = () => {
-    if (!name.trim()) { setError("Full name is required."); return; }
+    if (!name.trim()) { setError(t("profile.nameRequired")); return; }
     setError(null);
     startTransition(async () => {
       const r = await updateProfile({
@@ -39,7 +41,7 @@ export default function ProfileEditor({
         anniversary: anniversary || null,
       });
       if (r.ok) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
-      else setError("Could not save changes. Please try again.");
+      else setError(t("profile.saveError"));
     });
   };
 
@@ -47,27 +49,27 @@ export default function ProfileEditor({
     <section style={{ marginTop: 48, paddingTop: 40, borderTop: "1px solid var(--line)" }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 10, letterSpacing: ".18em", color: "var(--gold-text)", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 4 }}>
-          Account details
+          {t("profile.kicker")}
         </div>
         <h2 className="serif" style={{ fontSize: 28, color: "var(--purple-900)", fontWeight: 500, margin: 0 }}>
-          Profile
+          {t("profile.title")}
         </h2>
       </div>
 
       <div className="row">
         <div className="field">
-          <label>Full name</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name" />
+          <label>{t("addresses.fullName")}</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("profile.namePlaceholder")} />
         </div>
         <div className="field">
-          <label>Phone</label>
+          <label>{t("common.phone")}</label>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+8801XXXXXXXXX" />
         </div>
       </div>
 
       <div className="row" style={{ marginTop: 12 }}>
         <div className="field">
-          <label>Birthday</label>
+          <label>{t("profile.birthday")}</label>
           <input
             type="date"
             value={birthday}
@@ -75,11 +77,11 @@ export default function ProfileEditor({
             style={{ colorScheme: "light" }}
           />
           <span style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4, display: "block" }}>
-            We will send you a birthday discount
+            {t("profile.birthdayNote")}
           </span>
         </div>
         <div className="field">
-          <label>Anniversary (optional)</label>
+          <label>{t("profile.anniversary")}</label>
           <input
             type="date"
             value={anniversary}
@@ -87,7 +89,7 @@ export default function ProfileEditor({
             style={{ colorScheme: "light" }}
           />
           <span style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4, display: "block" }}>
-            A reminder to treat someone special
+            {t("profile.anniversaryNote")}
           </span>
         </div>
       </div>
@@ -99,7 +101,7 @@ export default function ProfileEditor({
           onChange={(e) => setMarketing(e.target.checked)}
           style={{ accentColor: "var(--mauve)", width: 16, height: 16 }}
         />
-        Receive Maison seasonal notes &amp; new arrivals
+        {t("profile.marketing")}
       </label>
 
       {error && (
@@ -114,7 +116,7 @@ export default function ProfileEditor({
           disabled={pending}
           style={{ minWidth: 140 }}
         >
-          {saved ? "✓ Saved" : pending ? "Saving…" : "Save changes"}
+          {saved ? t("profile.saved") : pending ? t("profile.saving") : t("profile.save")}
         </button>
       </div>
     </section>

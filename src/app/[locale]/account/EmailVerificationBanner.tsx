@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { resendVerificationEmail } from "@/lib/actions/auth";
 
 export default function EmailVerificationBanner({ email }: { email: string }) {
+  const t = useTranslations();
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -28,17 +30,17 @@ export default function EmailVerificationBanner({ email }: { email: string }) {
         <span style={{ fontSize: 15 }}>✉</span>
         <div>
           <div style={{ fontSize: 13, fontWeight: 500, color: "oklch(0.38 0.12 60)" }}>
-            Please verify your email address
+            {t("verify.title")}
           </div>
           <div style={{ fontSize: 12, color: "oklch(0.50 0.08 60)", marginTop: 2 }}>
-            We sent a confirmation link to <b>{email}</b>. Check your inbox.
+            {t.rich("verify.body", { email, b: (c) => <b>{c}</b> })}
           </div>
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         {error && <span style={{ fontSize: 12, color: "var(--err)" }}>{error}</span>}
         {sent ? (
-          <span style={{ fontSize: 12, color: "oklch(0.42 0.14 145)", fontFamily: "var(--mono)" }}>✓ Sent</span>
+          <span style={{ fontSize: 12, color: "oklch(0.42 0.14 145)", fontFamily: "var(--mono)" }}>{t("verify.sent")}</span>
         ) : (
           <button
             type="button"
@@ -51,7 +53,7 @@ export default function EmailVerificationBanner({ email }: { email: string }) {
               cursor: "pointer", fontFamily: "var(--sans)", opacity: pending ? 0.6 : 1,
             }}
           >
-            {pending ? "Sending…" : "Resend link"}
+            {pending ? t("verify.sending") : t("verify.resend")}
           </button>
         )}
       </div>

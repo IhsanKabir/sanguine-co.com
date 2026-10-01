@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -36,6 +36,7 @@ export default async function LocaleLayout({
   }
   setRequestLocale(locale);
   const messages = await getMessages();
+  const t = await getTranslations();
 
   // Admin-uploaded ambient audio (EXECUTION-PLAN 4.2). Only the URLs cross
   // to the client; atier.js plays the file when present and falls back to
@@ -56,7 +57,7 @@ export default async function LocaleLayout({
         <JsonLd data={[organizationLd, websiteLd]} />
         <NextIntlClientProvider messages={messages}>
           <SessionTracker />
-      <a href="#main" className="skip-link">Skip to content</a>
+      <a href="#main" className="skip-link">{t("common.skipToContent")}</a>
       <CartProvider>
         <WishlistProvider>
           <TopNav />
