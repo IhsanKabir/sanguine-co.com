@@ -25,6 +25,10 @@ type Props = {
   segmentTag: string;
   segmentSlug: string;
   showPreorder: boolean;
+  /** Where "see everything" leads when filters hide every item. Defaults to the segment page. */
+  resetHref?: string;
+  /** Query params the filters must keep when cleared (the search page's `q`). */
+  preserveParams?: string[];
 };
 
 export default function ShopGrid({
@@ -38,6 +42,8 @@ export default function ShopGrid({
   segmentTag,
   segmentSlug,
   showPreorder,
+  resetHref,
+  preserveParams,
 }: Props) {
   const t = useTranslations();
   const params = useSearchParams();
@@ -105,6 +111,7 @@ export default function ShopGrid({
       {allItems.length > 0 && (
         <SegmentFilters
           segmentSlug={segmentSlug}
+          preserveParams={preserveParams}
           availableColors={availableColors}
           availableSizes={availableSizes}
           availableTags={availableTags}
@@ -132,7 +139,7 @@ export default function ShopGrid({
             <p style={{ color: "var(--ink-soft)" }}>
               {t.rich("shopGrid.widen", {
                 a: (chunks) => (
-                  <Link href={`/shop/${segmentSlug}`} style={{ color: "var(--purple-900)" }}>
+                  <Link href={resetHref ?? `/shop/${segmentSlug}`} style={{ color: "var(--purple-900)" }}>
                     {chunks}
                   </Link>
                 ),

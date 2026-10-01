@@ -13,6 +13,8 @@ type Props = {
   priceMax: number;
   shownCount: number;
   totalCount: number;
+  /** Params that "clear all" keeps (e.g. the search query). */
+  preserveParams?: string[];
 };
 
 // Labels are message keys (filters.*), resolved per locale at render.
@@ -71,9 +73,15 @@ export default function SegmentFilters(props: Props) {
   };
 
   const clearAll = () => {
+    const kept = new URLSearchParams();
+    for (const k of props.preserveParams ?? []) {
+      const v = active.get(k);
+      if (v) kept.set(k, v);
+    }
+    const qs = kept.toString();
     startTransition(() => {
-      setOptimisticQs("");
-      router.push(pathname);
+      setOptimisticQs(qs);
+      router.push(qs ? `${pathname}?${qs}` : pathname);
     });
     setFilterOpen(false);
   };

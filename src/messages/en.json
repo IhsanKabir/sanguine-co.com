@@ -130,6 +130,8 @@
     "added": "Added",
     "optionLabel": "Option — {value}",
     "sizeLabel": "Size — {value}",
+    "selectSize": "Select a size",
+    "chooseSizeFirst": "Choose a size first.",
     "viewPhoto": "View photo {n}",
     "newRibbon": "New",
     "descriptionFallback": "A piece from the maison.",
@@ -413,7 +415,18 @@
     "title": "Pieces you have looked at."
   },
   "search": {
-    "empty": "No correspondence found"
+    "empty": "No correspondence found",
+    "seeAll": "See all results"
+  },
+  "searchPage": {
+    "title": "Search",
+    "submit": "Search",
+    "resultsFor": "Results for “{q}”",
+    "count": "{count, plural, one {# piece} other {# pieces}}",
+    "countCapped": "Showing the first {count} pieces — add a word to narrow it down.",
+    "prompt": "Type at least two letters to search the collection.",
+    "none": "Nothing matches “{q}”",
+    "noneHint": "Try a shorter or different word, or browse a collection:"
   },
   "filters": {
     "featured": "Featured",

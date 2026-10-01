@@ -76,6 +76,18 @@ test.describe("baseline · catalogue flows @db", () => {
     expect(await res.text()).toContain(KNOWN_PRODUCT_SLUG);
   });
 
+  test("Enter in the header search opens the full results page", async ({ page }) => {
+    skipWithoutDb();
+    await page.goto("/en");
+    await page.getByRole("button", { name: "Search the collection…" }).first().click();
+    const input = page.locator(".nav-search input");
+    await input.fill("rose");
+    await expect(page.locator(".search-row").first()).toBeVisible();
+    await input.press("Enter");
+    await expect(page).toHaveURL(/\/en\/search\?q=rose/);
+    await expect(page.locator(`a[href="/en/product/${KNOWN_PRODUCT_SLUG}"]`).first()).toBeVisible();
+  });
+
   test("bn PDP renders with lang=bn", async ({ page }) => {
     skipWithoutDb();
     await page.goto(`/bn/product/${KNOWN_PRODUCT_SLUG}`);

@@ -186,6 +186,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .swatch:hover{border-color:var(--purple-400)}
 .swatch.active{border-color:var(--purple-900);background:var(--purple-50);color:var(--purple-900)}
 .pdp-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
+.pdp-size-hint{font-size:12px;color:var(--err);margin:-4px 0 12px}
 .qty{display:inline-flex;align-items:center;border:1px solid var(--line);background:#fff}
 .qty button{width:44px;height:44px;font-size:18px;color:var(--purple-900)}
 .qty span{width:44px;text-align:center;font-weight:500}

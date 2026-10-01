@@ -84,7 +84,11 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
   const t = useTranslations();
   const { add } = useCart();
   const [color, setColor] = useState<string>(product.colors[0] || "");
-  const [size, setSize] = useState<string>(product.sizes[0] || "");
+  // Same rule as the product page: no size is assumed unless there is only one.
+  const [size, setSizeState] = useState<string>(product.sizes.length === 1 ? product.sizes[0] : "");
+  const [sizeHint, setSizeHint] = useState(false);
+  const needsSize = product.sizes.length > 0 && !size;
+  const setSize = (s: string) => { setSizeState(s); setSizeHint(false); };
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -92,6 +96,7 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
   const description = (locale === "bn" && product.descriptionBn) || product.description || "";
 
   const onAdd = () => {
+    if (needsSize) { setSizeHint(true); return; }
     const item: CartItem = {
       productId: product.id,
       slug: product.slug,
@@ -179,12 +184,16 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
                       key={s}
                       type="button"
                       className={"swatch size-pill " + (s === size ? "active" : "")}
+                      aria-pressed={s === size}
                       onClick={() => setSize(s)}
                     >
                       {s}
                     </button>
                   ))}
                 </div>
+                {sizeHint && needsSize && (
+                  <div className="pdp-size-hint" role="alert">{t("pdp.chooseSizeFirst")}</div>
+                )}
               </>
             )}
 
@@ -208,7 +217,7 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
                 disabled={added}
               >
                 <Icon name={added ? "check" : "bag"} size={14} />
-                {added ? t("pdp.added") : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
+                {added ? t("pdp.added") : needsSize ? t("pdp.selectSize") : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
               </button>
             )}
 

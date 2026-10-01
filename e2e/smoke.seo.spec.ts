@@ -26,6 +26,12 @@ test.describe("SEO smoke", () => {
     expect(await canonical.getAttribute("href")).toContain("/en");
   });
 
+  test("search results pages are kept out of the index", async ({ page }) => {
+    const res = await page.goto("/en/search?q=rose");
+    expect(res?.status()).toBe(200);
+    expect(await page.locator('meta[name="robots"]').getAttribute("content")).toContain("noindex");
+  });
+
   test("home og:image points at the OG card route", async ({ page }) => {
     await page.goto("/en");
     const og = page.locator('meta[property="og:image"]').first();
