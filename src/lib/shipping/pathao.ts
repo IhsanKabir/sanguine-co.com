@@ -100,3 +100,23 @@ export async function getCities(): Promise<Array<{ city_id: number; city_name: s
   const data = await res.json();
   return data.data?.data || [];
 }
+
+/**
+ * Current status of a consignment ("Pending", "Picked", "In_Transit",
+ * "Delivered", "Return", "Delivery_Failed", ...), from the order info endpoint.
+ * We store the consignment id as the order's tracking code.
+ */
+export async function getPathaoOrderStatus(consignmentId: string): Promise<string> {
+  const token = await getToken();
+  const res = await fetch(
+    `${process.env.PATHAO_BASE_URL}/aladdin/api/v1/orders/${encodeURIComponent(consignmentId)}/info`,
+    {
+      headers: { "Authorization": `Bearer ${token}` },
+      cache: "no-store",
+      signal: AbortSignal.timeout(15_000),
+    },
+  );
+  if (!res.ok) throw new Error(`Pathao status failed ${res.status}: ${await res.text()}`);
+  const data = await res.json();
+  return data.data?.order_status_slug || data.data?.order_status || "unknown";
+}

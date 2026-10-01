@@ -8,6 +8,7 @@ import { formatBdt, formatDate } from "@/lib/utils";
 import { Link } from "@/i18n/routing";
 import Icon from "@/components/storefront/Icon";
 import RefundPanel from "./RefundPanel";
+import CourierSyncButton from "./CourierSyncButton";
 
 type Props = { orders: Order[]; lines: OrderLine[] };
 
@@ -105,7 +106,8 @@ export default function OrdersClient({ orders, lines }: Props) {
           <h1 className="admin-h1">Orders</h1>
           <p className="admin-sub">{orders.length} total · {orders.filter((o) => o.status === "cod_pending").length} awaiting fulfilment.</p>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, position: "relative" }}>
+          <CourierSyncButton />
           <Link
             href="/admin/orders/new"
             className="btn btn-ghost btn-sm"
@@ -382,6 +384,7 @@ const EVENT_LABEL: Record<string, string> = {
   email_sent: "Email sent",
   sms_sent: "SMS sent",
   payment_received: "Payment received",
+  courier_status: "Courier update",
 };
 
 function Timeline({ events, loading }: { events: OrderEvent[]; loading: boolean }) {
@@ -403,7 +406,8 @@ function Timeline({ events, loading }: { events: OrderEvent[]; loading: boolean 
           const p = (e.payload as Record<string, unknown>) ?? {};
           const date = new Date(e.createdAt);
           let detail: string | null = null;
-          if (e.type === "status_changed") detail = `${p.from ?? "—"} → ${p.to ?? "—"}`;
+          if (e.type === "status_changed") detail = `${p.from ?? "—"} → ${p.to ?? "—"}${p.source === "courier" ? ` (reported by ${p.courier ?? "courier"})` : ""}`;
+          else if (e.type === "courier_status") detail = `${p.courier ?? ""} · ${p.status ?? ""}`.trim();
           else if (e.type === "courier_booked") detail = `${p.courier ?? ""} · ${p.tracking ?? ""}`.trim();
           else if (e.type === "refund_issued") detail = `${typeof p.amount === "number" ? `৳${(p.amount as number).toLocaleString("en-IN")}` : ""}${p.method ? ` · ${p.method}` : ""}${p.reason ? ` — ${p.reason}` : ""}`;
           else if (e.type === "note_added" && typeof p.note === "string") detail = p.note;

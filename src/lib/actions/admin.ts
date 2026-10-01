@@ -30,7 +30,9 @@ import { slugify } from "@/lib/utils";
 import { createPathaoOrder } from "@/lib/shipping/pathao";
 import { createSteadfastOrder } from "@/lib/shipping/steadfast";
 import { sendEmail } from "@/lib/email/brevo";
-import { orderShippedEmail, reviewRequestEmail, type OrderEmailLine } from "@/lib/email/templates";
+import { orderShippedEmail, type OrderEmailLine } from "@/lib/email/templates";
+import { applyOrderStatus, ORDER_STATUSES } from "@/lib/order-status";
+import { syncCourierStatuses } from "@/lib/shipping/sync";
 import { sendSms } from "@/lib/sms/ssl-wireless";
 import { logOrderEvent, listOrderEvents } from "@/lib/order-events";
 
@@ -305,60 +307,7 @@ export async function adjustStock(id: string, delta: number, reason: string) {
 }
 
 // ─── Orders ────────────────────────────────────────────────────────────
-const validStatuses = ["pending","pending_payment","cod_pending","paid","processing","shipped","delivered","cancelled","refunded","return_requested","returned"] as const;
-
-const SITE_URL_ORDERS = SITE_URL;
-
-/** Resolve recipient email for any order — guests have guestEmail, auth users need Supabase lookup. */
-async function resolveOrderEmail(orderId: string): Promise<{ email: string; firstName: string; number: string; trackingToken: string } | null> {
-  const [order] = await db
-    .select({
-      guestEmail: schema.orders.guestEmail,
-      customerId: schema.orders.customerId,
-      shippingAddress: schema.orders.shippingAddress,
-      number: schema.orders.number,
-      trackingToken: schema.orders.trackingToken,
-    })
-    .from(schema.orders)
-    .where(eq(schema.orders.id, orderId))
-    .limit(1);
-
-  if (!order) return null;
-
-  const addr = parseShippingAddress(order.shippingAddress);
-  const firstName = (addr.fullName ?? "").split(" ")[0] || "friend";
-
-  if (order.guestEmail) {
-    return { email: order.guestEmail, firstName, number: order.number, trackingToken: order.trackingToken };
-  }
-
-  if (order.customerId) {
-    try {
-      const { data } = await adminClient().auth.admin.getUserById(order.customerId);
-      if (data?.user?.email) {
-        return { email: data.user.email, firstName, number: order.number, trackingToken: order.trackingToken };
-      }
-    } catch {}
-  }
-
-  return null;
-}
-
-/** Fire review request email for a delivered order. Best-effort; never throws. */
-async function fireReviewRequest(orderId: string): Promise<void> {
-  const recipient = await resolveOrderEmail(orderId);
-  if (!recipient) return;
-
-  const trackingUrl = `${SITE_URL_ORDERS}/en/order/${recipient.number}/track?t=${recipient.trackingToken}`;
-  const { subject, html } = reviewRequestEmail(recipient.firstName, recipient.number, trackingUrl);
-
-  const result = await sendEmail({ to: recipient.email, subject, html });
-  await logOrderEvent({
-    orderId,
-    type: "email_sent",
-    payload: { subject, to: recipient.email, ok: result.ok, error: result.error ?? null },
-  });
-}
+const validStatuses = ORDER_STATUSES;
 
 /** Public-to-admin wrapper around the order events log. Permission-gated. */
 export async function getOrderTimeline(orderId: string) {
@@ -366,52 +315,11 @@ export async function getOrderTimeline(orderId: string) {
   return listOrderEvents(orderId);
 }
 
+// Side effects (restock on cancel, review request + return window on
+// delivered) live in applyOrderStatus, shared with the courier sync.
 export async function updateOrderStatus(orderId: string, status: typeof validStatuses[number]) {
   await requireAdmin();
-  const [before] = await db.select({ status: schema.orders.status, number: schema.orders.number })
-    .from(schema.orders).where(eq(schema.orders.id, orderId));
-  await db.update(schema.orders).set({ status }).where(eq(schema.orders.id, orderId));
-  await logOrderEvent({
-    orderId,
-    type: "status_changed",
-    payload: { from: before?.status ?? null, to: status },
-  });
-
-  // Cancelled storefront orders give their stock back (COD cancellations are
-  // routine in Bangladesh — without this every cancellation silently shrank
-  // inventory). Guards: only on the FIRST transition into cancelled, and only
-  // for orders that decremented stock at creation — converted preorders
-  // (SSG-PO-) and manual orders (SSG-MX-) never did, so restoring for them
-  // would inflate inventory.
-  const decrementedAtCreation =
-    !!before?.number && !before.number.startsWith("SSG-PO-") && !before.number.startsWith("SSG-MX-");
-  if (
-    status === "cancelled" &&
-    before && !["cancelled", "refunded", "returned"].includes(before.status) &&
-    decrementedAtCreation
-  ) {
-    const lines = await db.select({ productId: schema.orderLines.productId, qty: schema.orderLines.qty })
-      .from(schema.orderLines).where(eq(schema.orderLines.orderId, orderId));
-    for (const l of lines) {
-      if (!l.productId) continue;
-      await db.update(schema.products)
-        .set({ stock: sql`${schema.products.stock} + ${l.qty}` })
-        .where(eq(schema.products.id, l.productId));
-      await db.insert(schema.inventoryLog).values({
-        productId: l.productId,
-        delta: l.qty,
-        reason: "restock",
-        referenceId: `cancel:${before.number}`,
-      });
-    }
-    revalidateAllLocales(); // stock badges on PDP/grid reflect the restore
-  }
-
-  // Send review request when an order transitions into delivered for the first time.
-  if (status === "delivered" && before?.status !== "delivered") {
-    fireReviewRequest(orderId).catch(() => {});
-  }
-
+  await applyOrderStatus(orderId, z.enum(validStatuses).parse(status));
   revalidatePath("/admin", "layout");
 }
 
@@ -422,34 +330,36 @@ const bulkStatusSchema = z.object({
 
 /**
  * Apply the same status change to many orders at once. Used for the
- * multi-select bulk-action workflow on /admin/orders. Each transition is
- * logged individually so the per-order timeline still shows what happened.
+ * multi-select bulk-action workflow on /admin/orders. Each order goes through
+ * applyOrderStatus, so a bulk cancel restocks and a bulk "delivered" sends
+ * the review request, exactly as the single-order dropdown does.
  */
 export async function bulkUpdateOrderStatus(input: z.infer<typeof bulkStatusSchema>) {
   await requireAdmin();
   const data = bulkStatusSchema.parse(input);
 
-  const before = await db.select({ id: schema.orders.id, status: schema.orders.status })
+  const found = await db.select({ id: schema.orders.id })
     .from(schema.orders)
     .where(inArray(schema.orders.id, data.orderIds));
-  if (before.length === 0) return { ok: false as const, error: "No matching orders." };
+  if (found.length === 0) return { ok: false as const, error: "No matching orders." };
 
-  await db.update(schema.orders)
-    .set({ status: data.status })
-    .where(inArray(schema.orders.id, data.orderIds));
-
-  for (const o of before) {
-    if (o.status !== data.status) {
-      await logOrderEvent({
-        orderId: o.id,
-        type: "status_changed",
-        payload: { from: o.status, to: data.status, bulk: true },
-      });
-    }
+  for (const o of found) {
+    await applyOrderStatus(o.id, data.status, { bulk: true });
   }
 
   revalidatePath("/[locale]/admin/orders", "page");
-  return { ok: true as const, updated: before.length };
+  return { ok: true as const, updated: found.length };
+}
+
+/**
+ * "Sync now" on /admin/orders: ask the couriers about every shipped order.
+ * The same job runs daily from /api/cron/courier-sync.
+ */
+export async function syncCourierStatusNow() {
+  await requirePermission("orders");
+  const summary = await syncCourierStatuses();
+  revalidatePath("/admin", "layout");
+  return summary;
 }
 
 const courierSchema = z.object({
