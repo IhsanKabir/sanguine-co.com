@@ -501,3 +501,16 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .pdp-info-table th{background:var(--purple-50);color:var(--purple-900);font-weight:500}
 .pdp-delivery-estimate{margin-top:-4px}
 @media (prefers-reduced-motion: reduce){.pdp-more summary::after{transition:none}}
+
+/* Bangla: no letter-spacing, anywhere.
+   The design tracks small uppercase labels wide (letter-spacing .1em–.4em),
+   which suits Latin capitals but pulls Bangla apart: a conjunct such as
+   স্ব is several code points, and Chrome also turns off the font's
+   ligatures (which join those conjuncts) whenever letter-spacing is not
+   zero. Much of the spacing is set inline, hence !important. <html lang>
+   is set from the route locale ([locale]/layout.tsx). */
+html[lang="bn"] *,
+html[lang="bn"] *::before,
+html[lang="bn"] *::after {
+  letter-spacing: 0 !important;
+}
