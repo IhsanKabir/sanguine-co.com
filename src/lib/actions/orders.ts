@@ -15,11 +15,8 @@ import { getCurrentUser } from "@/lib/auth-utils";
 
 import { SITE_URL } from "@/lib/site-url";
 
-import {
-  FREE_SHIPPING_THRESHOLD_BDT as FREE_THRESHOLD,
-  FLAT_SHIPPING_DHAKA_BDT as FLAT_SHIPPING_DHAKA,
-  FLAT_SHIPPING_OUTSIDE_BDT as FLAT_SHIPPING_OUTSIDE,
-} from "@/lib/pricing";
+import { shippingFor } from "@/lib/pricing";
+import { getCommerceSettings, shippingRulesOf } from "@/lib/commerce";
 
 const COD_FEE = 0;          // we eat the COD fee at launch — courier charges merchant ~1%
 
@@ -61,11 +58,6 @@ function generateOrderNumber(): string {
   const t = Date.now().toString(36).slice(-5).toUpperCase();
   const r = Math.random().toString(36).slice(2, 5).toUpperCase();
   return `SSG-${t}${r}`;
-}
-
-function shippingCost(city: string, subtotal: number): number {
-  if (subtotal >= FREE_THRESHOLD) return 0;
-  return city.toLowerCase().includes("dhaka") ? FLAT_SHIPPING_DHAKA : FLAT_SHIPPING_OUTSIDE;
 }
 
 export async function createCodOrder(input: CreateOrderInput) {
@@ -154,7 +146,10 @@ export async function createCodOrder(input: CreateOrderInput) {
     couponCode = v.code;
   }
 
-  const baseShipping = shippingCost(data.shipping.city, subtotal);
+  // Same rules (Admin → Settings) and same function the cart and checkout
+  // used to quote this total.
+  const rules = shippingRulesOf(await getCommerceSettings());
+  const baseShipping = shippingFor(rules, data.shipping.city, subtotal);
   const shipping = freeShipping ? 0 : baseShipping;
   const total = Math.max(0, subtotal - couponDiscount) + shipping + COD_FEE;
   const number = generateOrderNumber();

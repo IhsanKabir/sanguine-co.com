@@ -9,12 +9,14 @@ import Icon from "@/components/storefront/Icon";
 import CouponInput from "@/components/storefront/CouponInput";
 import OceanicBand from "@/components/storefront/OceanicBand";
 
-import { FREE_SHIPPING_THRESHOLD_BDT as FREE_THRESHOLD } from "@/lib/pricing";
+import { qualifiesForFreeShipping } from "@/lib/pricing";
+import { useShippingRules } from "@/lib/shipping-rules-context";
 
 export default function CartPage() {
   const t = useTranslations();
   const locale = useLocale() as "en" | "bn";
   const { items, inc, dec, remove, subtotalBdt, itemKey, hydrated, coupon } = useCart();
+  const shippingRules = useShippingRules();
   const discount = coupon?.discountBdt ?? 0;
   const afterDiscount = Math.max(0, subtotalBdt - discount);
 
@@ -37,7 +39,7 @@ export default function CartPage() {
     );
   }
 
-  const shippingNote = subtotalBdt >= FREE_THRESHOLD ? t("cart.shippingFree") : t("cart.calculatedAtCheckout");
+  const shippingNote = qualifiesForFreeShipping(shippingRules, subtotalBdt) ? t("cart.shippingFree") : t("cart.calculatedAtCheckout");
 
   return (
     <section className="section" style={{ maxWidth: 1100 }}>

@@ -149,7 +149,8 @@ export default async function ProductPage({ params }: Props) {
   // Product schema with full Offer (shipping + returns) so Google Shopping
   // can render shipping cost and return-policy snippets in rich results.
   // shippingDetails is the standard for Bangladesh COD-only logistics:
-  // — Pathao Courier, 5–7 day standard, ৳80 inside Dhaka / ৳150 outside.
+  // — Pathao Courier; the advertised rate is the saved inside-Dhaka rate
+  //   (Admin → Settings), the lowest a customer can pay.
   // hasMerchantReturnPolicy follows our /legal/returns: 14-day window,
   // courier-arranged pickup, return shipping paid by the customer unless the
   // piece is defective or incorrect, BDT refund.
@@ -174,7 +175,7 @@ export default async function ProductPage({ params }: Props) {
         "@type": "OfferShippingDetails",
         shippingRate: {
           "@type": "MonetaryAmount",
-          value: 80,
+          value: commerce.shippingDhakaBdt,
           currency: "BDT",
         },
         shippingDestination: {
@@ -367,7 +368,16 @@ export default async function ProductPage({ params }: Props) {
           {/* Shipping estimate */}
           <div className="pdp-shipping-note">
             <Icon name="arrow" size={13} />
-            {t("pdp.shippingNote")}
+            {commerce.freeShippingThresholdBdt > 0
+              ? t("pdp.shippingNote", {
+                  threshold: formatBdt(commerce.freeShippingThresholdBdt, locale as "en" | "bn"),
+                  dhaka: formatBdt(commerce.shippingDhakaBdt, locale as "en" | "bn"),
+                  outside: formatBdt(commerce.shippingOutsideBdt, locale as "en" | "bn"),
+                })
+              : t("pdp.shippingNoteNoFree", {
+                  dhaka: formatBdt(commerce.shippingDhakaBdt, locale as "en" | "bn"),
+                  outside: formatBdt(commerce.shippingOutsideBdt, locale as "en" | "bn"),
+                })}
           </div>
 
           <div className="pdp-feats">

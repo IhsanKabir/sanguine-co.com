@@ -1,5 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { legalMetadata } from "../_metadata";
+import { getCommerceSettings, type CommerceSettings } from "@/lib/commerce";
+import { formatBdt } from "@/lib/utils";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -8,10 +10,13 @@ export const generateMetadata = ({ params }: Props) => legalMetadata("shipping",
 export default async function ShippingPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return locale === "bn" ? <BangleSection /> : <EnglishSection />;
+  // The rates quoted here are the ones checkout charges (Admin → Settings).
+  const c = await getCommerceSettings();
+  return locale === "bn" ? <BangleSection c={c} /> : <EnglishSection c={c} />;
 }
 
-function EnglishSection() {
+function EnglishSection({ c }: { c: CommerceSettings }) {
+  const bdt = (n: number) => formatBdt(n, "en");
   return (
     <>
       <div className="legal-kicker">SHIPPING</div>
@@ -41,7 +46,7 @@ function EnglishSection() {
       <p>These are typical figures, not guarantees. During Eid weeks, monsoon flooding, or hartal/civic disruption, all couriers slow down and we cannot promise the above.</p>
 
       <h2>Shipping cost</h2>
-      <p>Shipping is a flat ৳80 inside Dhaka and ৳150 everywhere else in Bangladesh, shown at checkout before you place the order. For orders over ৳5,000, shipping is complimentary anywhere in Bangladesh.</p>
+      <p>Shipping is a flat {bdt(c.shippingDhakaBdt)} inside Dhaka and {bdt(c.shippingOutsideBdt)} everywhere else in Bangladesh, shown at checkout before you place the order.{c.freeShippingThresholdBdt > 0 && <> For orders over {bdt(c.freeShippingThresholdBdt)}, shipping is complimentary anywhere in Bangladesh.</>}</p>
 
       <h2>Cash on Delivery</h2>
       <p>All orders at present are paid in cash on delivery &mdash; please have the displayed total ready in hand for our courier. The courier may carry change for amounts up to ৳1,000; for larger amounts, it helps both of you to have the exact amount.</p>
@@ -59,7 +64,8 @@ function EnglishSection() {
   );
 }
 
-function BangleSection() {
+function BangleSection({ c }: { c: CommerceSettings }) {
+  const bdt = (n: number) => formatBdt(n, "bn");
   return (
     <>
       <div className="legal-kicker">শিপিং</div>
@@ -89,7 +95,7 @@ function BangleSection() {
       <p>এগুলো সাধারণ চিত্র, গ্যারান্টি নয়। ঈদ সপ্তাহ, বন্যা, কিংবা হরতাল/অন্য বিঘ্নের সময় সকল কুরিয়ার ধীর হয় এবং উপরোক্ত সময় আমরা নিশ্চিত করতে পারি না।</p>
 
       <h2>শিপিং খরচ</h2>
-      <p>ঢাকার ভেতরে শিপিং ৳৮০ এবং বাংলাদেশের অন্য যেকোনো স্থানে ৳১৫০, অর্ডার দেওয়ার আগে চেকআউটে দেখানো হয়। ৳৫,০০০-এর বেশি অর্ডারে বাংলাদেশের যেকোনো জায়গায় শিপিং বিনামূল্যে।</p>
+      <p>ঢাকার ভেতরে শিপিং {bdt(c.shippingDhakaBdt)} এবং বাংলাদেশের অন্য যেকোনো স্থানে {bdt(c.shippingOutsideBdt)}, অর্ডার দেওয়ার আগে চেকআউটে দেখানো হয়।{c.freeShippingThresholdBdt > 0 && <> {bdt(c.freeShippingThresholdBdt)}-এর বেশি অর্ডারে বাংলাদেশের যেকোনো জায়গায় শিপিং বিনামূল্যে।</>}</p>
 
       <h2>ক্যাশ অন ডেলিভারি</h2>
       <p>বর্তমানে সকল অর্ডার ক্যাশ অন ডেলিভারিতে পরিশোধিত &mdash; অনুগ্রহ করে কুরিয়ারের জন্য প্রদর্শিত মোট অর্থ হাতে রাখুন। কুরিয়ার ৳১,০০০ পর্যন্ত খুচরা বহন করতে পারেন; বেশি অঙ্কের ক্ষেত্রে নির্দিষ্ট পরিমাণ থাকলে দু&rsquo;পক্ষেরই সুবিধা।</p>

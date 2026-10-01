@@ -12,6 +12,8 @@ import HeroTide from "@/components/storefront/HeroTide";
 import Ornament from "@/components/storefront/Ornament";
 import JsonLd from "@/components/seo/JsonLd";
 import { SITE_URL as BASE } from "@/lib/site-url";
+import { getCommerceSettings } from "@/lib/commerce";
+import { formatBdt } from "@/lib/utils";
 
 // ISR: the homepage fires several catalogue queries per request and reads no
 // cookies/auth — cache the rendered page. Admin edits still appear instantly
@@ -83,6 +85,12 @@ export default async function Home({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations();
+  const commerce = await getCommerceSettings();
+  const freeOver = formatBdt(commerce.freeShippingThresholdBdt, locale as "en" | "bn");
+  // A threshold of 0 switches free shipping off: drop that marquee point.
+  const marqueeKeys = commerce.freeShippingThresholdBdt > 0
+    ? MARQUEE_KEYS
+    : MARQUEE_KEYS.filter((k) => k !== "freeDelivery");
 
   const [segments, newArrivals, editors] = await Promise.all([
     safeQuery(getVisibleSegments()),
@@ -187,8 +195,8 @@ export default async function Home({ params }: Props) {
       <div className="marquee" data-cursor="default">
         <div className="marquee-track">
           {/* Listed twice so the scrolling track loops seamlessly. */}
-          {[...MARQUEE_KEYS, ...MARQUEE_KEYS].map((k, i) => (
-            <span key={k + i} aria-hidden={i >= MARQUEE_KEYS.length || undefined}>{t(`home.marquee.${k}`)}</span>
+          {[...marqueeKeys, ...marqueeKeys].map((k, i) => (
+            <span key={k + i} aria-hidden={i >= marqueeKeys.length || undefined}>{t(`home.marquee.${k}`, { threshold: freeOver })}</span>
           ))}
         </div>
       </div>

@@ -7,19 +7,6 @@ import type { CommerceSettings } from "@/lib/commerce";
 
 type Brand = { name: string; tagline?: string; email?: string; announcement?: string };
 
-type StoreConfig = {
-  freeShippingThresholdBdt: number;
-  flatShippingDhakaBdt: number;
-  flatShippingOutsideBdt: number;
-  taxRate: number;
-  codHandlingBdt: number;
-  acceptCod: boolean;
-  acceptCard: boolean;
-  acceptBkash: boolean;
-  acceptNagad: boolean;
-  acceptRocket: boolean;
-};
-
 export default function SettingsClient({ initialBrand, initialCommerce }: { initialBrand: Brand; initialCommerce: CommerceSettings }) {
   const [commerce, setCommerce] = useState({
     preorderDepositPct: String(initialCommerce.preorderDepositPct),
@@ -40,18 +27,33 @@ export default function SettingsClient({ initialBrand, initialCommerce }: { init
     });
   };
 
-  const [c, setC] = useState<StoreConfig>({
-    freeShippingThresholdBdt: 5000,
-    flatShippingDhakaBdt: 80,
-    flatShippingOutsideBdt: 150,
-    taxRate: 0,
-    codHandlingBdt: 0,
-    acceptCod: true,
-    acceptCard: false,
-    acceptBkash: false,
-    acceptNagad: false,
-    acceptRocket: false,
+  // Shipping rules — saved to the same commerce row; the cart, checkout,
+  // order total, product pages and /legal/shipping all read them.
+  const [ship, setShip] = useState({
+    freeShippingThresholdBdt: String(initialCommerce.freeShippingThresholdBdt),
+    shippingDhakaBdt: String(initialCommerce.shippingDhakaBdt),
+    shippingOutsideBdt: String(initialCommerce.shippingOutsideBdt),
   });
+  const [shipMsg, setShipMsg] = useState<string | null>(null);
+  const [shipPending, startShip] = useTransition();
+
+  const saveShipping = () => {
+    const threshold = Number(ship.freeShippingThresholdBdt);
+    const dhaka = Number(ship.shippingDhakaBdt);
+    const outside = Number(ship.shippingOutsideBdt);
+    const whole = (n: number, max: number) => Number.isInteger(n) && n >= 0 && n <= max;
+    if (!whole(threshold, 1_000_000)) { setShipMsg("Free-shipping threshold must be a whole number of taka (0 turns it off)."); return; }
+    if (!whole(dhaka, 10_000) || !whole(outside, 10_000)) { setShipMsg("Shipping rates must be whole numbers of taka, 0–10,000."); return; }
+    setShipMsg(null);
+    startShip(async () => {
+      const res = await updateCommerceSettings({
+        freeShippingThresholdBdt: threshold,
+        shippingDhakaBdt: dhaka,
+        shippingOutsideBdt: outside,
+      });
+      setShipMsg(res.ok ? "Saved — cart, checkout and order totals now use these rates." : "Save failed.");
+    });
+  };
 
   return (
     <>
@@ -105,46 +107,63 @@ export default function SettingsClient({ initialBrand, initialCommerce }: { init
           </div>
         </div>
 
-        {/* Shipping & tax */}
+        {/* Shipping — live */}
         <div className="panel">
-          <h3>Shipping & tax</h3>
+          <h3>Shipping</h3>
           <div className="row">
-            <div className="field"><label>Free shipping threshold (৳)</label><input type="number" value={c.freeShippingThresholdBdt} onChange={(e) => setC({ ...c, freeShippingThresholdBdt: Number(e.target.value) })} /></div>
-            <div className="field"><label>VAT / tax %</label><input type="number" step="0.1" value={c.taxRate} onChange={(e) => setC({ ...c, taxRate: Number(e.target.value) })} /></div>
+            <div className="field">
+              <label>Free shipping over (৳)</label>
+              <input type="number" min={0} value={ship.freeShippingThresholdBdt} onChange={(e) => setShip({ ...ship, freeShippingThresholdBdt: e.target.value })} />
+            </div>
           </div>
           <div className="row" style={{ marginTop: 12 }}>
-            <div className="field"><label>Dhaka shipping (৳)</label><input type="number" value={c.flatShippingDhakaBdt} onChange={(e) => setC({ ...c, flatShippingDhakaBdt: Number(e.target.value) })} /></div>
-            <div className="field"><label>Outside Dhaka (৳)</label><input type="number" value={c.flatShippingOutsideBdt} onChange={(e) => setC({ ...c, flatShippingOutsideBdt: Number(e.target.value) })} /></div>
+            <div className="field">
+              <label>Inside Dhaka (৳)</label>
+              <input type="number" min={0} value={ship.shippingDhakaBdt} onChange={(e) => setShip({ ...ship, shippingDhakaBdt: e.target.value })} />
+            </div>
+            <div className="field">
+              <label>Outside Dhaka (৳)</label>
+              <input type="number" min={0} value={ship.shippingOutsideBdt} onChange={(e) => setShip({ ...ship, shippingOutsideBdt: e.target.value })} />
+            </div>
           </div>
-          <div className="field" style={{ marginTop: 12 }}><label>COD handling fee (৳)</label><input type="number" value={c.codHandlingBdt} onChange={(e) => setC({ ...c, codHandlingBdt: Number(e.target.value) })} /></div>
-          <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 14, lineHeight: 1.6 }}>
-            Note: shipping logic is currently hard-coded in <code>orders.ts</code>. Changing values here is preview-only until we wire <code>site_settings</code> to the order calculator.
+          <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 10, lineHeight: 1.6 }}>
+            Used by the cart, checkout, the order total the customer pays, product pages, the
+            home page and the Shipping policy. A city containing &ldquo;Dhaka&rdquo; gets the
+            Dhaka rate. Set the threshold to 0 to switch free shipping off &mdash; then also
+            edit the announcement bar in Editorial if it mentions free shipping.
           </p>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 8 }}>
+            <button className="btn btn-primary btn-sm" onClick={saveShipping} disabled={shipPending}>
+              {shipPending ? "Saving…" : "Save"}
+            </button>
+            {shipMsg && <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{shipMsg}</span>}
+          </div>
         </div>
 
-        {/* Payment methods */}
+        {/* Payment methods — status only. Online methods need a payment
+            gateway integration; until then checkout offers COD alone, so no
+            switch here may suggest otherwise. */}
         <div className="panel">
           <h3>Payment methods</h3>
           {([
-            ["acceptCod",    "Cash on Delivery", "Active for soft launch"],
-            ["acceptBkash",  "bKash",            "Add SSLCommerz first"],
-            ["acceptNagad",  "Nagad",            "Add SSLCommerz first"],
-            ["acceptRocket", "Rocket (DBBL)",    "Add SSLCommerz first"],
-            ["acceptCard",   "Card (Visa/MC/Amex)", "Add SSLCommerz first"],
-          ] as const).map(([key, label, hint]) => (
-            <div key={key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid var(--line)" }}>
+            ["Cash on Delivery",    "The only method checkout offers today", true],
+            ["bKash",               "Needs a payment gateway (e.g. SSLCommerz) — not connected", false],
+            ["Nagad",               "Needs a payment gateway — not connected", false],
+            ["Rocket (DBBL)",       "Needs a payment gateway — not connected", false],
+            ["Card (Visa/MC/Amex)", "Needs a payment gateway — not connected", false],
+          ] as const).map(([label, hint, live]) => (
+            <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid var(--line)" }}>
               <div>
                 <div style={{ fontWeight: 500 }}>{label}</div>
                 <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>{hint}</div>
               </div>
-              <div
-                onClick={() => setC({ ...c, [key]: !c[key] })}
-                style={{ width: 40, height: 22, background: c[key] ? "var(--purple-800)" : "var(--line)", borderRadius: 22, position: "relative", cursor: "pointer", transition: "background .2s" }}
-              >
-                <div style={{ position: "absolute", top: 2, left: c[key] ? 20 : 2, width: 18, height: 18, background: "white", borderRadius: "50%", transition: "left .2s" }} />
-              </div>
+              <span className={"pill " + (live ? "pill-ok" : "pill-warn")}>{live ? "Active" : "Not available"}</span>
             </div>
           ))}
+          <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 14, lineHeight: 1.6 }}>
+            No VAT is added and there is no cash-on-delivery fee: the customer pays the subtotal,
+            less any coupon, plus shipping.
+          </p>
         </div>
 
         {/* Locales */}

@@ -1,6 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useShippingRules } from "@/lib/shipping-rules-context";
+import { formatBdt } from "@/lib/utils";
 
 type Tier = {
   key: string;
@@ -84,8 +86,10 @@ function getCurrentTier(spend: number): { current: Tier; currentIndex: number } 
   return { current: TIERS[0], currentIndex: 0 };
 }
 
-export default function LoyaltyCard({ lifetimeSpend }: Props) {
+export default function LoyaltyCard({ lifetimeSpend, locale }: Props) {
   const t = useTranslations();
+  const { freeShippingThresholdBdt } = useShippingRules();
+  const perkArgs = { threshold: formatBdt(freeShippingThresholdBdt, locale) };
   const formatter = new Intl.NumberFormat("en-IN");
   const { current, currentIndex } = getCurrentTier(lifetimeSpend);
   const next = currentIndex < TIERS.length - 1 ? TIERS[currentIndex + 1] : null;
@@ -252,7 +256,7 @@ export default function LoyaltyCard({ lifetimeSpend }: Props) {
                     transform: "translateY(-2px)",
                   }}
                 />
-                {t(perk)}
+                {t(perk, perkArgs)}
               </li>
             ))}
           </ul>
