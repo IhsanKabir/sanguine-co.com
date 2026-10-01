@@ -1,5 +1,7 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { getVisibleSegments } from "@/lib/queries";
+import { getCommerceSettings } from "@/lib/commerce";
+import { formatBdt } from "@/lib/utils";
 import {
   getAnnouncement,
   isWithinWindow,
@@ -17,6 +19,7 @@ import AnnouncementBar from "./AnnouncementBar";
 export default async function TopNav() {
   const t = await getTranslations();
   const locale = await getLocale();
+  const commerce = await getCommerceSettings();
   let segments: Awaited<ReturnType<typeof getVisibleSegments>> = [];
   try {
     segments = await getVisibleSegments();
@@ -48,7 +51,7 @@ export default async function TopNav() {
         />
       ) : (
         <div className="topbar">
-          {t("topbar.announcement")}
+          {t("topbar.announcement", { threshold: formatBdt(commerce.freeShippingThresholdBdt, locale as "en" | "bn") })}
         </div>
       )}
       <nav className="nav" aria-label={t("nav.primary")}>

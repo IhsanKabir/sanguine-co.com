@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { COPY_CACHE_TAG } from "@/lib/copy";
-import { COMMERCE_KEY, COMMERCE_CACHE_TAG, getCommerceSettings, type CommerceSettings } from "@/lib/commerce";
+import { COMMERCE_KEY, COMMERCE_CACHE_TAG, COMMERCE_DEFAULTS, commerceSchema, getCommerceSettings, type CommerceSettings } from "@/lib/commerce";
 import { SITE_URL } from "@/lib/site-url";
 
 // Bust the ISR cache for every locale-prefixed route.
@@ -586,12 +586,12 @@ export async function getBrand() {
 
 // ─── Commerce settings (quotation-driven pricing) ──────────────────────
 //
-// Global levers for the pricing model: the preorder deposit percentage and
-// the default return window. Product-level overrides live on the product row.
-const commerceUpdateSchema = z.object({
-  preorderDepositPct: z.number().int().min(1).max(100),
-  returnWindowDays: z.number().int().min(0).max(365),
-});
+// Global levers: the preorder deposit percentage, the default return window
+// (product-level overrides live on the product row) and the shipping rules.
+// The Settings page saves each panel separately, so an update carries only
+// some fields and is MERGED over the stored row; replacing the row would
+// reset the fields the other panel owns.
+const commerceUpdateSchema = commerceSchema.partial();
 
 export async function getCommerceForAdmin(): Promise<CommerceSettings> {
   await requirePermission("settings");
@@ -600,7 +600,13 @@ export async function getCommerceForAdmin(): Promise<CommerceSettings> {
 
 export async function updateCommerceSettings(input: z.infer<typeof commerceUpdateSchema>) {
   await requirePermission("settings");
-  const data = commerceUpdateSchema.parse(input);
+  const patch = commerceUpdateSchema.parse(input);
+  // Read the row itself, not the cached getCommerceSettings(): a stale cache
+  // entry would write old values back over a save made moments earlier.
+  const rows = await db.select().from(schema.siteSettings)
+    .where(eq(schema.siteSettings.key, COMMERCE_KEY)).limit(1);
+  const stored = commerceSchema.safeParse(rows[0]?.value);
+  const data = commerceSchema.parse({ ...(stored.success ? stored.data : COMMERCE_DEFAULTS), ...patch });
   await db.insert(schema.siteSettings).values({ key: COMMERCE_KEY, value: data })
     .onConflictDoUpdate({
       target: schema.siteSettings.key,

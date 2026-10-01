@@ -19,12 +19,39 @@ export const DEFAULT_PREORDER_DEPOSIT_PCT = 20;
 // commerce setting still overrides this once it has been saved.
 export const DEFAULT_RETURN_WINDOW_DAYS = 14;
 
-// Shipping rules, shared by the cart, the cart drawer, checkout and the
-// server-side order total so the four can never quote different numbers.
-// Must match /legal/shipping.
+// Shipping rules. These are only the DEFAULTS: the live values are saved in
+// Admin → Settings (site_settings.commerce) and read through
+// getCommerceSettings() on the server / useShippingRules() in the browser.
 export const FREE_SHIPPING_THRESHOLD_BDT = 5000;
 export const FLAT_SHIPPING_DHAKA_BDT = 80;
 export const FLAT_SHIPPING_OUTSIDE_BDT = 150;
+
+export type ShippingRules = {
+  freeShippingThresholdBdt: number;
+  shippingDhakaBdt: number;
+  shippingOutsideBdt: number;
+};
+
+export const DEFAULT_SHIPPING_RULES: ShippingRules = {
+  freeShippingThresholdBdt: FREE_SHIPPING_THRESHOLD_BDT,
+  shippingDhakaBdt: FLAT_SHIPPING_DHAKA_BDT,
+  shippingOutsideBdt: FLAT_SHIPPING_OUTSIDE_BDT,
+};
+
+/**
+ * The one shipping calculation. The cart, the drawer and checkout show it;
+ * createCodOrder charges it — same function, so the quote and the charge
+ * cannot disagree. A threshold of 0 disables free shipping.
+ */
+export function shippingFor(rules: ShippingRules, city: string, subtotalBdt: number): number {
+  if (rules.freeShippingThresholdBdt > 0 && subtotalBdt >= rules.freeShippingThresholdBdt) return 0;
+  return city.toLowerCase().includes("dhaka") ? rules.shippingDhakaBdt : rules.shippingOutsideBdt;
+}
+
+/** True when the subtotal already qualifies for free shipping. */
+export function qualifiesForFreeShipping(rules: ShippingRules, subtotalBdt: number): boolean {
+  return rules.freeShippingThresholdBdt > 0 && subtotalBdt >= rules.freeShippingThresholdBdt;
+}
 
 export type PriceFields = {
   priceBdt: number;

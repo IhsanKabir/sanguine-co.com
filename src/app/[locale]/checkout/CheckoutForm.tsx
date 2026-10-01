@@ -11,11 +11,8 @@ import Composition from "@/components/storefront/Composition";
 import Icon from "@/components/storefront/Icon";
 import CouponInput from "@/components/storefront/CouponInput";
 
-import {
-  FREE_SHIPPING_THRESHOLD_BDT as FREE_THRESHOLD,
-  FLAT_SHIPPING_DHAKA_BDT as FLAT_DHAKA,
-  FLAT_SHIPPING_OUTSIDE_BDT as FLAT_OUTSIDE,
-} from "@/lib/pricing";
+import { shippingFor } from "@/lib/pricing";
+import { useShippingRules } from "@/lib/shipping-rules-context";
 
 type Prefill = {
   fullName: string;
@@ -32,6 +29,7 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
   const locale = useLocale() as "en" | "bn";
   const router = useRouter();
   const { items, subtotalBdt, clear, hydrated, coupon } = useCart();
+  const shippingRules = useShippingRules();
   const [step, setStep] = useState<1 | 2>(1);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +52,8 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
   const [notes, setNotes] = useState("");
 
   const isDhaka = s.city.toLowerCase().includes("dhaka");
-  const baseShipping = subtotalBdt >= FREE_THRESHOLD ? 0 : (isDhaka ? FLAT_DHAKA : FLAT_OUTSIDE);
+  // Same function createCodOrder charges with.
+  const baseShipping = shippingFor(shippingRules, s.city, subtotalBdt);
   const shipping = coupon?.freeShipping ? 0 : baseShipping;
 
   // Estimated arrival: 1–2 days handling + 1–3 transit inside Dhaka, 3–5 outside.

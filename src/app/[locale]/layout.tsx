@@ -9,6 +9,8 @@ import { fontClasses } from "@/app/fonts";
 import { organizationLd, websiteLd } from "@/lib/site-ld";
 import JsonLd from "@/components/seo/JsonLd";
 import { getAudioSettings } from "@/lib/audio-settings";
+import { getCommerceSettings, shippingRulesOf } from "@/lib/commerce";
+import { ShippingRulesProvider } from "@/lib/shipping-rules-context";
 import TopNav from "@/components/storefront/TopNav";
 import Footer from "@/components/storefront/Footer";
 import { CartProvider } from "@/lib/cart-context";
@@ -42,6 +44,9 @@ export default async function LocaleLayout({
   // to the client; atier.js plays the file when present and falls back to
   // its synth tone otherwise. Cached + tag-busted like the copy library.
   const audio = await getAudioSettings();
+  // Saved shipping rules (Admin → Settings) for the browser-side cart,
+  // drawer and checkout; cached and tag-busted on save like the audio row.
+  const shippingRules = shippingRulesOf(await getCommerceSettings());
   const audioUrls: Record<string, string> = {};
   if (audio.gong) audioUrls.gong = audio.gong.url;
   if (audio.chime) audioUrls.chime = audio.chime.url;
@@ -58,6 +63,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <SessionTracker />
       <a href="#main" className="skip-link">{t("common.skipToContent")}</a>
+      <ShippingRulesProvider rules={shippingRules}>
       <CartProvider>
         <WishlistProvider>
           <TopNav />
@@ -68,6 +74,7 @@ export default async function LocaleLayout({
           <CookieConsent />
         </WishlistProvider>
       </CartProvider>
+      </ShippingRulesProvider>
       {/* Plain inline tag (not next/script): executes during HTML parse, so
        *  window.SSG_AUDIO_URLS exists before the afterInteractive atier.js
        *  reads it. URLs are server-validated against our own bucket prefix;

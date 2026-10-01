@@ -19,7 +19,7 @@
     "noCategories": "No categories yet"
   },
   "topbar": {
-    "announcement": "Complimentary shipping over ৳5,000 · Cash on Delivery available nationwide",
+    "announcement": "Complimentary shipping over {threshold} · Cash on Delivery available nationwide",
     "shipping": "Complimentary shipping over",
     "shippingThreshold": "৳5,000",
     "cod": "Cash on Delivery available nationwide",
@@ -53,7 +53,7 @@
       "atelierMade": "Atelier-made",
       "cod": "Cash on Delivery",
       "gift": "Gift packaging",
-      "freeDelivery": "Free delivery over ৳5,000",
+      "freeDelivery": "Free delivery over {threshold}",
       "returns": "14-day returns",
       "certified": "House-certified"
     },
@@ -153,13 +153,14 @@
     "outOfStock": "Currently out of stock",
     "outOfStockPreorder": "Out of stock — preorder available",
     "preorderOnly": "Available by preorder only",
-    "shippingNote": "Free delivery on orders over ৳5,000 · Standard ৳80–150",
+    "shippingNote": "Free delivery on orders over {threshold} · Standard {dhaka}–{outside}",
     "returnsTitle": "{days}-day returns",
     "returnsNote": "We arrange the courier pickup within {days} days of delivery",
     "whatsappText": "Hello, I'm interested in {name} — {url}",
     "whatsappLink": "Questions about this piece? Chat on WhatsApp →",
     "styleKicker": "STYLE IT WITH",
-    "completeLook": "Complete the look"
+    "completeLook": "Complete the look",
+    "shippingNoteNoFree": "Delivery {dhaka} inside Dhaka · {outside} elsewhere"
   },
   "cart": {
     "title": "Your Bag",
@@ -590,7 +591,7 @@
   },
   "loyalty": {
     "perks": {
-      "freeShipping": "Free shipping over ৳5,000",
+      "freeShipping": "Free shipping over {threshold}",
       "newsletter": "Sanguine seasonal newsletter",
       "memberSale": "Member-only sale access",
       "allInitie": "All Maison Initié perks",

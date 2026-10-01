@@ -9,13 +9,14 @@ import Icon from "./Icon";
 import CouponInput from "./CouponInput";
 import { useState, useCallback } from "react";
 
-import { FREE_SHIPPING_THRESHOLD_BDT as FREE_THRESHOLD } from "@/lib/pricing";
+import { useShippingRules } from "@/lib/shipping-rules-context";
 // Matches the `ssg-cart-line-out` keyframe duration in motion.css. Keeping
 // this as a constant so the JS delay and CSS duration stay in sync.
 const CART_LINE_OUT_MS = 280;
 
 export default function CartDrawer() {
   const t = useTranslations();
+  const { freeShippingThresholdBdt: FREE_THRESHOLD } = useShippingRules();
   const locale = useLocale() as "en" | "bn";
   const router = useRouter();
   const { items, saved, open, closeDrawer, inc, dec, remove, subtotalBdt, itemKey, coupon, saveForLater, moveToCart, removeSaved } = useCart();
@@ -40,9 +41,11 @@ export default function CartDrawer() {
   const discount = coupon?.discountBdt ?? 0;
   const afterDiscount = Math.max(0, subtotalBdt - discount);
 
+  // A threshold of 0 means free shipping is switched off: no progress bar.
+  const hasFreeShipping = FREE_THRESHOLD > 0;
   const remaining = Math.max(0, FREE_THRESHOLD - subtotalBdt);
-  const met = remaining === 0;
-  const pct = Math.min(100, Math.round((subtotalBdt / FREE_THRESHOLD) * 100));
+  const met = hasFreeShipping && remaining === 0;
+  const pct = hasFreeShipping ? Math.min(100, Math.round((subtotalBdt / FREE_THRESHOLD) * 100)) : 0;
 
   const onCheckout = () => { closeDrawer(); router.push("/checkout"); };
 
@@ -66,6 +69,7 @@ export default function CartDrawer() {
             </div>
           ) : (
             <>
+              {hasFreeShipping && (
               <div className={"ship-bar " + (met ? "met" : "")}>
                 <div className="top">
                   <span>
@@ -77,6 +81,7 @@ export default function CartDrawer() {
                 </div>
                 <div className="track"><div className="fill" style={{ ["--p" as string]: pct + "%" }} /></div>
               </div>
+              )}
 
               {items.map((i) => {
                 const k = itemKey(i);
