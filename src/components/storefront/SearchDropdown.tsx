@@ -15,6 +15,7 @@ type SearchHit = {
   nameBn: string | null;
   priceBdt: number;
   cat: string | null;
+  img: string | null;
 };
 
 export default function SearchDropdown() {
@@ -61,6 +62,16 @@ export default function SearchDropdown() {
     router.push(`/product/${slug}`);
   };
 
+  // Enter, or "See all results": the full results page with filters and sort.
+  const onSeeAll = () => {
+    const term = q.trim();
+    if (term.length < 2) return;
+    setOpen(false);
+    setExpanded(false);
+    setQ("");
+    router.push(`/search?q=${encodeURIComponent(term)}`);
+  };
+
   const handleExpand = () => {
     setExpanded(true);
     // Let the element mount before focusing.
@@ -93,7 +104,10 @@ export default function SearchDropdown() {
         onChange={(e) => { setQ(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
         onKeyDown={(e) => {
-          if (e.key === "Escape") {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            onSeeAll();
+          } else if (e.key === "Escape") {
             setOpen(false);
             setExpanded(false);
             setQ("");
@@ -115,7 +129,12 @@ export default function SearchDropdown() {
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => onPick(p.slug)}
               >
-                <Composition cat={p.cat || "clothing"} sku={p.sku} name={p.name} small />
+                {p.img ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- 44px thumbnail; the optimiser adds a round trip for nothing
+                  <span className="search-thumb"><img src={p.img} alt="" loading="lazy" /></span>
+                ) : (
+                  <Composition cat={p.cat || "clothing"} sku={p.sku} name={p.name} small />
+                )}
                 <div>
                   <div className="ct">{p.cat || ""}</div>
                   <div className="nm">{(locale === "bn" && p.nameBn) || p.name}</div>
@@ -124,6 +143,14 @@ export default function SearchDropdown() {
               </div>
             ))
           )}
+          <button
+            type="button"
+            className="search-all"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onSeeAll}
+          >
+            {t("search.seeAll")}
+          </button>
         </div>
       )}
     </div>

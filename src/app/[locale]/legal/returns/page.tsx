@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/routing";
 import { legalMetadata } from "../_metadata";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -16,11 +17,11 @@ function EnglishSection() {
     <>
       <div className="legal-kicker">RETURNS &amp; REFUNDS</div>
       <h1>How returns work, and what cannot be returned.</h1>
-      <p className="legal-lede">Last updated: 2 May 2026.</p>
+      <p className="legal-lede">Last updated: 1 October 2026.</p>
 
       <h2>Stock pieces &mdash; fourteen days</h2>
       <p>A piece bought from our in-stock collection may be returned within <b>fourteen days of delivery</b>, in its original condition (unworn, unwashed, with tags and packaging intact). The fourteen-day window matches the prevailing standard of Bangladeshi e-commerce.</p>
-      <p>To begin a return, write to <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a> with your order number (SSG-XXXX) and a sentence about why you are returning. We will book a collection through our courier; the maison covers return shipping for any defective or incorrect piece, otherwise return shipping is at the customer&rsquo;s cost (typically ৳60&ndash;120).</p>
+      <p>To begin a return, sign in and open <Link href="/account">your account</Link>: each delivered order has a <b>Return</b> button. If you ordered without an account, write to <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a> with your order number (SSG-XXXX) and a sentence about why you are returning. We will book a collection through our courier; the maison covers return shipping for any defective or incorrect piece, otherwise return shipping is at the customer&rsquo;s cost (typically ৳60&ndash;120).</p>
       <p>Once the piece arrives back at the atelier and we have verified its condition, we will refund you within seven working days. Refunds for cash-on-delivery orders are made by bKash or bank transfer to a number/account you nominate.</p>
 
       <h2>Bespoke pieces &mdash; defects only</h2>
@@ -53,11 +54,11 @@ function BangleSection() {
     <>
       <div className="legal-kicker">ফেরত ও অর্থ ফেরত</div>
       <h1>ফেরত কীভাবে কাজ করে, এবং কী ফেরত দেওয়া যায় না।</h1>
-      <p className="legal-lede">সর্বশেষ আপডেট: ২ মে ২০২৬।</p>
+      <p className="legal-lede">সর্বশেষ আপডেট: ১ অক্টোবর ২০২৬।</p>
 
       <h2>স্টক পিস &mdash; চৌদ্দ দিন</h2>
       <p>আমাদের ইন-স্টক সংগ্রহ থেকে কেনা একটি পিস ডেলিভারির <b>চৌদ্দ দিনের মধ্যে</b> মূল অবস্থায় ফেরত দেওয়া যায় (পরা হয়নি, ধোয়া হয়নি, ট্যাগ ও প্যাকেজিং অক্ষত)। চৌদ্দ দিনের সময়সীমাটি বাংলাদেশী ই-কমার্সের প্রচলিত মানদণ্ডের সঙ্গে সঙ্গতিপূর্ণ।</p>
-      <p>ফেরত শুরু করতে আপনার অর্ডার নম্বর (SSG-XXXX) এবং কারণসংক্রান্ত একটি সংক্ষিপ্ত বার্তা দিয়ে <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>-এ লিখুন। আমরা আমাদের কুরিয়ারের মাধ্যমে কালেকশন বুক করব; ত্রুটিযুক্ত বা ভুল পিসের ক্ষেত্রে ফেরতের শিপিং মেইসন বহন করে, অন্যথায় ফেরতের শিপিং গ্রাহকের খরচে (সাধারণত ৳৬০&ndash;১২০)।</p>
+      <p>ফেরত শুরু করতে সাইন ইন করে <Link href="/account">আপনার অ্যাকাউন্ট</Link> খুলুন: ডেলিভারি হওয়া প্রতিটি অর্ডারে <b>রিটার্ন</b> বোতাম আছে। অ্যাকাউন্ট ছাড়া অর্ডার করে থাকলে আপনার অর্ডার নম্বর (SSG-XXXX) এবং কারণসংক্রান্ত একটি সংক্ষিপ্ত বার্তা দিয়ে <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>-এ লিখুন। আমরা আমাদের কুরিয়ারের মাধ্যমে কালেকশন বুক করব; ত্রুটিযুক্ত বা ভুল পিসের ক্ষেত্রে ফেরতের শিপিং মেইসন বহন করে, অন্যথায় ফেরতের শিপিং গ্রাহকের খরচে (সাধারণত ৳৬০&ndash;১২০)।</p>
       <p>পিসটি অ্যাটেলিয়ারে ফিরে আসা ও অবস্থা যাচাই হওয়ার পর সাত কর্মদিবসের মধ্যে আপনাকে অর্থ ফেরত দেওয়া হবে। ক্যাশ অন ডেলিভারি অর্ডারের ফেরত আপনার নির্দেশিত bKash বা ব্যাংক অ্যাকাউন্টে পাঠানো হবে।</p>
 
       <h2>বেসপোক পিস &mdash; কেবল ত্রুটিতে</h2>

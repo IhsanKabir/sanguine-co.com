@@ -22,13 +22,19 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
   const { setActivePhotoIndex } = usePdpState();
 
   const [color, setColorState] = useState<string>(colors[0] ?? "");
-  const [size, setSize] = useState<string>(sizes[0] ?? "");
+  // No size is chosen for the shopper unless there is only one: pre-selecting
+  // the first (usually the smallest) put whoever didn't notice the picker into
+  // the wrong size. Colour stays pre-selected, since the photo shows it.
+  const [size, setSizeState] = useState<string>(sizes.length === 1 ? sizes[0] : "");
+  const [sizeHint, setSizeHint] = useState(false);
+  const needsSize = sizes.length > 0 && !size;
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [stickyVisible, setStickyVisible] = useState(false);
   const [flyPos, setFlyPos] = useState<{ x: number; y: number } | null>(null);
 
   const actionsRef = useRef<HTMLDivElement>(null);
+  const sizeRowRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -49,7 +55,21 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
     }
   };
 
+  const setSize = (s: string) => {
+    setSizeState(s);
+    setSizeHint(false);
+  };
+
+  // Add-to-bag without a size: point at the picker instead of adding.
+  const promptForSize = () => {
+    setSizeHint(true);
+    const row = sizeRowRef.current;
+    row?.scrollIntoView({ behavior: "smooth", block: "center" });
+    row?.querySelector<HTMLElement>("[role=button]")?.focus({ preventScroll: true });
+  };
+
   const doAdd = () => {
+    if (needsSize) return promptForSize();
     if (btnRef.current) {
       const r = btnRef.current.getBoundingClientRect();
       setFlyPos({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
@@ -98,13 +118,14 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
       )}
       {sizes.length > 0 && (
         <>
-          <div className="pdp-label">{t("pdp.sizeLabel", { value: size })}</div>
-          <div className="swatch-row">
+          <div className="pdp-label">{size ? t("pdp.sizeLabel", { value: size }) : t("common.size")}</div>
+          <div className="swatch-row" ref={sizeRowRef}>
             {sizes.map((s) => (
               <div
                 key={s}
                 className={"swatch size-pill " + (s === size ? "active" : "")}
                 role="button"
+                aria-pressed={s === size}
                 tabIndex={0}
                 onClick={() => setSize(s)}
                 onKeyDown={(e) => { if (e.key === "Enter") setSize(s); }}
@@ -113,6 +134,9 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
               </div>
             ))}
           </div>
+          {sizeHint && needsSize && (
+            <div className="pdp-size-hint" role="alert">{t("pdp.chooseSizeFirst")}</div>
+          )}
         </>
       )}
       <div className="pdp-label">{t("common.quantity")}</div>
@@ -124,7 +148,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
       <div className="pdp-actions" ref={actionsRef}>
         <button ref={btnRef} className="btn btn-primary btn-block" onClick={doAdd}>
           <Icon name={added ? "check" : "bag"} size={14} />
-          {added ? t("pdp.added") : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
+          {added ? t("pdp.added") : needsSize ? t("pdp.selectSize") : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
         </button>
       </div>
 
@@ -139,7 +163,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
           tabIndex={stickyVisible ? 0 : -1}
         >
           <Icon name={added ? "check" : "bag"} size={14} />
-          {added ? t("pdp.added") : formatBdt(product.priceBdt * qty, locale)}
+          {added ? t("pdp.added") : needsSize ? t("pdp.selectSize") : formatBdt(product.priceBdt * qty, locale)}
         </button>
       </div>
     </>
