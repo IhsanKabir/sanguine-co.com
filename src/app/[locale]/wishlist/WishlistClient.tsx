@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useWishlist } from "@/lib/wishlist-context";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
 import type { Product, Segment } from "@/lib/schema";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
@@ -12,11 +13,12 @@ import OceanicBand from "@/components/storefront/OceanicBand";
 export default function WishlistClient({ products, segments }: { products: Product[]; segments: Segment[] }) {
   const t = useTranslations();
   const { items, hydrated } = useWishlist();
+  const ready = useHydrated();
 
   const segMap = useMemo(() => new Map(segments.map((s) => [s.id, s])), [segments]);
   const list = useMemo(() => products.filter((p) => items.has(p.id)), [products, items]);
 
-  if (!hydrated) return <p>{t("common.loading")}</p>;
+  if (!ready || !hydrated) return <p>{t("common.loading")}</p>;
 
   return (
     <>
