@@ -3,10 +3,11 @@
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { db, schema } from "@/lib/db";
-import { eq, sql, inArray, and } from "drizzle-orm";
+import { sql, inArray, and } from "drizzle-orm";
 import { trackEvent } from "@/lib/events";
 import { validateCoupon, recordCouponRedemption } from "./coupons";
 import { logOrderEvent } from "@/lib/order-events";
+import { checkOptionStock, takeStock } from "@/lib/variant-stock";
 import { getCurrentUser } from "@/lib/auth-utils";
 
 import { SITE_URL } from "@/lib/site-url";
@@ -125,7 +126,6 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
     if (p.priceBdt <= 0) {
       return { ok: false as const, error: `${p.name} cannot be ordered right now — please contact the concierge` };
     }
-    if (p.stock < item.qty) return { ok: false as const, error: `${p.name} — only ${p.stock} in stock` };
     const lineTotal = p.priceBdt * item.qty;
     subtotal += lineTotal;
     lines.push({
@@ -139,6 +139,14 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
       lineTotalBdt: lineTotal,
     });
   }
+
+  // Stock per option (size/colour) where the product is tracked that way,
+  // otherwise the product's single stock number.
+  const stockError = await checkOptionStock(lines.map((l) => ({
+    productId: l.productId, color: l.color, size: l.size, qty: l.qty,
+    name: l.nameSnapshot, productStock: byId.get(l.productId)!.stock,
+  })));
+  if (stockError) return { ok: false as const, error: stockError };
 
   // 3. Validate coupon (server-side; never trust client)
   let couponDiscount = 0;
@@ -198,16 +206,10 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
     );
 
     for (const l of lines) {
-      // Atomic stock decrement with WHERE guard — if `stock >= qty` is no longer
-      // true (because a concurrent order beat us to the last unit), the UPDATE
-      // affects 0 rows and we throw to abort the whole transaction.
-      const updated = await tx.update(schema.products)
-        .set({ stock: sql`${schema.products.stock} - ${l.qty}` })
-        .where(and(eq(schema.products.id, l.productId), sql`${schema.products.stock} >= ${l.qty}`))
-        .returning({ id: schema.products.id });
-      if (updated.length === 0) {
-        throw new Error(`OUT_OF_STOCK:${l.nameSnapshot}`);
-      }
+      // Guarded decrement of the option and the product total — if a
+      // concurrent order beat us to the last unit it throws OUT_OF_STOCK
+      // and the whole transaction rolls back.
+      await takeStock(tx, { ...l, name: l.nameSnapshot });
       await tx.insert(schema.inventoryLog).values({
         productId: l.productId,
         delta: -l.qty,

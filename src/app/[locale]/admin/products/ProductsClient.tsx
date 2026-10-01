@@ -9,7 +9,7 @@ import { Link } from "@/i18n/routing";
 import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import ProductImagesEditor from "./ProductImagesEditor";
 
-type Props = { segments: Segment[]; products: Product[] };
+type Props = { segments: Segment[]; products: Product[]; trackedIds: string[] };
 
 function LookPicker({
   selected,
@@ -167,7 +167,7 @@ const empty = (segId: string): Editing => ({
   priceMinBdt: "", priceMaxBdt: "", preorderDepositPct: "", returnWindowDays: "",
 });
 
-export default function ProductsClient({ segments, products }: Props) {
+export default function ProductsClient({ segments, products, trackedIds }: Props) {
   const [editing, setEditing] = useState<Editing | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [pendingDel, setPendingDel] = useState<Product | null>(null);
@@ -390,7 +390,14 @@ export default function ProductsClient({ segments, products }: Props) {
             <div className="row" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
               <div className="field"><label>Price (৳)</label><input type="number" value={editing.priceBdt} onChange={(e) => setEditing({ ...editing, priceBdt: e.target.value })}/></div>
               <div className="field"><label>Was (৳)</label><input type="number" value={editing.wasBdt} onChange={(e) => setEditing({ ...editing, wasBdt: e.target.value })}/></div>
-              <div className="field"><label>Stock</label><input type="number" value={editing.stock} onChange={(e) => setEditing({ ...editing, stock: e.target.value })}/></div>
+              {editing.id && trackedIds.includes(editing.id) ? (
+                // Counted per size/colour: the total is the sum of the options
+                // and is changed in Inventory → Per option (the server ignores
+                // a stock value sent from here).
+                <div className="field"><label>Stock</label><input type="number" value={editing.stock} disabled title="Counted per size/colour — change it in Inventory → Per option"/></div>
+              ) : (
+                <div className="field"><label>Stock</label><input type="number" value={editing.stock} onChange={(e) => setEditing({ ...editing, stock: e.target.value })}/></div>
+              )}
               <div className="field"><label>Tag</label>
                 <select value={editing.tag} onChange={(e) => setEditing({ ...editing, tag: e.target.value })}>
                   <option value="">— None —</option>

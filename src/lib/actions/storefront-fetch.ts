@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { getProductsByIds, getHeroImagesFor } from "@/lib/queries";
 import type { Product } from "@/lib/schema";
+import { optionStock } from "@/lib/variant-stock";
 
 const idsSchema = z.array(z.string().min(1).max(120)).max(20);
 
@@ -50,4 +51,15 @@ export async function fetchProductsLite(ids: string[]): Promise<StorefrontProduc
     tag: p.tag ?? null,
     heroImage: heroes.get(p.id) ?? null,
   }));
+}
+
+/**
+ * Per size/colour stock for one piece ("colour|size" → n), or null when it
+ * has a single stock number. Read by the quick-view modal, which opens from
+ * cached grid pages that don't carry it.
+ */
+export async function getOptionStock(productId: string): Promise<Record<string, number> | null> {
+  const id = z.string().min(1).max(120).safeParse(productId);
+  if (!id.success) return null;
+  return optionStock(id.data).catch(() => null);
 }

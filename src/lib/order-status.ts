@@ -1,11 +1,12 @@
 import { revalidatePath } from "next/cache";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { parseShippingAddress } from "@/lib/schema";
 import { SITE_URL } from "@/lib/site-url";
 import { sendEmail } from "@/lib/email/brevo";
 import { reviewRequestEmail } from "@/lib/email/templates";
 import { logOrderEvent } from "@/lib/order-events";
+import { returnStock } from "@/lib/variant-stock";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 
 /**
@@ -62,26 +63,28 @@ export async function applyOrderStatus(
     ...(opts.actor !== undefined ? { actor: opts.actor } : {}),
   });
 
-  // Cancelled storefront orders give their stock back (COD cancellations are
-  // routine in Bangladesh — without this every cancellation silently shrank
-  // inventory). Guards: only on the FIRST transition into cancelled, and only
-  // for orders that decremented stock at creation — converted preorders
-  // (SSG-PO-) and manual orders (SSG-MX-) never did, so restoring for them
-  // would inflate inventory.
-  const decrementedAtCreation =
-    !before.number.startsWith("SSG-PO-") && !before.number.startsWith("SSG-MX-");
+  // Cancelled orders give their stock back (COD cancellations are routine in
+  // Bangladesh — without this every cancellation silently shrank inventory).
+  // Guards: only on the FIRST transition into cancelled, and only for orders
+  // that took stock at creation. Storefront and manual (SSG-MX-) orders do;
+  // converted preorders (SSG-PO-) never did, so restoring for them would
+  // inflate inventory. (Manual orders were wrongly excluded before: they do
+  // take stock, so cancelling one used to lose it.)
+  const decrementedAtCreation = !before.number.startsWith("SSG-PO-");
   if (
     status === "cancelled" &&
     !["cancelled", "refunded", "returned"].includes(before.status) &&
     decrementedAtCreation
   ) {
-    const lines = await db.select({ productId: schema.orderLines.productId, qty: schema.orderLines.qty })
-      .from(schema.orderLines).where(eq(schema.orderLines.orderId, orderId));
+    const lines = await db.select({
+      productId: schema.orderLines.productId,
+      qty: schema.orderLines.qty,
+      color: schema.orderLines.color,
+      size: schema.orderLines.size,
+    }).from(schema.orderLines).where(eq(schema.orderLines.orderId, orderId));
     for (const l of lines) {
       if (!l.productId) continue;
-      await db.update(schema.products)
-        .set({ stock: sql`${schema.products.stock} + ${l.qty}` })
-        .where(eq(schema.products.id, l.productId));
+      await returnStock(db, { productId: l.productId, color: l.color, size: l.size, qty: l.qty });
       await db.insert(schema.inventoryLog).values({
         productId: l.productId,
         delta: l.qty,

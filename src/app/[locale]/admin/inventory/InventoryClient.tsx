@@ -1,17 +1,21 @@
 "use client";
 
 import { useState, useTransition, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import type { Product, Segment } from "@/lib/schema";
 import { adjustStock } from "@/lib/actions/admin";
 import { notifyBackInStock } from "@/lib/actions/stock-notify";
 import { formatBdt } from "@/lib/utils";
 import Composition from "@/components/storefront/Composition";
+import OptionStockEditor from "./OptionStockEditor";
 
 type Props = {
   products: Product[];
   segments: Segment[];
   canSeeRevenue: boolean;
   pendingNotifs: Record<string, number>;
+  /** Products counted per size/colour (product_variants rows exist). */
+  trackedIds: string[];
 };
 
 type StockHealth = "out" | "critical" | "low" | "healthy";
@@ -29,7 +33,11 @@ const HEALTH_PILL: Record<StockHealth, string> = {
   out: "pill-err", critical: "pill-err", low: "pill-warn", healthy: "pill-ok",
 };
 
-export default function InventoryClient({ products, segments, canSeeRevenue, pendingNotifs }: Props) {
+export default function InventoryClient({ products, segments, canSeeRevenue, pendingNotifs, trackedIds }: Props) {
+  const router = useRouter();
+  const tracked = useMemo(() => new Set(trackedIds), [trackedIds]);
+  const [perOption, setPerOption] = useState<{ id: string; name: string } | null>(null);
+  const [adjustError, setAdjustError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | StockHealth>("all");
   const [adjusting, setAdjusting] = useState<{ id: string; name: string; current: number } | null>(null);
   const [delta, setDelta] = useState("");
@@ -77,7 +85,8 @@ export default function InventoryClient({ products, segments, canSeeRevenue, pen
     const d = parseInt(delta) || 0;
     if (d === 0) { setAdjusting(null); return; }
     startTransition(async () => {
-      await adjustStock(adjusting.id, d, reason);
+      const r = await adjustStock(adjusting.id, d, reason);
+      if (!r.ok) { setAdjustError(r.error); return; }
       setAdjusting(null);
       setDelta("");
     });
@@ -126,7 +135,10 @@ export default function InventoryClient({ products, segments, canSeeRevenue, pen
                   </td>
                   <td className="mono" style={{ fontSize: 11, color: "var(--ink-soft)" }}>{p.sku}</td>
                   <td>{seg?.name || "—"}</td>
-                  <td style={{ fontWeight: 500, color: h === "critical" || h === "out" ? "var(--err)" : "inherit" }}>{p.stock}</td>
+                  <td style={{ fontWeight: 500, color: h === "critical" || h === "out" ? "var(--err)" : "inherit" }}>
+                    {p.stock}
+                    {tracked.has(p.id) && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 400, color: "var(--ink-soft)" }}>per option</span>}
+                  </td>
                   {canSeeRevenue && <td>{formatBdt(p.priceBdt)}</td>}
                   <td>
                     <span className={"pill " + HEALTH_PILL[h]}>{HEALTH_LABEL[h]}</span>
@@ -157,9 +169,21 @@ export default function InventoryClient({ products, segments, canSeeRevenue, pen
                         </button>
                       )
                     )}
-                    <button className="btn btn-ghost btn-sm" onClick={() => { setAdjusting({ id: p.id, name: p.name, current: p.stock }); setDelta(""); setReason("restock"); }}>
-                      Adjust
-                    </button>
+                    {((p.sizes as string[] | null)?.length || (p.colors as string[] | null)?.length) ? (
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        onClick={() => setPerOption({ id: p.id, name: p.name })}
+                        title="Count stock for each size / colour"
+                        style={{ marginRight: tracked.has(p.id) ? 0 : 6 }}
+                      >
+                        Per option
+                      </button>
+                    ) : null}
+                    {!tracked.has(p.id) && (
+                      <button className="btn btn-ghost btn-sm" onClick={() => { setAdjusting({ id: p.id, name: p.name, current: p.stock }); setDelta(""); setReason("restock"); setAdjustError(null); }}>
+                        Adjust
+                      </button>
+                    )}
                   </td>
                 </tr>
               );
@@ -200,12 +224,21 @@ export default function InventoryClient({ products, segments, canSeeRevenue, pen
             <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: "10px 0 18px" }}>
               New stock: <b style={{ color: "var(--purple-900)" }}>{Math.max(0, adjusting.current + (parseInt(delta) || 0))}</b>
             </p>
+            {adjustError && <p className="field-err" style={{ margin: "0 0 12px", fontSize: 13 }}>{adjustError}</p>}
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button className="btn btn-ghost btn-sm" onClick={() => setAdjusting(null)}>Cancel</button>
               <button className="btn btn-primary btn-sm" onClick={onAdjust}>Apply</button>
             </div>
           </div>
         </>
+      )}
+
+      {perOption && (
+        <OptionStockEditor
+          productId={perOption.id}
+          name={perOption.name}
+          onClose={() => { setPerOption(null); router.refresh(); }}
+        />
       )}
     </>
   );

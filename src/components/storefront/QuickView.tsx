@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
@@ -8,6 +8,8 @@ import { useCart, type CartItem } from "@/lib/cart-context";
 import { formatBdt } from "@/lib/utils";
 import Composition from "./Composition";
 import Icon from "./Icon";
+import { getOptionStock } from "@/lib/actions/storefront-fetch";
+import { colorSoldOut, sizeSoldOut, stockOf, type OptionStock } from "./option-availability";
 
 export type QuickViewProduct = {
   id: string;
@@ -83,13 +85,44 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
   const locale = useLocale() as "en" | "bn";
   const t = useTranslations();
   const { add } = useCart();
-  const [color, setColor] = useState<string>(product.colors[0] || "");
+  const { colors, sizes } = product;
+  const [color, setColorState] = useState<string>(colors[0] || "");
   // Same rule as the product page: no size is assumed unless there is only one.
-  const [size, setSizeState] = useState<string>(product.sizes.length === 1 ? product.sizes[0] : "");
+  const [size, setSizeState] = useState<string>(sizes.length === 1 ? sizes[0] : "");
   const [sizeHint, setSizeHint] = useState(false);
-  const needsSize = product.sizes.length > 0 && !size;
-  const setSize = (s: string) => { setSizeState(s); setSizeHint(false); };
+  const needsSize = sizes.length > 0 && !size;
   const [qty, setQty] = useState(1);
+
+  // Per size/colour stock, fetched when the modal opens (grid pages are
+  // cached and don't carry it). Until it arrives every option looks open;
+  // checkout checks again either way.
+  const [optStock, setOptStock] = useState<OptionStock>(null);
+  useEffect(() => {
+    let live = true;
+    getOptionStock(product.id).then((m) => {
+      if (!live || !m) return;
+      setOptStock(m);
+      // Same defaults as the product page, now that availability is known.
+      setColorState((c) => (colorSoldOut(m, sizes, c) ? colors.find((x) => !colorSoldOut(m, sizes, x)) ?? c : c));
+    }).catch(() => {});
+    return () => { live = false; };
+  }, [product.id, colors, sizes]);
+
+  const setColor = (c: string) => {
+    if (colorSoldOut(optStock, sizes, c)) return;
+    setColorState(c);
+    if (size && sizeSoldOut(optStock, colors, c, size)) setSizeState("");
+    setQty(1);
+  };
+  const setSize = (s: string) => {
+    if (sizeSoldOut(optStock, colors, color, s)) return;
+    setSizeState(s);
+    setSizeHint(false);
+    setQty(1);
+  };
+  const chosen = (colors.length === 0 || color) && (sizes.length === 0 || size);
+  const optionLeft = chosen ? stockOf(optStock, color, size) : null;
+  const optionSoldOut = optionLeft !== null && optionLeft <= 0;
   const [added, setAdded] = useState(false);
 
   const name = (locale === "bn" && product.nameBn) || product.name;
@@ -97,6 +130,7 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
 
   const onAdd = () => {
     if (needsSize) { setSizeHint(true); return; }
+    if (optionSoldOut) return;
     const item: CartItem = {
       productId: product.id,
       slug: product.slug,
@@ -165,7 +199,9 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
                     <button
                       key={c}
                       type="button"
-                      className={"swatch size-pill " + (c === color ? "active" : "")}
+                      className={"swatch size-pill " + (c === color ? "active" : "") + (colorSoldOut(optStock, sizes, c) ? " sold-out" : "")}
+                      disabled={colorSoldOut(optStock, sizes, c)}
+                      title={colorSoldOut(optStock, sizes, c) ? t("pdp.optionSoldOut") : undefined}
                       onClick={() => setColor(c)}
                     >
                       {c}
@@ -183,8 +219,10 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
                     <button
                       key={s}
                       type="button"
-                      className={"swatch size-pill " + (s === size ? "active" : "")}
+                      className={"swatch size-pill " + (s === size ? "active" : "") + (sizeSoldOut(optStock, colors, color, s) ? " sold-out" : "")}
                       aria-pressed={s === size}
+                      disabled={sizeSoldOut(optStock, colors, color, s)}
+                      title={sizeSoldOut(optStock, colors, color, s) ? t("pdp.optionSoldOut") : undefined}
                       onClick={() => setSize(s)}
                     >
                       {s}
@@ -201,7 +239,11 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
             <div className="qty">
               <button type="button" onClick={() => setQty(Math.max(1, qty - 1))} aria-label={t("common.decrease")}>−</button>
               <span aria-live="polite">{qty}</span>
-              <button type="button" onClick={() => setQty(qty + 1)} aria-label={t("common.increase")}>+</button>
+              <button
+                type="button"
+                onClick={() => setQty(optionLeft !== null ? Math.min(qty + 1, Math.max(1, optionLeft)) : qty + 1)}
+                aria-label={t("common.increase")}
+              >+</button>
             </div>
 
             {product.stock === 0 ? (
@@ -214,10 +256,10 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
                 onClick={onAdd}
                 className="btn btn-primary btn-block"
                 style={{ marginTop: 14 }}
-                disabled={added}
+                disabled={added || optionSoldOut}
               >
                 <Icon name={added ? "check" : "bag"} size={14} />
-                {added ? t("pdp.added") : needsSize ? t("pdp.selectSize") : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
+                {added ? t("pdp.added") : needsSize ? t("pdp.selectSize") : optionSoldOut ? t("pdp.optionSoldOut") : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
               </button>
             )}
 

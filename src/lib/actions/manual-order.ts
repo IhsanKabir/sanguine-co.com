@@ -3,10 +3,11 @@
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
-import { eq, sql, inArray, and } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { requirePermission } from "@/lib/auth-utils";
 import { logOrderEvent } from "@/lib/order-events";
+import { checkOptionStock, takeStock } from "@/lib/variant-stock";
 import { sendEmail } from "@/lib/email/brevo";
 import { orderPlacedEmail, type OrderEmailLine } from "@/lib/email/templates";
 
@@ -62,7 +63,6 @@ export async function createManualOrder(input: z.infer<typeof manualSchema>) {
   for (const item of data.items) {
     const p = byId.get(item.productId);
     if (!p) return { ok: false as const, error: `Product ${item.productId} not found` };
-    if (p.stock < item.qty) return { ok: false as const, error: `${p.name} — only ${p.stock} in stock` };
     const lineTotal = p.priceBdt * item.qty;
     subtotal += lineTotal;
     lines.push({
@@ -76,6 +76,12 @@ export async function createManualOrder(input: z.infer<typeof manualSchema>) {
       lineTotalBdt: lineTotal,
     });
   }
+
+  const stockError = await checkOptionStock(lines.map((l) => ({
+    productId: l.productId, color: l.color, size: l.size, qty: l.qty,
+    name: l.nameSnapshot, productStock: byId.get(l.productId)!.stock,
+  })));
+  if (stockError) return { ok: false as const, error: stockError };
 
   const total = subtotal + data.shippingBdt;
   const number = `SSG-MX-${Date.now().toString(36).toUpperCase()}`;
@@ -102,15 +108,9 @@ export async function createManualOrder(input: z.infer<typeof manualSchema>) {
       await tx.insert(schema.orderLines).values(lines.map((l) => ({ ...l, orderId: o.id })));
 
       for (const l of lines) {
-        // Atomic stock decrement with guard — abort the transaction if a
+        // Guarded decrement (option + total) — aborts the transaction if a
         // concurrent order took the unit between read and write.
-        const updated = await tx.update(schema.products)
-          .set({ stock: sql`${schema.products.stock} - ${l.qty}` })
-          .where(and(eq(schema.products.id, l.productId), sql`${schema.products.stock} >= ${l.qty}`))
-          .returning({ id: schema.products.id });
-        if (updated.length === 0) {
-          throw new Error(`OUT_OF_STOCK:${l.nameSnapshot}`);
-        }
+        await takeStock(tx, { ...l, name: l.nameSnapshot });
         await tx.insert(schema.inventoryLog).values({
           productId: l.productId,
           delta: -l.qty,
