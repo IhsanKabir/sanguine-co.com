@@ -9,7 +9,7 @@ import Icon from "./Icon";
 import CouponInput from "./CouponInput";
 import { useState, useCallback } from "react";
 
-const FREE_THRESHOLD = 3000;
+import { FREE_SHIPPING_THRESHOLD_BDT as FREE_THRESHOLD } from "@/lib/pricing";
 // Matches the `ssg-cart-line-out` keyframe duration in motion.css. Keeping
 // this as a constant so the JS delay and CSS duration stay in sync.
 const CART_LINE_OUT_MS = 280;

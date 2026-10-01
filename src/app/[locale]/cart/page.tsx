@@ -9,7 +9,7 @@ import Icon from "@/components/storefront/Icon";
 import CouponInput from "@/components/storefront/CouponInput";
 import OceanicBand from "@/components/storefront/OceanicBand";
 
-const FREE_THRESHOLD = 3000;
+import { FREE_SHIPPING_THRESHOLD_BDT as FREE_THRESHOLD } from "@/lib/pricing";
 
 export default function CartPage() {
   const t = useTranslations();

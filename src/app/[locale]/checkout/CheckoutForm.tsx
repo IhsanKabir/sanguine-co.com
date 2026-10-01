@@ -11,9 +11,11 @@ import Composition from "@/components/storefront/Composition";
 import Icon from "@/components/storefront/Icon";
 import CouponInput from "@/components/storefront/CouponInput";
 
-const FREE_THRESHOLD = 3000;
-const FLAT_DHAKA = 80;
-const FLAT_OUTSIDE = 150;
+import {
+  FREE_SHIPPING_THRESHOLD_BDT as FREE_THRESHOLD,
+  FLAT_SHIPPING_DHAKA_BDT as FLAT_DHAKA,
+  FLAT_SHIPPING_OUTSIDE_BDT as FLAT_OUTSIDE,
+} from "@/lib/pricing";
 
 type Prefill = {
   fullName: string;

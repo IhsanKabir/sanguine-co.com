@@ -13,9 +13,9 @@
     "admin": "Admin"
   },
   "topbar": {
-    "announcement": "Complimentary shipping over ৳3,000 · Cash on Delivery available nationwide",
+    "announcement": "Complimentary shipping over ৳5,000 · Cash on Delivery available nationwide",
     "shipping": "Complimentary shipping over",
-    "shippingThreshold": "৳3,000",
+    "shippingThreshold": "৳5,000",
     "cod": "Cash on Delivery available nationwide"
   },
   "home": {
@@ -59,7 +59,7 @@
     "remaining": "Only {count} remaining — assembled to order",
     "inStock": "In stock — ships in 48 hours",
     "freeShipping": "Free shipping",
-    "freeShippingNote": "Over ৳3,000",
+    "freeShippingNote": "Over ৳5,000",
     "codTitle": "Cash on Delivery",
     "codNote": "Available nationwide",
     "authentic": "Authentic",

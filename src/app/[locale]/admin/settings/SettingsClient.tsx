@@ -41,7 +41,7 @@ export default function SettingsClient({ initialBrand, initialCommerce }: { init
   };
 
   const [c, setC] = useState<StoreConfig>({
-    freeShippingThresholdBdt: 3000,
+    freeShippingThresholdBdt: 5000,
     flatShippingDhakaBdt: 80,
     flatShippingOutsideBdt: 150,
     taxRate: 0,

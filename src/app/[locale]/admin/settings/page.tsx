@@ -11,7 +11,7 @@ export default async function AdminSettingsPage() {
       name: "Sanguine",
       tagline: "Garments, flora & small ceremonies",
       email: "concierge@sanguine-co.com",
-      announcement: "Complimentary shipping over ৳3,000 · Cash on Delivery available nationwide",
+      announcement: "Complimentary shipping over ৳5,000 · Cash on Delivery available nationwide",
     }} />
   );
 }

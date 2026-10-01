@@ -15,7 +15,16 @@ import { formatBdt } from "./utils";
  */
 
 export const DEFAULT_PREORDER_DEPOSIT_PCT = 20;
-export const DEFAULT_RETURN_WINDOW_DAYS = 7;
+// 14 days matches the published returns policy (/legal/returns). The admin
+// commerce setting still overrides this once it has been saved.
+export const DEFAULT_RETURN_WINDOW_DAYS = 14;
+
+// Shipping rules, shared by the cart, the cart drawer, checkout and the
+// server-side order total so the four can never quote different numbers.
+// Must match /legal/shipping.
+export const FREE_SHIPPING_THRESHOLD_BDT = 5000;
+export const FLAT_SHIPPING_DHAKA_BDT = 80;
+export const FLAT_SHIPPING_OUTSIDE_BDT = 150;
 
 export type PriceFields = {
   priceBdt: number;

@@ -41,11 +41,11 @@ function EnglishSection() {
       <p>These are typical figures, not guarantees. During Eid weeks, monsoon flooding, or hartal/civic disruption, all couriers slow down and we cannot promise the above.</p>
 
       <h2>Shipping cost</h2>
-      <p>Shipping is calculated at checkout based on destination and parcel weight. For orders over ৳5,000, shipping is complimentary anywhere in Bangladesh.</p>
+      <p>Shipping is a flat ৳80 inside Dhaka and ৳150 everywhere else in Bangladesh, shown at checkout before you place the order. For orders over ৳5,000, shipping is complimentary anywhere in Bangladesh.</p>
 
       <h2>Cash on Delivery</h2>
       <p>All orders at present are paid in cash on delivery &mdash; please have the displayed total ready in hand for our courier. The courier may carry change for amounts up to ৳1,000; for larger amounts, it helps both of you to have the exact amount.</p>
-      <p>A small COD handling fee (typically ৳20&ndash;40, displayed at checkout) is added by the courier and passed on transparently.</p>
+      <p>There is no cash-on-delivery fee: the total shown at checkout is the amount you pay the courier.</p>
 
       <h2>Tracking</h2>
       <p>When your parcel is collected, we email and SMS you the tracking number from your courier. You can also see live tracking on your order page after signing in.</p>
@@ -89,11 +89,11 @@ function BangleSection() {
       <p>এগুলো সাধারণ চিত্র, গ্যারান্টি নয়। ঈদ সপ্তাহ, বন্যা, কিংবা হরতাল/অন্য বিঘ্নের সময় সকল কুরিয়ার ধীর হয় এবং উপরোক্ত সময় আমরা নিশ্চিত করতে পারি না।</p>
 
       <h2>শিপিং খরচ</h2>
-      <p>চেকআউটে গন্তব্য ও পার্সেলের ওজনের ভিত্তিতে শিপিং হিসাব করা হয়। ৳৫,০০০-এর বেশি অর্ডারে বাংলাদেশের যেকোনো জায়গায় শিপিং বিনামূল্যে।</p>
+      <p>ঢাকার ভেতরে শিপিং ৳৮০ এবং বাংলাদেশের অন্য যেকোনো স্থানে ৳১৫০, অর্ডার দেওয়ার আগে চেকআউটে দেখানো হয়। ৳৫,০০০-এর বেশি অর্ডারে বাংলাদেশের যেকোনো জায়গায় শিপিং বিনামূল্যে।</p>
 
       <h2>ক্যাশ অন ডেলিভারি</h2>
       <p>বর্তমানে সকল অর্ডার ক্যাশ অন ডেলিভারিতে পরিশোধিত &mdash; অনুগ্রহ করে কুরিয়ারের জন্য প্রদর্শিত মোট অর্থ হাতে রাখুন। কুরিয়ার ৳১,০০০ পর্যন্ত খুচরা বহন করতে পারেন; বেশি অঙ্কের ক্ষেত্রে নির্দিষ্ট পরিমাণ থাকলে দু&rsquo;পক্ষেরই সুবিধা।</p>
-      <p>একটি ছোট COD হ্যান্ডলিং ফি (সাধারণত ৳২০&ndash;৪০, চেকআউটে প্রদর্শিত) কুরিয়ার যোগ করে এবং স্বচ্ছভাবে গ্রাহকের কাছে আসে।</p>
+      <p>ক্যাশ অন ডেলিভারির জন্য কোনো অতিরিক্ত ফি নেই: চেকআউটে দেখানো মোট অর্থই কুরিয়ারকে পরিশোধ করবেন।</p>
 
       <h2>ট্র্যাকিং</h2>
       <p>পার্সেল সংগ্রহ করা হলে আমরা আপনার কুরিয়ারের ট্র্যাকিং নম্বর ইমেইল ও SMS-এ পাঠাই। সাইন-ইনের পর আপনার অর্ডার পাতায়ও সরাসরি ট্র্যাকিং দেখতে পারেন।</p>

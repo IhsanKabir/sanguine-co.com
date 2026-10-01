@@ -65,15 +65,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const PRESS_MARKS = [
-  { name: "Maison Quarterly", sup: "MMXXVI" },
-  { name: "La Florilegium", sup: "Mars" },
-  { name: "Le Horologium", sup: "Issue 14" },
-  { name: "Sable Review", sup: "Spring" },
-  { name: "Bibliothèque", sup: "Vol. IX" },
-  { name: "Atelier Notes", sup: "Avril" },
-];
-
 const CAT_CURSOR: Record<string, string> = {
   clothing: "magnify",
   accessories: "magnify",
@@ -194,11 +185,11 @@ export default async function Home({ params }: Props) {
       <div className="marquee" data-cursor="default">
         <div className="marquee-track">
           <span>Atelier-made</span><span>Cash on Delivery</span>
-          <span>Gift packaging</span><span>Free delivery over ৳3,000</span>
-          <span>30-day returns</span><span>House-certified</span>
+          <span>Gift packaging</span><span>Free delivery over ৳5,000</span>
+          <span>14-day returns</span><span>House-certified</span>
           <span>Atelier-made</span><span>Cash on Delivery</span>
-          <span>Gift packaging</span><span>Free delivery over ৳3,000</span>
-          <span>30-day returns</span><span>House-certified</span>
+          <span>Gift packaging</span><span>Free delivery over ৳5,000</span>
+          <span>14-day returns</span><span>House-certified</span>
         </div>
       </div>
 
@@ -398,20 +389,6 @@ export default async function Home({ params }: Props) {
         </div>
       </section>
 
-      {/* ─── Press strip — aspirational citations ────────────────── */}
-      <section className="press" aria-label="Press">
-        <div className="press-inner">
-          <span className="press-kicker">As discussed in</span>
-          {/* Press marks are aspirational placeholders. Rendered as <span>,
-            * not <a> with no href — Google's quality rater guidelines flag
-            * anchor-without-destination as "implied false authority". Swap
-            * to real publications + real URLs once we have citations. */}
-          {PRESS_MARKS.map((m) => (
-            <span key={m.name} className="press-mark">{m.name}<sup aria-hidden="true">{m.sup}</sup></span>
-          ))}
-        </div>
-      </section>
-
       <Ornament variant="tide-line" />
 
       {/* ─── Our Promise · dark slab with 4 features ────────────── */}
@@ -422,13 +399,13 @@ export default async function Home({ params }: Props) {
             We hand-deliver and accept payment <em style={{ color: "var(--gold)" }}>on arrival</em>,<br />like a couturier — not a warehouse.
           </h2>
           <p style={{ color: "var(--purple-200)", fontSize: 16, maxWidth: 600, margin: "0 auto 24px", lineHeight: 1.7 }}>
-            Pay by card, wallet, UPI, or in cash when our courier arrives at your door. Complimentary returns within thirty days.
+            Pay in cash when our courier arrives at your door — nothing to pay in advance. Returns accepted within fourteen days of delivery.
           </p>
           <div className="promise-grid">
             {[
               { i: "arrow",   t: "White-glove delivery",   s: "Courier, signed." },
               { i: "check",   t: "Cash on Delivery",       s: "No pre-payment required." },
-              { i: "feather", t: "30-day returns",         s: "Complimentary." },
+              { i: "feather", t: "14-day returns",         s: "Courier pickup arranged." },
               { i: "feather", t: "Ceremonial packaging",   s: "Wax-sealed." },
             ].map((x) => (
               <div key={x.t} style={{ display: "flex", gap: 14, alignItems: "start" }}>
