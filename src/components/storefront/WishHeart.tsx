@@ -2,12 +2,16 @@
 
 import { useTranslations } from "next-intl";
 import { useWishlist } from "@/lib/wishlist-context";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
 import Icon from "./Icon";
 
 export default function WishHeart({ productId, className }: { productId: string; className?: string }) {
   const t = useTranslations();
   const { has, toggle, hydrated } = useWishlist();
-  if (!hydrated) return null;
+  // Both: this component's own hydration (useHydrated) and the wishlist
+  // having been read from localStorage (hydrated).
+  const ready = useHydrated();
+  if (!ready || !hydrated) return null;
   const on = has(productId);
   return (
     <button

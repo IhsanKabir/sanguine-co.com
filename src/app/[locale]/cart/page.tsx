@@ -1,6 +1,7 @@
 "use client";
 
 import { useCart } from "@/lib/cart-context";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { formatBdt } from "@/lib/utils";
@@ -15,7 +16,9 @@ import { useShippingRules } from "@/lib/shipping-rules-context";
 export default function CartPage() {
   const t = useTranslations();
   const locale = useLocale() as "en" | "bn";
-  const { items, inc, dec, remove, subtotalBdt, itemKey, hydrated, coupon } = useCart();
+  const { items, inc, dec, remove, subtotalBdt, itemKey, hydrated: cartLoaded, coupon } = useCart();
+  // Matches the server's loading markup on the hydration render (see useHydrated).
+  const hydrated = useHydrated() && cartLoaded;
   const shippingRules = useShippingRules();
   const discount = coupon?.discountBdt ?? 0;
   const afterDiscount = Math.max(0, subtotalBdt - discount);

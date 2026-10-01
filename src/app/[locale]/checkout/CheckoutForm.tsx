@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { useCart } from "@/lib/cart-context";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { formatBdt } from "@/lib/utils";
@@ -39,7 +40,9 @@ export default function CheckoutForm({
   const t = useTranslations();
   const locale = useLocale() as "en" | "bn";
   const router = useRouter();
-  const { items, subtotalBdt, clear, hydrated, coupon } = useCart();
+  const { items, subtotalBdt, clear, hydrated: cartLoaded, coupon } = useCart();
+  // Matches the server's loading markup on the hydration render (see useHydrated).
+  const hydrated = useHydrated() && cartLoaded;
   const shippingRules = useShippingRules();
   const [step, setStep] = useState<1 | 2>(1);
   const [pending, startTransition] = useTransition();
