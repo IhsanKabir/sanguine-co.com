@@ -221,7 +221,15 @@
     "errPhone": "Enter a valid phone number (used for delivery updates only).",
     "errAddress": "Enter your street address.",
     "errCity": "Enter your city.",
-    "errFix": "Please correct the fields above."
+    "errFix": "Please correct the fields above.",
+    "payOnline": "Pay online",
+    "payOnlineSub": "bKash, Nagad, Rocket or card — on SSLCommerz's secure page",
+    "onlineBadge": "bKash · Nagad · Card",
+    "onlineNote": "You will pay <b>{amount}</b> on SSLCommerz's secure page, then return here. Nothing is due on delivery.",
+    "payNow": "Pay {amount} securely",
+    "redirecting": "Opening the payment page…",
+    "paymentFailed": "The payment did not go through, so the order was not placed. Your bag is unchanged — try again or choose Cash on Delivery.",
+    "paymentCancelled": "Payment cancelled — the order was not placed. Your bag is unchanged."
   },
   "wishlist": {
     "title": "Your wishlist",
@@ -434,7 +442,11 @@
     "items": "Items",
     "method": "Method",
     "methodCod": "COD",
-    "deliveringTo": "Delivering to"
+    "deliveringTo": "Delivering to",
+    "methodOnline": "Paid online",
+    "paidOnlineNote": "Your payment is received — nothing is due on delivery.",
+    "confirmingTitle": "Confirming your payment",
+    "confirmingNote": "We are waiting for the payment gateway to confirm. This usually takes a minute; you will receive an email as soon as it does. Refresh this page to check."
   },
   "notFound": {
     "title": "Nothing here",
@@ -449,7 +461,8 @@
     "delivered": "Delivered",
     "cancelled": "Cancelled",
     "refunded": "Refunded",
-    "return_requested": "Return Requested"
+    "return_requested": "Return Requested",
+    "pending_payment": "Awaiting payment"
   },
   "accountOrders": {
     "none": "No orders yet.",
