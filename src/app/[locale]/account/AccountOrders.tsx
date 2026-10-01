@@ -22,6 +22,7 @@ type Props = { orders: OrderRow[]; locale: "en" | "bn" };
 const STATUS_STYLE: Record<string, string> = {
   pending:          "pill-warn",
   cod_pending:      "pill-warn",
+  pending_payment:  "pill-warn",
   paid:             "pill-info",
   processing:       "pill-info",
   shipped:          "pill-info",

@@ -7,7 +7,9 @@ import type { CommerceSettings } from "@/lib/commerce";
 
 type Brand = { name: string; tagline?: string; email?: string; announcement?: string };
 
-export default function SettingsClient({ initialBrand, initialCommerce }: { initialBrand: Brand; initialCommerce: CommerceSettings }) {
+type Gateway = { connected: boolean; live: boolean };
+
+export default function SettingsClient({ initialBrand, initialCommerce, gateway }: { initialBrand: Brand; initialCommerce: CommerceSettings; gateway: Gateway }) {
   const [commerce, setCommerce] = useState({
     preorderDepositPct: String(initialCommerce.preorderDepositPct),
     returnWindowDays: String(initialCommerce.returnWindowDays),
@@ -146,11 +148,16 @@ export default function SettingsClient({ initialBrand, initialCommerce }: { init
         <div className="panel">
           <h3>Payment methods</h3>
           {([
-            ["Cash on Delivery",    "The only method checkout offers today", true],
-            ["bKash",               "Needs a payment gateway (e.g. SSLCommerz) — not connected", false],
-            ["Nagad",               "Needs a payment gateway — not connected", false],
-            ["Rocket (DBBL)",       "Needs a payment gateway — not connected", false],
-            ["Card (Visa/MC/Amex)", "Needs a payment gateway — not connected", false],
+            ["Cash on Delivery", "Always offered at checkout", true],
+            [
+              "Online — bKash, Nagad, Rocket, card (SSLCommerz)",
+              gateway.connected
+                ? gateway.live
+                  ? "Connected to the LIVE gateway: real payments"
+                  : "Connected to the SANDBOX: test payments only, no real money"
+                : "Not connected — set SSLCOMMERZ_STORE_ID and SSLCOMMERZ_STORE_PASSWORD in the hosting environment",
+              gateway.connected,
+            ],
           ] as const).map(([label, hint, live]) => (
             <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid var(--line)" }}>
               <div>
@@ -162,7 +169,8 @@ export default function SettingsClient({ initialBrand, initialCommerce }: { init
           ))}
           <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 14, lineHeight: 1.6 }}>
             No VAT is added and there is no cash-on-delivery fee: the customer pays the subtotal,
-            less any coupon, plus shipping.
+            less any coupon, plus shipping. Online orders wait as &ldquo;pending_payment&rdquo; until
+            SSLCommerz confirms them; unpaid ones are cancelled after an hour and their stock returned.
           </p>
         </div>
 

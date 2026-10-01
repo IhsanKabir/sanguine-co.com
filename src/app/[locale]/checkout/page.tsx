@@ -4,13 +4,20 @@ import { getCurrentUser } from "@/lib/auth-utils";
 import { db, schema } from "@/lib/db";
 import { eq, and } from "drizzle-orm";
 import CheckoutForm from "./CheckoutForm";
+import { isOnlinePaymentEnabled } from "@/lib/payments/sslcommerz";
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: Promise<{ locale: string }> };
+type Props = {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ payment?: string }>;
+};
 
-export default async function CheckoutPage({ params }: Props) {
+export default async function CheckoutPage({ params, searchParams }: Props) {
   const { locale } = await params;
+  const { payment } = await searchParams;
+  // Back from SSLCommerz without paying (see api/payments/sslcommerz).
+  const paymentNotice = payment === "failed" || payment === "cancelled" ? payment : null;
   setRequestLocale(locale);
   const t = await getTranslations();
 
@@ -66,7 +73,7 @@ export default async function CheckoutPage({ params }: Props) {
       <h1 className="serif page-h1" style={{ margin: "0 0 28px", color: "var(--purple-900)", fontWeight: 400 }}>
         {t("checkout.title")}
       </h1>
-      <CheckoutForm prefill={prefill} />
+      <CheckoutForm prefill={prefill} onlinePayment={isOnlinePaymentEnabled()} paymentNotice={paymentNotice} />
     </div>
   );
 }

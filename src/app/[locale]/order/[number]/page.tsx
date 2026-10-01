@@ -4,6 +4,7 @@ import { Link } from "@/i18n/routing";
 import { db, schema } from "@/lib/db";
 import { parseShippingAddress } from "@/lib/schema";
 import WaxSeal from "@/components/storefront/WaxSeal";
+import ClearCartOnMount from "@/components/storefront/ClearCartOnMount";
 import { eq } from "drizzle-orm";
 import { formatBdt } from "@/lib/utils";
 import { getCurrentUser } from "@/lib/auth-utils";
@@ -41,6 +42,8 @@ export default async function OrderConfirmation({ params, searchParams }: Props)
   const lines = await db.select().from(schema.orderLines).where(eq(schema.orderLines.orderId, order.id)).catch(() => []);
   const addr = parseShippingAddress(order.shippingAddress);
   const firstName = (addr.fullName ?? "").split(" ")[0] || "friend";
+  const online = order.paymentMethod === "sslcommerz";
+  const awaitingPayment = order.status === "pending_payment";
 
   return (
     <section className="section order-confirm-section" style={{ maxWidth: 760, textAlign: "center" }}>
@@ -48,14 +51,16 @@ export default async function OrderConfirmation({ params, searchParams }: Props)
         <WaxSeal size={180} />
       </div>
       <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold-deep)", marginBottom: 10, textTransform: "uppercase" }}>
-        {t("checkout.orderConfirmed")}
+        {awaitingPayment ? t("orderStatus.pending_payment") : t("checkout.orderConfirmed")}
       </div>
       <h1 className="serif page-h1" style={{ fontWeight: 400, color: "var(--purple-900)", margin: "0 0 16px", lineHeight: 1.1 }}>
-        {t("checkout.thankYou")}, {firstName}.
+        {awaitingPayment ? t("order.confirmingTitle") : <>{t("checkout.thankYou")}, {firstName}.</>}
       </h1>
       <p style={{ color: "var(--ink-soft)", fontSize: 16, maxWidth: 500, margin: "0 auto 28px", lineHeight: 1.7 }}>
-        {t("checkout.orderId")} <b style={{ color: "var(--purple-900)" }}>{order.number}</b>. {t("checkout.haveCash")}
+        {t("checkout.orderId")} <b style={{ color: "var(--purple-900)" }}>{order.number}</b>.{" "}
+        {awaitingPayment ? t("order.confirmingNote") : online ? t("order.paidOnlineNote") : t("checkout.haveCash")}
       </p>
+      {online && <ClearCartOnMount />}
       <div className="divider-ornament">
         <span className="mono" style={{ fontSize: 10, letterSpacing: ".3em", color: "var(--gold-deep)" }}>{t("order.ceremonyComplete")}</span>
       </div>
@@ -70,7 +75,7 @@ export default async function OrderConfirmation({ params, searchParams }: Props)
         </div>
         <div>
           <div className="pdp-label">{t("order.method")}</div>
-          <div className="serif" style={{ fontSize: 24, color: "var(--purple-900)" }}>{t("order.methodCod")}</div>
+          <div className="serif" style={{ fontSize: 24, color: "var(--purple-900)" }}>{online ? t("order.methodOnline") : t("order.methodCod")}</div>
         </div>
       </div>
       {(addr.fullName || addr.line1 || addr.city) && (

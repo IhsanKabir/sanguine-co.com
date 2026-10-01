@@ -305,7 +305,7 @@ export async function adjustStock(id: string, delta: number, reason: string) {
 }
 
 // ─── Orders ────────────────────────────────────────────────────────────
-const validStatuses = ["pending","cod_pending","paid","processing","shipped","delivered","cancelled","refunded","return_requested","returned"] as const;
+const validStatuses = ["pending","pending_payment","cod_pending","paid","processing","shipped","delivered","cancelled","refunded","return_requested","returned"] as const;
 
 const SITE_URL_ORDERS = SITE_URL;
 

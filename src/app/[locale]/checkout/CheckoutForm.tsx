@@ -5,7 +5,7 @@ import { useCart } from "@/lib/cart-context";
 import { useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { formatBdt } from "@/lib/utils";
-import { createCodOrder } from "@/lib/actions/orders";
+import { createCodOrder, startOnlinePayment } from "@/lib/actions/orders";
 import { track } from "@/lib/actions/track";
 import Composition from "@/components/storefront/Composition";
 import Icon from "@/components/storefront/Icon";
@@ -25,7 +25,17 @@ type Prefill = {
   postcode: string;
 };
 
-export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
+export default function CheckoutForm({
+  prefill,
+  onlinePayment = false,
+  paymentNotice = null,
+}: {
+  prefill?: Prefill;
+  /** SSLCommerz configured on the server (lib/payments/sslcommerz.ts). */
+  onlinePayment?: boolean;
+  /** Set when the shopper is back from a failed / cancelled gateway payment. */
+  paymentNotice?: "failed" | "cancelled" | null;
+}) {
   const t = useTranslations();
   const locale = useLocale() as "en" | "bn";
   const router = useRouter();
@@ -51,6 +61,8 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
     postcode: prefill?.postcode ?? "",
   });
   const [notes, setNotes] = useState("");
+  const [method, setMethod] = useState<"cod" | "online">("cod");
+  const [redirecting, setRedirecting] = useState(false);
 
   const isDhaka = s.city.toLowerCase().includes("dhaka");
   // Same function createCodOrder charges with.
@@ -100,14 +112,24 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
     const v = validateStep1();
     if (v) { setError(v); return; }
     setError(null);
+    const input = {
+      customer: { fullName: c.fullName.trim(), email: c.email.trim(), phone: c.phone.trim() },
+      shipping: s,
+      items: items.map((i) => ({ productId: i.productId, qty: i.qty, color: i.color, size: i.size })),
+      couponCode: coupon?.code || null,
+      notes: notes || null,
+    };
     startTransition(async () => {
-      const res = await createCodOrder({
-        customer: { fullName: c.fullName.trim(), email: c.email.trim(), phone: c.phone.trim() },
-        shipping: s,
-        items: items.map((i) => ({ productId: i.productId, qty: i.qty, color: i.color, size: i.size })),
-        couponCode: coupon?.code || null,
-        notes: notes || null,
-      });
+      if (method === "online") {
+        const res = await startOnlinePayment(input, locale);
+        if (!res.ok) { setError(res.error); return; }
+        // The bag is kept until the shopper is back on the order page, so a
+        // failed or cancelled payment does not lose it (ClearCartOnMount).
+        setRedirecting(true);
+        window.location.assign(res.gatewayUrl);
+        return;
+      }
+      const res = await createCodOrder(input);
       if (!res.ok) {
         setError(res.error);
         return;
@@ -121,6 +143,11 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
   return (
     <div className="checkout-grid">
       <div>
+        {paymentNotice && (
+          <div role="alert" style={{ marginBottom: 18, padding: "12px 16px", background: "#fdf3f0", border: "1px solid #e5b8ab", color: "#7a2e1c", fontSize: 13, lineHeight: 1.6 }}>
+            {paymentNotice === "cancelled" ? t("checkout.paymentCancelled") : t("checkout.paymentFailed")}
+          </div>
+        )}
         <div className="step-bar">
           {[t("checkout.stepAddress"), t("checkout.stepPayment"), t("checkout.stepConfirmation")].map((n, i) => (
             <div key={n} className={"step " + (step === i + 1 ? "active" : step > i + 1 ? "done" : "")}>
@@ -190,26 +217,61 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
         {step === 2 && (
           <div className="panel">
             <h3>{t("checkout.stepPayment")}</h3>
-            <div className="pay-opt active" style={{ marginBottom: 10 }}>
-              <div className="radio" />
-              <div>
-                <div className="name">{t("checkout.payCod")}</div>
-                <div className="sub">{t("checkout.payCodSub")}</div>
-              </div>
-              <div className="logos"><span>{t("checkout.cashBadge")}</span></div>
+            <div role="radiogroup" aria-label={t("checkout.stepPayment")}>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={method === "cod"}
+                className={"pay-opt" + (method === "cod" ? " active" : "")}
+                style={{ marginBottom: 10, width: "100%", textAlign: "left", background: method === "cod" ? undefined : "white" }}
+                onClick={() => setMethod("cod")}
+              >
+                <div className="radio" />
+                <div>
+                  <div className="name">{t("checkout.payCod")}</div>
+                  <div className="sub">{t("checkout.payCodSub")}</div>
+                </div>
+                <div className="logos"><span>{t("checkout.cashBadge")}</span></div>
+              </button>
+              {onlinePayment && (
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={method === "online"}
+                  className={"pay-opt" + (method === "online" ? " active" : "")}
+                  style={{ marginBottom: 10, width: "100%", textAlign: "left", background: method === "online" ? undefined : "white" }}
+                  onClick={() => setMethod("online")}
+                >
+                  <div className="radio" />
+                  <div>
+                    <div className="name">{t("checkout.payOnline")}</div>
+                    <div className="sub">{t("checkout.payOnlineSub")}</div>
+                  </div>
+                  <div className="logos"><span>{t("checkout.onlineBadge")}</span></div>
+                </button>
+              )}
             </div>
             <div style={{ marginTop: 18, padding: 18, background: "var(--purple-50)", border: "1px solid var(--purple-200)" }}>
               <div style={{ fontFamily: "var(--serif)", fontSize: 18, color: "var(--purple-900)", marginBottom: 6 }}>
-                {t("checkout.payCod")}
+                {method === "online" ? t("checkout.payOnline") : t("checkout.payCod")}
               </div>
               <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>
-                {t.rich("checkout.keepReady", { amount: formatBdt(total, locale), b: (c) => <b style={{ color: "var(--purple-900)" }}>{c}</b> })}
+                {method === "online"
+                  ? t.rich("checkout.onlineNote", { amount: formatBdt(total, locale), b: (c) => <b style={{ color: "var(--purple-900)" }}>{c}</b> })
+                  : t.rich("checkout.keepReady", { amount: formatBdt(total, locale), b: (c) => <b style={{ color: "var(--purple-900)" }}>{c}</b> })}
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
               <button className="btn btn-ghost" onClick={() => setStep(1)} disabled={pending}>← {t("checkout.back")}</button>
-              <button className="btn btn-gold" style={{ flex: 1 }} onClick={onPlace} disabled={pending}>
-                <Icon name="check" size={14}/> {pending ? t("checkout.placing") : `${t("checkout.placeOrder")} · ${formatBdt(total, locale)}`}
+              <button className="btn btn-gold" style={{ flex: 1 }} onClick={onPlace} disabled={pending || redirecting}>
+                <Icon name="check" size={14}/>{" "}
+                {redirecting
+                  ? t("checkout.redirecting")
+                  : pending
+                  ? t("checkout.placing")
+                  : method === "online"
+                  ? t("checkout.payNow", { amount: formatBdt(total, locale) })
+                  : `${t("checkout.placeOrder")} · ${formatBdt(total, locale)}`}
               </button>
             </div>
             {error && <p style={{ color: "var(--err)", fontSize: 13, marginTop: 12 }}>{error}</p>}

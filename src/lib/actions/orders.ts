@@ -4,19 +4,19 @@ import { z } from "zod";
 import { randomBytes } from "crypto";
 import { db, schema } from "@/lib/db";
 import { eq, sql, inArray, and } from "drizzle-orm";
-import { sendEmail } from "@/lib/email/brevo";
-import { orderPlacedEmail, type OrderEmailLine } from "@/lib/email/templates";
-import { sendSms } from "@/lib/sms/ssl-wireless";
 import { trackEvent } from "@/lib/events";
 import { validateCoupon, recordCouponRedemption } from "./coupons";
-import { formatBdt } from "@/lib/utils";
 import { logOrderEvent } from "@/lib/order-events";
 import { getCurrentUser } from "@/lib/auth-utils";
 
 import { SITE_URL } from "@/lib/site-url";
+import { headers } from "next/headers";
 
 import { shippingFor } from "@/lib/pricing";
 import { getCommerceSettings, shippingRulesOf } from "@/lib/commerce";
+import { notifyOrderPlaced } from "@/lib/order-notify";
+import { initPayment, isOnlinePaymentEnabled } from "@/lib/payments/sslcommerz";
+import { expireStaleUnpaidOrders, releaseUnpaidOrder } from "@/lib/payments/online-orders";
 
 const COD_FEE = 0;          // we eat the COD fee at launch — courier charges merchant ~1%
 
@@ -60,7 +60,13 @@ function generateOrderNumber(): string {
   return `SSG-${t}${r}`;
 }
 
-export async function createCodOrder(input: CreateOrderInput) {
+/**
+ * Shared order placement. "cod" confirms immediately (status cod_pending,
+ * notifications sent). "online" reserves stock and the coupon under status
+ * pending_payment and sends nothing: the SSLCommerz callback confirms it
+ * (lib/payments/online-orders.ts) or releases it.
+ */
+async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
   // 1. Validate input shape
   const parsed = inputSchema.safeParse(input);
   if (!parsed.success) {
@@ -170,8 +176,8 @@ export async function createCodOrder(input: CreateOrderInput) {
       customerId: currentUser?.id ?? null,
       guestEmail: data.customer.email,
       guestPhone: data.customer.phone,
-      status: "cod_pending",
-      paymentMethod: "cod",
+      status: mode === "cod" ? "cod_pending" : "pending_payment",
+      paymentMethod: mode === "cod" ? "cod" : "sslcommerz",
       subtotalBdt: subtotal,
       shippingBdt: shipping,
       codFeeBdt: COD_FEE,
@@ -242,68 +248,90 @@ export async function createCodOrder(input: CreateOrderInput) {
   await logOrderEvent({
     orderId: order.id,
     type: "created",
-    payload: { number, total: total, payment: "cod", channel: "storefront" },
+    payload: { number, total: total, payment: mode === "cod" ? "cod" : "sslcommerz", channel: "storefront" },
     actor: null,                        // customer-placed; no admin actor
   });
 
-  // 5. Send email + SMS confirmations (best effort, never throw)
-  const emailLines: OrderEmailLine[] = lines.map((l) => ({
-    name: l.nameSnapshot,
-    qty: l.qty,
-    lineTotalBdt: l.lineTotalBdt,
-    color: l.color,
-    size: l.size,
-  }));
-  const emailData = {
-    number,
-    customerName: data.customer.fullName,
-    customerEmail: data.customer.email,
-    customerPhone: data.customer.phone,
-    shippingAddress: {
-      line1: data.shipping.line1,
-      area: data.shipping.area || undefined,
-      city: data.shipping.city,
-      postcode: data.shipping.postcode || undefined,
-    },
-    lines: emailLines,
-    subtotalBdt: subtotal,
-    shippingBdt: shipping,
-    codFeeBdt: COD_FEE,
-    totalBdt: total,
-    paymentMethod: "cod" as const,
-    trackingUrl: `${SITE_URL}/en/order/${number}/track?t=${trackingToken}`,
-  };
-  const { subject, html } = orderPlacedEmail(emailData);
-  sendEmail({ to: data.customer.email, toName: data.customer.fullName, subject, html })
-    .then((r) => logOrderEvent({
-      orderId: order.id,
-      type: "email_sent",
-      payload: { subject, to: data.customer.email, ok: r.ok, error: r.error ?? null },
-      actor: null,
-    }))
-    .catch((e) => console.error("[order email]", e));
-  sendSms(
-    data.customer.phone,
-    `Sanguine: order ${number} confirmed (COD ${formatBdt(total)}). Have cash ready for our courier.`,
-  )
-    .then((r) => logOrderEvent({
-      orderId: order.id,
-      type: "sms_sent",
-      payload: { to: data.customer.phone, ok: r.ok, error: r.error ?? null },
-      actor: null,
-    }))
-    .catch((e) => console.error("[order sms]", e));
+  // 5. Email + SMS confirmation (best effort, never throws). Online orders
+  //    are confirmed only after the gateway payment is validated.
+  if (mode === "cod") await notifyOrderPlaced(order.id);
 
   // 6. Coupon redemption is now atomic with the order (above, inside the tx).
 
   // 7. Behavior analytics
   trackEvent({
     type: "order_placed",
-    payload: { number, totalBdt: total, lines: lines.length, paymentMethod: "cod", couponCode },
+    payload: { number, totalBdt: total, lines: lines.length, paymentMethod: mode === "cod" ? "cod" : "sslcommerz", couponCode },
     path: "/checkout",
   }).catch(() => {});
 
   // trackingToken lets the confirmation redirect carry ?t= so the (now
   // ownership-gated) confirmation page opens for guests too.
-  return { ok: true as const, number, totalBdt: total, trackingToken };
+  return {
+    ok: true as const,
+    number,
+    totalBdt: total,
+    trackingToken,
+    orderId: order.id,
+    itemCount: lines.reduce((n, l) => n + l.qty, 0),
+    firstItemName: lines[0]?.nameSnapshot ?? "Sanguine order",
+  };
+}
+
+export async function createCodOrder(input: CreateOrderInput) {
+  const res = await placeOrder(input, "cod");
+  if (!res.ok) return res;
+  return { ok: true as const, number: res.number, totalBdt: res.totalBdt, trackingToken: res.trackingToken };
+}
+
+/**
+ * The origin this request was served from, so a preview deployment's payment
+ * returns to that preview (SITE_URL always names production). Falls back to
+ * SITE_URL when the headers are missing.
+ */
+async function requestOrigin(): Promise<string> {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  if (!host) return SITE_URL;
+  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https");
+  return `${proto}://${host}`;
+}
+
+/**
+ * Online payment (SSLCommerz): place the order as pending_payment, open a
+ * gateway session and hand back the hosted payment page URL. If the gateway
+ * refuses, the reservation is released immediately.
+ */
+export async function startOnlinePayment(input: CreateOrderInput, locale: string) {
+  if (!isOnlinePaymentEnabled()) {
+    return { ok: false as const, error: "Online payment is not available right now. Please choose Cash on Delivery." };
+  }
+  // Abandoned payment sessions hold stock; free any that have timed out first.
+  await expireStaleUnpaidOrders().catch(() => {});
+
+  const placed = await placeOrder(input, "online");
+  if (!placed.ok) return placed;
+
+  const safeLocale = locale === "bn" ? "bn" : "en";
+  const init = await initPayment({
+    tranId: placed.number,
+    totalBdt: placed.totalBdt,
+    numItems: placed.itemCount,
+    productName: placed.itemCount > 1 ? `${placed.firstItemName} and more` : placed.firstItemName,
+    customer: { name: input.customer.fullName, email: input.customer.email, phone: input.customer.phone },
+    shipping: { line1: input.shipping.line1, city: input.shipping.city, postcode: input.shipping.postcode },
+    callbackBase: `${await requestOrigin()}/api/payments/sslcommerz`,
+    locale: safeLocale,
+  });
+  if (!init.ok) {
+    await releaseUnpaidOrder(placed.orderId, `gateway_init_failed: ${init.error}`);
+    return { ok: false as const, error: "We could not open the payment page. Please try again, or choose Cash on Delivery." };
+  }
+  await logOrderEvent({
+    orderId: placed.orderId,
+    type: "status_changed",
+    payload: { to: "pending_payment", gateway: "sslcommerz", sessionKey: init.sessionKey },
+    actor: null,
+  });
+  return { ok: true as const, gatewayUrl: init.gatewayUrl };
 }
