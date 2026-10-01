@@ -289,6 +289,13 @@
 [data-reveal-delay="5"] { transition-delay: .40s; }
 [data-reveal-delay="6"] { transition-delay: .48s; }
 .reveal-in { opacity: 1 !important; transform: none !important; }
+/* Safety net: [data-reveal] starts invisible and only cursor.js reveals it.
+   cursor.js tags every element it takes over with .reveal-init; anything it
+   has not reached 2.5s after paint (script slow, blocked or failed) is shown
+   anyway instead of leaving whole sections blank. Elements the script does
+   handle keep their scroll-triggered reveal. */
+[data-reveal]:not(.reveal-init) { animation: ssg-reveal-fallback .6s ease 2.5s forwards; }
+@keyframes ssg-reveal-fallback { to { opacity: 1; transform: none; } }
 
 /* Theatrical: ornament line draws on reveal */
 .ornament-rule {

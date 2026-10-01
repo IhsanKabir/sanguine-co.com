@@ -44,7 +44,6 @@
     "atelier": "The House Atelier",
     "cabinet": "A small cabinet of curiosities",
     "editors": "Editor's Selection",
-    "favourites": "The House Favourites",
     "cursorEnter": "Enter",
     "stillRail": "Atelier",
     "stillCaption": "The slow unspooling of a season.",
@@ -56,19 +55,6 @@
       "freeDelivery": "Free delivery over {threshold}",
       "returns": "14-day returns",
       "certified": "House-certified"
-    },
-    "curiositiesLabel": "Curiosities by category",
-    "pin": {
-      "kicker": "Genesis Collection · Chapter I",
-      "headline": "The slow<br></br><em>unspooling</em><br></br>of a season.",
-      "f1Cap": "Velvet Hours",
-      "f1Meta": "Cropped opera coat · Plum velvet · MMXXVI",
-      "f2Cap": "Inkwell & Folio",
-      "f2Meta": "Bound first editions · Atelier-pressed",
-      "f3Cap": "Hours, Worn",
-      "f3Meta": "Mechanical movement · Cabochon crown",
-      "f4Cap": "After the Rain",
-      "f4Meta": "Eau de parfum · Iris, vetiver, rain"
     },
     "note": {
       "kicker": "Atelier · Note · 001",
