@@ -2,20 +2,25 @@ import { db, schema } from "@/lib/db";
 import { sql, desc } from "drizzle-orm";
 import { formatBdt } from "@/lib/utils";
 import { requirePermission } from "@/lib/auth-utils";
+import { countsAsRevenue, netOrderRevenue } from "@/lib/revenue";
 
 export default async function AdminAnalyticsPage() {
   const ctx = await requirePermission("analytics");
   const canSeeRevenue = ctx.has("revenue");
   // Real aggregates from the orders table
   const [revRow] = await db.execute<{
-    total_orders: number; total_revenue: number; aov: number;
+    total_orders: number; total_revenue: number; aov: number; units_sold: number;
   }>(sql`
     select
       count(*)::int as total_orders,
-      coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total_revenue,
-      coalesce(round(avg(${schema.orders.totalBdt}))::int, 0) as aov
+      -- Revenue and AOV over orders that count as revenue, net of refunds
+      -- (lib/revenue.ts); total_orders still counts every order placed.
+      coalesce(sum(${netOrderRevenue}) filter (where ${countsAsRevenue}), 0)::int as total_revenue,
+      coalesce(round(avg(${netOrderRevenue}) filter (where ${countsAsRevenue}))::int, 0) as aov,
+      coalesce((select sum(${schema.orderLines.qty})::int from ${schema.orderLines}
+        where ${schema.orderLines.orderId} in (select id from ${schema.orders} where ${countsAsRevenue})), 0) as units_sold
     from ${schema.orders}
-  `).catch(() => [{ total_orders: 0, total_revenue: 0, aov: 0 }]);
+  `).catch(() => [{ total_orders: 0, total_revenue: 0, aov: 0, units_sold: 0 }]);
 
   const statusBreakdown = await db.execute<{ status: string; count: number; total: number }>(sql`
     select ${schema.orders.status} as status, count(*)::int as count, coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total
@@ -30,6 +35,8 @@ export default async function AdminAnalyticsPage() {
       sum(${schema.orderLines.qty})::int as units,
       sum(${schema.orderLines.lineTotalBdt})::int as revenue
     from ${schema.orderLines}
+    join ${schema.orders} on ${schema.orderLines.orderId} = ${schema.orders.id}
+    where ${countsAsRevenue}
     group by product_id, name
     order by revenue desc
     limit 10
@@ -37,22 +44,10 @@ export default async function AdminAnalyticsPage() {
 
   const recentOrders = await db.select().from(schema.orders).orderBy(desc(schema.orders.createdAt)).limit(30).catch(() => []);
 
-  // Synthetic funnel — until we wire PostHog/analytics, derive a placeholder
-  // from order count so the visual still tells a story.
-  const orders = revRow.total_orders;
-  const funnel = [
-    { k: "Sessions",         v: Math.max(orders * 80, 0) },
-    { k: "Product views",    v: Math.max(orders * 40, 0) },
-    { k: "Add to bag",       v: Math.max(orders * 8,  0) },
-    { k: "Checkout started", v: Math.max(orders * 2,  0) },
-    { k: "Orders placed",    v: orders },
-  ];
-  const max = funnel[0].v || 1;
-
   return (
     <>
       <h1 className="admin-h1">Analytics</h1>
-      <p className="admin-sub">Live aggregates from your order history. Once you wire PostHog/Cloudflare Analytics, sessions and views become real.</p>
+      <p className="admin-sub">Live aggregates from your order history.</p>
 
       <div className="stat-grid">
         {canSeeRevenue && (
@@ -62,32 +57,10 @@ export default async function AdminAnalyticsPage() {
         {canSeeRevenue && (
           <div className="stat kpi"><div className="kpi-top"><div className="k">Avg. basket</div></div><div className="v">{formatBdt(revRow.aov)}</div></div>
         )}
-        <div className="stat kpi"><div className="kpi-top"><div className="k">Order lines</div></div><div className="v">{topProducts.reduce((s, p) => s + p.units, 0)}</div></div>
+        <div className="stat kpi"><div className="kpi-top"><div className="k">Units sold</div></div><div className="v">{revRow.units_sold}</div></div>
       </div>
 
-      <div className="chart-row" style={{ gridTemplateColumns: "1.4fr 1fr" }}>
-        <div className="chart">
-          <div className="chart-hd"><h3>Conversion Funnel · all-time</h3></div>
-          <div className="funnel">
-            {funnel.map((s, i) => {
-              const pct = Math.round((s.v / max) * 100);
-              const conv = i === 0 ? null : Math.round((s.v / (funnel[i - 1].v || 1)) * 100);
-              return (
-                <div key={s.k} className="funnel-row">
-                  <div className="funnel-lbl">
-                    <div className="k">{s.k}</div>
-                    <div className="v">{s.v.toLocaleString("en-IN")}</div>
-                  </div>
-                  <div className="funnel-bar"><div className="funnel-fill" style={{ width: pct + "%" }} /></div>
-                  <div className="funnel-conv">{conv === null ? "100%" : `${conv}%`}</div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="funnel-foot">
-            <span>Note: top-of-funnel numbers are derived placeholders until web analytics are wired.</span>
-          </div>
-        </div>
+      <div className="chart-row" style={{ gridTemplateColumns: "1fr" }}>
         <div className="chart">
           <div className="chart-hd"><h3>Status breakdown</h3></div>
           {statusBreakdown.length === 0 ? (
