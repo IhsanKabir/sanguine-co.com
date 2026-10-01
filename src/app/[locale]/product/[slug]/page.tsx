@@ -149,8 +149,9 @@ export default async function ProductPage({ params }: Props) {
   // can render shipping cost and return-policy snippets in rich results.
   // shippingDetails is the standard for Bangladesh COD-only logistics:
   // — Pathao Courier, 5–7 day standard, ৳80 inside Dhaka / ৳150 outside.
-  // hasMerchantReturnPolicy follows our /legal/returns: 7-day window,
-  // courier-arranged pickup, BDT refund.
+  // hasMerchantReturnPolicy follows our /legal/returns: 14-day window,
+  // courier-arranged pickup, return shipping paid by the customer unless the
+  // piece is defective or incorrect, BDT refund.
   const productLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -191,7 +192,7 @@ export default async function ProductPage({ params }: Props) {
         returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
         merchantReturnDays: returnDays,
         returnMethod: "https://schema.org/ReturnByMail",
-        returnFees: "https://schema.org/FreeReturn",
+        returnFees: "https://schema.org/ReturnFeesCustomerResponsibility",
       },
     } : undefined,
     aggregateRating: p.reviewCount > 0 ? {
@@ -365,11 +366,11 @@ export default async function ProductPage({ params }: Props) {
           {/* Shipping estimate */}
           <div className="pdp-shipping-note">
             <Icon name="arrow" size={13} />
-            Free delivery on orders over ৳3,000 · Standard ৳80–150
+            Free delivery on orders over ৳5,000 · Standard ৳80–150
           </div>
 
           <div className="pdp-feats">
-            <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{returnDays}-day returns</b> Free courier pickup within {returnDays} days of delivery</div></div>
+            <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{returnDays}-day returns</b> We arrange the courier pickup within {returnDays} days of delivery</div></div>
             <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.codTitle")}</b>{t("pdp.codNote")}</div></div>
             <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.authentic")}</b>{t("pdp.authenticNote")}</div></div>
             <div className="pdp-feat"><Icon name="feather" size={18} /><div><b>{t("pdp.giftService")}</b>{t("pdp.giftServiceNote")}</div></div>

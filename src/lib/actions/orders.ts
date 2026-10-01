@@ -15,9 +15,12 @@ import { getCurrentUser } from "@/lib/auth-utils";
 
 import { SITE_URL } from "@/lib/site-url";
 
-const FREE_THRESHOLD = 3000;
-const FLAT_SHIPPING_DHAKA = 80;
-const FLAT_SHIPPING_OUTSIDE = 150;
+import {
+  FREE_SHIPPING_THRESHOLD_BDT as FREE_THRESHOLD,
+  FLAT_SHIPPING_DHAKA_BDT as FLAT_SHIPPING_DHAKA,
+  FLAT_SHIPPING_OUTSIDE_BDT as FLAT_SHIPPING_OUTSIDE,
+} from "@/lib/pricing";
+
 const COD_FEE = 0;          // we eat the COD fee at launch — courier charges merchant ~1%
 
 const itemSchema = z.object({
