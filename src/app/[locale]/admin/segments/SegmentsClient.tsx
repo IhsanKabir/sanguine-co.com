@@ -18,6 +18,8 @@ type Editing = {
     tagBn: string;
     blurb: string;
     blurbBn: string;
+    sizeGuide: string;
+    sizeGuideBn: string;
     hidden: boolean;
     stockEnabled: boolean;
     preorderEnabled: boolean;
@@ -37,7 +39,7 @@ export default function SegmentsClient({ segments, products }: Props) {
 
   const startNew = () => setEditing({
     mode: "new",
-    cat: { name: "", nameBn: "", tag: "Maison", tagBn: "মেইসন", blurb: "", blurbBn: "", hidden: false, stockEnabled: true, preorderEnabled: false },
+    cat: { name: "", nameBn: "", tag: "Maison", tagBn: "মেইসন", blurb: "", blurbBn: "", sizeGuide: "", sizeGuideBn: "", hidden: false, stockEnabled: true, preorderEnabled: false },
   });
 
   const onSave = () => {
@@ -52,6 +54,8 @@ export default function SegmentsClient({ segments, products }: Props) {
           tagBn: editing.cat.tagBn || null,
           blurb: editing.cat.blurb || null,
           blurbBn: editing.cat.blurbBn || null,
+          sizeGuide: editing.cat.sizeGuide.trim() || null,
+          sizeGuideBn: editing.cat.sizeGuideBn.trim() || null,
           hidden: editing.cat.hidden,
           stockEnabled: editing.cat.stockEnabled,
           preorderEnabled: editing.cat.preorderEnabled,
@@ -64,6 +68,8 @@ export default function SegmentsClient({ segments, products }: Props) {
           tagBn: editing.cat.tagBn || null,
           blurb: editing.cat.blurb || null,
           blurbBn: editing.cat.blurbBn || null,
+          sizeGuide: editing.cat.sizeGuide.trim() || null,
+          sizeGuideBn: editing.cat.sizeGuideBn.trim() || null,
           hidden: editing.cat.hidden,
           stockEnabled: editing.cat.stockEnabled,
           preorderEnabled: editing.cat.preorderEnabled,
@@ -117,6 +123,7 @@ export default function SegmentsClient({ segments, products }: Props) {
                   name: c.name, nameBn: c.nameBn || "",
                   tag: c.tag || "", tagBn: c.tagBn || "",
                   blurb: c.blurb || "", blurbBn: c.blurbBn || "",
+                  sizeGuide: c.sizeGuide || "", sizeGuideBn: c.sizeGuideBn || "",
                   hidden: c.hidden,
                   stockEnabled: c.stockEnabled,
                   preorderEnabled: c.preorderEnabled,
@@ -151,6 +158,13 @@ export default function SegmentsClient({ segments, products }: Props) {
                 </div>
                 <div className="field"><label>Blurb (EN)</label><input value={editing.cat.blurb} onChange={(e) => setEditing({ ...editing, cat: { ...editing.cat, blurb: e.target.value } })}/></div>
                 <div className="field"><label>Blurb (বাংলা)</label><input value={editing.cat.blurbBn} onChange={(e) => setEditing({ ...editing, cat: { ...editing.cat, blurbBn: e.target.value } })}/></div>
+                {/* Size guide: shown on this category's product pages that have sizes.
+                    Lines with "|" become a table; the first such line is the header. */}
+                <div className="field"><label>Size guide (EN)</label><textarea rows={5} maxLength={4000} value={editing.cat.sizeGuide} onChange={(e) => setEditing({ ...editing, cat: { ...editing.cat, sizeGuide: e.target.value } })} placeholder={"Size | Chest (in) | Length (in)\nS | 36 | 27\nM | 38 | 28\nMeasured flat, garment laid on a table."}/></div>
+                <div className="field"><label>Size guide (বাংলা)</label><textarea rows={5} maxLength={4000} value={editing.cat.sizeGuideBn} onChange={(e) => setEditing({ ...editing, cat: { ...editing.cat, sizeGuideBn: e.target.value } })}/></div>
+                <p style={{ fontSize: 11, color: "var(--ink-soft)", margin: "4px 0 0", lineHeight: 1.5 }}>
+                  Rows separated by new lines, columns by &ldquo;|&rdquo;; the first table row is the header. Other lines show as notes. Leave empty to hide the size guide.
+                </p>
                 <div style={{ marginTop: 12, padding: 14, background: "#fcfaf6", border: "1px solid var(--line)" }}>
                   <div style={{ fontSize: 11, letterSpacing: ".15em", color: "var(--ink-soft)", textTransform: "uppercase", marginBottom: 10 }}>Fulfilment</div>
                   <label className="seg-check" style={{ marginBottom: 6 }}>

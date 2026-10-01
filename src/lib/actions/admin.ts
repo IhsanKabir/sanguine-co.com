@@ -43,6 +43,8 @@ const segSchema = z.object({
   tagBn: z.string().max(40).optional().nullable(),
   blurb: z.string().max(200).optional().nullable(),
   blurbBn: z.string().max(200).optional().nullable(),
+  sizeGuide: z.string().max(4000).optional().nullable(),
+  sizeGuideBn: z.string().max(4000).optional().nullable(),
   hidden: z.boolean().optional(),
   stockEnabled: z.boolean().optional(),
   preorderEnabled: z.boolean().optional(),
@@ -60,6 +62,8 @@ export async function createSegment(input: z.infer<typeof segSchema>) {
     tagBn: data.tagBn || null,
     blurb: data.blurb || null,
     blurbBn: data.blurbBn || null,
+    sizeGuide: data.sizeGuide || null,
+    sizeGuideBn: data.sizeGuideBn || null,
     hidden: data.hidden ?? false,
     stockEnabled: data.stockEnabled ?? true,
     preorderEnabled: data.preorderEnabled ?? false,
@@ -68,8 +72,12 @@ export async function createSegment(input: z.infer<typeof segSchema>) {
   return { ok: true as const, id };
 }
 
-export async function updateSegment(id: string, patch: Partial<z.infer<typeof segSchema>>) {
+export async function updateSegment(id: string, input: Partial<z.infer<typeof segSchema>>) {
   await requireAdmin();
+  // Network-callable: enforce the field limits at runtime, as updateProduct does.
+  const parsed = segSchema.partial().safeParse(input);
+  if (!parsed.success) return { ok: false as const, error: "Invalid category patch" };
+  const patch = parsed.data;
   await db.update(schema.segments).set({
     ...(patch.name !== undefined && { name: patch.name }),
     ...(patch.nameBn !== undefined && { nameBn: patch.nameBn || null }),
@@ -77,6 +85,8 @@ export async function updateSegment(id: string, patch: Partial<z.infer<typeof se
     ...(patch.tagBn !== undefined && { tagBn: patch.tagBn || null }),
     ...(patch.blurb !== undefined && { blurb: patch.blurb || null }),
     ...(patch.blurbBn !== undefined && { blurbBn: patch.blurbBn || null }),
+    ...(patch.sizeGuide !== undefined && { sizeGuide: patch.sizeGuide || null }),
+    ...(patch.sizeGuideBn !== undefined && { sizeGuideBn: patch.sizeGuideBn || null }),
     ...(patch.hidden !== undefined && { hidden: patch.hidden }),
     ...(patch.stockEnabled !== undefined && { stockEnabled: patch.stockEnabled }),
     ...(patch.preorderEnabled !== undefined && { preorderEnabled: patch.preorderEnabled }),
@@ -152,6 +162,10 @@ const prodSchema = z.object({
   estimatedDelivery: z.string().max(100).optional().nullable(),
   preorderPriceBdt: z.number().int().min(0).optional().nullable(),
   modelNote: z.string().max(300).optional().nullable(),
+  details: z.string().max(2000).optional().nullable(),
+  detailsBn: z.string().max(2000).optional().nullable(),
+  care: z.string().max(2000).optional().nullable(),
+  careBn: z.string().max(2000).optional().nullable(),
   lookProductIds: z.array(z.string()).optional(),
   // Quotation model (0016): estimated range + per-product deposit/return overrides.
   priceMinBdt: z.number().int().min(1).optional().nullable(),
@@ -209,6 +223,10 @@ export async function createProduct(input: z.infer<typeof prodSchema>) {
     estimatedDelivery: data.estimatedDelivery || null,
     preorderPriceBdt: data.preorderPriceBdt ?? null,
     modelNote: data.modelNote || null,
+    details: data.details || null,
+    detailsBn: data.detailsBn || null,
+    care: data.care || null,
+    careBn: data.careBn || null,
     lookProductIds: data.lookProductIds || [],
     priceMinBdt: data.priceMinBdt ?? null,
     priceMaxBdt: data.priceMaxBdt ?? null,
@@ -238,7 +256,7 @@ export async function updateProduct(id: string, patch: Partial<z.infer<typeof pr
   if (priceError) return { ok: false as const, error: priceError };
 
   const update: Record<string, unknown> = {};
-  for (const k of ["name","nameBn","sku","segmentId","priceBdt","wasBdt","stock","tag","description","descriptionBn","colors","sizes","preorderEnabled","preorderOnly","estimatedDelivery","preorderPriceBdt","modelNote","lookProductIds","priceMinBdt","priceMaxBdt","preorderDepositPct","returnWindowDays"] as const) {
+  for (const k of ["name","nameBn","sku","segmentId","priceBdt","wasBdt","stock","tag","description","descriptionBn","colors","sizes","preorderEnabled","preorderOnly","estimatedDelivery","preorderPriceBdt","modelNote","details","detailsBn","care","careBn","lookProductIds","priceMinBdt","priceMaxBdt","preorderDepositPct","returnWindowDays"] as const) {
     if (safe[k] !== undefined) (update as Record<string, unknown>)[k] = safe[k];
   }
   if (typeof safe.sku === "string") update.sku = safe.sku.toUpperCase();

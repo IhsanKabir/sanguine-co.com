@@ -12,6 +12,8 @@ import { PdpStateProvider } from "@/components/storefront/PdpStateContext";
 import JsonLd from "@/components/seo/JsonLd";
 import ReviewsSection from "@/components/storefront/ReviewsSection";
 import NotifyMeButton from "@/components/storefront/NotifyMeButton";
+import DeliveryEstimate from "@/components/storefront/DeliveryEstimate";
+import PlainTextBlock from "@/components/storefront/PlainTextBlock";
 import PreorderButton from "@/components/storefront/PreorderButton";
 import RecentlyViewedTracker from "@/components/storefront/RecentlyViewedTracker";
 import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
@@ -145,6 +147,13 @@ export default async function ProductPage({ params }: Props) {
   const description = (isBn && p.descriptionBn) || p.description || "";
   const segName = seg ? ((isBn && seg.nameBn) || seg.name) : "";
   const segTag = seg ? ((isBn && seg.tagBn) || seg.tag) : "";
+  // Optional blocks (0018): each shows only when the admin filled it in. The
+  // size guide is per category and only relevant when the piece has sizes.
+  const details = ((isBn && p.detailsBn) || p.details || "").trim();
+  const care = ((isBn && p.careBn) || p.care || "").trim();
+  const hasSizes = ((p.sizes as string[] | null) ?? []).length > 0;
+  const sizeGuide = hasSizes && seg ? ((isBn && seg.sizeGuideBn) || seg.sizeGuide || "").trim() : "";
+  const sellableNow = !p.preorderOnly && p.stock > 0;
 
   // Product schema with full Offer (shipping + returns) so Google Shopping
   // can render shipping cost and return-policy snippets in rich results.
@@ -379,6 +388,30 @@ export default async function ProductPage({ params }: Props) {
                   outside: formatBdt(commerce.shippingOutsideBdt, locale as "en" | "bn"),
                 })}
           </div>
+          {sellableNow && <DeliveryEstimate />}
+
+          {(sizeGuide || details || care) && (
+            <div className="pdp-more">
+              {sizeGuide && (
+                <details>
+                  <summary>{t("pdp.sizeGuide")}</summary>
+                  <div className="pdp-more-body"><PlainTextBlock text={sizeGuide} /></div>
+                </details>
+              )}
+              {details && (
+                <details>
+                  <summary>{t("pdp.materials")}</summary>
+                  <div className="pdp-more-body"><PlainTextBlock text={details} /></div>
+                </details>
+              )}
+              {care && (
+                <details>
+                  <summary>{t("pdp.care")}</summary>
+                  <div className="pdp-more-body"><PlainTextBlock text={care} /></div>
+                </details>
+              )}
+            </div>
+          )}
 
           <div className="pdp-feats">
             <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.returnsTitle", { days: returnDays })}</b> {t("pdp.returnsNote", { days: returnDays })}</div></div>

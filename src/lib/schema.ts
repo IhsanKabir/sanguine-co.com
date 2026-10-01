@@ -9,6 +9,10 @@ export const segments = pgTable("segments", {
   tagBn: text("tag_bn"),
   blurb: text("blurb"),
   blurbBn: text("blurb_bn"),
+  // Size guide shown on product pages of this segment (0018). Plain text;
+  // lines containing "|" render as a table, the first such line as header.
+  sizeGuide: text("size_guide"),
+  sizeGuideBn: text("size_guide_bn"),
   hidden: boolean("hidden").default(false).notNull(),
   // Per-segment fulfilment toggles. Either, both, or neither can be live.
   // stockEnabled=false hides product listings entirely from this segment.
@@ -52,6 +56,11 @@ export const products = pgTable("products", {
   // Per-product return window override — null falls back to the global default.
   returnWindowDays: integer("return_window_days"),
   modelNote: text("model_note"),
+  // Materials / composition and care instructions (0018). Plain text.
+  details: text("details"),
+  detailsBn: text("details_bn"),
+  care: text("care"),
+  careBn: text("care_bn"),
   lookProductIds: jsonb("look_product_ids").$type<string[]>().default([]),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),

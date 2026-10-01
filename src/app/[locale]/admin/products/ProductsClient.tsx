@@ -143,6 +143,10 @@ type Editing = {
   estimatedDelivery: string;
   preorderPriceBdt: string;
   modelNote: string;
+  details: string;
+  detailsBn: string;
+  care: string;
+  careBn: string;
   lookProductIds: string[];
   priceMinBdt: string;
   priceMaxBdt: string;
@@ -159,7 +163,7 @@ const empty = (segId: string): Editing => ({
   description: "", descriptionBn: "", colors: "", sizes: "",
   preorderEnabled: false, preorderOnly: false,
   estimatedDelivery: "", preorderPriceBdt: "",
-  modelNote: "", lookProductIds: [],
+  modelNote: "", details: "", detailsBn: "", care: "", careBn: "", lookProductIds: [],
   priceMinBdt: "", priceMaxBdt: "", preorderDepositPct: "", returnWindowDays: "",
 });
 
@@ -224,6 +228,10 @@ export default function ProductsClient({ segments, products }: Props) {
       estimatedDelivery: editing.estimatedDelivery || null,
       preorderPriceBdt: editing.preorderPriceBdt ? parseInt(editing.preorderPriceBdt) : null,
       modelNote: editing.modelNote.trim() || null,
+      details: editing.details.trim() || null,
+      detailsBn: editing.detailsBn.trim() || null,
+      care: editing.care.trim() || null,
+      careBn: editing.careBn.trim() || null,
       lookProductIds: editing.lookProductIds,
       priceMinBdt: editing.priceMinBdt ? parseInt(editing.priceMinBdt) : null,
       priceMaxBdt: editing.priceMaxBdt ? parseInt(editing.priceMaxBdt) : null,
@@ -339,6 +347,8 @@ export default function ProductsClient({ segments, products }: Props) {
                       estimatedDelivery: p.estimatedDelivery || "",
                       preorderPriceBdt: p.preorderPriceBdt ? String(p.preorderPriceBdt) : "",
                       modelNote: p.modelNote ?? "",
+                      details: p.details ?? "", detailsBn: p.detailsBn ?? "",
+                      care: p.care ?? "", careBn: p.careBn ?? "",
                       lookProductIds: (p.lookProductIds as string[] | null) ?? [],
                       priceMinBdt: p.priceMinBdt ? String(p.priceMinBdt) : "",
                       priceMaxBdt: p.priceMaxBdt ? String(p.priceMaxBdt) : "",
@@ -406,6 +416,16 @@ export default function ProductsClient({ segments, products }: Props) {
                 placeholder="Model is 165 cm, wearing size S"
                 maxLength={300}
               />
+            </div>
+            {/* Shown on the product page as "Materials & details" and "Care";
+                a block left empty is not shown. */}
+            <div className="row" style={{ marginTop: 8 }}>
+              <div className="field"><label>Materials &amp; details (EN)</label><textarea rows={3} maxLength={2000} value={editing.details} onChange={(e) => setEditing({ ...editing, details: e.target.value })} placeholder="100% mulberry silk · Hand-rolled hems · Made in Dhaka"/></div>
+              <div className="field"><label>Materials &amp; details (বাংলা)</label><textarea rows={3} maxLength={2000} value={editing.detailsBn} onChange={(e) => setEditing({ ...editing, detailsBn: e.target.value })}/></div>
+            </div>
+            <div className="row" style={{ marginTop: 8 }}>
+              <div className="field"><label>Care (EN)</label><textarea rows={2} maxLength={2000} value={editing.care} onChange={(e) => setEditing({ ...editing, care: e.target.value })} placeholder="Dry clean only · Store away from sunlight"/></div>
+              <div className="field"><label>Care (বাংলা)</label><textarea rows={2} maxLength={2000} value={editing.careBn} onChange={(e) => setEditing({ ...editing, careBn: e.target.value })}/></div>
             </div>
             <div className="field" style={{ marginTop: 8 }}>
               <label>Complete the look</label>
