@@ -3,13 +3,15 @@ import { desc, sql } from "drizzle-orm";
 import { formatBdt, formatDate } from "@/lib/utils";
 import { Link } from "@/i18n/routing";
 import { requirePermission } from "@/lib/auth-utils";
+import { countsAsRevenue, netOrderRevenue } from "@/lib/revenue";
 
 export default async function AdminDashboard() {
   const ctx = await requirePermission("dashboard");
   const canSeeRevenue = ctx.has("revenue");
   // Aggregate KPIs from real data
   const [{ count: orderCount = 0 } = { count: 0 }] = await db.select({ count: sql<number>`count(*)::int` }).from(schema.orders).catch(() => [{ count: 0 }] as never);
-  const [{ revenue = 0 } = { revenue: 0 }] = await db.select({ revenue: sql<number>`coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int` }).from(schema.orders).catch(() => [{ revenue: 0 }] as never);
+  // Revenue excludes cancelled / unpaid orders and subtracts refunds (lib/revenue.ts).
+  const [{ revenue = 0 } = { revenue: 0 }] = await db.select({ revenue: sql<number>`coalesce(sum(${netOrderRevenue}), 0)::int` }).from(schema.orders).where(countsAsRevenue).catch(() => [{ revenue: 0 }] as never);
   const [{ count: productCount = 0 } = { count: 0 }] = await db.select({ count: sql<number>`count(*)::int` }).from(schema.products).catch(() => [{ count: 0 }] as never);
   const [{ count: lowStock = 0 } = { count: 0 }] = await db.select({ count: sql<number>`count(*)::int` })
     .from(schema.products).where(sql`${schema.products.stock} < 5`).catch(() => [{ count: 0 }] as never);

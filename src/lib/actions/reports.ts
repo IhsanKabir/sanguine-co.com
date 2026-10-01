@@ -3,6 +3,7 @@
 import { db, schema } from "@/lib/db";
 import { sql, and, gte, lte, desc, eq } from "drizzle-orm";
 import { requirePermission } from "@/lib/auth-utils";
+import { countsAsRevenue, netOrderRevenue } from "@/lib/revenue";
 
 export type DateRange = { from: Date; to: Date };
 
@@ -17,17 +18,20 @@ export async function getSalesData(range: DateRange) {
     gte(schema.orders.createdAt, range.from),
     lte(schema.orders.createdAt, range.to),
   );
+  // Money figures use only orders that count as revenue (lib/revenue.ts);
+  // the by-status breakdown below still lists every order.
+  const revCond = and(cond, countsAsRevenue);
 
   const [{ orders, revenue, units }] = await db.execute<{ orders: number; revenue: number; units: number }>(sql`
     select
       count(*)::int as orders,
-      coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as revenue,
+      coalesce(sum(${netOrderRevenue}), 0)::int as revenue,
       coalesce((select sum(${schema.orderLines.qty})::int
         from ${schema.orderLines}
-        where ${schema.orderLines.orderId} in (select id from ${schema.orders} where ${cond})
+        where ${schema.orderLines.orderId} in (select id from ${schema.orders} where ${revCond})
       ), 0) as units
     from ${schema.orders}
-    where ${cond}
+    where ${revCond}
   `);
 
   const aov = orders > 0 ? Math.round(revenue / orders) : 0;
@@ -41,9 +45,9 @@ export async function getSalesData(range: DateRange) {
   `);
 
   const byPayment = await db.execute<{ method: string; count: number; total: number }>(sql`
-    select ${schema.orders.paymentMethod} as method, count(*)::int as count, coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total
+    select ${schema.orders.paymentMethod} as method, count(*)::int as count, coalesce(sum(${netOrderRevenue}), 0)::int as total
     from ${schema.orders}
-    where ${cond}
+    where ${revCond}
     group by method
     order by count desc
   `);
@@ -58,7 +62,7 @@ export async function getSalesData(range: DateRange) {
     join ${schema.orders} on ${schema.orderLines.orderId} = ${schema.orders.id}
     left join ${schema.products} on ${schema.orderLines.productId} = ${schema.products.id}
     left join ${schema.segments} on ${schema.products.segmentId} = ${schema.segments.id}
-    where ${cond}
+    where ${revCond}
     group by ${schema.products.segmentId}, ${schema.segments.name}
     order by revenue desc nulls last
   `);
@@ -66,9 +70,9 @@ export async function getSalesData(range: DateRange) {
   const byCity = await db.execute<{ city: string; count: number; total: number }>(sql`
     select coalesce(${schema.orders.shippingAddress}->>'city', '—') as city,
            count(*)::int as count,
-           coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total
+           coalesce(sum(${netOrderRevenue}), 0)::int as total
     from ${schema.orders}
-    where ${cond}
+    where ${revCond}
     group by city
     order by count desc
     limit 12
@@ -77,9 +81,9 @@ export async function getSalesData(range: DateRange) {
   const byDay = await db.execute<{ day: string; count: number; total: number }>(sql`
     select to_char(${schema.orders.createdAt}, 'YYYY-MM-DD') as day,
            count(*)::int as count,
-           coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total
+           coalesce(sum(${netOrderRevenue}), 0)::int as total
     from ${schema.orders}
-    where ${cond}
+    where ${revCond}
     group by day
     order by day asc
   `);
@@ -93,7 +97,7 @@ export async function getSalesData(range: DateRange) {
       sum(${schema.orderLines.lineTotalBdt})::int as revenue
     from ${schema.orderLines}
     join ${schema.orders} on ${schema.orderLines.orderId} = ${schema.orders.id}
-    where ${cond}
+    where ${revCond}
     group by product_id, name, sku
     order by revenue desc
     limit 10

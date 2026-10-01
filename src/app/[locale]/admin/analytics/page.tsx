@@ -2,6 +2,7 @@ import { db, schema } from "@/lib/db";
 import { sql, desc } from "drizzle-orm";
 import { formatBdt } from "@/lib/utils";
 import { requirePermission } from "@/lib/auth-utils";
+import { countsAsRevenue, netOrderRevenue } from "@/lib/revenue";
 
 export default async function AdminAnalyticsPage() {
   const ctx = await requirePermission("analytics");
@@ -12,8 +13,10 @@ export default async function AdminAnalyticsPage() {
   }>(sql`
     select
       count(*)::int as total_orders,
-      coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total_revenue,
-      coalesce(round(avg(${schema.orders.totalBdt}))::int, 0) as aov
+      -- Revenue and AOV over orders that count as revenue, net of refunds
+      -- (lib/revenue.ts); total_orders still counts every order placed.
+      coalesce(sum(${netOrderRevenue}) filter (where ${countsAsRevenue}), 0)::int as total_revenue,
+      coalesce(round(avg(${netOrderRevenue}) filter (where ${countsAsRevenue}))::int, 0) as aov
     from ${schema.orders}
   `).catch(() => [{ total_orders: 0, total_revenue: 0, aov: 0 }]);
 
@@ -30,6 +33,8 @@ export default async function AdminAnalyticsPage() {
       sum(${schema.orderLines.qty})::int as units,
       sum(${schema.orderLines.lineTotalBdt})::int as revenue
     from ${schema.orderLines}
+    join ${schema.orders} on ${schema.orderLines.orderId} = ${schema.orders.id}
+    where ${countsAsRevenue}
     group by product_id, name
     order by revenue desc
     limit 10
