@@ -132,6 +132,8 @@
     "sizeLabel": "সাইজ — {value}",
     "selectSize": "সাইজ বেছে নিন",
     "chooseSizeFirst": "আগে একটি সাইজ বেছে নিন।",
+    "optionSoldOut": "বিক্রি শেষ",
+    "optionLeft": "{option}-এ মাত্র {count}টি বাকি",
     "viewPhoto": "ছবি {n} দেখুন",
     "newRibbon": "নতুন",
     "descriptionFallback": "মেইসনের একটি পিস।",

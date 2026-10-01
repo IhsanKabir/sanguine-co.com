@@ -1,6 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { logOrderEvent } from "@/lib/order-events";
+import { returnStock } from "@/lib/variant-stock";
 import { notifyOrderPlaced } from "@/lib/order-notify";
 import { isValidStatus, queryTransaction, validatePayment } from "./sslcommerz";
 
@@ -32,9 +33,7 @@ export async function releaseUnpaidOrder(orderId: string, reason: string): Promi
     const lines = await tx.select().from(schema.orderLines).where(eq(schema.orderLines.orderId, orderId));
     for (const l of lines) {
       if (!l.productId) continue;
-      await tx.update(schema.products)
-        .set({ stock: sql`${schema.products.stock} + ${l.qty}` })
-        .where(eq(schema.products.id, l.productId));
+      await returnStock(tx, { productId: l.productId, color: l.color, size: l.size, qty: l.qty });
       await tx.insert(schema.inventoryLog).values({
         productId: l.productId,
         delta: l.qty,

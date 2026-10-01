@@ -33,6 +33,7 @@ import { sendEmail } from "@/lib/email/brevo";
 import { orderShippedEmail, type OrderEmailLine } from "@/lib/email/templates";
 import { applyOrderStatus, ORDER_STATUSES } from "@/lib/order-status";
 import { syncCourierStatuses } from "@/lib/shipping/sync";
+import { clearOptionStock, isTrackedPerOption, optionCombos, setOptionStock, variantsFor } from "@/lib/variant-stock";
 import { sendSms } from "@/lib/sms/ssl-wireless";
 import { logOrderEvent, listOrderEvents } from "@/lib/order-events";
 
@@ -263,7 +264,22 @@ export async function updateProduct(id: string, patch: Partial<z.infer<typeof pr
   }
   if (typeof safe.sku === "string") update.sku = safe.sku.toUpperCase();
   if (typeof safe.name === "string") update.slug = slugify(safe.name);
+
+  // Tracked per option: the stock number is the sum of the options and is
+  // only changed through Inventory → Per option, never typed over here.
+  const tracked = await isTrackedPerOption(id);
+  if (tracked) delete update.stock;
   await db.update(schema.products).set(update).where(eq(schema.products.id, id));
+
+  // Options dropped from the colour/size lists can't be sold any more, so
+  // their stock leaves the total rather than sitting there unsellable.
+  if (tracked && (safe.colors !== undefined || safe.sizes !== undefined)) {
+    const offered = new Set(optionCombos(safe.colors ?? current.colors, safe.sizes ?? current.sizes)
+      .map((o) => `${o.color}|${o.size}`));
+    const rows = (await variantsFor([id])).get(id) ?? [];
+    const kept = rows.filter((r) => offered.has(`${r.color}|${r.size}`));
+    if (kept.length !== rows.length) await setOptionStock(id, kept);
+  }
   revalidateAllLocales();
   return { ok: true as const };
 }
@@ -295,8 +311,63 @@ export async function deleteProducts(ids: string[]) {
   revalidateAllLocales();
 }
 
+// ─── Stock per option (size / colour) ──────────────────────────────────
+// The rows live in product_variants; lib/variant-stock.ts keeps the
+// product's single stock number equal to their sum.
+
+const optionRowsSchema = z.array(z.object({
+  color: z.string().max(60),
+  size: z.string().max(60),
+  stock: z.number().int().min(0).max(100000),
+})).max(200);
+
+/** Admin view of one product's options: what it offers and what is counted. */
+export async function getOptionStockAdmin(productId: string) {
+  await requirePermission("inventory");
+  const [p] = await db.select().from(schema.products).where(eq(schema.products.id, productId)).limit(1);
+  if (!p) return { ok: false as const, error: "Product not found" };
+  const rows = (await variantsFor([productId])).get(productId) ?? [];
+  const counted = new Map(rows.map((r) => [`${r.color}|${r.size}`, r.stock]));
+  const options = optionCombos(p.colors, p.sizes).map((o) => ({
+    ...o,
+    stock: counted.get(`${o.color}|${o.size}`) ?? null,   // null = not counted yet
+  }));
+  return { ok: true as const, tracked: rows.length > 0, total: p.stock, options };
+}
+
+/** Save the counted stock of every option; the product total becomes their sum. */
+export async function saveOptionStock(productId: string, rows: z.infer<typeof optionRowsSchema>) {
+  const ctx = await requirePermission("inventory");
+  const parsed = optionRowsSchema.safeParse(rows);
+  if (!parsed.success) return { ok: false as const, error: "Invalid stock numbers." };
+  const [p] = await db.select({ colors: schema.products.colors, sizes: schema.products.sizes })
+    .from(schema.products).where(eq(schema.products.id, productId)).limit(1);
+  if (!p) return { ok: false as const, error: "Product not found" };
+  const offered = new Set(optionCombos(p.colors, p.sizes).map((o) => `${o.color}|${o.size}`));
+  if (offered.size === 0) return { ok: false as const, error: "This piece has no sizes or colours to count." };
+  const unknown = parsed.data.find((r) => !offered.has(`${r.color.trim()}|${r.size.trim()}`));
+  if (unknown) return { ok: false as const, error: `"${[unknown.color, unknown.size].filter(Boolean).join(" · ")}" is not one of this piece's options.` };
+  if (parsed.data.length !== offered.size) {
+    return { ok: false as const, error: "Enter a number (0 is fine) for every option." };
+  }
+  const total = await setOptionStock(productId, parsed.data, ctx.user.id);
+  revalidateAllLocales();
+  return { ok: true as const, total };
+}
+
+/** Go back to one stock number for the piece. It keeps its current total. */
+export async function stopOptionStock(productId: string) {
+  await requirePermission("inventory");
+  await clearOptionStock(productId);
+  revalidateAllLocales();
+  return { ok: true as const };
+}
+
 export async function adjustStock(id: string, delta: number, reason: string) {
   await requireAdmin();
+  if (await isTrackedPerOption(id)) {
+    return { ok: false as const, error: "This piece is counted per size/colour. Use Per option instead." };
+  }
   await db.transaction(async (tx) => {
     await tx.update(schema.products)
       .set({ stock: sql`greatest(0, ${schema.products.stock} + ${delta})` })
@@ -304,6 +375,7 @@ export async function adjustStock(id: string, delta: number, reason: string) {
     await tx.insert(schema.inventoryLog).values({ productId: id, delta, reason });
   });
   revalidateAllLocales();
+  return { ok: true as const };
 }
 
 // ─── Orders ────────────────────────────────────────────────────────────

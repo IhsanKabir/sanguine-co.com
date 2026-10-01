@@ -6,6 +6,7 @@ import { eq, inArray } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth-utils";
 import { slugify } from "@/lib/utils";
+import { variantsFor } from "@/lib/variant-stock";
 
 /**
  * Parse a single CSV line, respecting quoted fields and escaped quotes ("").
@@ -212,19 +213,23 @@ export async function importProductsCsv(input: z.infer<typeof importInputSchema>
     return result;
   }
 
+  // Pieces counted per size/colour keep their stock: the CSV has one stock
+  // column, and writing it would put the total out of step with the options.
+  const tracked = await variantsFor(existing.map((e) => e.id));
+
   // Commit. Wrap in a transaction so partial failures roll back cleanly.
   await db.transaction(async (tx) => {
     for (const p of valid) {
       const existingId = existingBySku.get(p.sku);
       if (existingId) {
         await tx.update(schema.products).set({
+          ...(tracked.has(existingId) ? {} : { stock: p.stock }),
           name: p.name,
           nameBn: p.nameBn,
           slug: slugify(p.name),
           segmentId: p.segmentId,
           priceBdt: p.priceBdt,
           wasBdt: p.wasBdt,
-          stock: p.stock,
           tag: p.tag,
           description: p.description,
           descriptionBn: p.descriptionBn,

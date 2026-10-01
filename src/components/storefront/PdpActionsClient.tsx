@@ -7,28 +7,42 @@ import { formatBdt } from "@/lib/utils";
 import { track } from "@/lib/actions/track";
 import Icon from "./Icon";
 import { usePdpState } from "./PdpStateContext";
+import { colorSoldOut, sizeSoldOut, stockOf, type OptionStock } from "./option-availability";
 
 type Props = {
   product: Omit<CartItem, "qty" | "color" | "size">;
   colors?: string[];
   sizes?: string[];
   colorPhotoMap?: Record<string, number>;
+  /** Stock per option ("colour|size" → n), or null when the piece has one stock number. */
+  optionStock?: OptionStock;
 };
 
-export default function PdpActionsClient({ product, colors = [], sizes = [], colorPhotoMap }: Props) {
+export default function PdpActionsClient({ product, colors = [], sizes = [], colorPhotoMap, optionStock }: Props) {
   const t = useTranslations();
   const locale = useLocale() as "en" | "bn";
   const { add } = useCart();
   const { setActivePhotoIndex } = usePdpState();
 
-  const [color, setColorState] = useState<string>(colors[0] ?? "");
+  // First colour that still has stock (the photo follows the colour).
+  const [color, setColorState] = useState<string>(
+    colors.find((c) => !colorSoldOut(optionStock, sizes, c)) ?? colors[0] ?? "",
+  );
   // No size is chosen for the shopper unless there is only one: pre-selecting
   // the first (usually the smallest) put whoever didn't notice the picker into
   // the wrong size. Colour stays pre-selected, since the photo shows it.
-  const [size, setSizeState] = useState<string>(sizes.length === 1 ? sizes[0] : "");
+  const [size, setSizeState] = useState<string>(
+    sizes.length === 1 && !sizeSoldOut(optionStock, colors, colors[0] ?? "", sizes[0]) ? sizes[0] : "",
+  );
   const [sizeHint, setSizeHint] = useState(false);
   const needsSize = sizes.length > 0 && !size;
   const [qty, setQty] = useState(1);
+  // Stock of the exact option chosen; null = unknown (not counted per option,
+  // or the choice isn't complete yet).
+  const chosen = (colors.length === 0 || color) && (sizes.length === 0 || size);
+  const optionLeft = chosen ? stockOf(optionStock, color, size) : null;
+  const optionSoldOut = optionLeft !== null && optionLeft <= 0;
+  const optionName = [color, size].filter(Boolean).join(" · ");
   const [added, setAdded] = useState(false);
   const [stickyVisible, setStickyVisible] = useState(false);
   const [flyPos, setFlyPos] = useState<{ x: number; y: number } | null>(null);
@@ -49,15 +63,21 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
   }, []);
 
   const setColor = (c: string) => {
+    if (colorSoldOut(optionStock, sizes, c)) return;
     setColorState(c);
+    // The size picked may not exist in the new colour.
+    if (size && sizeSoldOut(optionStock, colors, c, size)) setSizeState("");
+    setQty(1);
     if (colorPhotoMap && colorPhotoMap[c] !== undefined) {
       setActivePhotoIndex(colorPhotoMap[c]);
     }
   };
 
   const setSize = (s: string) => {
+    if (sizeSoldOut(optionStock, colors, color, s)) return;
     setSizeState(s);
     setSizeHint(false);
+    setQty(1);
   };
 
   // Add-to-bag without a size: point at the picker instead of adding.
@@ -70,6 +90,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
 
   const doAdd = () => {
     if (needsSize) return promptForSize();
+    if (optionSoldOut) return;
     if (btnRef.current) {
       const r = btnRef.current.getBoundingClientRect();
       setFlyPos({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
@@ -104,8 +125,10 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
             {colors.map((c) => (
               <div
                 key={c}
-                className={"swatch size-pill " + (c === color ? "active" : "")}
+                className={"swatch size-pill " + (c === color ? "active" : "") + (colorSoldOut(optionStock, sizes, c) ? " sold-out" : "")}
                 role="button"
+                aria-disabled={colorSoldOut(optionStock, sizes, c) || undefined}
+                title={colorSoldOut(optionStock, sizes, c) ? t("pdp.optionSoldOut") : undefined}
                 tabIndex={0}
                 onClick={() => setColor(c)}
                 onKeyDown={(e) => { if (e.key === "Enter") setColor(c); }}
@@ -123,9 +146,11 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
             {sizes.map((s) => (
               <div
                 key={s}
-                className={"swatch size-pill " + (s === size ? "active" : "")}
+                className={"swatch size-pill " + (s === size ? "active" : "") + (sizeSoldOut(optionStock, colors, color, s) ? " sold-out" : "")}
                 role="button"
                 aria-pressed={s === size}
+                aria-disabled={sizeSoldOut(optionStock, colors, color, s) || undefined}
+                title={sizeSoldOut(optionStock, colors, color, s) ? t("pdp.optionSoldOut") : undefined}
                 tabIndex={0}
                 onClick={() => setSize(s)}
                 onKeyDown={(e) => { if (e.key === "Enter") setSize(s); }}
@@ -139,16 +164,22 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
           )}
         </>
       )}
+      {optionLeft !== null && optionLeft > 0 && optionLeft <= 5 && optionName && (
+        <div className="pdp-option-left">{t("pdp.optionLeft", { count: optionLeft, option: optionName })}</div>
+      )}
       <div className="pdp-label">{t("common.quantity")}</div>
       <div className="qty">
         <button onClick={() => setQty(Math.max(1, qty - 1))} aria-label={t("common.decrease")}>−</button>
         <span aria-live="polite">{qty}</span>
-        <button onClick={() => setQty(qty + 1)} aria-label={t("common.increase")}>+</button>
+        <button
+          onClick={() => setQty(optionLeft !== null ? Math.min(qty + 1, Math.max(1, optionLeft)) : qty + 1)}
+          aria-label={t("common.increase")}
+        >+</button>
       </div>
       <div className="pdp-actions" ref={actionsRef}>
-        <button ref={btnRef} className="btn btn-primary btn-block" onClick={doAdd}>
+        <button ref={btnRef} className="btn btn-primary btn-block" onClick={doAdd} disabled={optionSoldOut}>
           <Icon name={added ? "check" : "bag"} size={14} />
-          {added ? t("pdp.added") : needsSize ? t("pdp.selectSize") : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
+          {added ? t("pdp.added") : needsSize ? t("pdp.selectSize") : optionSoldOut ? t("pdp.optionSoldOut") : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
         </button>
       </div>
 
@@ -160,10 +191,11 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
         <button
           className={"btn btn-primary" + (added ? " btn-added" : "")}
           onClick={doAdd}
+          disabled={optionSoldOut}
           tabIndex={stickyVisible ? 0 : -1}
         >
           <Icon name={added ? "check" : "bag"} size={14} />
-          {added ? t("pdp.added") : needsSize ? t("pdp.selectSize") : formatBdt(product.priceBdt * qty, locale)}
+          {added ? t("pdp.added") : needsSize ? t("pdp.selectSize") : optionSoldOut ? t("pdp.optionSoldOut") : formatBdt(product.priceBdt * qty, locale)}
         </button>
       </div>
     </>

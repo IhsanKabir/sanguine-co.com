@@ -7,6 +7,7 @@ import { formatBdt, normalizeBdWhatsApp } from "@/lib/utils";
 import Icon from "@/components/storefront/Icon";
 import ProductCard from "@/components/storefront/ProductCard";
 import PdpActionsClient from "@/components/storefront/PdpActionsClient";
+import { optionStock } from "@/lib/variant-stock";
 import PdpGallery from "@/components/storefront/PdpGallery";
 import { PdpStateProvider } from "@/components/storefront/PdpStateContext";
 import JsonLd from "@/components/seo/JsonLd";
@@ -154,6 +155,8 @@ export default async function ProductPage({ params }: Props) {
   const hasSizes = ((p.sizes as string[] | null) ?? []).length > 0;
   const sizeGuide = hasSizes && seg ? ((isBn && seg.sizeGuideBn) || seg.sizeGuide || "").trim() : "";
   const sellableNow = !p.preorderOnly && p.stock > 0;
+  // Per size/colour stock when the piece is counted that way (null otherwise).
+  const optionStockMap = sellableNow ? await optionStock(p.id).catch(() => null) : null;
 
   // Product schema with full Offer (shipping + returns) so Google Shopping
   // can render shipping cost and return-policy snippets in rich results.
@@ -323,6 +326,7 @@ export default async function ProductPage({ params }: Props) {
                 }}
                 colors={(p.colors as string[] | null) || []}
                 sizes={(p.sizes as string[] | null) || []}
+                optionStock={optionStockMap}
               />
               {p.preorderEnabled && (
                 <PreorderButton

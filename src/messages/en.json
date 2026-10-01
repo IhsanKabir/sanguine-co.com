@@ -132,6 +132,8 @@
     "sizeLabel": "Size — {value}",
     "selectSize": "Select a size",
     "chooseSizeFirst": "Choose a size first.",
+    "optionSoldOut": "Sold out",
+    "optionLeft": "Only {count} left in {option}",
     "viewPhoto": "View photo {n}",
     "newRibbon": "New",
     "descriptionFallback": "A piece from the maison.",

@@ -1,4 +1,5 @@
-import { pgTable, text, integer, boolean, uuid, timestamp, jsonb, numeric, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, boolean, uuid, timestamp, jsonb, numeric, primaryKey, unique, index, check } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 // ─── Catalogue ─────────────────────────────────────────────────────────
 export const segments = pgTable("segments", {
@@ -76,6 +77,26 @@ export const productImages = pgTable("product_images", {
 });
 
 export type ProductImage = typeof productImages.$inferSelect;
+
+// Stock per option (0019). A product with no rows keeps its single
+// products.stock; a product with rows is tracked per option and its
+// products.stock is kept equal to their sum (lib/variant-stock.ts).
+// '' = no colour / no size, so size-only and colour-only pieces fit the key.
+export const productVariants = pgTable("product_variants", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  color: text("color").default("").notNull(),
+  size: text("size").default("").notNull(),
+  stock: integer("stock").default(0).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+  unique("product_variants_product_id_color_size_key").on(t.productId, t.color, t.size),
+  index("idx_product_variants_product").on(t.productId),
+  check("product_variants_stock_check", sql`${t.stock} >= 0`),
+]);
+
+export type ProductVariant = typeof productVariants.$inferSelect;
 
 // ─── Customers (Supabase Auth owns auth.users; we add a profile) ───────
 export const customerProfiles = pgTable("customer_profiles", {
