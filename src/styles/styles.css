@@ -484,3 +484,20 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 @media (max-width: 767px) {
   body:has(.pdp-sticky-bar) .cookie-banner{bottom:calc(76px + env(safe-area-inset-bottom, 0px))}
 }
+
+/* Product page: size guide / materials / care disclosures (step 4) */
+.pdp-more{margin:6px 0 22px;border-top:1px solid var(--line)}
+.pdp-more details{border-bottom:1px solid var(--line)}
+.pdp-more summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:14px 2px;font-size:13px;letter-spacing:.06em;color:var(--purple-900)}
+.pdp-more summary::-webkit-details-marker{display:none}
+.pdp-more summary::after{content:"+";font-size:16px;color:var(--ink-soft);transition:transform .2s}
+.pdp-more details[open] summary::after{transform:rotate(45deg)}
+.pdp-more summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.pdp-more-body{padding:0 2px 16px;font-size:13px;line-height:1.7;color:var(--ink-soft)}
+.pdp-more-body p{margin:0 0 8px}
+.pdp-info-table-wrap{overflow-x:auto;margin:4px 0 10px}
+.pdp-info-table{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+.pdp-info-table th,.pdp-info-table td{border:1px solid var(--line);padding:6px 10px;text-align:left;white-space:nowrap}
+.pdp-info-table th{background:var(--purple-50);color:var(--purple-900);font-weight:500}
+.pdp-delivery-estimate{margin-top:-4px}
+@media (prefers-reduced-motion: reduce){.pdp-more summary::after{transition:none}}

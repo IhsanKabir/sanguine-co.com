@@ -160,7 +160,11 @@
     "whatsappLink": "এই পিস নিয়ে প্রশ্ন? হোয়াটসঅ্যাপে কথা বলুন →",
     "styleKicker": "সঙ্গে মানাবে",
     "completeLook": "লুকটি সম্পূর্ণ করুন",
-    "shippingNoteNoFree": "ডেলিভারি ঢাকায় {dhaka} · অন্যত্র {outside}"
+    "shippingNoteNoFree": "ডেলিভারি ঢাকায় {dhaka} · অন্যত্র {outside}",
+    "deliveryEstimate": "আজ অর্ডার করলে — আনুমানিক পৌঁছাবে ঢাকায় {dhaka}-এর মধ্যে, অন্যত্র {outside}-এর মধ্যে",
+    "sizeGuide": "সাইজ গাইড",
+    "materials": "উপকরণ ও বিবরণ",
+    "care": "যত্ন"
   },
   "cart": {
     "title": "আপনার ব্যাগ",

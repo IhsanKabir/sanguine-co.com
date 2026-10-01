@@ -160,7 +160,11 @@
     "whatsappLink": "Questions about this piece? Chat on WhatsApp →",
     "styleKicker": "STYLE IT WITH",
     "completeLook": "Complete the look",
-    "shippingNoteNoFree": "Delivery {dhaka} inside Dhaka · {outside} elsewhere"
+    "shippingNoteNoFree": "Delivery {dhaka} inside Dhaka · {outside} elsewhere",
+    "deliveryEstimate": "Order today — estimated arrival by {dhaka} in Dhaka, {outside} elsewhere",
+    "sizeGuide": "Size guide",
+    "materials": "Materials & details",
+    "care": "Care"
   },
   "cart": {
     "title": "Your Bag",

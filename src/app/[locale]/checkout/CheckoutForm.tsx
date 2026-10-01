@@ -12,6 +12,7 @@ import Icon from "@/components/storefront/Icon";
 import CouponInput from "@/components/storefront/CouponInput";
 
 import { shippingFor } from "@/lib/pricing";
+import { estimatedArrival, formatArrival } from "@/lib/delivery";
 import { useShippingRules } from "@/lib/shipping-rules-context";
 
 type Prefill = {
@@ -56,12 +57,8 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
   const baseShipping = shippingFor(shippingRules, s.city, subtotalBdt);
   const shipping = coupon?.freeShipping ? 0 : baseShipping;
 
-  // Estimated arrival: 1–2 days handling + 1–3 transit inside Dhaka, 3–5 outside.
-  const estArrival = (() => {
-    const d = new Date();
-    d.setDate(d.getDate() + (isDhaka ? 4 : 7));
-    return d.toLocaleDateString(t("common.dateLocale"), { weekday: "short", day: "numeric", month: "short" });
-  })();
+  // Same estimate as the product page (lib/delivery.ts, from /legal/shipping).
+  const estArrival = formatArrival(estimatedArrival(new Date(), isDhaka), locale);
   const discount = coupon?.discountBdt ?? 0;
   const total = Math.max(0, subtotalBdt - discount) + shipping;
 
