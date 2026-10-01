@@ -110,8 +110,6 @@ export default async function Home({ params }: Props) {
 
   // Bento takes the first 6 visible products
   const bento = (eds.length >= 6 ? eds : [...eds, ...news]).slice(0, 6);
-  // Wunderkammer scrolls — duplicate for seamless loop
-  const wkCats = [...segs, ...segs];
 
   // Editorial product groupings exposed as ItemList structured data so
   // Google can surface featured products in image / shopping results.
@@ -299,87 +297,6 @@ export default async function Home({ params }: Props) {
       )}
 
       <Ornament variant="spiral" size={64} />
-
-      {/* ─── Editor's Selection · House Favourites ──────────────── */}
-      {eds.length > 0 && (
-        <section className="section" data-cursor="crosshair">
-          <div className="section-hd" data-reveal>
-            <div>
-              <div className="kicker">{t("home.editors")}</div>
-              <h2>{t("home.favourites")}</h2>
-              <div className="ornament-rule" />
-            </div>
-          </div>
-          <div className="grid grid-3">
-            {eds.slice(0, 6).map((p, i) => {
-              const seg = segs.find((s) => s.id === p.segmentId);
-              return (
-                <div key={p.id} data-reveal data-reveal-delay={(i % 3) + 1}>
-                  <ProductCard product={p} segmentTag={seg?.tag} heroImage={heroImages.get(p.id) ?? null} />
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* ─── Wunderkammer · scrolling curiosity strip ───────────── */}
-      {segs.length > 0 && (
-        <section className="wunderkammer" aria-label={t("home.curiositiesLabel")} data-cursor="magnify">
-          <div className="wunderkammer-track">
-            {wkCats.map((c, i) => (
-              <Link key={c.id + i} href={`/shop/${c.id}`} className="wunderkammer-card">
-                <Composition cat={c.id} sku={c.id} name={c.name} />
-                <span className="wk-tag">{c.tag}</span>
-                <div className="wk-name">{c.name}</div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ─── Pin showcase (Genesis Collection · 4 frames) ──────── */}
-      <section data-pin-showcase className="pin-showcase" data-cursor="seal" style={{ height: "300vh", background: "var(--purple-950)", color: "var(--cream)", margin: "60px 0", position: "relative" }}>
-        <div className="pin-inner">
-          <div className="pin-stage">
-            <div className="pin-aside">
-              <div className="kicker" style={{ color: "var(--gold)" }}>{t("home.pin.kicker")}</div>
-              <h2 className="pin-headline serif">{t.rich("home.pin.headline", { br: () => <br />, em: (c) => <em>{c}</em> })}</h2>
-              <div className="pin-progress"><div className="pin-progress-bar"></div><span className="pin-counter">01 / 04</span></div>
-            </div>
-            <div className="pin-frames">
-              <div className="pin-frame active" data-i="0">
-                <div className="pin-art pin-art-1">
-                  <div className="pin-num">I.</div>
-                  <div className="pin-cap">{t("home.pin.f1Cap")}</div>
-                  <div className="pin-meta">{t("home.pin.f1Meta")}</div>
-                </div>
-              </div>
-              <div className="pin-frame" data-i="1">
-                <div className="pin-art pin-art-2">
-                  <div className="pin-num">II.</div>
-                  <div className="pin-cap">{t("home.pin.f2Cap")}</div>
-                  <div className="pin-meta">{t("home.pin.f2Meta")}</div>
-                </div>
-              </div>
-              <div className="pin-frame" data-i="2">
-                <div className="pin-art pin-art-3">
-                  <div className="pin-num">III.</div>
-                  <div className="pin-cap">{t("home.pin.f3Cap")}</div>
-                  <div className="pin-meta">{t("home.pin.f3Meta")}</div>
-                </div>
-              </div>
-              <div className="pin-frame" data-i="3">
-                <div className="pin-art pin-art-4">
-                  <div className="pin-num">IV.</div>
-                  <div className="pin-cap">{t("home.pin.f4Cap")}</div>
-                  <div className="pin-meta">{t("home.pin.f4Meta")}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ─── Journal · Atelier note ──────────────────────────────── */}
       <section className="journal" data-reveal data-cursor="inkwell">
