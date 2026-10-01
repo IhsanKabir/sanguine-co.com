@@ -51,7 +51,7 @@ export default async function TopNav() {
           {t("topbar.announcement")}
         </div>
       )}
-      <nav className="nav" aria-label="Primary">
+      <nav className="nav" aria-label={t("nav.primary")}>
         <div className="nav-inner">
           <MobileMenuButton segments={segmentData} />
           <Link href="/" className="nav-brand" aria-label={t("brand.name")}>

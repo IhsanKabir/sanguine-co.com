@@ -45,7 +45,7 @@ function SignInInner() {
 
   const onMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) { setError("Enter your email first."); return; }
+    if (!email) { setError(t("signIn.enterEmailFirst")); return; }
     setPending(true);
     setError(null);
     setInfo(null);
@@ -59,7 +59,7 @@ function SignInInner() {
     });
     setPending(false);
     if (error) { setError(error.message); return; }
-    setInfo("Check your inbox — we sent you a sign-in link.");
+    setInfo(t("signIn.linkSent"));
   };
 
   const onOAuth = async (provider: "google") => {
@@ -77,12 +77,12 @@ function SignInInner() {
 
   return (
     <section className="section sign-in-section" style={{ maxWidth: 440 }}>
-      <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold-deep)", marginBottom: 8, textAlign: "center" }}>WELCOME</div>
+      <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold-deep)", marginBottom: 8, textAlign: "center" }}>{t("signIn.welcome")}</div>
       <h1 className="serif page-h1" style={{ margin: "0 0 8px", color: "var(--purple-900)", fontWeight: 400, textAlign: "center" }}>
         {t("account.signIn")}
       </h1>
       <p style={{ color: "var(--ink-soft)", fontSize: 14, margin: "0 0 28px", textAlign: "center" }}>
-        Choose how you would like to enter the maison.
+        {t("signIn.intro")}
       </p>
 
       {/* OAuth providers */}
@@ -104,13 +104,13 @@ function SignInInner() {
         }}
       >
         <GoogleIcon />
-        Continue with Google
+        {t("signIn.google")}
       </button>
 
       {/* Divider */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0", color: "var(--ink-soft)", fontSize: 11, letterSpacing: ".15em" }}>
         <div style={{ flex: 1, borderTop: "1px solid var(--line)" }} />
-        <span>OR BY EMAIL</span>
+        <span>{t("signIn.orByEmail")}</span>
         <div style={{ flex: 1, borderTop: "1px solid var(--line)" }} />
       </div>
 
@@ -121,26 +121,26 @@ function SignInInner() {
           onClick={() => { setMode("password"); setError(null); setInfo(null); }}
           style={{ flex: 1, padding: "8px 10px", border: "none", background: mode === "password" ? "white" : "transparent", fontSize: 12, fontFamily: "var(--mono)", letterSpacing: ".1em", cursor: "pointer", textTransform: "uppercase", color: mode === "password" ? "var(--purple-900)" : "var(--ink-soft)" }}
         >
-          Password
+          {t("signIn.password")}
         </button>
         <button
           type="button"
           onClick={() => { setMode("magic"); setError(null); setInfo(null); }}
           style={{ flex: 1, padding: "8px 10px", border: "none", background: mode === "magic" ? "white" : "transparent", fontSize: 12, fontFamily: "var(--mono)", letterSpacing: ".1em", cursor: "pointer", textTransform: "uppercase", color: mode === "magic" ? "var(--purple-900)" : "var(--ink-soft)" }}
         >
-          Magic link
+          {t("signIn.magicLink")}
         </button>
       </div>
 
       <form className="panel" onSubmit={mode === "password" ? onPasswordSubmit : onMagicLink}>
         <div className="field">
-          <label>Email</label>
+          <label>{t("common.email")}</label>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@mail.co"
+            placeholder={t("common.emailPlaceholder")}
             autoComplete="email"
             autoFocus
           />
@@ -148,7 +148,7 @@ function SignInInner() {
 
         {mode === "password" && (
           <div className="field" style={{ marginTop: 12 }}>
-            <label>Password</label>
+            <label>{t("signIn.password")}</label>
             <input
               type="password"
               required
@@ -163,13 +163,13 @@ function SignInInner() {
 
         <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: 16 }} disabled={pending}>
           {pending
-            ? (mode === "password" ? "Signing in…" : "Sending link…")
-            : (mode === "password" ? "Sign in" : "Send me a sign-in link")}
+            ? (mode === "password" ? t("signIn.signingIn") : t("signIn.sendingLink"))
+            : (mode === "password" ? t("account.signIn") : t("signIn.sendLink"))}
         </button>
 
         {mode === "magic" && (
           <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 10, textAlign: "center", lineHeight: 1.5 }}>
-            We will email you a one-tap link. No password required.
+            {t("signIn.magicNote")}
           </p>
         )}
 
@@ -177,7 +177,7 @@ function SignInInner() {
         {info && <p style={{ color: "var(--ok)", fontSize: 13, marginTop: 12, background: "#eef7ee", padding: 10, border: "1px solid #4caf50" }}>{info}</p>}
 
         <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 18, textAlign: "center" }}>
-          Or simply <Link href="/checkout">place an order as a guest</Link>.
+          {t.rich("signIn.guest", { a: (c) => <Link href="/checkout">{c}</Link> })}
         </p>
       </form>
     </section>

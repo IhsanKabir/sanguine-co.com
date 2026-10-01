@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { normalizeBdWhatsApp } from "@/lib/utils";
 
 /**
@@ -12,10 +13,12 @@ const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;   // e.g. 8801XXXXXXXX
 const MESSENGER = process.env.NEXT_PUBLIC_MESSENGER_PAGE;   // e.g. sanguine
 
 export default function FloatingChat() {
+  // Hook before the early return: hooks must run on every render.
+  const t = useTranslations();
   if (!WHATSAPP && !MESSENGER) return null;
-  const greeting = encodeURIComponent("Hello, I'd like to ask about a piece on Sanguine.");
+  const greeting = encodeURIComponent(t("chat.greeting"));
   return (
-    <div className="floating-chat" aria-label="Chat with the maison">
+    <div className="floating-chat" aria-label={t("chat.label")}>
       {WHATSAPP && (
         <a
           href={`https://wa.me/${normalizeBdWhatsApp(WHATSAPP)}?text=${greeting}`}

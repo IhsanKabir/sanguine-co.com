@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent, type ChangeEvent } from "react";
+import { useTranslations } from "next-intl";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { createPreorderRequest } from "@/lib/actions/preorders";
 import Icon from "@/components/storefront/Icon";
@@ -35,6 +36,7 @@ const MAX_BYTES = 10 * 1024 * 1024;
 const ACCEPT = "image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm";
 
 export default function RequestForm({ segmentId, segmentName, userId, userEmail }: Props) {
+  const t = useTranslations();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [description, setDescription] = useState("");
@@ -59,14 +61,14 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
     e.target.value = ""; // reset so the same file can be re-picked after removal
 
     if (attachments.length + files.length > MAX_FILES) {
-      setUploadError(`Maximum ${MAX_FILES} files.`);
+      setUploadError(t("bespoke.errMaxFiles", { max: MAX_FILES }));
       return;
     }
     setUploadError(null);
 
     const oversized = files.find((f) => f.size > MAX_BYTES);
     if (oversized) {
-      setUploadError(`${oversized.name} is over 10 MB.`);
+      setUploadError(t("bespoke.errTooBig", { name: oversized.name }));
       return;
     }
 
@@ -78,7 +80,7 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
         // Reject any mime not in the bucket policy whitelist before upload.
         const mimeMaybe = file.type as AllowedMime;
         if (!ALLOWED_MIMES.includes(mimeMaybe)) {
-          setUploadError(`${file.name}: type ${file.type || "unknown"} is not allowed.`);
+          setUploadError(t("bespoke.errType", { name: file.name, type: file.type || t("bespoke.unknownType") }));
           break;
         }
         const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
@@ -88,7 +90,7 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
           .from("preorder-attachments")
           .upload(path, file, { contentType: file.type, upsert: false });
         if (upErr) {
-          setUploadError(`Upload failed for ${file.name}: ${upErr.message}`);
+          setUploadError(t("bespoke.errUpload", { name: file.name, message: upErr.message }));
           break;
         }
         const { data: urlData } = await sb.storage
@@ -140,7 +142,7 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
         if (result.ok) setDone(true);
         else setError(result.error);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Something went wrong.");
+        setError(err instanceof Error ? err.message : t("common.genericError"));
       }
     });
   };
@@ -148,11 +150,11 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
   if (done) {
     return (
       <div style={{ padding: 32, background: "#f9f4ec", border: "1px solid var(--gold-deep)" }}>
-        <h2 className="serif" style={{ fontSize: 32, color: "var(--purple-900)", margin: 0 }}>Received with care.</h2>
+        <h2 className="serif" style={{ fontSize: 32, color: "var(--purple-900)", margin: 0 }}>{t("bespoke.doneTitle")}</h2>
         <p style={{ fontSize: 15, color: "var(--ink-soft)", lineHeight: 1.7, margin: "12px 0 0" }}>
-          The maison has your request for a piece in <em>{segmentName}</em>. We will write back to <b>{userEmail}</b> within a day or two with a quote.
+          {t.rich("bespoke.doneBody", { segment: segmentName, email: userEmail, em: (c) => <em>{c}</em>, b: (c) => <b>{c}</b> })}
         </p>
-        <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 18 }}>No payment is due. The piece is paid for in cash on delivery — no deposit required.</p>
+        <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 18 }}>{t("bespoke.doneNote")}</p>
       </div>
     );
   }
@@ -162,18 +164,18 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
       {/* Identity */}
       <div className="row">
         <div className="field">
-          <label>Your name</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} required minLength={1} maxLength={120} placeholder="Maryam Khan" />
+          <label>{t("preorderForm.yourName")}</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} required minLength={1} maxLength={120} placeholder={t("preorderForm.namePlaceholder")} />
         </div>
         <div className="field">
-          <label>Phone (so we can call back)</label>
+          <label>{t("preorderForm.phoneCallback")}</label>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+8801XXXXXXXXX" />
         </div>
       </div>
 
       {/* The request itself */}
       <div className="field">
-        <label>What would you like?</label>
+        <label>{t("bespoke.what")}</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -181,7 +183,7 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
           minLength={10}
           maxLength={4000}
           rows={6}
-          placeholder="Describe the piece, the occasion, colours, materials, scale — anything you can tell us. The more detail, the better the quote."
+          placeholder={t("bespoke.whatPlaceholder")}
           style={{ width: "100%", padding: 12, fontFamily: "inherit", fontSize: 14, lineHeight: 1.6, border: "1px solid var(--line)", background: "white", resize: "vertical" }}
         />
         <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4 }}>{description.length} / 4000</div>
@@ -189,7 +191,7 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
 
       {/* Attachments */}
       <div>
-        <label style={{ fontSize: 11, letterSpacing: ".15em", color: "var(--ink-soft)", textTransform: "uppercase" }}>References (optional · up to 5 files, 10 MB each)</label>
+        <label style={{ fontSize: 11, letterSpacing: ".15em", color: "var(--ink-soft)", textTransform: "uppercase" }}>{t("bespoke.references")}</label>
         <div style={{ marginTop: 8, padding: 16, border: "1px dashed var(--line)", background: "#fcfaf6" }}>
           {attachments.length > 0 && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 12 }}>
@@ -204,7 +206,7 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
                   <button
                     type="button"
                     onClick={() => removeAttachment(i)}
-                    aria-label={`Remove ${a.fileName}`}
+                    aria-label={t("bespoke.removeFile", { name: a.fileName })}
                     style={{ position: "absolute", top: 4, right: 4, width: 22, height: 22, borderRadius: "50%", border: "none", background: "rgba(0,0,0,.6)", color: "white", cursor: "pointer", fontSize: 14, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}
                   >
                     ×
@@ -216,7 +218,7 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
           {attachments.length < MAX_FILES && (
             <label style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 16px", border: "1px solid var(--purple-900)", color: "var(--purple-900)", cursor: uploading ? "wait" : "pointer", fontSize: 13, letterSpacing: ".05em" }}>
               <Icon name="plus" size={14} />
-              {uploading ? "Uploading…" : (attachments.length === 0 ? "Add references" : "Add more")}
+              {uploading ? t("bespoke.uploading") : (attachments.length === 0 ? t("bespoke.addReferences") : t("bespoke.addMore"))}
               <input type="file" multiple accept={ACCEPT} onChange={onFileChange} disabled={uploading} style={{ display: "none" }} />
             </label>
           )}
@@ -227,35 +229,35 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
       {/* Logistics */}
       <div className="row">
         <div className="field">
-          <label>Quantity</label>
+          <label>{t("common.quantity")}</label>
           <input type="number" min={1} max={50} value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value) || 1)} />
         </div>
         <div className="field">
-          <label>Budget hint (৳, optional)</label>
-          <input type="number" min={0} value={budgetHint} onChange={(e) => setBudgetHint(e.target.value)} placeholder="e.g. 8000" />
+          <label>{t("bespoke.budget")}</label>
+          <input type="number" min={0} value={budgetHint} onChange={(e) => setBudgetHint(e.target.value)} placeholder={t("bespoke.budgetPlaceholder")} />
         </div>
         <div className="field">
-          <label>Wanted by (optional)</label>
+          <label>{t("bespoke.wantedBy")}</label>
           <input type="date" value={targetDate} onChange={(e) => setTargetDate(e.target.value)} />
         </div>
       </div>
 
       {/* Delivery address (optional — admin will follow up if missing) */}
       <div>
-        <label style={{ fontSize: 11, letterSpacing: ".15em", color: "var(--ink-soft)", textTransform: "uppercase" }}>Delivery address (optional · we can collect this on the call)</label>
+        <label style={{ fontSize: 11, letterSpacing: ".15em", color: "var(--ink-soft)", textTransform: "uppercase" }}>{t("preorderForm.addressOptionalCall")}</label>
         <div style={{ marginTop: 8, display: "grid", gap: 10 }}>
           <div className="field">
-            <input value={line1} onChange={(e) => setLine1(e.target.value)} placeholder="House, road, building" />
+            <input value={line1} onChange={(e) => setLine1(e.target.value)} placeholder={t("preorderForm.line1Placeholder")} />
           </div>
           <div className="row">
             <div className="field">
-              <input value={area} onChange={(e) => setArea(e.target.value)} placeholder="Area (e.g. Gulshan)" />
+              <input value={area} onChange={(e) => setArea(e.target.value)} placeholder={t("preorderForm.areaPlaceholder")} />
             </div>
             <div className="field">
-              <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" />
+              <input value={city} onChange={(e) => setCity(e.target.value)} placeholder={t("preorderForm.cityPlaceholder")} />
             </div>
             <div className="field">
-              <input value={postcode} onChange={(e) => setPostcode(e.target.value)} placeholder="Postcode" />
+              <input value={postcode} onChange={(e) => setPostcode(e.target.value)} placeholder={t("preorderForm.postcodePlaceholder")} />
             </div>
           </div>
         </div>
@@ -264,9 +266,9 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
       {error && <p style={{ color: "var(--err)", fontSize: 13 }}>{error}</p>}
 
       <div style={{ borderTop: "1px solid var(--line)", paddingTop: 18, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: 0 }}>No payment is taken now. Pay on delivery.</p>
+        <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: 0 }}>{t("bespoke.payNote")}</p>
         <button type="submit" className="btn btn-primary" disabled={pending || uploading} style={{ minWidth: 220 }}>
-          {pending ? "Sending…" : "Submit request"}
+          {pending ? t("preorderForm.sending") : t("bespoke.submit")}
         </button>
       </div>
     </form>

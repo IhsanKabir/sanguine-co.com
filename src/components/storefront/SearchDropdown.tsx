@@ -103,7 +103,7 @@ export default function SearchDropdown() {
       {open && q.length >= 2 && (
         <div className="search-pop" role="listbox">
           {hits.length === 0 ? (
-            <div className="search-empty">No correspondence found</div>
+            <div className="search-empty">{t("search.empty")}</div>
           ) : (
             hits.map((p) => (
               <div

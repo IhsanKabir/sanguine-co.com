@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { db, schema } from "@/lib/db";
 import { eq } from "drizzle-orm";
@@ -15,6 +15,7 @@ type Props = {
 export default async function PreorderPage({ params }: Props) {
   const { locale, segment } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations();
 
   const [seg] = await db.select().from(schema.segments).where(eq(schema.segments.id, segment)).limit(1);
   if (!seg || seg.hidden || !seg.preorderEnabled) notFound();
@@ -31,20 +32,20 @@ export default async function PreorderPage({ params }: Props) {
   return (
     <>
       <div className="crumbs">
-        <Link href="/" style={{ cursor: "pointer" }}>Maison</Link>
+        <Link href="/" style={{ cursor: "pointer" }}>{t("nav.maison")}</Link>
         <Link href={`/shop/${segment}`} style={{ cursor: "pointer" }}>{name}</Link>
-        <span className="current">Bespoke request</span>
+        <span className="current">{t("bespoke.crumb")}</span>
       </div>
       <section className="section" style={{ paddingTop: 28, maxWidth: 880 }}>
         <div style={{ marginBottom: 36, paddingBottom: 24, borderBottom: "1px solid var(--line)" }}>
           <div style={{ fontSize: 11, letterSpacing: ".3em", color: "var(--gold-deep)", marginBottom: 8 }}>
-            {tag.toUpperCase()} · BESPOKE
+            {t("bespoke.kicker", { tag: tag.toUpperCase() })}
           </div>
           <h1 className="serif page-h1" style={{ margin: 0, color: "var(--purple-900)", fontWeight: 400, lineHeight: 1.05 }}>
-            Compose a piece
+            {t("bespoke.title")}
           </h1>
           <p style={{ fontSize: 15, color: "var(--ink-soft)", margin: "16px 0 0", maxWidth: 620, lineHeight: 1.7 }}>
-            {blurb || `Tell the maison what you have in mind for ${name}. Attach references — images, films, anything that conveys the feeling you want.`} A quote and timeline will follow within a day or two.
+            {blurb || t("bespoke.introFallback", { name })} {t("bespoke.introTail")}
           </p>
         </div>
         <RequestForm

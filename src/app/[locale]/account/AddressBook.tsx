@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
+import { useTranslations } from "next-intl";
 import { saveAddress, deleteAddress, setDefaultAddress } from "@/lib/actions/addresses";
 import Icon from "@/components/storefront/Icon";
 
@@ -63,6 +64,7 @@ export default function AddressBook({
   profileName?: string;
   profilePhone?: string;
 }) {
+  const t = useTranslations();
   const [editing, setEditing] = useState<EditState | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +91,7 @@ export default function AddressBook({
         isDefault: editing.isDefault,
       });
       if (result.ok) setEditing(null);
-      else setError("Could not save the address.");
+      else setError(t("addresses.saveError"));
     });
   };
 
@@ -118,17 +120,17 @@ export default function AddressBook({
     <section style={{ marginTop: 48 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", marginBottom: 16 }}>
         <h2 className="serif" style={{ fontSize: 24, color: "var(--purple-900)", fontWeight: 500, margin: 0 }}>
-          Addresses
+          {t("addresses.title")}
         </h2>
         <button className="btn btn-ghost btn-sm" onClick={() => setEditing(empty(profileName, profilePhone))}>
-          <Icon name="plus" size={12} /> Add address
+          <Icon name="plus" size={12} /> {t("addresses.add")}
         </button>
       </div>
 
       {addresses.length === 0 ? (
         <div className="empty-state" style={{ padding: 24 }}>
           <p style={{ color: "var(--ink-soft)" }}>
-            No addresses saved. Add one and we will offer it at checkout.
+            {t("addresses.none")}
           </p>
         </div>
       ) : (
@@ -137,10 +139,10 @@ export default function AddressBook({
             <article key={a.id} style={{ padding: 16, background: "white", border: "1px solid var(--line)", position: "relative" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                 <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".15em", color: "var(--ink-soft)", textTransform: "uppercase" }}>
-                  {a.label || "Address"}
+                  {a.label || t("addresses.fallbackLabel")}
                 </div>
                 {a.isDefault && (
-                  <span className="pill pill-ok" style={{ fontSize: 9 }}>Default</span>
+                  <span className="pill pill-ok" style={{ fontSize: 9 }}>{t("addresses.default")}</span>
                 )}
               </div>
               <div style={{ fontSize: 13, lineHeight: 1.6 }}>
@@ -150,22 +152,22 @@ export default function AddressBook({
                 {a.phone}
               </div>
               <div style={{ display: "flex", gap: 6, marginTop: 12, alignItems: "center", flexWrap: "wrap" }}>
-                <button className="icon-btn" title="Edit" onClick={() => setEditing(toEdit(a))} disabled={busyId === a.id}>
+                <button className="icon-btn" title={t("common.edit")} onClick={() => setEditing(toEdit(a))} disabled={busyId === a.id}>
                   <Icon name="feather" size={12} />
                 </button>
                 {!a.isDefault && (
-                  <button className="icon-btn" title="Set as default" onClick={() => onMakeDefault(a.id)} disabled={busyId === a.id}>
+                  <button className="icon-btn" title={t("addresses.setDefault")} onClick={() => onMakeDefault(a.id)} disabled={busyId === a.id}>
                     <Icon name="check" size={12} />
                   </button>
                 )}
                 {confirmDelId === a.id ? (
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13 }}>
-                    <span style={{ color: "var(--ink-soft)" }}>Remove?</span>
-                    <button type="button" className="btn btn-primary btn-sm" onClick={() => doDelete(a.id)} style={{ padding: "3px 10px" }}>Yes</button>
-                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirmDelId(null)} style={{ padding: "3px 8px" }}>No</button>
+                    <span style={{ color: "var(--ink-soft)" }}>{t("addresses.removeConfirm")}</span>
+                    <button type="button" className="btn btn-primary btn-sm" onClick={() => doDelete(a.id)} style={{ padding: "3px 10px" }}>{t("addresses.yes")}</button>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirmDelId(null)} style={{ padding: "3px 8px" }}>{t("addresses.no")}</button>
                   </span>
                 ) : (
-                  <button className="icon-btn" title="Delete" onClick={() => onDelete(a.id)} disabled={busyId === a.id}>
+                  <button className="icon-btn" title={t("common.delete")} onClick={() => onDelete(a.id)} disabled={busyId === a.id}>
                     <Icon name="x" size={12} />
                   </button>
                 )}
@@ -180,46 +182,46 @@ export default function AddressBook({
           <div className="overlay" onClick={() => setEditing(null)} />
           <div className="seg-modal" style={{ width: 560 }}>
             <div className="seg-modal-hd">
-              <h3 className="serif">{editing.id ? "Edit address" : "New address"}</h3>
-              <button className="icon-btn" onClick={() => setEditing(null)}><Icon name="x" /></button>
+              <h3 className="serif">{editing.id ? t("addresses.editTitle") : t("addresses.newTitle")}</h3>
+              <button className="icon-btn" onClick={() => setEditing(null)} aria-label={t("common.close")}><Icon name="x" /></button>
             </div>
             <form onSubmit={onSave}>
               <div className="seg-modal-body" style={{ display: "block" }}>
                 <div className="row">
-                  <div className="field"><label>Label</label>
-                    <input value={editing.label} onChange={(e) => setEditing({ ...editing, label: e.target.value })} placeholder="Home, Office, …" /></div>
-                  <div className="field"><label>Full name</label>
+                  <div className="field"><label>{t("addresses.label")}</label>
+                    <input value={editing.label} onChange={(e) => setEditing({ ...editing, label: e.target.value })} placeholder={t("addresses.labelPlaceholder")} /></div>
+                  <div className="field"><label>{t("addresses.fullName")}</label>
                     <input value={editing.fullName} onChange={(e) => setEditing({ ...editing, fullName: e.target.value })} required minLength={1} /></div>
                 </div>
-                <div className="field"><label>Phone</label>
+                <div className="field"><label>{t("common.phone")}</label>
                   <input value={editing.phone} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} required minLength={6} placeholder="+8801XXXXXXXXX" /></div>
-                <div className="field"><label>Address line 1</label>
-                  <input value={editing.line1} onChange={(e) => setEditing({ ...editing, line1: e.target.value })} required minLength={1} placeholder="House, road, building" /></div>
-                <div className="field"><label>Address line 2 (optional)</label>
+                <div className="field"><label>{t("addresses.line1")}</label>
+                  <input value={editing.line1} onChange={(e) => setEditing({ ...editing, line1: e.target.value })} required minLength={1} placeholder={t("addresses.line1Placeholder")} /></div>
+                <div className="field"><label>{t("addresses.line2")}</label>
                   <input value={editing.line2} onChange={(e) => setEditing({ ...editing, line2: e.target.value })} /></div>
                 <div className="row">
-                  <div className="field"><label>Area</label>
-                    <input value={editing.area} onChange={(e) => setEditing({ ...editing, area: e.target.value })} placeholder="Gulshan, Dhanmondi…" /></div>
-                  <div className="field"><label>City</label>
+                  <div className="field"><label>{t("checkout.area")}</label>
+                    <input value={editing.area} onChange={(e) => setEditing({ ...editing, area: e.target.value })} placeholder={t("addresses.areaPlaceholder")} /></div>
+                  <div className="field"><label>{t("checkout.city")}</label>
                     <input value={editing.city} onChange={(e) => setEditing({ ...editing, city: e.target.value })} required minLength={1} /></div>
                 </div>
                 <div className="row">
-                  <div className="field"><label>District</label>
+                  <div className="field"><label>{t("checkout.district")}</label>
                     <input value={editing.district} onChange={(e) => setEditing({ ...editing, district: e.target.value })} /></div>
-                  <div className="field"><label>Division</label>
+                  <div className="field"><label>{t("checkout.division")}</label>
                     <input value={editing.division} onChange={(e) => setEditing({ ...editing, division: e.target.value })} /></div>
-                  <div className="field"><label>Postcode</label>
+                  <div className="field"><label>{t("checkout.postcode")}</label>
                     <input value={editing.postcode} onChange={(e) => setEditing({ ...editing, postcode: e.target.value })} /></div>
                 </div>
                 <label className="seg-check" style={{ marginTop: 12 }}>
                   <input type="checkbox" checked={editing.isDefault} onChange={(e) => setEditing({ ...editing, isDefault: e.target.checked })} />
-                  Use as default for future orders
+                  {t("addresses.makeDefault")}
                 </label>
                 {error && <p style={{ color: "var(--err)", fontSize: 13, marginTop: 12 }}>{error}</p>}
               </div>
               <div className="seg-modal-foot">
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditing(null)}>Cancel</button>
-                <button type="submit" className="btn btn-primary btn-sm">Save</button>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditing(null)}>{t("common.cancel")}</button>
+                <button type="submit" className="btn btn-primary btn-sm">{t("common.save")}</button>
               </div>
             </form>
           </div>

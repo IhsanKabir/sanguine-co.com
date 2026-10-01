@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { updateNotificationPrefs } from "@/lib/actions/profile";
 
 type Props = {
@@ -10,8 +11,8 @@ type Props = {
 
 type Row = {
   key: "orderEmail" | "newArrivals" | "smsAlerts";
-  label: string;
-  description: string;
+  label: string;        // message key
+  description: string;  // message key
   alwaysOn?: boolean;
   controls?: "email" | "sms";
 };
@@ -19,25 +20,26 @@ type Row = {
 const ROWS: Row[] = [
   {
     key: "orderEmail",
-    label: "Order updates by email",
-    description: "Always receive dispatch and delivery confirmation",
+    label: "notifications.orderEmail",
+    description: "notifications.orderEmailDesc",
     alwaysOn: true,
   },
   {
     key: "newArrivals",
-    label: "New arrivals & seasonal notes",
-    description: "Curated editorial drops and new collections",
+    label: "notifications.newArrivals",
+    description: "notifications.newArrivalsDesc",
     controls: "email",
   },
   {
     key: "smsAlerts",
-    label: "SMS delivery alerts",
-    description: "Courier dispatch and delivery ping",
+    label: "notifications.sms",
+    description: "notifications.smsDesc",
     controls: "sms",
   },
 ];
 
 export default function NotificationPrefs({ initialEmail, initialSms }: Props) {
+  const tr = useTranslations();
   const [notifyEmail, setNotifyEmail] = useState(initialEmail);
   const [notifySms, setNotifySms] = useState(initialSms);
   const [savedAt, setSavedAt] = useState<number | null>(null);
@@ -92,13 +94,13 @@ export default function NotificationPrefs({ initialEmail, initialSms }: Props) {
             marginBottom: 4,
           }}
         >
-          Communications
+          {tr("notifications.kicker")}
         </div>
         <h2
           className="serif"
           style={{ fontSize: 28, color: "var(--purple-900)", fontWeight: 500, margin: 0 }}
         >
-          Notifications
+          {tr("notifications.title")}
         </h2>
       </div>
 
@@ -149,10 +151,10 @@ export default function NotificationPrefs({ initialEmail, initialSms }: Props) {
                     marginBottom: 2,
                   }}
                 >
-                  {row.label}
+                  {tr(row.label)}
                 </div>
                 <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>
-                  {row.description}
+                  {tr(row.description)}
                 </div>
               </div>
               <label
@@ -202,7 +204,7 @@ export default function NotificationPrefs({ initialEmail, initialSms }: Props) {
           pointerEvents: "none",
         }}
       >
-        ✓ Saved
+        {tr("common.saved")}
       </div>
     </section>
   );

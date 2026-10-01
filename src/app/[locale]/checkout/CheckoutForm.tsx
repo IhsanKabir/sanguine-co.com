@@ -61,7 +61,7 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
   const estArrival = (() => {
     const d = new Date();
     d.setDate(d.getDate() + (isDhaka ? 4 : 7));
-    return d.toLocaleDateString("en-BD", { weekday: "short", day: "numeric", month: "short" });
+    return d.toLocaleDateString(t("common.dateLocale"), { weekday: "short", day: "numeric", month: "short" });
   })();
   const discount = coupon?.discountBdt ?? 0;
   const total = Math.max(0, subtotalBdt - discount) + shipping;
@@ -78,7 +78,7 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated]);
 
-  if (!hydrated) return <p>Loading…</p>;
+  if (!hydrated) return <p>{t("common.loading")}</p>;
   if (items.length === 0) {
     return (
       <div className="empty-state">
@@ -90,14 +90,14 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
 
   const validateStep1 = () => {
     const errs: Record<string, string> = {};
-    if (c.fullName.trim().length < 2) errs.fullName = "Please enter your full name.";
-    if (!c.email.includes("@") || !c.email.includes(".")) errs.email = "Enter a valid email address — e.g. you@mail.com";
+    if (c.fullName.trim().length < 2) errs.fullName = t("checkout.errName");
+    if (!c.email.includes("@") || !c.email.includes(".")) errs.email = t("checkout.errEmail");
     const digits = c.phone.replace(/\D/g, "");
-    if (digits.length < 10) errs.phone = "Enter a valid phone number (used for delivery updates only).";
-    if (s.line1.trim().length < 2) errs.line1 = "Enter your street address.";
-    if (s.city.trim().length < 2) errs.city = "Enter your city.";
+    if (digits.length < 10) errs.phone = t("checkout.errPhone");
+    if (s.line1.trim().length < 2) errs.line1 = t("checkout.errAddress");
+    if (s.city.trim().length < 2) errs.city = t("checkout.errCity");
     setFieldErrors(errs);
-    return Object.keys(errs).length === 0 ? null : "Please correct the fields above.";
+    return Object.keys(errs).length === 0 ? null : t("checkout.errFix");
   };
 
   const onPlace = () => {
@@ -139,12 +139,12 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
             <div className="row">
               <div className="field">
                 <label>{t("checkout.fullName")}</label>
-                <input autoComplete="name" value={c.fullName} onChange={(e) => { setC({ ...c, fullName: e.target.value }); setFieldErrors((fe) => ({ ...fe, fullName: "" })); }} placeholder="Adelaide Voss" aria-invalid={!!fieldErrors.fullName} />
+                <input autoComplete="name" value={c.fullName} onChange={(e) => { setC({ ...c, fullName: e.target.value }); setFieldErrors((fe) => ({ ...fe, fullName: "" })); }} placeholder={t("checkout.namePlaceholder")} aria-invalid={!!fieldErrors.fullName} />
                 {fieldErrors.fullName && <span className="field-err">{fieldErrors.fullName}</span>}
               </div>
               <div className="field">
                 <label>{t("checkout.email")}</label>
-                <input type="email" autoComplete="email" inputMode="email" value={c.email} onChange={(e) => { setC({ ...c, email: e.target.value }); setFieldErrors((fe) => ({ ...fe, email: "" })); }} placeholder="you@mail.co" aria-invalid={!!fieldErrors.email} />
+                <input type="email" autoComplete="email" inputMode="email" value={c.email} onChange={(e) => { setC({ ...c, email: e.target.value }); setFieldErrors((fe) => ({ ...fe, email: "" })); }} placeholder={t("common.emailPlaceholder")} aria-invalid={!!fieldErrors.email} />
                 {fieldErrors.email && <span className="field-err">{fieldErrors.email}</span>}
               </div>
             </div>
@@ -158,18 +158,18 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
             <div className="row">
               <div className="field" style={{ gridColumn: "1/-1" }}>
                 <label>{t("checkout.address")}</label>
-                <input autoComplete="street-address" value={s.line1} onChange={(e) => { setS({ ...s, line1: e.target.value }); setFieldErrors((fe) => ({ ...fe, line1: "" })); }} placeholder="House 12, Road 5, Gulshan" aria-invalid={!!fieldErrors.line1} />
+                <input autoComplete="street-address" value={s.line1} onChange={(e) => { setS({ ...s, line1: e.target.value }); setFieldErrors((fe) => ({ ...fe, line1: "" })); }} placeholder={t("checkout.addressPlaceholder")} aria-invalid={!!fieldErrors.line1} />
                 {fieldErrors.line1 && <span className="field-err">{fieldErrors.line1}</span>}
               </div>
             </div>
             <div className="row row-3">
               <div className="field">
                 <label>{t("checkout.area")}</label>
-                <input value={s.area} onChange={(e) => setS({ ...s, area: e.target.value })} placeholder="Gulshan" />
+                <input value={s.area} onChange={(e) => setS({ ...s, area: e.target.value })} placeholder={t("checkout.areaPlaceholder")} />
               </div>
               <div className="field">
                 <label>{t("checkout.city")}</label>
-                <input value={s.city} onChange={(e) => { setS({ ...s, city: e.target.value }); setFieldErrors((fe) => ({ ...fe, city: "" })); }} placeholder="Dhaka" aria-invalid={!!fieldErrors.city} />
+                <input value={s.city} onChange={(e) => { setS({ ...s, city: e.target.value }); setFieldErrors((fe) => ({ ...fe, city: "" })); }} placeholder={t("checkout.cityPlaceholder")} aria-invalid={!!fieldErrors.city} />
                 {fieldErrors.city && <span className="field-err">{fieldErrors.city}</span>}
               </div>
               <div className="field">
@@ -177,8 +177,8 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
                 <input inputMode="numeric" autoComplete="postal-code" value={s.postcode} onChange={(e) => setS({ ...s, postcode: e.target.value })} placeholder="1212" />
               </div>
             </div>
-            <div className="row"><div className="field" style={{ gridColumn: "1/-1" }}><label>Order notes (optional)</label>
-              <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything our courier should know"/></div></div>
+            <div className="row"><div className="field" style={{ gridColumn: "1/-1" }}><label>{t("checkout.notesLabel")}</label>
+              <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("checkout.notesPlaceholder")}/></div></div>
             <button className="btn btn-primary" style={{ marginTop: 18 }} onClick={() => {
               const v = validateStep1();
               if (v) { setError(v); return; }
@@ -200,20 +200,20 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
                 <div className="name">{t("checkout.payCod")}</div>
                 <div className="sub">{t("checkout.payCodSub")}</div>
               </div>
-              <div className="logos"><span>CASH</span></div>
+              <div className="logos"><span>{t("checkout.cashBadge")}</span></div>
             </div>
             <div style={{ marginTop: 18, padding: 18, background: "var(--purple-50)", border: "1px solid var(--purple-200)" }}>
               <div style={{ fontFamily: "var(--serif)", fontSize: 18, color: "var(--purple-900)", marginBottom: 6 }}>
                 {t("checkout.payCod")}
               </div>
               <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>
-                Keep <b style={{ color: "var(--purple-900)" }}>{formatBdt(total, locale)}</b> ready for our courier.
+                {t.rich("checkout.keepReady", { amount: formatBdt(total, locale), b: (c) => <b style={{ color: "var(--purple-900)" }}>{c}</b> })}
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
               <button className="btn btn-ghost" onClick={() => setStep(1)} disabled={pending}>← {t("checkout.back")}</button>
               <button className="btn btn-gold" style={{ flex: 1 }} onClick={onPlace} disabled={pending}>
-                <Icon name="check" size={14}/> {pending ? "Placing…" : `${t("checkout.placeOrder")} · ${formatBdt(total, locale)}`}
+                <Icon name="check" size={14}/> {pending ? t("checkout.placing") : `${t("checkout.placeOrder")} · ${formatBdt(total, locale)}`}
               </button>
             </div>
             {error && <p style={{ color: "var(--err)", fontSize: 13, marginTop: 12 }}>{error}</p>}
@@ -223,7 +223,7 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
 
       <div>
         <div className="panel checkout-panel">
-          <h3>Order Summary</h3>
+          <h3>{t("cart.orderSummary")}</h3>
           {items.map((i, idx) => (
             <div key={idx} style={{ display: "grid", gridTemplateColumns: "56px 1fr auto", gap: 12, marginBottom: 12, alignItems: "start" }}>
               <div style={{ aspectRatio: "3/4" }}>
@@ -232,7 +232,7 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
               <div>
                 <div className="serif" style={{ fontSize: 15, color: "var(--purple-900)" }}>{i.name}</div>
                 <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>
-                  {i.color || ""}{i.size ? ` · ${i.size}` : ""} · Qty {i.qty}
+                  {i.color || ""}{i.size ? ` · ${i.size}` : ""} · {t("checkout.qty", { qty: i.qty })}
                 </div>
               </div>
               <div style={{ fontSize: 13, fontWeight: 500 }}>{formatBdt(i.priceBdt * i.qty, locale)}</div>
@@ -241,17 +241,17 @@ export default function CheckoutForm({ prefill }: { prefill?: Prefill }) {
           <div style={{ borderTop: "1px solid var(--line)", paddingTop: 16, marginTop: 8 }}>
             <CouponInput compact />
             <div className="totals" style={{ marginTop: 16 }}>
-              <div className="r"><span className="muted">Subtotal</span><span>{formatBdt(subtotalBdt, locale)}</span></div>
+              <div className="r"><span className="muted">{t("cart.subtotal")}</span><span>{formatBdt(subtotalBdt, locale)}</span></div>
               {discount > 0 && (
                 <div className="r" style={{ color: "oklch(0.45 0.14 145)" }}>
-                  <span className="muted">Discount · {coupon?.code}</span>
+                  <span className="muted">{t("cart.discountLine", { code: coupon?.code ?? "" })}</span>
                   <span>− {formatBdt(discount, locale)}</span>
                 </div>
               )}
-              <div className="r"><span className="muted">Shipping</span><span>{shipping === 0 ? t("cart.shippingFree") : formatBdt(shipping, locale)}</span></div>
+              <div className="r"><span className="muted">{t("cart.shipping")}</span><span>{shipping === 0 ? t("cart.shippingFree") : formatBdt(shipping, locale)}</span></div>
               <div className="r grand"><span>{t("cart.total")}</span><span>{formatBdt(total, locale)}</span></div>
               <div className="r" style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line)" }}>
-                <span className="muted" style={{ fontSize: 11, letterSpacing: ".06em", textTransform: "uppercase" }}>Est. arrival</span>
+                <span className="muted" style={{ fontSize: 11, letterSpacing: ".06em", textTransform: "uppercase" }}>{t("checkout.estArrival")}</span>
                 <span style={{ fontSize: 13, fontWeight: 600, color: "var(--purple-900)" }}>{estArrival}</span>
               </div>
             </div>

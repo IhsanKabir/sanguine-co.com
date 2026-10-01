@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { formatBdt, formatDate } from "@/lib/utils";
 import ReturnModal from "./ReturnModal";
@@ -30,18 +31,6 @@ const STATUS_STYLE: Record<string, string> = {
   return_requested: "pill-warn",
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  pending:          "Pending",
-  cod_pending:      "COD Pending",
-  paid:             "Paid",
-  processing:       "Processing",
-  shipped:          "Shipped",
-  delivered:        "Delivered",
-  cancelled:        "Cancelled",
-  refunded:         "Refunded",
-  return_requested: "Return Requested",
-};
-
 // The exact window (per-product, anchored to delivery) is enforced server-side
 // in requestReturn — the button shows for any delivered order and the server
 // message states the precise window when it has closed.
@@ -50,13 +39,16 @@ function canReturn(order: OrderRow) {
 }
 
 export default function AccountOrders({ orders, locale }: Props) {
+  const t = useTranslations();
   const [returnOrder, setReturnOrder] = useState<OrderRow | null>(null);
+  // Known statuses have a translated label; anything new shows its raw value.
+  const statusLabel = (s: string) => (t.has(`orderStatus.${s}`) ? t(`orderStatus.${s}`) : s);
 
   if (orders.length === 0) {
     return (
       <div className="empty-state" style={{ padding: "40px 0" }}>
-        <p style={{ color: "var(--ink-soft)", marginBottom: 16 }}>No orders yet.</p>
-        <Link href="/" className="btn btn-primary btn-sm">Wander the Maison</Link>
+        <p style={{ color: "var(--ink-soft)", marginBottom: 16 }}>{t("accountOrders.none")}</p>
+        <Link href="/" className="btn btn-primary btn-sm">{t("accountOrders.wander")}</Link>
       </div>
     );
   }
@@ -67,11 +59,11 @@ export default function AccountOrders({ orders, locale }: Props) {
         <table>
           <thead>
             <tr>
-              <th>Order</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Tracking</th>
-              <th>Total</th>
+              <th>{t("accountOrders.colOrder")}</th>
+              <th>{t("accountOrders.colDate")}</th>
+              <th>{t("accountOrders.colStatus")}</th>
+              <th>{t("accountOrders.colTracking")}</th>
+              <th>{t("accountOrders.colTotal")}</th>
               <th />
             </tr>
           </thead>
@@ -86,7 +78,7 @@ export default function AccountOrders({ orders, locale }: Props) {
                 </td>
                 <td>
                   <span className={"pill " + (STATUS_STYLE[o.status] ?? "pill-info")}>
-                    {STATUS_LABEL[o.status] ?? o.status}
+                    {statusLabel(o.status)}
                   </span>
                 </td>
                 <td style={{ fontSize: 12 }}>
@@ -112,7 +104,7 @@ export default function AccountOrders({ orders, locale }: Props) {
                       href={`/order/${o.number}/track${o.trackingToken ? `?t=${o.trackingToken}` : ""}`}
                       style={{ fontSize: 12, color: "var(--purple-800)", borderBottom: "1px solid var(--gold)", paddingBottom: 1 }}
                     >
-                      Track
+                      {t("accountOrders.track")}
                     </Link>
                     <a
                       href={`/api/invoice/${o.id}`}
@@ -120,7 +112,7 @@ export default function AccountOrders({ orders, locale }: Props) {
                       rel="noopener noreferrer"
                       style={{ fontSize: 11, color: "var(--ink-soft)", borderBottom: "1px solid var(--line)", paddingBottom: 1, cursor: "pointer" }}
                     >
-                      Invoice
+                      {t("accountOrders.invoice")}
                     </a>
                     {canReturn(o) && (
                       <button
@@ -128,7 +120,7 @@ export default function AccountOrders({ orders, locale }: Props) {
                         onClick={() => setReturnOrder(o)}
                         style={{ fontSize: 11, color: "var(--ink-soft)", letterSpacing: ".08em", textTransform: "uppercase", background: "none", border: "none", borderBottom: "1px solid var(--line)", cursor: "pointer", padding: "0 0 1px" }}
                       >
-                        Return
+                        {t("accountOrders.return")}
                       </button>
                     )}
                   </div>

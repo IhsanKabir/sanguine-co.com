@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useCart } from "@/lib/cart-context";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { formatBdt } from "@/lib/utils";
 import { validateCoupon } from "@/lib/actions/coupons";
 
@@ -14,6 +14,7 @@ import { validateCoupon } from "@/lib/actions/coupons";
 export default function CouponInput({ compact = false }: { compact?: boolean }) {
   const { coupon, setCoupon, subtotalBdt } = useCart();
   const locale = useLocale() as "en" | "bn";
+  const t = useTranslations();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -47,10 +48,10 @@ export default function CouponInput({ compact = false }: { compact?: boolean }) 
             {coupon.description && <span className="ca-desc"> — {coupon.description}</span>}
           </div>
           <div className="ca-savings">
-            {coupon.freeShipping ? "Free shipping unlocked" : `Saving ${formatBdt(coupon.discountBdt, locale)}`}
+            {coupon.freeShipping ? t("coupon.freeShipping") : t("coupon.saving", { amount: formatBdt(coupon.discountBdt, locale) })}
           </div>
         </div>
-        <button type="button" className="ca-remove" onClick={remove} aria-label="Remove coupon">✕</button>
+        <button type="button" className="ca-remove" onClick={remove} aria-label={t("coupon.remove")}>✕</button>
       </div>
     );
   }
@@ -59,15 +60,15 @@ export default function CouponInput({ compact = false }: { compact?: boolean }) 
     <form className={"coupon-input " + (compact ? "compact" : "")} onSubmit={apply}>
       <input
         type="text"
-        placeholder="Discount code"
+        placeholder={t("coupon.placeholder")}
         value={code}
         onChange={(e) => setCode(e.target.value)}
         autoComplete="off"
         spellCheck={false}
-        aria-label="Discount code"
+        aria-label={t("coupon.placeholder")}
       />
       <button type="submit" disabled={pending || code.trim().length < 2}>
-        {pending ? "…" : "Apply"}
+        {pending ? "…" : t("common.apply")}
       </button>
       {error && <p className="ci-error">{error}</p>}
     </form>

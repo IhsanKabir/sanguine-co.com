@@ -65,6 +65,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+const MARQUEE_KEYS = ["atelierMade", "cod", "gift", "freeDelivery", "returns", "certified"];
+
 const CAT_CURSOR: Record<string, string> = {
   clothing: "magnify",
   accessories: "magnify",
@@ -110,7 +112,7 @@ export default async function Home({ params }: Props) {
     news.length > 0 && {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      name: "New This Week",
+      name: t("home.newThisWeek"),
       numberOfItems: news.length,
       itemListElement: news.map((p, i) => ({
         "@type": "ListItem",
@@ -122,7 +124,7 @@ export default async function Home({ params }: Props) {
     eds.length > 0 && {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      name: "Editor's Selection",
+      name: t("home.editors"),
       numberOfItems: eds.length,
       itemListElement: eds.map((p, i) => ({
         "@type": "ListItem",
@@ -156,7 +158,7 @@ export default async function Home({ params }: Props) {
             <p>{t("home.lede")}</p>
             <div className="hero-btns">
               {segs[0] && (
-                <Link href={`/shop/${segs[0].id}`} className="btn btn-gold" data-magnetic data-cursor-label="Enter">
+                <Link href={`/shop/${segs[0].id}`} className="btn btn-gold" data-magnetic data-cursor-label={t("home.cursorEnter")}>
                   {t("home.ctaPrimary")} <Icon name="arrow" size={14} />
                 </Link>
               )}
@@ -172,10 +174,10 @@ export default async function Home({ params }: Props) {
             <div className="hs-ring" />
             <div className="hs-numeral">MMXXVI</div>
             <div className="hs-rail">
-              <span>{t("brand.name")}</span><span>·</span><span>Atelier</span>
+              <span>{t("brand.name")}</span><span>·</span><span>{t("home.stillRail")}</span>
             </div>
             <div className="hs-cap">
-              The slow unspooling of a season.<small>Genesis · Chapter I</small>
+              {t("home.stillCaption")}<small>{t("home.stillCaptionSmall")}</small>
             </div>
           </div>
         </div>
@@ -184,12 +186,10 @@ export default async function Home({ params }: Props) {
       {/* ─── Marquee — concise trust points ──────────────────────── */}
       <div className="marquee" data-cursor="default">
         <div className="marquee-track">
-          <span>Atelier-made</span><span>Cash on Delivery</span>
-          <span>Gift packaging</span><span>Free delivery over ৳5,000</span>
-          <span>14-day returns</span><span>House-certified</span>
-          <span>Atelier-made</span><span>Cash on Delivery</span>
-          <span>Gift packaging</span><span>Free delivery over ৳5,000</span>
-          <span>14-day returns</span><span>House-certified</span>
+          {/* Listed twice so the scrolling track loops seamlessly. */}
+          {[...MARQUEE_KEYS, ...MARQUEE_KEYS].map((k, i) => (
+            <span key={k + i} aria-hidden={i >= MARQUEE_KEYS.length || undefined}>{t(`home.marquee.${k}`)}</span>
+          ))}
         </div>
       </div>
 
@@ -317,7 +317,7 @@ export default async function Home({ params }: Props) {
 
       {/* ─── Wunderkammer · scrolling curiosity strip ───────────── */}
       {segs.length > 0 && (
-        <section className="wunderkammer" aria-label="Curiosities by category" data-cursor="magnify">
+        <section className="wunderkammer" aria-label={t("home.curiositiesLabel")} data-cursor="magnify">
           <div className="wunderkammer-track">
             {wkCats.map((c, i) => (
               <Link key={c.id + i} href={`/shop/${c.id}`} className="wunderkammer-card">
@@ -335,37 +335,37 @@ export default async function Home({ params }: Props) {
         <div className="pin-inner">
           <div className="pin-stage">
             <div className="pin-aside">
-              <div className="kicker" style={{ color: "var(--gold)" }}>Genesis Collection · Chapter I</div>
-              <h2 className="pin-headline serif">The slow<br /><em>unspooling</em><br />of a season.</h2>
+              <div className="kicker" style={{ color: "var(--gold)" }}>{t("home.pin.kicker")}</div>
+              <h2 className="pin-headline serif">{t.rich("home.pin.headline", { br: () => <br />, em: (c) => <em>{c}</em> })}</h2>
               <div className="pin-progress"><div className="pin-progress-bar"></div><span className="pin-counter">01 / 04</span></div>
             </div>
             <div className="pin-frames">
               <div className="pin-frame active" data-i="0">
                 <div className="pin-art pin-art-1">
                   <div className="pin-num">I.</div>
-                  <div className="pin-cap">Velvet Hours</div>
-                  <div className="pin-meta">Cropped opera coat · Plum velvet · MMXXVI</div>
+                  <div className="pin-cap">{t("home.pin.f1Cap")}</div>
+                  <div className="pin-meta">{t("home.pin.f1Meta")}</div>
                 </div>
               </div>
               <div className="pin-frame" data-i="1">
                 <div className="pin-art pin-art-2">
                   <div className="pin-num">II.</div>
-                  <div className="pin-cap">Inkwell &amp; Folio</div>
-                  <div className="pin-meta">Bound first editions · Atelier-pressed</div>
+                  <div className="pin-cap">{t("home.pin.f2Cap")}</div>
+                  <div className="pin-meta">{t("home.pin.f2Meta")}</div>
                 </div>
               </div>
               <div className="pin-frame" data-i="2">
                 <div className="pin-art pin-art-3">
                   <div className="pin-num">III.</div>
-                  <div className="pin-cap">Hours, Worn</div>
-                  <div className="pin-meta">Mechanical movement · Cabochon crown</div>
+                  <div className="pin-cap">{t("home.pin.f3Cap")}</div>
+                  <div className="pin-meta">{t("home.pin.f3Meta")}</div>
                 </div>
               </div>
               <div className="pin-frame" data-i="3">
                 <div className="pin-art pin-art-4">
                   <div className="pin-num">IV.</div>
-                  <div className="pin-cap">After the Rain</div>
-                  <div className="pin-meta">Eau de parfum · Iris, vetiver, rain</div>
+                  <div className="pin-cap">{t("home.pin.f4Cap")}</div>
+                  <div className="pin-meta">{t("home.pin.f4Meta")}</div>
                 </div>
               </div>
             </div>
@@ -377,14 +377,14 @@ export default async function Home({ params }: Props) {
       <section className="journal" data-reveal data-cursor="inkwell">
         <div className="journal-inner">
           <div>
-            <div className="journal-kicker">Atelier · Note · 001</div>
-            <p className="journal-num">№<small>One</small></p>
+            <div className="journal-kicker">{t("home.note.kicker")}</div>
+            <p className="journal-num">№<small>{t("home.note.num")}</small></p>
           </div>
           <div>
-            <h2>On the cutting of <em>velvet</em> at dusk, and the patience it asks of the hand.</h2>
-            <p>The first cut is never the deepest. We learned this from an aunt — who learned it from her own — that velvet asks for the slow knife, the one that waits for the nap to settle before it commits. The maison was built around small lessons of this kind: that a wax seal cools in under a minute but holds for a century, that an iris will refuse to open if you watch it too closely, that a watch crown is best turned with the ball of the thumb, not the nail.</p>
-            <p>None of this is on our website by accident. Each object you&rsquo;ll find here has been refused, redrafted, and accepted by hands that have argued about it. We are a small house. We prefer it this way.</p>
-            <div className="journal-sig">— The Atelier<small>{t("brand.name")} · MMXXVI</small></div>
+            <h2>{t.rich("home.note.title", { em: (c) => <em>{c}</em> })}</h2>
+            <p>{t("home.note.p1")}</p>
+            <p>{t("home.note.p2")}</p>
+            <div className="journal-sig">{t("home.note.sig")}<small>{t("brand.name")} · MMXXVI</small></div>
           </div>
         </div>
       </section>
@@ -394,25 +394,25 @@ export default async function Home({ params }: Props) {
       {/* ─── Our Promise · dark slab with 4 features ────────────── */}
       <section data-cursor="seal" data-reveal className="promise-section" style={{ background: "var(--purple-950)", color: "var(--cream)", margin: "0" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
-          <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold)", marginBottom: 16 }}>OUR PROMISE</div>
+          <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold)", marginBottom: 16 }}>{t("home.promise.kicker")}</div>
           <h2 className="serif" style={{ fontSize: 48, margin: "0 0 20px", color: "var(--cream)", fontWeight: 400, lineHeight: 1.1 }}>
-            We hand-deliver and accept payment <em style={{ color: "var(--gold)" }}>on arrival</em>,<br />like a couturier — not a warehouse.
+            {t.rich("home.promise.title", { em: (c) => <em style={{ color: "var(--gold)" }}>{c}</em>, br: () => <br /> })}
           </h2>
           <p style={{ color: "var(--purple-200)", fontSize: 16, maxWidth: 600, margin: "0 auto 24px", lineHeight: 1.7 }}>
-            Pay in cash when our courier arrives at your door — nothing to pay in advance. Returns accepted within fourteen days of delivery.
+            {t("home.promise.body")}
           </p>
           <div className="promise-grid">
             {[
-              { i: "arrow",   t: "White-glove delivery",   s: "Courier, signed." },
-              { i: "check",   t: "Cash on Delivery",       s: "No pre-payment required." },
-              { i: "feather", t: "14-day returns",         s: "Courier pickup arranged." },
-              { i: "feather", t: "Ceremonial packaging",   s: "Wax-sealed." },
+              { i: "arrow",   n: 1 },
+              { i: "check",   n: 2 },
+              { i: "feather", n: 3 },
+              { i: "feather", n: 4 },
             ].map((x) => (
-              <div key={x.t} style={{ display: "flex", gap: 14, alignItems: "start" }}>
+              <div key={x.n} style={{ display: "flex", gap: 14, alignItems: "start" }}>
                 <div style={{ color: "var(--gold)" }}><Icon name={x.i} size={26} /></div>
                 <div>
-                  <div style={{ fontWeight: 500, color: "var(--cream)", marginBottom: 4 }}>{x.t}</div>
-                  <div style={{ fontSize: 12, color: "var(--purple-200)" }}>{x.s}</div>
+                  <div style={{ fontWeight: 500, color: "var(--cream)", marginBottom: 4 }}>{t(`home.promise.f${x.n}Title`)}</div>
+                  <div style={{ fontSize: 12, color: "var(--purple-200)" }}>{t(`home.promise.f${x.n}Sub`)}</div>
                 </div>
               </div>
             ))}
@@ -428,9 +428,9 @@ export default async function Home({ params }: Props) {
       {/* ─── Newsletter / Letters from the Maison ───────────────── */}
       <section className="letters" data-cursor="seal">
         <div className="letters-inner">
-          <div className="letters-kicker">Letters from the Maison</div>
-          <h2>Correspondence, <em>quietly</em>.</h2>
-          <p>One slim envelope each season — new arrivals, atelier notes, and the occasional invitation to a private viewing. No more, no less.</p>
+          <div className="letters-kicker">{t("home.letters.kicker")}</div>
+          <h2>{t.rich("home.letters.title", { em: (c) => <em>{c}</em> })}</h2>
+          <p>{t("home.letters.body")}</p>
           <NewsletterForm />
         </div>
       </section>

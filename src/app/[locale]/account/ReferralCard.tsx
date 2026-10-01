@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 type Props = {
   code: string;
   locale: "en" | "bn";
 };
 
-export default function ReferralCard({ code, locale }: Props) {
+export default function ReferralCard({ code }: Props) {
+  const t = useTranslations();
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,14 +20,11 @@ export default function ReferralCard({ code, locale }: Props) {
       setError(null);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      setError("Could not copy to clipboard.");
+      setError(t("referral.copyError"));
     }
   };
 
-  const bodyText =
-    locale === "bn"
-      ? "Give a friend ৳500 off their first order. When they place an order using your code, you receive ৳500 credit on your next purchase."
-      : "Give a friend ৳500 off their first order. When they place an order using your code, you receive ৳500 credit on your next purchase.";
+  const bodyText = t("referral.body");
 
   return (
     <section style={{ marginTop: 48, paddingTop: 40, borderTop: "1px solid var(--line)" }}>
@@ -40,13 +39,13 @@ export default function ReferralCard({ code, locale }: Props) {
             marginBottom: 4,
           }}
         >
-          Refer &amp; Earn
+          {t("referral.kicker")}
         </div>
         <h2
           className="serif"
           style={{ fontSize: 28, color: "var(--purple-900)", fontWeight: 500, margin: 0 }}
         >
-          Share the Maison
+          {t("referral.title")}
         </h2>
       </div>
 
@@ -82,7 +81,7 @@ export default function ReferralCard({ code, locale }: Props) {
           }}
         >
           <div
-            aria-label="Your referral code"
+            aria-label={t("referral.codeLabel")}
             style={{
               fontFamily: "var(--mono)",
               fontSize: 22,
@@ -105,7 +104,7 @@ export default function ReferralCard({ code, locale }: Props) {
             aria-live="polite"
             style={{ minWidth: 130 }}
           >
-            {copied ? "✓ Copied!" : "Copy code"}
+            {copied ? t("referral.copied") : t("referral.copy")}
           </button>
         </div>
 

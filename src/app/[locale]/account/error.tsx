@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 
 export default function AccountError({
   error,
@@ -10,6 +11,7 @@ export default function AccountError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations();
   useEffect(() => {
     console.error("[account] page error:", error.message, error.digest);
   }, [error]);
@@ -23,13 +25,13 @@ export default function AccountError({
         fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase",
         fontFamily: "var(--mono)", color: "var(--gold-text)",
       }}>
-        Account
+        {t("accountError.kicker")}
       </div>
       <h1 className="serif" style={{ fontSize: 28, color: "var(--purple-900)", fontWeight: 500, margin: 0 }}>
-        Something went wrong
+        {t("accountError.title")}
       </h1>
       <p style={{ fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.7, margin: 0 }}>
-        We could not load your account right now. This is usually a temporary issue.
+        {t("accountError.body")}
         {error.digest && (
           <span style={{ display: "block", fontFamily: "var(--mono)", fontSize: 11, marginTop: 8, color: "var(--line)" }}>
             ref: {error.digest}
@@ -41,10 +43,10 @@ export default function AccountError({
           onClick={reset}
           className="btn btn-primary btn-sm"
         >
-          Try again
+          {t("accountError.retry")}
         </button>
         <Link href="/" className="btn btn-ghost btn-sm">
-          Back to shop
+          {t("accountError.backToShop")}
         </Link>
       </div>
     </div>

@@ -1,28 +1,29 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { updateStylePreferences } from "@/lib/actions/profile";
 
 type Group = {
   key: "perfumeFamily" | "bookGenre" | "flowerPreference";
-  label: string;
-  options: string[];
+  label: string;      // message key
+  options: string[];  // stored values (English); shown via taste.options.*
 };
 
 const GROUPS: Group[] = [
   {
     key: "perfumeFamily",
-    label: "Perfume family",
+    label: "taste.perfumeFamily",
     options: ["Floral", "Oud", "Citrus", "Woody", "Aquatic", "Oriental"],
   },
   {
     key: "bookGenre",
-    label: "Book genre",
+    label: "taste.bookGenre",
     options: ["Fiction", "Non-fiction", "Poetry", "Art & Design", "Philosophy", "Mystery"],
   },
   {
     key: "flowerPreference",
-    label: "Flowers",
+    label: "taste.flowers",
     options: ["Roses", "Lilies", "Seasonal Mix", "Wildflowers", "Exotic"],
   },
 ];
@@ -38,6 +39,12 @@ type Props = {
 };
 
 export default function StylePreferences({ initial }: Props) {
+  const t = useTranslations();
+  // "Art & Design" -> taste.options.ArtDesign; unknown values show as stored.
+  const optionLabel = (o: string) => {
+    const k = `taste.options.${o.replace(/[^A-Za-z]/g, "")}`;
+    return t.has(k) ? t(k) : o;
+  };
   const [selection, setSelection] = useState<Selection>(initial);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +67,7 @@ export default function StylePreferences({ initial }: Props) {
           setTimeout(() => setSaved(false), 2500);
         }
       } catch {
-        setError("Could not save preferences. Please try again.");
+        setError(t("taste.saveError"));
       }
     });
   };
@@ -78,13 +85,13 @@ export default function StylePreferences({ initial }: Props) {
             marginBottom: 4,
           }}
         >
-          Taste Profile
+          {t("taste.kicker")}
         </div>
         <h2
           className="serif"
           style={{ fontSize: 28, color: "var(--purple-900)", fontWeight: 500, margin: 0 }}
         >
-          Style &amp; Preferences
+          {t("taste.title")}
         </h2>
       </div>
 
@@ -103,7 +110,7 @@ export default function StylePreferences({ initial }: Props) {
                   marginBottom: 10,
                 }}
               >
-                {group.label}
+                {t(group.label)}
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {group.options.map((option) => {
@@ -131,7 +138,7 @@ export default function StylePreferences({ initial }: Props) {
                           "background 200ms ease, color 200ms ease, border-color 200ms ease",
                       }}
                     >
-                      {option}
+                      {optionLabel(option)}
                     </button>
                   );
                 })}
@@ -153,7 +160,7 @@ export default function StylePreferences({ initial }: Props) {
           disabled={pending}
           style={{ minWidth: 160 }}
         >
-          {saved ? "✓ Saved" : pending ? "Saving…" : "Save preferences"}
+          {saved ? t("common.saved") : pending ? t("common.saving") : t("taste.save")}
         </button>
       </div>
     </section>

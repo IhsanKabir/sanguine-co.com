@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getSegmentBySlug, getLiveProducts, getHeroImagesFor } from "@/lib/queries";
 import { Link } from "@/i18n/routing";
 import ShopGrid from "@/components/storefront/ShopGrid";
@@ -35,7 +35,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!seg || seg.hidden) return { title: "Not found" };
   const isBn = locale === "bn";
   const name = (isBn && seg.nameBn) || seg.name;
-  const blurb = (isBn && seg.blurbBn) || seg.blurb || `Pieces in ${name}, composed by Sanguine.`;
+  const tm = await getTranslations({ locale });
+  const blurb = (isBn && seg.blurbBn) || seg.blurb || tm("shop.blurbFallback", { name });
   const url = `${BASE}/${locale}/shop/${segment}`;
   return {
     title: name,
@@ -74,6 +75,7 @@ const CURSOR_BY_SEGMENT: Record<string, string> = {
 export default async function SegmentPage({ params }: Props) {
   const { locale, segment } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations();
 
   const seg = await getSegmentBySlug(segment).catch(() => null);
   if (!seg || seg.hidden) notFound();
@@ -109,8 +111,8 @@ export default async function SegmentPage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Maison", item: `${BASE}/${locale}` },
-      { "@type": "ListItem", position: 2, name: "Boutique", item: `${BASE}/${locale}/shop/${segment}` },
+      { "@type": "ListItem", position: 1, name: t("nav.maison"), item: `${BASE}/${locale}` },
+      { "@type": "ListItem", position: 2, name: t("nav.boutique"), item: `${BASE}/${locale}/shop/${segment}` },
       { "@type": "ListItem", position: 3, name, item: `${BASE}/${locale}/shop/${segment}` },
     ],
   };
@@ -131,8 +133,8 @@ export default async function SegmentPage({ params }: Props) {
     <>
       <JsonLd data={itemListLd ? [breadcrumbLd, itemListLd] : [breadcrumbLd]} />
       <div className="crumbs">
-        <Link href="/" style={{ cursor: "pointer" }}>Maison</Link>
-        <span>Boutique</span>
+        <Link href="/" style={{ cursor: "pointer" }}>{t("nav.maison")}</Link>
+        <span>{t("nav.boutique")}</span>
         <span className="current">{name}</span>
       </div>
       <section className="section" style={{ paddingTop: 28 }} data-cursor={cursor}>
@@ -145,12 +147,12 @@ export default async function SegmentPage({ params }: Props) {
           </h1>
           <p style={{ fontSize: 15, color: "var(--ink-soft)", margin: "12px 0 0", maxWidth: 520 }}>
             {showStock && showPreorder
-              ? `${blurb}. Browse below or compose a bespoke piece.`
+              ? t("shop.blurbBoth", { blurb })
               : showPreorder
-              ? `${blurb}. Each piece is composed on request, then delivered.`
+              ? t("shop.blurbPreorder", { blurb })
               : showStock
-              ? `${blurb}. ${allItems.length} pieces in stock.`
-              : `${blurb}.`}
+              ? t("shop.blurbStock", { blurb, count: allItems.length })
+              : t("shop.blurbOnly", { blurb })}
           </p>
         </div>
 
@@ -176,19 +178,19 @@ export default async function SegmentPage({ params }: Props) {
           <div className="preorder-cta" style={{ marginTop: showStock ? 60 : 0 }}>
             <div>
               <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold)", marginBottom: 14 }}>
-                BESPOKE · ON REQUEST
+                {t("shop.bespokeKicker")}
               </div>
               <h2 className="serif" style={{ fontSize: 40, margin: 0, color: "var(--cream)", fontWeight: 400, lineHeight: 1.1 }}>
                 {showStock
-                  ? <>Or have us <em style={{ color: "var(--gold)" }}>compose one</em> for you.</>
-                  : <>Each piece is <em style={{ color: "var(--gold)" }}>composed on request</em>.</>}
+                  ? t.rich("shop.bespokeTitleBoth", { em: (c) => <em style={{ color: "var(--gold)" }}>{c}</em> })
+                  : t.rich("shop.bespokeTitleOnly", { em: (c) => <em style={{ color: "var(--gold)" }}>{c}</em> })}
               </h2>
               <p style={{ color: "var(--purple-200)", fontSize: 15, lineHeight: 1.7, margin: "16px 0 0", maxWidth: 540 }}>
-                Send your references — images, films, the feeling you have in mind — and the maison will return a quote and timeline within a day or two. No payment is taken until delivery.
+                {t("shop.bespokeBody")}
               </p>
             </div>
             <Link href={`/preorder/${segment}`} className="btn btn-gold" style={{ whiteSpace: "nowrap" }}>
-              Compose a piece →
+              {t("shop.bespokeCta")}
             </Link>
           </div>
         )}
@@ -196,8 +198,8 @@ export default async function SegmentPage({ params }: Props) {
         {/* Both off → segment placeholder */}
         {!showStock && !showPreorder && (
           <div className="empty-state">
-            <h3>Coming soon</h3>
-            <p style={{ color: "var(--ink-soft)" }}>This collection is being prepared.</p>
+            <h3>{t("shop.comingSoon")}</h3>
+            <p style={{ color: "var(--ink-soft)" }}>{t("shop.beingPrepared")}</p>
           </div>
         )}
       </section>

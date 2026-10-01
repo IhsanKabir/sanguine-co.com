@@ -34,6 +34,9 @@
   if (isTouch) return; // custom cursor + effects only on pointer devices
 
   // ===== Mount cursor DOM =====
+  // The layout sets <html lang> from the route locale, so the Bangla site
+  // gets a Bangla label on the magnify cursor.
+  const enterLabel = document.documentElement.lang === 'bn' ? 'প্রবেশ' : 'ENTER';
   const root = document.createElement('div');
   root.id = 'ssg-cursor-root';
   root.innerHTML = `
@@ -42,7 +45,7 @@
       <div class="cur-ring"></div>
       <div class="cur-dot"></div>
       <!-- magnify "ENTER" -->
-      <div class="cur-enter">ENTER</div>
+      <div class="cur-enter">${enterLabel}</div>
       <!-- loupe -->
       <div class="cur-loupe"></div>
       <!-- wax seal -->

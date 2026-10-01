@@ -41,9 +41,9 @@ export default async function Footer() {
           <div>
             <div className="col-title">{t("footer.service")}</div>
             <ul>
-              <li><Link href="/legal/shipping">Shipping</Link></li>
-              <li><Link href="/legal/returns">Returns</Link></li>
-              <li>Cash on Delivery</li>
+              <li><Link href="/legal/shipping">{t("footer.shipping")}</Link></li>
+              <li><Link href="/legal/returns">{t("footer.returns")}</Link></li>
+              <li>{t("footer.cod")}</li>
             </ul>
           </div>
           <div>
@@ -58,9 +58,9 @@ export default async function Footer() {
             {" · "}
             <Link href="/legal/terms">{t("footer.terms")}</Link>
             {" · "}
-            <Link href="/legal/returns">Returns</Link>
+            <Link href="/legal/returns">{t("footer.returns")}</Link>
             {" · "}
-            <Link href="/legal/shipping">Shipping</Link>
+            <Link href="/legal/shipping">{t("footer.shipping")}</Link>
           </span>
         </div>
       </div>

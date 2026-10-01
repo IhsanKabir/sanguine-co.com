@@ -35,8 +35,8 @@ export default function RecentlyViewedStrip({ excludeId }: Props) {
     <section className="section" style={{ paddingTop: 28 }}>
       <div className="section-hd" data-reveal>
         <div>
-          <div className="kicker">RECENTLY VIEWED</div>
-          <h2>Pieces you have looked at.</h2>
+          <div className="kicker">{t("recent.kicker")}</div>
+          <h2>{t("recent.title")}</h2>
           <div className="ornament-rule" />
         </div>
       </div>

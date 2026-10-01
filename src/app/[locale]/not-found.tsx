@@ -8,10 +8,10 @@ export default function NotFound() {
       <div>
         <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold-deep)", marginBottom: 8 }}>404</div>
         <h1 className="serif" style={{ fontSize: 56, margin: 0, color: "var(--purple-900)", fontWeight: 400 }}>
-          Nothing here
+          {t("notFound.title")}
         </h1>
         <p style={{ color: "var(--ink-soft)", marginTop: 12 }}>
-          The piece you sought has either moved or never existed.
+          {t("notFound.body")}
         </p>
         <Link href="/" className="btn btn-primary" style={{ marginTop: 24 }}>
           {t("checkout.returnHome")}

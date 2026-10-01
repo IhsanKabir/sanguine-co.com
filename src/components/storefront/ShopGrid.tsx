@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { Product } from "@/lib/schema";
 import { Link } from "@/i18n/routing";
 import { priceSortValue } from "@/lib/pricing";
@@ -38,6 +39,7 @@ export default function ShopGrid({
   segmentSlug,
   showPreorder,
 }: Props) {
+  const t = useTranslations();
   const params = useSearchParams();
 
   const minPrice = params.get("min") ? parseInt(params.get("min")!, 10) : undefined;
@@ -125,17 +127,19 @@ export default function ShopGrid({
         </div>
       ) : (
         <div className="empty-state" style={{ marginBottom: showPreorder ? 24 : 0 }}>
-          <h3>{isFiltered ? "No pieces match these filters" : "No pieces in stock just now"}</h3>
+          <h3>{isFiltered ? t("shopGrid.noMatch") : t("shopGrid.noneInStock")}</h3>
           {isFiltered ? (
             <p style={{ color: "var(--ink-soft)" }}>
-              Try widening the filters &mdash;{" "}
-              <Link href={`/shop/${segmentSlug}`} style={{ color: "var(--purple-900)" }}>
-                see everything
-              </Link>
-              .
+              {t.rich("shopGrid.widen", {
+                a: (chunks) => (
+                  <Link href={`/shop/${segmentSlug}`} style={{ color: "var(--purple-900)" }}>
+                    {chunks}
+                  </Link>
+                ),
+              })}
             </p>
           ) : !showPreorder ? (
-            <p style={{ color: "var(--ink-soft)" }}>Check back soon.</p>
+            <p style={{ color: "var(--ink-soft)" }}>{t("shopGrid.checkBack")}</p>
           ) : null}
         </div>
       )}

@@ -38,6 +38,7 @@ type Props = {
  * card so a customer can grab the piece without leaving the listing page.
  */
 export default function QuickView({ product, trigger = "pill" }: Props) {
+  const t = useTranslations();
   const [open, setOpen] = useState(false);
 
   if (trigger === "overlay") {
@@ -47,10 +48,10 @@ export default function QuickView({ product, trigger = "pill" }: Props) {
           type="button"
           className="qv-overlay"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(true); }}
-          aria-label={`Quick view ${product.name}`}
+          aria-label={t("quickView.openFor", { name: product.name })}
           data-quick-view-trigger
         >
-          Add to bag
+          {t("quickView.addToBag")}
         </button>
         {open && <QuickViewModal product={product} onClose={() => setOpen(false)} />}
       </>
@@ -63,14 +64,14 @@ export default function QuickView({ product, trigger = "pill" }: Props) {
         type="button"
         className={trigger === "icon" ? "icon-btn" : "btn btn-ghost btn-sm"}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(true); }}
-        aria-label={`Quick view of ${product.name}`}
+        aria-label={t("quickView.openFor", { name: product.name })}
         style={trigger === "icon"
           ? { position: "absolute", top: 10, right: 10, background: "rgba(255,255,255,0.92)", backdropFilter: "blur(4px)" }
           : { position: "absolute", top: 10, left: 10, background: "rgba(255,255,255,0.95)", backdropFilter: "blur(4px)", padding: "5px 12px", fontSize: 10, letterSpacing: ".15em", textTransform: "uppercase", border: "1px solid var(--line)", color: "var(--purple-900)", zIndex: 2 }
         }
         data-quick-view-trigger
       >
-        {trigger === "icon" ? <Icon name="search" size={14} /> : "Quick view"}
+        {trigger === "icon" ? <Icon name="search" size={14} /> : t("quickView.open")}
       </button>
 
       {open && <QuickViewModal product={product} onClose={() => setOpen(false)} />}
@@ -113,7 +114,7 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
       <div className="seg-modal" style={{ width: 880, maxWidth: "calc(100vw - 32px)", maxHeight: "90vh", overflow: "auto" }}>
         <div className="seg-modal-hd">
           <h3 className="serif">{name}</h3>
-          <button className="icon-btn" onClick={onClose} aria-label="Close"><Icon name="x" /></button>
+          <button className="icon-btn" onClick={onClose} aria-label={t("common.close")}><Icon name="x" /></button>
         </div>
 
         <div className="qv-grid">
@@ -153,7 +154,7 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
 
             {product.colors.length > 0 && (
               <>
-                <div className="pdp-label">Colour {color && <span style={{ color: "var(--ink-soft)" }}>· {color}</span>}</div>
+                <div className="pdp-label">{t("common.colour")} {color && <span style={{ color: "var(--ink-soft)" }}>· {color}</span>}</div>
                 <div className="swatch-row" style={{ marginBottom: 12 }}>
                   {product.colors.map((c) => (
                     <button
@@ -171,7 +172,7 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
 
             {product.sizes.length > 0 && (
               <>
-                <div className="pdp-label">Size {size && <span style={{ color: "var(--ink-soft)" }}>· {size}</span>}</div>
+                <div className="pdp-label">{t("common.size")} {size && <span style={{ color: "var(--ink-soft)" }}>· {size}</span>}</div>
                 <div className="swatch-row" style={{ marginBottom: 12 }}>
                   {product.sizes.map((s) => (
                     <button
@@ -187,16 +188,16 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
               </>
             )}
 
-            <div className="pdp-label">Quantity</div>
+            <div className="pdp-label">{t("common.quantity")}</div>
             <div className="qty">
-              <button type="button" onClick={() => setQty(Math.max(1, qty - 1))} aria-label="Decrease">−</button>
+              <button type="button" onClick={() => setQty(Math.max(1, qty - 1))} aria-label={t("common.decrease")}>−</button>
               <span aria-live="polite">{qty}</span>
-              <button type="button" onClick={() => setQty(qty + 1)} aria-label="Increase">+</button>
+              <button type="button" onClick={() => setQty(qty + 1)} aria-label={t("common.increase")}>+</button>
             </div>
 
             {product.stock === 0 ? (
               <div style={{ marginTop: 14, padding: 10, background: "var(--purple-50)", border: "1px solid var(--purple-200)", fontSize: 13, color: "var(--ink-soft)" }}>
-                Currently out of stock. Open the full piece to be notified when it returns.
+                {t("quickView.outOfStock")}
               </div>
             ) : (
               <button
@@ -207,13 +208,13 @@ function QuickViewModal({ product, onClose }: { product: QuickViewProduct; onClo
                 disabled={added}
               >
                 <Icon name={added ? "check" : "bag"} size={14} />
-                {added ? "Added" : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
+                {added ? t("pdp.added") : `${t("pdp.addToBag")} · ${formatBdt(product.priceBdt * qty, locale)}`}
               </button>
             )}
 
             <div style={{ marginTop: 14, textAlign: "center" }}>
               <Link href={`/product/${product.slug}`} className="link" onClick={onClose} style={{ fontSize: 13 }}>
-                See the full piece →
+                {t("quickView.seeFull")}
               </Link>
             </div>
           </div>
