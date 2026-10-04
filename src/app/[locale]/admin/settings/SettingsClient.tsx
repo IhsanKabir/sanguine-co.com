@@ -9,7 +9,7 @@ type Brand = { name: string; tagline?: string; email?: string; announcement?: st
 
 type Gateway = { connected: boolean; live: boolean };
 
-export default function SettingsClient({ initialBrand, initialCommerce, gateway }: { initialBrand: Brand; initialCommerce: CommerceSettings; gateway: Gateway }) {
+export default function SettingsClient({ initialBrand, initialCommerce, gateway, smsConnected }: { initialBrand: Brand; initialCommerce: CommerceSettings; gateway: Gateway; smsConnected: boolean }) {
   const [commerce, setCommerce] = useState({
     preorderDepositPct: String(initialCommerce.preorderDepositPct),
     returnWindowDays: String(initialCommerce.returnWindowDays),
@@ -54,6 +54,23 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway 
         shippingOutsideBdt: outside,
       });
       setShipMsg(res.ok ? "Saved — cart, checkout and order totals now use these rates." : "Save failed.");
+    });
+  };
+
+  // Cash-on-delivery phone check (lib/phone-code.ts) — same commerce row.
+  const [codCheck, setCodCheck] = useState({
+    on: initialCommerce.codPhoneCheck,
+    min: String(initialCommerce.codPhoneCheckMinBdt),
+  });
+  const [codMsg, setCodMsg] = useState<string | null>(null);
+  const [codPending, startCod] = useTransition();
+  const saveCodCheck = () => {
+    const min = Number(codCheck.min);
+    if (!Number.isInteger(min) || min < 0 || min > 1_000_000) { setCodMsg("Minimum must be a whole number of taka (0 = every COD order)."); return; }
+    setCodMsg(null);
+    startCod(async () => {
+      const res = await updateCommerceSettings({ codPhoneCheck: codCheck.on, codPhoneCheckMinBdt: min });
+      setCodMsg(res.ok ? "Saved — applies to the next checkout." : "Save failed.");
     });
   };
 
@@ -139,6 +156,39 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway 
               {shipPending ? "Saving…" : "Save"}
             </button>
             {shipMsg && <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{shipMsg}</span>}
+          </div>
+        </div>
+
+        {/* Cash-on-delivery phone check — live */}
+        <div className="panel">
+          <h3>Cash on delivery: phone check</h3>
+          <label style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 14 }}>
+            <input type="checkbox" checked={codCheck.on} onChange={(e) => setCodCheck({ ...codCheck, on: e.target.checked })} />
+            Ask for a one-time SMS code before a cash-on-delivery order
+          </label>
+          <div className="row" style={{ marginTop: 12 }}>
+            <div className="field">
+              <label>Only for orders of at least (৳)</label>
+              <input type="number" min={0} value={codCheck.min} disabled={!codCheck.on} onChange={(e) => setCodCheck({ ...codCheck, min: e.target.value })} />
+            </div>
+          </div>
+          <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 10, lineHeight: 1.6 }}>
+            The code proves the phone belongs to whoever is ordering, which cuts refused parcels.
+            0 = every cash-on-delivery order. Online payments are never asked. If the SMS
+            can&rsquo;t be sent, the order still goes through and its timeline says
+            &ldquo;phone not verified&rdquo;.
+          </p>
+          {!smsConnected && (
+            <p style={{ fontSize: 12, color: "var(--err)", marginTop: 6, lineHeight: 1.6 }}>
+              SMS is not connected (SSLWIRELESS_API_TOKEN / SSLWIRELESS_SID), so no code is asked
+              for until it is.
+            </p>
+          )}
+          <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 8 }}>
+            <button className="btn btn-primary btn-sm" onClick={saveCodCheck} disabled={codPending}>
+              {codPending ? "Saving…" : "Save"}
+            </button>
+            {codMsg && <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{codMsg}</span>}
           </div>
         </div>
 

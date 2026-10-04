@@ -6,7 +6,7 @@ import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { formatBdt } from "@/lib/utils";
-import { createCodOrder, startOnlinePayment } from "@/lib/actions/orders";
+import { createCodOrder, requestPhoneCode, startOnlinePayment } from "@/lib/actions/orders";
 import { track } from "@/lib/actions/track";
 import Composition from "@/components/storefront/Composition";
 import Icon from "@/components/storefront/Icon";
@@ -67,6 +67,18 @@ export default function CheckoutForm({
   const [method, setMethod] = useState<"cod" | "online">("cod");
   const [redirecting, setRedirecting] = useState(false);
 
+  // Cash on delivery: the server may ask for a one-time SMS code first
+  // (lib/phone-code.ts). `codeFor` is the phone the code was sent to.
+  const [codeStage, setCodeStage] = useState<{ id: string; last4: string; codeFor: string } | null>(null);
+  const [code, setCode] = useState("");
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [resendIn, setResendIn] = useState(0);
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const timer = setTimeout(() => setResendIn((n) => n - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendIn]);
+
   const isDhaka = s.city.toLowerCase().includes("dhaka");
   // Same function createCodOrder charges with.
   const baseShipping = shippingFor(shippingRules, s.city, subtotalBdt);
@@ -111,16 +123,21 @@ export default function CheckoutForm({
     return Object.keys(errs).length === 0 ? null : t("checkout.errFix");
   };
 
-  const onPlace = () => {
+  // A code only counts for the number it was sent to.
+  const activeCode = codeStage && codeStage.codeFor === c.phone.trim() ? codeStage : null;
+
+  const onPlace = (phoneCode?: { id: string; code?: string | null }) => {
     const v = validateStep1();
     if (v) { setError(v); return; }
     setError(null);
+    setCodeError(null);
     const input = {
       customer: { fullName: c.fullName.trim(), email: c.email.trim(), phone: c.phone.trim() },
       shipping: s,
       items: items.map((i) => ({ productId: i.productId, qty: i.qty, color: i.color, size: i.size })),
       couponCode: coupon?.code || null,
       notes: notes || null,
+      phoneCode: phoneCode ?? (activeCode ? { id: activeCode.id, code: code.trim() } : null),
     };
     startTransition(async () => {
       if (method === "online") {
@@ -134,6 +151,12 @@ export default function CheckoutForm({
       }
       const res = await createCodOrder(input);
       if (!res.ok) {
+        if ("needsPhoneCode" in res) { await sendCode(); return; }
+        if ("codeError" in res) {
+          setCodeError(res.error);
+          if (res.newCodeNeeded) { setCodeStage(null); setCode(""); }
+          return;
+        }
         setError(res.error);
         return;
       }
@@ -142,6 +165,19 @@ export default function CheckoutForm({
       router.push(`/order/${res.number}?t=${res.trackingToken}`);
     });
   };
+
+  // Ask the server to text a code. If the SMS can't go out, the order is
+  // placed straight away, marked "phone not verified" for the team.
+  async function sendCode() {
+    const phone = c.phone.trim();
+    const r = await requestPhoneCode(phone, locale);
+    if (!r.ok) { setCodeError(r.error); return; }
+    if (!r.sent) { onPlace({ id: r.id }); return; }
+    setCodeStage({ id: r.id, last4: r.last4, codeFor: phone });
+    setCode("");
+    setResendIn(30);
+  }
+  const onResend = () => startTransition(sendCode);
 
   return (
     <div className="checkout-grid">
@@ -264,9 +300,37 @@ export default function CheckoutForm({
                   : t.rich("checkout.keepReady", { amount: formatBdt(total, locale), b: (c) => <b style={{ color: "var(--purple-900)" }}>{c}</b> })}
               </div>
             </div>
+            {method === "cod" && activeCode && (
+              <div className="phone-code" role="group" aria-labelledby="phone-code-title">
+                <div id="phone-code-title" className="phone-code-title">{t("checkout.codeTitle")}</div>
+                <p className="phone-code-note">{t("checkout.codeSent", { last4: activeCode.last4 })}</p>
+                <div className="phone-code-row">
+                  <input
+                    className="phone-code-input"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    aria-label={t("checkout.codeLabel")}
+                    placeholder="••••••"
+                    value={code}
+                    onChange={(e) => { setCode(e.target.value.replace(/\D/g, "").slice(0, 6)); setCodeError(null); }}
+                    onKeyDown={(e) => { if (e.key === "Enter" && code.length === 6) onPlace(); }}
+                    autoFocus
+                  />
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={onResend} disabled={pending || resendIn > 0}>
+                    {resendIn > 0 ? t("checkout.codeResendIn", { s: resendIn }) : t("checkout.codeResend")}
+                  </button>
+                </div>
+                <button type="button" className="link phone-code-change" onClick={() => { setStep(1); setCodeStage(null); setCode(""); }}>
+                  {t("checkout.codeChangeNumber")}
+                </button>
+              </div>
+            )}
+            {method === "cod" && codeError && <p role="alert" style={{ color: "var(--err)", fontSize: 13, marginTop: 10 }}>{codeError}</p>}
             <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
               <button className="btn btn-ghost" onClick={() => setStep(1)} disabled={pending}>← {t("checkout.back")}</button>
-              <button className="btn btn-gold" style={{ flex: 1 }} onClick={onPlace} disabled={pending || redirecting}>
+              <button className="btn btn-gold" style={{ flex: 1 }} onClick={() => onPlace()} disabled={pending || redirecting || (method === "cod" && !!activeCode && code.length !== 6)}>
                 <Icon name="check" size={14}/>{" "}
                 {redirecting
                   ? t("checkout.redirecting")
@@ -274,6 +338,8 @@ export default function CheckoutForm({
                   ? t("checkout.placing")
                   : method === "online"
                   ? t("checkout.payNow", { amount: formatBdt(total, locale) })
+                  : activeCode
+                  ? `${t("checkout.codeConfirm")} · ${formatBdt(total, locale)}`
                   : `${t("checkout.placeOrder")} · ${formatBdt(total, locale)}`}
               </button>
             </div>

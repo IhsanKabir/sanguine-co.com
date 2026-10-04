@@ -12,7 +12,8 @@ export type OrderEventType =
   | "email_sent"
   | "sms_sent"
   | "payment_received"
-  | "courier_status";   // a new status reported by the courier sync (payload: courier, status, outcome)
+  | "courier_status"
+  | "phone_check";      // COD phone code result at checkout (payload: verified, reason?)   // a new status reported by the courier sync (payload: courier, status, outcome)
 
 /**
  * Log a material event against an order. Append-only — never throws on a

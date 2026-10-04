@@ -18,6 +18,7 @@ import { getCommerceSettings, shippingRulesOf } from "@/lib/commerce";
 import { notifyOrderPlaced } from "@/lib/order-notify";
 import { initPayment, isOnlinePaymentEnabled } from "@/lib/payments/sslcommerz";
 import { expireStaleUnpaidOrders, releaseUnpaidOrder } from "@/lib/payments/online-orders";
+import { checkPhoneCode, phoneCheckRequired, sendPhoneCode } from "@/lib/phone-code";
 
 const COD_FEE = 0;          // we eat the COD fee at launch — courier charges merchant ~1%
 
@@ -51,6 +52,11 @@ const inputSchema = z.object({
   items: z.array(itemSchema).min(1).max(50),
   couponCode: z.string().max(40).optional().nullable(),
   notes: z.string().max(400).optional().nullable(),
+  // SMS code for cash-on-delivery (lib/phone-code.ts); only read for COD.
+  phoneCode: z.object({
+    id: z.string().uuid(),
+    code: z.string().max(10).optional().nullable(),
+  }).optional().nullable(),
 });
 
 export type CreateOrderInput = z.infer<typeof inputSchema>;
@@ -162,11 +168,25 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
 
   // Same rules (Admin → Settings) and same function the cart and checkout
   // used to quote this total.
-  const rules = shippingRulesOf(await getCommerceSettings());
+  const commerce = await getCommerceSettings();
+  const rules = shippingRulesOf(commerce);
   const baseShipping = shippingFor(rules, data.shipping.city, subtotal);
   const shipping = freeShipping ? 0 : baseShipping;
   const total = Math.max(0, subtotal - couponDiscount) + shipping + COD_FEE;
   const number = generateOrderNumber();
+
+  // 3b. Cash on delivery: the phone must answer a one-time SMS code first
+  // (Admin → Settings decides from what total). Checked before anything is
+  // reserved; a correct code stays valid if this attempt fails later on.
+  let phoneCheck: { verified: boolean; reason?: string } | null = null;
+  if (mode === "cod" && phoneCheckRequired(commerce, total)) {
+    if (!data.phoneCode) {
+      return { ok: false as const, needsPhoneCode: true as const, error: "Please confirm your phone number with the code we send." };
+    }
+    const r = await checkPhoneCode(data.phoneCode.id, data.phoneCode.code, data.customer.phone);
+    if (!r.ok) return { ok: false as const, codeError: true as const, newCodeNeeded: !r.retry, error: r.error };
+    phoneCheck = { verified: r.verified, reason: r.reason };
+  }
 
   // 4. Insert order + lines + decrement stock in a single transaction.
   // If a concurrent order took the last unit between read and write, the
@@ -254,6 +274,15 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
     actor: null,                        // customer-placed; no admin actor
   });
 
+  if (phoneCheck) {
+    await logOrderEvent({
+      orderId: order.id,
+      type: "phone_check",
+      payload: { verified: phoneCheck.verified, ...(phoneCheck.reason ? { reason: phoneCheck.reason } : {}) },
+      actor: null,
+    });
+  }
+
   // 5. Email + SMS confirmation (best effort, never throws). Online orders
   //    are confirmed only after the gateway payment is validated.
   if (mode === "cod") await notifyOrderPlaced(order.id);
@@ -284,6 +313,17 @@ export async function createCodOrder(input: CreateOrderInput) {
   const res = await placeOrder(input, "cod");
   if (!res.ok) return res;
   return { ok: true as const, number: res.number, totalBdt: res.totalBdt, trackingToken: res.trackingToken };
+}
+
+/**
+ * Send the cash-on-delivery SMS code to the checkout's phone number.
+ * Rate-limited per phone and per IP inside sendPhoneCode.
+ */
+export async function requestPhoneCode(phone: string, locale: string) {
+  if (typeof phone !== "string" || phone.length > 20) return { ok: false as const, error: "Enter a valid Bangladeshi mobile number (01XXXXXXXXX)." };
+  const h = await headers();
+  const ip = (h.get("x-forwarded-for") ?? "").split(",")[0].trim() || h.get("x-real-ip") || null;
+  return sendPhoneCode(phone, locale === "bn" ? "bn" : "en", ip);
 }
 
 /**
