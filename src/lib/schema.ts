@@ -221,6 +221,24 @@ export const auditLog = pgTable("audit_log", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// One-time SMS codes for cash-on-delivery checkout (0020). Only a hash of
+// the code is stored. status 'send_failed' = the SMS could not be sent and
+// that checkout goes through unverified (lib/phone-code.ts).
+export const phoneVerifications = pgTable("phone_verifications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  phone: text("phone").notNull(),
+  codeHash: text("code_hash").notNull(),
+  status: text("status").default("sent").notNull(),
+  attempts: integer("attempts").default(0).notNull(),
+  ip: text("ip"),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  verifiedAt: timestamp("verified_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+  index("idx_phone_verifications_phone").on(t.phone, t.createdAt.desc()),
+  index("idx_phone_verifications_ip").on(t.ip, t.createdAt.desc()),
+]);
+
 export const inventoryLog = pgTable("inventory_log", {
   id: uuid("id").primaryKey().defaultRandom(),
   productId: text("product_id").notNull().references(() => products.id),

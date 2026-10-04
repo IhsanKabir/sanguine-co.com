@@ -187,6 +187,13 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .swatch.active{border-color:var(--purple-900);background:var(--purple-50);color:var(--purple-900)}
 .pdp-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
 .pdp-size-hint{font-size:12px;color:var(--err);margin:-4px 0 12px}
+.phone-code{margin-top:16px;padding:14px 16px;border:1px solid var(--purple-200);background:var(--purple-50)}
+.phone-code-title{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--purple-900);margin-bottom:6px}
+.phone-code-note{font-size:13px;color:var(--ink-soft);margin:0 0 10px;line-height:1.5}
+.phone-code-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.phone-code-input{width:150px;padding:10px 12px;border:1px solid var(--line);background:#fff;font-family:var(--mono);font-size:20px;letter-spacing:.35em;outline:none}
+.phone-code-input:focus{border-color:var(--purple-800)}
+.phone-code-change{margin-top:10px;font-size:12px;background:none;border:0;padding:0;cursor:pointer;color:var(--purple-800);text-decoration:underline}
 .size-pill.sold-out{opacity:.45;text-decoration:line-through;cursor:not-allowed}
 .pdp-option-left{font-size:12px;color:var(--gold-deep);margin:-4px 0 12px}
 .qty{display:inline-flex;align-items:center;border:1px solid var(--line);background:#fff}

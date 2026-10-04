@@ -385,6 +385,7 @@ const EVENT_LABEL: Record<string, string> = {
   sms_sent: "SMS sent",
   payment_received: "Payment received",
   courier_status: "Courier update",
+  phone_check: "Phone check",
 };
 
 function Timeline({ events, loading }: { events: OrderEvent[]; loading: boolean }) {
@@ -408,6 +409,7 @@ function Timeline({ events, loading }: { events: OrderEvent[]; loading: boolean 
           let detail: string | null = null;
           if (e.type === "status_changed") detail = `${p.from ?? "—"} → ${p.to ?? "—"}${p.source === "courier" ? ` (reported by ${p.courier ?? "courier"})` : ""}`;
           else if (e.type === "courier_status") detail = `${p.courier ?? ""} · ${p.status ?? ""}`.trim();
+          else if (e.type === "phone_check") detail = p.verified ? "Phone verified by SMS code" : `Phone NOT verified${p.reason ? ` (${p.reason})` : ""} — confirm by phone before shipping`;
           else if (e.type === "courier_booked") detail = `${p.courier ?? ""} · ${p.tracking ?? ""}`.trim();
           else if (e.type === "refund_issued") detail = `${typeof p.amount === "number" ? `৳${(p.amount as number).toLocaleString("en-IN")}` : ""}${p.method ? ` · ${p.method}` : ""}${p.reason ? ` — ${p.reason}` : ""}`;
           else if (e.type === "note_added" && typeof p.note === "string") detail = p.note;
