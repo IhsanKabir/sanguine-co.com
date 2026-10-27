@@ -4,7 +4,7 @@ import { defineConfig, devices } from "@playwright/test";
  * Smoke tier (EXECUTION-PLAN 5.8): fast, deterministic checks that run on
  * every CI push. Specs that need a seeded database tag themselves with
  * `@db` and self-skip when DATABASE_URL is absent (the GitHub runner has no
- * Supabase credentials), so the same suite runs everywhere — fuller locally,
+ * Supabase credentials), so the same suite runs everywhere: fuller locally,
  * leaner in CI. Nightly/full tiers can extend this config later.
  */
 export default defineConfig({

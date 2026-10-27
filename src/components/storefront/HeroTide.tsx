@@ -9,12 +9,12 @@ import { useEffect, useRef } from "react";
  *
  * Layers (back to front):
  *   1. Sky gradient + slow-moving sun + drifting cloud strokes
- *   2. Distant water — pale cyan band with a long horizon ripple
- *   3. Foreground tide — deeper teal, two soft wavelets, slight bob
+ *   2. Distant water: pale cyan band with a long horizon ripple
+ *   3. Foreground tide: deeper teal, two soft wavelets, slight bob
  *
  * Honours `prefers-reduced-motion`: skips the rAF loop, paints a static frame.
  *
- * Pure SVG with `transform` on each layer — compositor-friendly, no canvas,
+ * Pure SVG with `transform` on each layer: compositor-friendly, no canvas,
  * no library. ~3 KB rendered, GPU-accelerated.
  */
 export default function HeroTide() {
@@ -61,7 +61,7 @@ export default function HeroTide() {
 
       // Ambient sway: a tiny periodic drift so the scene moves while idle.
       // 22-second sky cycle, 11-second sea, 7-second tide. Asymmetric so
-      // they never line up — the brain stops trying to predict them.
+      // they never line up: the brain stops trying to predict them.
       const skySway  = Math.sin(t * 2 * Math.PI / 22) * 6;
       const seaSway  = Math.sin(t * 2 * Math.PI / 11) * 4;
       const tideSway = Math.sin(t * 2 * Math.PI / 7) * 3;
@@ -128,14 +128,14 @@ export default function HeroTide() {
         </radialGradient>
       </defs>
 
-      {/* Sky band — top 60% of the viewport */}
+      {/* Sky band: top 60% of the viewport */}
       <g ref={skyRef} style={{ willChange: "transform" }}>
         <rect x="0" y="0" width="1440" height="560" fill="url(#ht-sky)" />
         {/* Sun, slightly off-centre */}
         <circle cx="980" cy="320" r="220" fill="url(#ht-sun)" />
       </g>
 
-      {/* Cloud strokes — drift across the sky */}
+      {/* Cloud strokes: drift across the sky */}
       <g ref={cloudRef} style={{ willChange: "transform", opacity: 0.5 }}>
         <path d="M -200 200 Q -50 195, 100 200 T 400 195 T 700 198 T 1000 195 T 1300 200 T 1600 198"
               stroke="oklch(0.93 0.025 200)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
@@ -145,7 +145,7 @@ export default function HeroTide() {
               stroke="oklch(0.93 0.025 200)" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.5" />
       </g>
 
-      {/* Mid sea — band from 56% to 76% */}
+      {/* Mid sea: band from 56% to 76% */}
       <g ref={seaRef} style={{ willChange: "transform" }}>
         <path d="M 0 540 Q 360 532, 720 540 T 1440 540 L 1440 700 L 0 700 Z" fill="url(#ht-sea)" />
         {/* Horizon ripple */}
@@ -153,7 +153,7 @@ export default function HeroTide() {
               stroke="oklch(0.93 0.025 200)" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.6" />
       </g>
 
-      {/* Foreground tide — bottom 28%, with two soft wavelets */}
+      {/* Foreground tide: bottom 28%, with two soft wavelets */}
       <g ref={tideRef} style={{ willChange: "transform" }}>
         <path d="M 0 660 Q 200 655, 400 665 T 800 660 T 1200 665 T 1440 660 L 1440 900 L 0 900 Z"
               fill="url(#ht-tide)" />

@@ -24,14 +24,14 @@ function EnglishSection({ c }: { c: CommerceSettings }) {
       <p className="legal-lede">Last updated: 2 May 2026.</p>
 
       <h2>Where we ship</h2>
-      <p>The maison ships nationwide within Bangladesh &mdash; sixty-four districts, every upazila served by Pathao or Steadfast. We do not ship internationally at this time; if you are abroad and would like a piece sent within Bangladesh, you may of course place the order and have it delivered to a Bangladeshi address.</p>
+      <p>The maison ships nationwide within Bangladesh: sixty-four districts, every upazila served by Pathao or Steadfast. We do not ship internationally at this time; if you are abroad and would like a piece sent within Bangladesh, you may of course place the order and have it delivered to a Bangladeshi address.</p>
 
       <h2>How we ship</h2>
       <p>Stock orders are typically dispatched within one working day of order confirmation. Bespoke pieces are dispatched on the date stated in the quote.</p>
       <p>We use:</p>
       <ul>
-        <li><b>Pathao Courier</b> &mdash; primary, for Dhaka and the major divisional cities</li>
-        <li><b>Steadfast Courier</b> &mdash; fallback and for routes Pathao does not serve well</li>
+        <li><b>Pathao Courier</b>: primary, for Dhaka and the major divisional cities</li>
+        <li><b>Steadfast Courier</b>: fallback and for routes Pathao does not serve well</li>
       </ul>
 
       <h2>How long it takes</h2>
@@ -49,7 +49,7 @@ function EnglishSection({ c }: { c: CommerceSettings }) {
       <p>Shipping is a flat {bdt(c.shippingDhakaBdt)} inside Dhaka and {bdt(c.shippingOutsideBdt)} everywhere else in Bangladesh, shown at checkout before you place the order.{c.freeShippingThresholdBdt > 0 && <> For orders over {bdt(c.freeShippingThresholdBdt)}, shipping is complimentary anywhere in Bangladesh.</>}</p>
 
       <h2>Cash on Delivery</h2>
-      <p>All orders at present are paid in cash on delivery &mdash; please have the displayed total ready in hand for our courier. The courier may carry change for amounts up to ৳1,000; for larger amounts, it helps both of you to have the exact amount.</p>
+      <p>All orders at present are paid in cash on delivery. Please have the displayed total ready in hand for our courier. The courier may carry change for amounts up to ৳1,000; for larger amounts, it helps both of you to have the exact amount.</p>
       <p>There is no cash-on-delivery fee: the total shown at checkout is the amount you pay the courier.</p>
 
       <h2>Tracking</h2>
@@ -73,14 +73,14 @@ function BangleSection({ c }: { c: CommerceSettings }) {
       <p className="legal-lede">সর্বশেষ আপডেট: ২ মে ২০২৬।</p>
 
       <h2>কোথায় পাঠাই</h2>
-      <p>মেইসন বাংলাদেশের সারা দেশে পাঠায় &mdash; চৌষট্টি জেলা, Pathao বা Steadfast যেসব উপজেলায় পরিষেবা দেয় সব। বর্তমানে আমরা আন্তর্জাতিক শিপিং করি না; আপনি বিদেশে থেকেও বাংলাদেশের কোনো ঠিকানায় ডেলিভারির জন্য অবশ্যই অর্ডার করতে পারেন।</p>
+      <p>মেইসন বাংলাদেশের সারা দেশে পাঠায়: চৌষট্টি জেলা, Pathao বা Steadfast যেসব উপজেলায় পরিষেবা দেয় সব। বর্তমানে আমরা আন্তর্জাতিক শিপিং করি না; আপনি বিদেশে থেকেও বাংলাদেশের কোনো ঠিকানায় ডেলিভারির জন্য অবশ্যই অর্ডার করতে পারেন।</p>
 
       <h2>কীভাবে পাঠাই</h2>
       <p>স্টক অর্ডার সাধারণত অর্ডার নিশ্চিতকরণের এক কর্মদিবসের মধ্যে প্রেরিত হয়। বেসপোক পিস কোটে উল্লিখিত তারিখে প্রেরিত হয়।</p>
       <p>আমরা ব্যবহার করি:</p>
       <ul>
-        <li><b>Pathao Courier</b> &mdash; প্রাথমিক, ঢাকা ও বিভাগীয় শহরগুলোর জন্য</li>
-        <li><b>Steadfast Courier</b> &mdash; বিকল্প, এবং যেসব রুটে Pathao কম পরিষেবা দেয় সেগুলোর জন্য</li>
+        <li><b>Pathao Courier</b>: প্রাথমিক, ঢাকা ও বিভাগীয় শহরগুলোর জন্য</li>
+        <li><b>Steadfast Courier</b>: বিকল্প, এবং যেসব রুটে Pathao কম পরিষেবা দেয় সেগুলোর জন্য</li>
       </ul>
 
       <h2>সময় কত লাগে</h2>
@@ -98,7 +98,7 @@ function BangleSection({ c }: { c: CommerceSettings }) {
       <p>ঢাকার ভেতরে শিপিং {bdt(c.shippingDhakaBdt)} এবং বাংলাদেশের অন্য যেকোনো স্থানে {bdt(c.shippingOutsideBdt)}, অর্ডার দেওয়ার আগে চেকআউটে দেখানো হয়।{c.freeShippingThresholdBdt > 0 && <> {bdt(c.freeShippingThresholdBdt)}-এর বেশি অর্ডারে বাংলাদেশের যেকোনো জায়গায় শিপিং বিনামূল্যে।</>}</p>
 
       <h2>ক্যাশ অন ডেলিভারি</h2>
-      <p>বর্তমানে সকল অর্ডার ক্যাশ অন ডেলিভারিতে পরিশোধিত &mdash; অনুগ্রহ করে কুরিয়ারের জন্য প্রদর্শিত মোট অর্থ হাতে রাখুন। কুরিয়ার ৳১,০০০ পর্যন্ত খুচরা বহন করতে পারেন; বেশি অঙ্কের ক্ষেত্রে নির্দিষ্ট পরিমাণ থাকলে দু&rsquo;পক্ষেরই সুবিধা।</p>
+      <p>বর্তমানে সকল অর্ডার ক্যাশ অন ডেলিভারিতে পরিশোধিত। অনুগ্রহ করে কুরিয়ারের জন্য প্রদর্শিত মোট অর্থ হাতে রাখুন। কুরিয়ার ৳১,০০০ পর্যন্ত খুচরা বহন করতে পারেন; বেশি অঙ্কের ক্ষেত্রে নির্দিষ্ট পরিমাণ থাকলে দু&rsquo;পক্ষেরই সুবিধা।</p>
       <p>ক্যাশ অন ডেলিভারির জন্য কোনো অতিরিক্ত ফি নেই: চেকআউটে দেখানো মোট অর্থই কুরিয়ারকে পরিশোধ করবেন।</p>
 
       <h2>ট্র্যাকিং</h2>

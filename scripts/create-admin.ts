@@ -57,7 +57,7 @@ const supabase = createClient(url, serviceKey, {
       console.error("Update failed:", error.message);
       process.exit(1);
     }
-    console.log(`✓ Updated ${email} — password reset, email confirmed, role=owner.`);
+    console.log(`✓ Updated ${email}: password reset, email confirmed, role=owner.`);
   } else {
     console.log("→ Creating new admin user…");
     const { data, error } = await supabase.auth.admin.createUser({

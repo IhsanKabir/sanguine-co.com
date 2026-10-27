@@ -9,11 +9,11 @@ import { SITE_URL } from "@/lib/site-url";
 // Bust the ISR cache for every locale-prefixed route.
 // revalidatePath("/", "layout") alone does not reach /en or /bn because
 // localePrefix:"always" in next-intl means the root "/" path never serves
-// storefront content — all pages live under /{locale}/...
+// storefront content: all pages live under /{locale}/...
 //
 // Known limit: this does NOT purge the /api/og share-card CDN cache
 // (s-maxage=86400), so a product's social card can show an old price/name
-// for up to a day after an edit. Accepted trade-off — see the Cache-Control
+// for up to a day after an edit. Accepted trade-off: see the Cache-Control
 // note in src/app/api/og/route.tsx.
 function revalidateAllLocales() {
   for (const locale of ["en", "bn"]) {
@@ -179,7 +179,7 @@ const prodSchema = z.object({
 
 /**
  * Cross-field price rules (shared by create, update and CSV import):
- *  - a regular (buy-now) product must have a real price — ৳0 placeholders were
+ *  - a regular (buy-now) product must have a real price: ৳0 placeholders were
  *    the root cause of the zero-price checkout hole;
  *  - an estimate range must be coherent (min ≤ max).
  * Preorder-only pieces MAY omit every price ("price on quotation").
@@ -194,7 +194,7 @@ function validatePriceRules(p: {
     return "A buy-now product needs a price of at least ৳1. Mark it preorder-only if the price comes from quotation.";
   }
   if (p.priceMinBdt != null && p.priceMaxBdt != null && p.priceMinBdt > p.priceMaxBdt) {
-    return "Estimated price range is inverted — min must be ≤ max.";
+    return "Estimated price range is inverted: min must be ≤ max.";
   }
   return null;
 }
@@ -287,11 +287,11 @@ export async function updateProduct(id: string, patch: Partial<z.infer<typeof pr
 export async function deleteProduct(id: string) {
   await requireAdmin();
   await db.transaction(async (tx) => {
-    // orderLines.productId and preorderRequests.productId are nullable FKs with no cascade —
+    // orderLines.productId and preorderRequests.productId are nullable FKs with no cascade:
     // nullify them so order history is preserved but the constraint doesn't block the delete.
     await tx.update(schema.orderLines).set({ productId: null }).where(eq(schema.orderLines.productId, id));
     await tx.update(schema.preorderRequests).set({ productId: null }).where(eq(schema.preorderRequests.productId, id));
-    // inventoryLog.productId is NOT NULL with no cascade — delete those rows first.
+    // inventoryLog.productId is NOT NULL with no cascade: delete those rows first.
     await tx.delete(schema.inventoryLog).where(eq(schema.inventoryLog.productId, id));
     // Product row last (cascade handles productImages, reviews, wishlists, stockNotifications).
     await tx.delete(schema.products).where(eq(schema.products.id, id));
@@ -558,7 +558,7 @@ export async function bookCourier(input: z.infer<typeof courierSchema>) {
 //
 // `brand` row holds non-i18n metadata (currently just the contact email).
 // All consumer-facing copy lives in messages/{en,bn}.json and is overridden
-// per-locale via the `copy` row — see `lib/copy.ts`.
+// per-locale via the `copy` row: see `lib/copy.ts`.
 const brandSchema = z.object({
   name: z.string().min(1).max(80),
   tagline: z.string().max(160).optional(),
@@ -578,7 +578,7 @@ export async function updateBrand(input: z.infer<typeof brandSchema>) {
 export async function getBrand() {
   const rows = await db.select().from(schema.siteSettings).where(eq(schema.siteSettings.key, "brand"));
   if (!rows[0]) return null;
-  // safeParse rather than blind cast — protects against historical / corrupted
+  // safeParse rather than blind cast: protects against historical / corrupted
   // jsonb that doesn't conform to the current `brandSchema`.
   const parsed = brandSchema.safeParse(rows[0].value);
   return parsed.success ? parsed.data : null;
@@ -630,7 +630,7 @@ const copyOverridesSchema = z.object({
 export async function updateCopyOverrides(input: z.infer<typeof copyOverridesSchema>) {
   await requirePermission("editorial");
   const data = copyOverridesSchema.parse(input);
-  // Empty-string entries mean "fall back to the static default" — drop them so
+  // Empty-string entries mean "fall back to the static default": drop them so
   // future re-edits don't surface stale blanks in the form.
   const clean = {
     en: Object.fromEntries(Object.entries(data.en).filter(([, v]) => v !== "")),

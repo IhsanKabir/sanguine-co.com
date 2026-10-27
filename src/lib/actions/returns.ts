@@ -18,7 +18,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 /**
  * The order's effective return window: the most generous per-product override
  * among its lines, falling back to the global commerce default (7 days).
- * Anchored to the DELIVERED event, not order creation — a slow courier must
+ * Anchored to the DELIVERED event, not order creation: a slow courier must
  * not eat the customer's window.
  */
 async function orderReturnWindow(orderId: string): Promise<number> {
@@ -38,7 +38,7 @@ async function orderReturnWindow(orderId: string): Promise<number> {
   if (prods.length === 0) return commerce.returnWindowDays;
   // Each line's effective window is its own override ?? global; the order
   // takes the most generous line. Seeding the max with the global default
-  // made short overrides (returnWindowDays = 0 → final sale) unenforceable —
+  // made short overrides (returnWindowDays = 0 → final sale) unenforceable:
   // the PDP advertised "0-day returns" while the server accepted 7.
   const windows = prods.map((p) => p.returnWindowDays ?? commerce.returnWindowDays);
   return Math.max(...windows);
@@ -83,7 +83,7 @@ export async function requestReturn(input: z.infer<typeof returnSchema>) {
   if (ageMs > windowDays * DAY_MS)
     return { ok: false as const, error: `The ${windowDays}-day return window has closed for this order.` };
 
-  // The reason goes on the order-events timeline — it must NOT overwrite
+  // The reason goes on the order-events timeline: it must NOT overwrite
   // orders.notes, which holds the customer's delivery instructions.
   await db
     .update(schema.orders)

@@ -1,4 +1,4 @@
-// Sanguine — Cursor System & Motion Layer
+// Sanguine: Cursor System & Motion Layer
 // Custom cursor that morphs per section + scroll reveal utility + page transition curtain.
 // Respects prefers-reduced-motion and disables itself on touch devices.
 
@@ -6,7 +6,7 @@
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
-  // ===== Scroll reveal — runs on ALL devices (touch + pointer) =====
+  // ===== Scroll reveal: runs on ALL devices (touch + pointer) =====
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {
@@ -91,7 +91,7 @@
   let visible = false;
   let pointerDirty = false;
 
-  // The stylesheet only hides the native cursor once this class exists —
+  // The stylesheet only hides the native cursor once this class exists:
   // until the layer is actually live the user must never be cursor-less.
   // Reduced-motion users keep the NATIVE cursor entirely: their replacement
   // layer is display:none'd by motion.css, so hiding the real one would
@@ -103,7 +103,7 @@
     pointerDirty = true;
     if (!visible) { cx = mx; cy = my; visible = true; cur.classList.add('visible'); }
   });
-  // Scroll moves the page under a stationary pointer — hover state must
+  // Scroll moves the page under a stationary pointer: hover state must
   // re-evaluate even though no mousemove fires.
   window.addEventListener('scroll', () => { pointerDirty = true; }, { passive: true });
   window.addEventListener('mousedown', (e) => {
@@ -143,7 +143,7 @@
     particles.push({ x, y, vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5 - 0.3, life: 1, type });
   };
 
-  // ===== Hover detection — find nearest section with data-cursor =====
+  // ===== Hover detection: find nearest section with data-cursor =====
   let hoverEl = null;
   const updateHover = () => {
     const el = document.elementFromPoint(mx, my);
@@ -180,7 +180,7 @@
     const dt = Math.min((t - lastT) / 16, 3) || 1;
     lastT = t;
 
-    // Lerp toward mouse — dt-normalised so 144 Hz feels identical to 60 Hz.
+    // Lerp toward mouse: dt-normalised so 144 Hz feels identical to 60 Hz.
     // 0.65 keeps a hint of glide without the 4-6 frame trail users aim with:
     // the visible cursor lagging the true hit point made every click feel
     // late or mistargeted.
@@ -195,7 +195,7 @@
     cur.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
 
     // Hover detection every other frame (~30fps), and only when the pointer
-    // actually moved — elementFromPoint forces a style/hit-test flush, which
+    // actually moved: elementFromPoint forces a style/hit-test flush, which
     // is wasted main-thread work on an idle mouse.
     if (pointerDirty && ++hoverFrame % 2 === 0) { updateHover(); pointerDirty = false; }
 
@@ -299,7 +299,7 @@
   };
   refreshMagnetic();
   // rAF-coalesced: scroll fires dozens of times a frame and every React
-  // commit triggers the observer — refreshing rects synchronously in both
+  // commit triggers the observer: refreshing rects synchronously in both
   // forced layout mid-scroll and mid-commit.
   let magRaf = 0;
   const scheduleRefreshMagnetic = () => {

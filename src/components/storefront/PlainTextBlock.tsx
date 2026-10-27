@@ -1,7 +1,7 @@
 /**
  * Renders admin-entered plain text (size guides, materials, care) without
- * HTML: lines containing "|" become table rows — the first such row is the
- * header — and every other non-empty line is a paragraph. Pure, so it works
+ * HTML: lines containing "|" become table rows: the first such row is the
+ * header: and every other non-empty line is a paragraph. Pure, so it works
  * in server and client components and cannot inject markup.
  */
 export default function PlainTextBlock({ text }: { text: string }) {

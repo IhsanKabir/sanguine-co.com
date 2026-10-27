@@ -83,12 +83,12 @@ export function orderPlacedEmail(d: OrderEmailData) {
     ${codNote}
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:32px 0 8px;">DELIVERING TO</p>
     <p style="font-size:14px;line-height:1.6;margin:0;">
-      ${d.customerName}<br/>${d.shippingAddress.line1}<br/>${d.shippingAddress.area ? d.shippingAddress.area + ", " : ""}${d.shippingAddress.city}${d.shippingAddress.postcode ? " — " + d.shippingAddress.postcode : ""}<br/>
+      ${d.customerName}<br/>${d.shippingAddress.line1}<br/>${d.shippingAddress.area ? d.shippingAddress.area + ", " : ""}${d.shippingAddress.city}${d.shippingAddress.postcode ? " " + d.shippingAddress.postcode : ""}<br/>
       ${d.customerPhone}
     </p>
     ${d.trackingUrl ? `<p style="margin:24px 0 0;"><a href="${d.trackingUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Track your order →</a></p>` : ""}
     <p style="font-size:13px;color:#7a6a52;margin:32px 0 0;line-height:1.7;">We will be in touch when the courier collects your parcel. Reply to this email if anything is amiss.</p>
-    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">— The atelier</p>
+    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">The atelier</p>
   `;
   return { subject, html: SHELL(body) };
 }
@@ -100,7 +100,7 @@ export function orderShippedEmail(d: OrderEmailData & { courier: string; trackin
     <p style="font-size:15px;margin:0 0 24px;">Your order is in the hands of <b>${d.courier}</b>${d.tracking ? `, tracking <code style="font-family:'Courier New',monospace;background:#f4ecd8;padding:2px 6px;">${d.tracking}</code>` : ""}.</p>
     ${d.paymentMethod === "cod" ? `<p style="background:#fdf6e8;border:1px solid #e8d8a8;padding:14px 16px;font-size:13px;">Please have <b>${formatBdt(d.totalBdt)}</b> ready in cash for the courier.</p>` : ""}
     ${d.trackingUrl ? `<p style="margin:18px 0 0;"><a href="${d.trackingUrl}" style="color:#2a1854;font-weight:500;">View tracking on the maison →</a></p>` : ""}
-    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">— The atelier</p>
+    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">The atelier</p>
   `;
   return { subject, html: SHELL(body) };
 }
@@ -131,7 +131,7 @@ export function preorderReceivedEmail(d: PreorderEmailData) {
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:24px 0 8px;">YOU WROTE</p>
     <p style="font-size:14px;color:#3a2a64;line-height:1.7;background:#f9f4ec;padding:14px 16px;border-left:2px solid #a07e2c;white-space:pre-wrap;margin:0;">${escapeHtml(d.description)}</p>
     <p style="font-size:13px;color:#7a6a52;margin:32px 0 0;line-height:1.7;">No payment is due now. The maison will write back with a price and timeline; a small deposit confirms the commission and the remainder is paid on delivery.</p>
-    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">— The atelier</p>
+    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">The atelier</p>
   `;
   return { subject, html: SHELL(body) };
 }
@@ -156,8 +156,8 @@ export function preorderQuoteEmail(
     <p style="font-size:15px;margin:0 0 24px;">We have considered your request and would be honoured to make this for you. The price, complete and delivered, is:</p>
     <p style="text-align:center;font-family:Georgia,serif;font-size:32px;color:#2a1854;font-weight:400;margin:0 0 24px;">${priceLine}</p>
     ${d.adminNotes ? `<p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:0 0 8px;">FROM THE ATELIER</p><p style="font-size:14px;color:#3a2a64;line-height:1.7;background:#f9f4ec;padding:14px 16px;border-left:2px solid #a07e2c;white-space:pre-wrap;margin:0 0 24px;">${escapeHtml(d.adminNotes)}</p>` : ""}
-    <p style="font-size:13px;color:#7a6a52;margin:0 0 24px;line-height:1.7;">Reply to this email to accept. A deposit of <b style="color:#2a1854;">${formatBdt(d.depositBdt)}</b> (${d.depositPct}%) confirms the commission — we will send a bKash prepayment request. The remainder, ${formatBdt(Math.max(0, total - d.depositBdt))}, is paid in cash when our courier arrives at your door.</p>
-    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">— The atelier</p>
+    <p style="font-size:13px;color:#7a6a52;margin:0 0 24px;line-height:1.7;">Reply to this email to accept. A deposit of <b style="color:#2a1854;">${formatBdt(d.depositBdt)}</b> (${d.depositPct}%) confirms the commission, and we will send a bKash prepayment request. The remainder, ${formatBdt(Math.max(0, total - d.depositBdt))}, is paid in cash when our courier arrives at your door.</p>
+    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">The atelier</p>
   `;
   return { subject, html: SHELL(body) };
 }
@@ -186,13 +186,13 @@ export function preorderAdminNotifyEmail(d: PreorderEmailData & {
 
 // ─── Newsletter welcome ───────────────────────────────────────────────
 export function newsletterWelcomeEmail(siteUrl: string) {
-  const subject = "Letters from the Maison — welcome";
+  const subject = "Welcome to Letters from the Maison";
   const body = `
     <p style="font-size:15px;margin:0 0 24px;">You asked the maison to write. It will.</p>
-    <p style="font-size:15px;margin:0 0 20px;">We send letters rarely — only when there is something genuinely worth pausing for. A new cloth. A scent that took three seasons to settle. A small piece that will not be restocked.</p>
+    <p style="font-size:15px;margin:0 0 20px;">We send letters rarely: only when there is something genuinely worth pausing for. A new cloth. A scent that took three seasons to settle. A small piece that will not be restocked.</p>
     <p style="font-size:15px;margin:0 0 32px;">The next one will find you when it is ready.</p>
     <p style="margin:0 0 32px;"><a href="${siteUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Wander the boutique &rarr;</a></p>
-    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:0;">— The atelier</p>
+    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:0;">The atelier</p>
   `;
   return { subject, html: SHELL(body) };
 }
@@ -202,10 +202,10 @@ export function reviewRequestEmail(firstName: string, orderNumber: string, track
   const subject = `Your order has arrived · ${orderNumber}`;
   const body = `
     <p style="font-size:15px;margin:0 0 6px;">Dear ${firstName},</p>
-    <p style="font-size:15px;margin:0 0 24px;">We hope your parcel arrived in the way the maison intended it — quietly, in the right state.</p>
+    <p style="font-size:15px;margin:0 0 24px;">We hope your parcel arrived in the way the maison intended it: quietly, in the right state.</p>
     <p style="font-size:15px;margin:0 0 24px;">If you have a moment, a few words on the piece would mean a great deal to the small team that prepared it. No obligation. Only if it earned them.</p>
     <p style="margin:0 0 32px;"><a href="${trackingUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Leave a note &rarr;</a></p>
-    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:0;">— The atelier</p>
+    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:0;">The atelier</p>
   `;
   return { subject, html: SHELL(body) };
 }
@@ -216,7 +216,7 @@ export function backInStockEmail(productName: string, productUrl: string) {
   const body = `
     <p style="font-size:11px;letter-spacing:.4em;color:#a07e2c;margin:0 0 14px;font-family:'Courier New',monospace;">BACK ON THE SHELF</p>
     <h2 style="font-size:24px;font-weight:400;color:#2a1854;margin:0 0 14px;font-family:Georgia,serif;">${productName}</h2>
-    <p style="font-size:15px;margin:0 0 28px;">The piece you asked the maison to remember has returned. Quantities are limited &mdash; we will not write again until you say so.</p>
+    <p style="font-size:15px;margin:0 0 28px;">The piece you asked the maison to remember has returned. Quantities are limited. We will not write again until you say so.</p>
     <p style="margin:0 0 6px;"><a href="${productUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Return to the piece &rarr;</a></p>
   `;
   return { subject, html: SHELL(body) };

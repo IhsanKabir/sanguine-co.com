@@ -1,6 +1,6 @@
--- Sanguine — discount codes (coupons)
+-- Sanguine: discount codes (coupons)
 -- Three discount types: percent off, fixed BDT off, free shipping.
--- Server-side validation only — never trust client price calculations.
+-- Server-side validation only: never trust client price calculations.
 
 create table if not exists coupons (
   id uuid primary key default gen_random_uuid(),
@@ -44,7 +44,7 @@ drop trigger if exists trg_coupons_updated on coupons;
 create trigger trg_coupons_updated before update on coupons
   for each row execute function set_updated_at();
 
--- RLS — service-role only
+-- RLS: service-role only
 alter table coupons enable row level security;
 alter table coupon_redemptions enable row level security;
--- (no public policies — server-side validation only)
+-- (no public policies: server-side validation only)

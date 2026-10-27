@@ -23,7 +23,7 @@ const nextConfig = {
   outputFileTracingIncludes: {
     "/api/og": ["./src/app/api/og/_fonts/*.ttf"],
   },
-  // Order confirmation/tracking URLs carry ?t= access tokens — the referrer
+  // Order confirmation/tracking URLs carry ?t= access tokens: the referrer
   // policy keeps them from leaking to external destinations a customer might
   // click through to (couriers, WhatsApp web, etc.).
   async headers() {
@@ -55,7 +55,7 @@ const sentryBuildOptions = {
 
 // One-line build-time signal so we can confirm in Vercel logs whether source
 // maps are being uploaded. Silent failure here was costing us symbolicated
-// stack traces — explicit log makes the misconfiguration visible.
+// stack traces: explicit log makes the misconfiguration visible.
 if (process.env.NODE_ENV !== "test") {
   const hasToken = Boolean(process.env.SENTRY_AUTH_TOKEN);
   const hasOrg = Boolean(process.env.SENTRY_ORG);
@@ -64,7 +64,7 @@ if (process.env.NODE_ENV !== "test") {
     console.log(`[sentry] Source maps will be uploaded for ${process.env.SENTRY_ORG}/${process.env.SENTRY_PROJECT}.`);
   } else {
     console.log(
-      `[sentry] Source maps skipped — missing: ${[
+      `[sentry] Source maps skipped: missing: ${[
         !hasToken && "SENTRY_AUTH_TOKEN",
         !hasOrg && "SENTRY_ORG",
         !hasProject && "SENTRY_PROJECT",

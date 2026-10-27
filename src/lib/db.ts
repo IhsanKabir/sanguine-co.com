@@ -16,7 +16,7 @@ if (!process.env.DATABASE_URL) {
 
 /**
  * On Vercel/serverless we need the Supabase Transaction pooler (port 6543).
- * It multiplexes connections via PgBouncer in transaction mode — the only
+ * It multiplexes connections via PgBouncer in transaction mode: the only
  * way to handle many concurrent serverless function invocations without
  * blowing past Supabase's session-mode pool limit (15 clients).
  *

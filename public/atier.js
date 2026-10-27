@@ -1,4 +1,4 @@
-// Sanguine — A-tier features
+// Sanguine: A-tier features
 // 1. WebGL hero shader (violet plasma + cursor reactive)
 // 2. Sound design (gong, paper, click) with mute toggle
 // 3. Wax-seal loading state on route changes
@@ -135,7 +135,7 @@
   // noiseBurst() call early-returns. The mute toggle is still mounted but
   // its unmute path is also gated. Existing visitors who already toggled
   // sound on get grandfathered via `localStorage.ssg-muted === 'false'`
-  // — that legacy preference is treated as implicit consent for audio
+  //: that legacy preference is treated as implicit consent for audio
   // since the toggle pre-dated the consent banner.
   function readConsent() {
     try {
@@ -162,7 +162,7 @@
   // user's hands.
   window.addEventListener('storage', e => {
     if (e.key === 'ssg-cookie-consent-v1' && audioPermitted()) {
-      // Don't auto-unmute — just allow it. User still has to press the toggle.
+      // Don't auto-unmute: just allow it. User still has to press the toggle.
       document.querySelectorAll('.ssg-mute').forEach(el => el.removeAttribute('data-locked'));
     }
   });
@@ -197,8 +197,8 @@
   // Curated audio (admin-uploaded via /admin/audio) takes precedence over
   // the synth tones for the three signature sounds. The locale layout
   // injects `window.SSG_AUDIO_URLS = { gong, chime, seal }` inline before
-  // this script runs. ANY playback failure — 404, decode error, autoplay
-  // rejection — falls back to the synth so the cue is never silently lost.
+  // this script runs. ANY playback failure: 404, decode error, autoplay
+  // rejection: falls back to the synth so the cue is never silently lost.
   // click/rustle stay synth-only by design (sub-50ms cues, files add lag).
   const synthTones = {
     gong() { tone(110, 2.0, 'sine', 0.18, 80); tone(220, 1.8, 'sine', 0.06, 165); tone(440, 1.6, 'sine', 0.03, 330); },
@@ -264,10 +264,10 @@
     document.body.appendChild(b);
   }
   // No mute toggle on touch: it sat fixed bottom-right on top of the cookie
-  // banner's Accept button and the PDP sticky Add-to-Bag — taps aimed at the
+  // banner's Accept button and the PDP sticky Add-to-Bag: taps aimed at the
   // buy CTA hit a pre-consent no-op instead. Audio is gesture-gated anyway.
   if (!isTouch) mountMuteToggle();
-  // Click-driven cues (button feedback, card hover) — gated on consent and mute.
+  // Click-driven cues (button feedback, card hover): gated on consent and mute.
   // Bail on the element test FIRST: this capture listener runs ahead of every
   // React handler on the page, so the common case (a click anywhere else)
   // must not touch localStorage or the audio pipeline at all.
@@ -278,7 +278,7 @@
     if (!wantsClick && !wantsRustle) return;
     if (!audioPermitted()) return;
     // Deferred: creating the AudioContext opens the OS audio device, which
-    // blocks the main thread 100ms+ on Windows — inside a click handler that
+    // blocks the main thread 100ms+ on Windows: inside a click handler that
     // cost lands directly on INP (and on the Add-to-Bag button, this IS the
     // buy click). Web Audio needs only sticky activation, so init in a
     // macrotask after the frame paints; a ~10ms-late cue is imperceptible.
@@ -288,7 +288,7 @@
       else window.SSG_SOUND.rustle();
     }, 0);
   }, true);
-  // First gong on first user gesture — gated on consent. Pre-consent
+  // First gong on first user gesture: gated on consent. Pre-consent
   // visitors get a silent first paint, which is what PDPO/WCAG expect.
   let gongPlayed = false;
   const playGong = () => {
@@ -297,7 +297,7 @@
     gongPlayed = true;
     // ensureAudio lives INSIDE the timeout: AudioContext creation blocks the
     // main thread 100ms+ on Windows, and this handler runs on the very first
-    // keydown/pointerdown — it was the page's worst INP interaction (156ms
+    // keydown/pointerdown: it was the page's worst INP interaction (156ms
     // measured). Sticky activation keeps the deferred resume() gesture-legal.
     setTimeout(() => { ensureAudio(); window.SSG_SOUND.gong(); }, 100);
   };
@@ -381,10 +381,10 @@
     if (idlePts.length) requestAnimationFrame(idleTick);
     else { idleCanvas.remove(); idleCanvas = null; idleCtx = null; }
   }
-  function resetIdle() { return; /* disabled — see Phase 1.5 */ }
-  // No mousemove / keydown / scroll listeners — idle constellation off.
+  function resetIdle() { return; /* disabled: see Phase 1.5 */ }
+  // No mousemove / keydown / scroll listeners: idle constellation off.
 
-  // ============ 5. LIVE ADMIN — count-up + chart draw ============
+  // ============ 5. LIVE ADMIN: count-up + chart draw ============
   function liveAdmin() {
     document.querySelectorAll('.stat .v:not(.counted)').forEach(el => {
       el.classList.add('counted');
@@ -434,14 +434,14 @@
       p.style.strokeDashoffset = len;
       setTimeout(() => { p.style.transition = 'stroke-dashoffset 1.2s ease'; p.style.strokeDashoffset = 0; }, 200);
     });
-    // Pulsing live status pill — only on processing order status, not on every .pill-warn
+    // Pulsing live status pill: only on processing order status, not on every .pill-warn
     document.querySelectorAll('.pill-warn:not(.pulsing)').forEach(p => {
       if ((p.textContent || '').trim().toLowerCase() === 'processing') p.classList.add('pulsing');
     });
   }
   setTimeout(liveAdmin, 500);
 
-  // ============ 6. KINETIC TYPOGRAPHY — hero subline ============
+  // ============ 6. KINETIC TYPOGRAPHY: hero subline ============
   function kineticSubline() {
     const p = document.querySelector('.hero p');
     if (!p || p.dataset.kinetic) return;
@@ -453,7 +453,7 @@
   setTimeout(kineticSubline, 200);
 
   // ============ 7. SHARED-ELEMENT FLIGHT (DISABLED 2026-05-03) ============
-  // The FLIP card flight overlapped with `<RouteTransition>`'s fade — both
+  // The FLIP card flight overlapped with `<RouteTransition>`'s fade: both
   // fired on card→PDP navigation, producing two competing transitions.
   // RouteTransition wins (per EXECUTION-PLAN.md Phase 1.5). The View
   // Transitions API will replace this properly in Phase 3 (cross-document
@@ -501,7 +501,7 @@
     }, true);
 
     // Swipe-to-dismiss cart drawer. The React drawer renders as `.drawer`
-    // only while open (conditional render) — the old `.cart-drawer.open`
+    // only while open (conditional render): the old `.cart-drawer.open`
     // selector matched nothing, so this entire feature was dead.
     const attachDrawerSwipe = () => {
       const drawer = document.querySelector('.drawer');
@@ -514,7 +514,7 @@
       }
       let sy = 0, dy = 0, dragging = false;
       drawer.addEventListener('touchstart', e => {
-        // The drawer itself never scrolls — .drawer-body is the scroll
+        // The drawer itself never scrolls: .drawer-body is the scroll
         // container. Guarding on the wrong element let drags start while the
         // cart list was mid-scroll, dismissing the drawer on scroll-up.
         const scroller = drawer.querySelector('.drawer-body');

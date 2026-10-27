@@ -26,7 +26,7 @@ export default function PdpGallery({ photos, fallback, activeIndex, onIndexChang
   const { activePhotoIndex, setActivePhotoIndex } = usePdpState();
   const [imgKey, setImgKey] = useState(0);
   // Swapping photos remounts the Image (for the fade), which blanks the frame
-  // until the full-size file arrives — seconds on first load. The veil gives
+  // until the full-size file arrives: seconds on first load. The veil gives
   // the click immediate, visible acknowledgement.
   const [loading, setLoading] = useState(false);
   const prev = useRef(0);
@@ -106,7 +106,7 @@ export default function PdpGallery({ photos, fallback, activeIndex, onIndexChang
               height={1200}
               priority
               sizes="(max-width: 768px) 100vw, 50vw"
-              // height:100% + cover clips ANY upload shape to the 3:4 frame —
+              // height:100% + cover clips ANY upload shape to the 3:4 frame:
               // height:auto let portrait photos overflow across the info column.
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               className="pdp-img-fade"

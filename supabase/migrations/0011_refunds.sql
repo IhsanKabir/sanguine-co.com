@@ -1,7 +1,7 @@
--- Sanguine — Refund workflow
+-- Sanguine: Refund workflow
 --
 -- Each refund is a row in `refunds`; refunds can be partial or full. We do not
--- mutate the order's totalBdt — the original total is preserved as a snapshot.
+-- mutate the order's totalBdt: the original total is preserved as a snapshot.
 -- The order's status flips to 'refunded' when a refund is issued (admin can
 -- decide whether to leave it 'delivered' for a partial refund).
 --

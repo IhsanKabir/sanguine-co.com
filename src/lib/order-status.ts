@@ -64,7 +64,7 @@ export async function applyOrderStatus(
   });
 
   // Cancelled orders give their stock back (COD cancellations are routine in
-  // Bangladesh — without this every cancellation silently shrank inventory).
+  // Bangladesh: without this every cancellation silently shrank inventory).
   // Guards: only on the FIRST transition into cancelled, and only for orders
   // that took stock at creation. Storefront and manual (SSG-MX-) orders do;
   // converted preorders (SSG-PO-) never did, so restoring for them would
@@ -103,7 +103,7 @@ export async function applyOrderStatus(
   return { changed: true, from: before.status };
 }
 
-/** Recipient for any order — guests have guestEmail, signed-in customers need a Supabase lookup. */
+/** Recipient for any order: guests have guestEmail, signed-in customers need a Supabase lookup. */
 async function resolveOrderEmail(orderId: string): Promise<{ email: string; firstName: string; number: string; trackingToken: string } | null> {
   const [order] = await db
     .select({

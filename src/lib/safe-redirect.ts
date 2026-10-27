@@ -14,7 +14,7 @@
  *  - containing `://` (full URL anywhere in string)
  *  - containing `\` (Windows path separator can confuse browser URL parsing)
  *
- * Returns the supplied `fallback` for any rejection — never throws.
+ * Returns the supplied `fallback` for any rejection: never throws.
  */
 export function safeRedirect(raw: string | null | undefined, fallback: string): string {
   if (!raw) return fallback;

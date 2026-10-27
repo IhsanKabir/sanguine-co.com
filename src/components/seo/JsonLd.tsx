@@ -1,6 +1,6 @@
 /**
  * Renders an inline `<script type="application/ld+json">` for SEO structured data.
- * Server component — safe to use inside any page or layout. Pass any JSON-LD
+ * Server component: safe to use inside any page or layout. Pass any JSON-LD
  * shape (Organization, Product, BreadcrumbList, etc.) as `data`.
  *
  * Escapes the dangerous `</script>` and `<!--` sequences in the JSON output so

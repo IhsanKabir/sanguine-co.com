@@ -14,7 +14,7 @@ type Props = {
   searchParams: Promise<{ t?: string }>;
 };
 
-// This page renders a full name, street address and phone — never indexable.
+// This page renders a full name, street address and phone: never indexable.
 export const metadata = { robots: { index: false, follow: false } };
 
 export default async function OrderConfirmation({ params, searchParams }: Props) {
@@ -82,7 +82,7 @@ export default async function OrderConfirmation({ params, searchParams }: Props)
         <div style={{ textAlign: "left", maxWidth: 460, margin: "0 auto 32px", padding: "20px 24px", background: "var(--purple-50)", border: "1px solid var(--purple-200)" }}>
           <div className="pdp-label">{t("order.deliveringTo")}</div>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "var(--purple-900)" }}>
-            {addr.fullName ?? "—"}<br/>{addr.line1 ?? ""}<br/>{addr.area ? addr.area + ", " : ""}{addr.city ?? ""}{addr.postcode ? " — " + addr.postcode : ""}<br/>{addr.phone ?? ""}
+            {addr.fullName ?? "-"}<br/>{addr.line1 ?? ""}<br/>{addr.area ? addr.area + ", " : ""}{addr.city ?? ""}{addr.postcode ? " " + addr.postcode : ""}<br/>{addr.phone ?? ""}
           </p>
         </div>
       )}

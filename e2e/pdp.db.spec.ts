@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { skipWithoutDb, KNOWN_PRODUCT_SLUG } from "./helpers";
 
 /**
- * Catalogue-backed checks — local only (the CI runner has no database).
+ * Catalogue-backed checks: local only (the CI runner has no database).
  */
 test.describe("PDP @db", () => {
   test("product page renders with Product JSON-LD and the OG card", async ({ page }) => {
@@ -29,7 +29,7 @@ test.describe("PDP @db", () => {
 
   test("cart page renders for a fresh visitor", async ({ page }) => {
     // Cart is localStorage-backed (no DB), but lives here with a real
-    // navigation flow; keep it deterministic — fresh context = empty cart.
+    // navigation flow; keep it deterministic: fresh context = empty cart.
     // The page has no <h1> (heading lives in client components), so assert
     // the layout's <main> landmark instead.
     const res = await page.goto("/en/cart");

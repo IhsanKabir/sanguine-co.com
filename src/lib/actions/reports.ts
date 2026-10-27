@@ -68,7 +68,7 @@ export async function getSalesData(range: DateRange) {
   `);
 
   const byCity = await db.execute<{ city: string; count: number; total: number }>(sql`
-    select coalesce(${schema.orders.shippingAddress}->>'city', '—') as city,
+    select coalesce(${schema.orders.shippingAddress}->>'city', '-') as city,
            count(*)::int as count,
            coalesce(sum(${netOrderRevenue}), 0)::int as total
     from ${schema.orders}
@@ -134,7 +134,7 @@ export async function getCodReconciliation(range: DateRange) {
     count: number;
     total: number;
   }>(sql`
-    select coalesce(${schema.orders.shippingCourier}, '— not booked') as courier,
+    select coalesce(${schema.orders.shippingCourier}, 'Not booked') as courier,
            ${schema.orders.status} as status,
            count(*)::int as count,
            coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total

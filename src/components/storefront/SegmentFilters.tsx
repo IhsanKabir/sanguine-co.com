@@ -133,7 +133,7 @@ export default function SegmentFilters(props: Props) {
       {/* ── Full filter body (always visible on desktop, toggle on mobile) ── */}
       <div id="filter-body" className={"filter-body" + (filterOpen ? " open" : "")}>
         <div className="filter-body-inner">
-          {/* Sort — desktop only (mobile has inline select above) */}
+          {/* Sort: desktop only (mobile has inline select above) */}
           <label className="filter-group filter-sort-desktop">
             <span className="filter-label">{tr("filters.sort")}</span>
             <select

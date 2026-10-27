@@ -5,8 +5,8 @@ import { DEFAULT_SHIPPING_RULES, type ShippingRules } from "@/lib/pricing";
 
 /**
  * The saved shipping rules (Admin → Settings), handed down from the locale
- * layout so browser-side components — cart drawer, cart page, checkout,
- * loyalty card — quote exactly what createCodOrder will charge.
+ * layout so browser-side components: cart drawer, cart page, checkout,
+ * loyalty card: quote exactly what createCodOrder will charge.
  */
 const ShippingRulesContext = createContext<ShippingRules>(DEFAULT_SHIPPING_RULES);
 

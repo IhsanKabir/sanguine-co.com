@@ -134,7 +134,7 @@ export default function InventoryClient({ products, segments, canSeeRevenue, pen
                     </div>
                   </td>
                   <td className="mono" style={{ fontSize: 11, color: "var(--ink-soft)" }}>{p.sku}</td>
-                  <td>{seg?.name || "—"}</td>
+                  <td>{seg?.name || "-"}</td>
                   <td style={{ fontWeight: 500, color: h === "critical" || h === "out" ? "var(--err)" : "inherit" }}>
                     {p.stock}
                     {tracked.has(p.id) && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 400, color: "var(--ink-soft)" }}>per option</span>}

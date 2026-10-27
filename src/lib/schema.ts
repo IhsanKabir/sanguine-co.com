@@ -46,15 +46,15 @@ export const products = pgTable("products", {
   preorderEnabled: boolean("preorder_enabled").default(false).notNull(),
   preorderOnly: boolean("preorder_only").default(false).notNull(),
   estimatedDelivery: text("estimated_delivery"),   // e.g. "4–6 weeks"
-  preorderPriceBdt: integer("preorder_price_bdt"), // DEPRECATED (0016) — kept for rollback; app no longer reads it
+  preorderPriceBdt: integer("preorder_price_bdt"), // DEPRECATED (0016): kept for rollback; app no longer reads it
   // Quotation-driven pricing (0016): the actual price of a preorder piece is
   // set by quotation after research; until then the catalogue carries at most
   // an estimated range. Deposit % of the quoted price is what the customer
-  // prepays — null falls back to site_settings.commerce.preorderDepositPct.
+  // prepays: null falls back to site_settings.commerce.preorderDepositPct.
   priceMinBdt: integer("price_min_bdt"),
   priceMaxBdt: integer("price_max_bdt"),
   preorderDepositPct: integer("preorder_deposit_pct"),
-  // Per-product return window override — null falls back to the global default.
+  // Per-product return window override: null falls back to the global default.
   returnWindowDays: integer("return_window_days"),
   modelNote: text("model_note"),
   // Materials / composition and care instructions (0018). Plain text.
@@ -154,7 +154,7 @@ export const orders = pgTable("orders", {
   shippingTracking: text("shipping_tracking"),
   couponCode: text("coupon_code"),
   couponDiscountBdt: integer("coupon_discount_bdt").default(0).notNull(),
-  // Prepaid preorder deposit (0017) — a PAYMENT already received, distinct
+  // Prepaid preorder deposit (0017): a PAYMENT already received, distinct
   // from discounts: refunds cap at totalBdt + depositPaidBdt, revenue counts
   // totalBdt + depositPaidBdt, the courier collects totalBdt.
   depositPaidBdt: integer("deposit_paid_bdt").default(0).notNull(),
@@ -376,7 +376,7 @@ export const preorderRequests = pgTable("preorder_requests", {
   // 'new' | 'reviewing' | 'quoted' | 'confirmed' | 'rejected' | 'converted'
   adminNotes: text("admin_notes"),
   quotedPriceBdt: integer("quoted_price_bdt"),   // PER-UNIT quote (owner decision 2026-07-13)
-  // Snapshot of what the customer was shown at request time (0016) — the
+  // Snapshot of what the customer was shown at request time (0016): the
   // quote can differ from the estimate, but the estimate must be on record.
   advertisedMinBdt: integer("advertised_min_bdt"),
   advertisedMaxBdt: integer("advertised_max_bdt"),
@@ -401,7 +401,7 @@ export type PreorderRequest = typeof preorderRequests.$inferSelect;
  * Canonical shape of `orders.shippingAddress` jsonb. All fields optional so a
  * single parser handles every historical row safely. Always use
  * `parseShippingAddress(jsonb)` before reading individual fields rather than
- * casting inline — historical orders or future regressions may have missing
+ * casting inline: historical orders or future regressions may have missing
  * fields and inline casts will silently produce `undefined.foo` accesses.
  */
 export type ShippingAddress = {

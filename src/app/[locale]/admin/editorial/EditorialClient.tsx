@@ -24,7 +24,7 @@ export default function EditorialClient({
   const [email, setEmail] = useState(initialEmail);
   // Keep one map per locale of *current* values (override if set, otherwise
   // the static default). Sending equality with the default on save signals
-  // "no override" — we strip those server-side.
+  // "no override": we strip those server-side.
   const [en, setEn] = useState<Map>(() => mergeWithDefaults(defaultsEn, overridesEn));
   const [bn, setBn] = useState<Map>(() => mergeWithDefaults(defaultsBn, overridesBn));
   const [filter, setFilter] = useState("");
@@ -86,7 +86,7 @@ export default function EditorialClient({
     return { en: diff(en, defaultsEn), bn: diff(bn, defaultsBn) };
   };
 
-  // Both panels save the same underlying state — the form is one editable
+  // Both panels save the same underlying state: the form is one editable
   // surface, the buttons are just two affordances. The brand row holds the
   // (non-i18n) contact email; copy overrides hold every customer-facing
   // string for both locales.
@@ -160,7 +160,7 @@ export default function EditorialClient({
           <label>Contact email</label>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4 }}>
-            Not localised — single value used in mailto links across the storefront.
+            Not localised: single value used in mailto links across the storefront.
           </div>
         </div>
 

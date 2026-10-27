@@ -2,7 +2,7 @@
  * Promote a Supabase Auth user to admin role.
  * Usage:  npx tsx scripts/make-admin.ts your-email@gmail.com
  *
- * Prerequisite: the user must already exist in Supabase Auth — i.e. they
+ * Prerequisite: the user must already exist in Supabase Auth: i.e. they
  * signed in once via magic link. This script writes role="admin" into
  * raw_app_meta_data so the requireAdmin() guard in src/lib/auth-utils.ts
  * lets them through.

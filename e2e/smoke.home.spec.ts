@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * Storefront skeleton renders in both locales without a database —
+ * Storefront skeleton renders in both locales without a database:
  * the canary for "the deploy is fundamentally broken".
  */
 test.describe("home smoke", () => {

@@ -1,9 +1,9 @@
 /**
  * Expand the catalogue with the 5 segments dropped from the curated launch.
- * All segments are HIDDEN (Draft) — they appear in admin but NOT on the storefront.
+ * All segments are HIDDEN (Draft): they appear in admin but NOT on the storefront.
  * Toggle live anytime via Admin → Segments → click the visibility icon.
  *
- * Idempotent — safe to run multiple times. Uses ON CONFLICT DO UPDATE so existing
+ * Idempotent: safe to run multiple times. Uses ON CONFLICT DO UPDATE so existing
  * data (including your test orders) is preserved.
  *
  * Usage:  npx tsx scripts/expand-catalogue.ts
@@ -49,14 +49,14 @@ const products: P[] = [
   // ─── Watches ───
   { id: "p017", sku: "WAT-REG-017", slug: "regent-automatic-41",   name: "Regent Automatic 41",   nameBn: "রিজেন্ট অটোমেটিক ৪১",        segmentId: "watches",    priceBdt: 175000, wasBdt: null,   stock: 3, tag: "new",  rating: 4.9, reviewCount: 4,  description: "41mm steel case, in-house automatic movement, violet sunray dial.",            descriptionBn: "৪১ মিমি স্টিল কেস, ইন-হাউস অটোমেটিক মুভমেন্ট, ভায়োলেট ডায়াল।",  colors: ["Violet Dial","Onyx Dial"], sizes: [] },
   { id: "p018", sku: "WAT-BAR-018", slug: "baroque-chronograph",   name: "Baroque Chronograph",   nameBn: "বারোক ক্রনোগ্রাফ",          segmentId: "watches",    priceBdt: 135000, wasBdt: null,   stock: 5, tag: null,   rating: 4.7, reviewCount: 8,  description: "Three-register chronograph. Exhibition caseback. Made in our atelier.",        descriptionBn: "তিন-রেজিস্টার ক্রনোগ্রাফ। প্রদর্শনী কেসব্যাক।",                colors: ["Gold","Steel"], sizes: [] },
-  { id: "p019", sku: "WAT-MIN-019", slug: "minuit-dress-watch",    name: "Minuit — Dress Watch", nameBn: "মিনুই — ড্রেস ঘড়ি",          segmentId: "watches",    priceBdt: 70000,  wasBdt: 82000, stock: 6, tag: "sale", rating: 4.8, reviewCount: 13, description: "A slim dress watch under a chemise sleeve. Cabochon crown.",                   descriptionBn: "একটি পাতলা ড্রেস ঘড়ি, ক্যাবোশন ক্রাউন।",                       colors: ["Amethyst"], sizes: [] },
+  { id: "p019", sku: "WAT-MIN-019", slug: "minuit-dress-watch",    name: "Minuit (Dress Watch", nameBn: "মিনুই) ড্রেস ঘড়ি",          segmentId: "watches",    priceBdt: 70000,  wasBdt: 82000, stock: 6, tag: "sale", rating: 4.8, reviewCount: 13, description: "A slim dress watch under a chemise sleeve. Cabochon crown.",                   descriptionBn: "একটি পাতলা ড্রেস ঘড়ি, ক্যাবোশন ক্রাউন।",                       colors: ["Amethyst"], sizes: [] },
   { id: "p020", sku: "WAT-CRO-020", slug: "crown-diver-300m",      name: "Crown Diver 300m",      nameBn: "ক্রাউন ডাইভার ৩০০মি",         segmentId: "watches",    priceBdt: 120000, wasBdt: null,   stock: 4, tag: null,   rating: 4.6, reviewCount: 7,  description: "300m water resistance. Ceramic bezel. Lume that holds through midnight.",       descriptionBn: "৩০০মি জল প্রতিরোধ। সিরামিক বেজেল।",                              colors: ["Violet","Noir"], sizes: [] },
 
   // ─── Anime ───
   { id: "p021", sku: "ANI-NIG-021", slug: "nightshade-volumes-1-5",   name: "Nightshade Volumes 1–5",   nameBn: "নাইটশেড খণ্ড ১–৫",            segmentId: "anime",      priceBdt: 4800, wasBdt: null, stock: 32, tag: null,   rating: 4.9, reviewCount: 38, description: "Box set of the cult shoujo classic. Original Japanese print run.",   descriptionBn: "শোজো ক্ল্যাসিকের বক্স সেট।",                colors: ["Box Set"], sizes: [] },
-  { id: "p022", sku: "ANI-FIG-022", slug: "figurine-moon-sovereign",  name: "Figurine — Moon Sovereign", nameBn: "ফিগারিন — মুন সভরিন",        segmentId: "anime",      priceBdt: 10300, wasBdt: null, stock: 11, tag: "new",  rating: 4.8, reviewCount: 14, description: "30cm articulated figurine. Cloth robe, painted face.",               descriptionBn: "৩০ সেমি আর্টিকুলেটেড ফিগারিন।",            colors: ["Standard","Deluxe"], sizes: [] },
+  { id: "p022", sku: "ANI-FIG-022", slug: "figurine-moon-sovereign",  name: "Figurine (Moon Sovereign", nameBn: "ফিগারিন) মুন সভরিন",        segmentId: "anime",      priceBdt: 10300, wasBdt: null, stock: 11, tag: "new",  rating: 4.8, reviewCount: 14, description: "30cm articulated figurine. Cloth robe, painted face.",               descriptionBn: "৩০ সেমি আর্টিকুলেটেড ফিগারিন।",            colors: ["Standard","Deluxe"], sizes: [] },
   { id: "p023", sku: "ANI-ART-023", slug: "art-of-the-violet-blade",  name: "Art of the Violet Blade",  nameBn: "ভায়োলেট ব্লেডের শিল্প",       segmentId: "anime",      priceBdt: 4100,  wasBdt: 5100, stock: 18, tag: "sale", rating: 4.7, reviewCount: 22, description: "Concept art and storyboards from the cult film.",                    descriptionBn: "কাল্ট চলচ্চিত্রের কনসেপ্ট আর্ট।",            colors: ["Hardcover"], sizes: [] },
-  { id: "p024", sku: "ANI-RES-024", slug: "resin-statue-oracle",      name: "Resin Statue — Oracle",    nameBn: "রেজিন স্ট্যাচু — ওরাকল",       segmentId: "anime",      priceBdt: 20500, wasBdt: null, stock: 2,  tag: null,   rating: 4.9, reviewCount: 5,  description: "Limited 200-piece run. Numbered base, cold-cast resin.",             descriptionBn: "সীমিত ২০০ পিসের রান।",                       colors: ["Limited"], sizes: [] },
+  { id: "p024", sku: "ANI-RES-024", slug: "resin-statue-oracle",      name: "Resin Statue (Oracle",    nameBn: "রেজিন স্ট্যাচু) ওরাকল",       segmentId: "anime",      priceBdt: 20500, wasBdt: null, stock: 2,  tag: null,   rating: 4.9, reviewCount: 5,  description: "Limited 200-piece run. Numbered base, cold-cast resin.",             descriptionBn: "সীমিত ২০০ পিসের রান।",                       colors: ["Limited"], sizes: [] },
 
   // ─── Flowers (Dhaka-only when launched) ───
   { id: "p013", sku: "FLO-VIO-013", slug: "violet-noir-bouquet",    name: "Violet Noir Bouquet", nameBn: "ভায়োলেট নয়ার তোড়া",   segmentId: "flowers",    priceBdt: 7000,  wasBdt: null,  stock: 18, tag: "new",  rating: 4.9, reviewCount: 24, description: "Dark violets, black calla lily, sprig of rosemary. Hand-tied, wax-sealed card.", descriptionBn: "গাঢ় ভায়োলেট, কালো ক্যালা লিলি।",  colors: ["Small","Medium","Grand"], sizes: [] },
@@ -67,7 +67,7 @@ const products: P[] = [
   // ─── Boardgames ───
   { id: "p033", sku: "BRD-COU-033", slug: "courts-of-the-violet-throne",  name: "Courts of the Violet Throne", nameBn: "ভায়োলেট সিংহাসনের দরবার",  segmentId: "boardgames", priceBdt: 5500,  wasBdt: null, stock: 28, tag: "new",  rating: 4.9, reviewCount: 52, description: "A 2–6 player strategy game of court intrigue and slow betrayal. 90–120 mins.", descriptionBn: "২–৬ খেলোয়াড়ের কৌশল গেম।",  colors: ["Standard","Deluxe"], sizes: [] },
   { id: "p034", sku: "BRD-CAR-034", slug: "the-cartographers-dilemma",    name: "The Cartographer's Dilemma", nameBn: "মানচিত্রকারের দ্বিধা",      segmentId: "boardgames", priceBdt: 4400,  wasBdt: null, stock: 19, tag: null,   rating: 4.7, reviewCount: 33, description: "Solo or 2-player. Draw maps of imagined worlds. 45 mins per session.",          descriptionBn: "সলো বা ২-প্লেয়ার। কাল্পনিক জগতের মানচিত্র আঁকুন।", colors: ["Standard"], sizes: [] },
-  { id: "p035", sku: "BRD-NOC-035", slug: "nocturne-card-game",           name: "Nocturne — Card Game",        nameBn: "নকটার্ন — কার্ড গেম",        segmentId: "boardgames", priceBdt: 2500,  wasBdt: 3200, stock: 38, tag: "sale", rating: 4.5, reviewCount: 71, description: "78-card trick-taking game. Beautiful suits.",                                  descriptionBn: "৭৮-কার্ড ট্রিক-টেকিং গেম।",   colors: ["Standard"], sizes: [] },
+  { id: "p035", sku: "BRD-NOC-035", slug: "nocturne-card-game",           name: "Nocturne (Card Game",        nameBn: "নকটার্ন) কার্ড গেম",        segmentId: "boardgames", priceBdt: 2500,  wasBdt: 3200, stock: 38, tag: "sale", rating: 4.5, reviewCount: 71, description: "78-card trick-taking game. Beautiful suits.",                                  descriptionBn: "৭৮-কার্ড ট্রিক-টেকিং গেম।",   colors: ["Standard"], sizes: [] },
   { id: "p036", sku: "BRD-ORC-036", slug: "orchid-and-iron",              name: "Orchid & Iron",                nameBn: "অর্কিড ও লোহা",              segmentId: "boardgames", priceBdt: 6800,  wasBdt: null, stock: 9,  tag: null,   rating: 4.8, reviewCount: 14, description: "Asymmetric 2-player game. One side is the orchid, the other the iron.",        descriptionBn: "অসমমিতিক ২-প্লেয়ার গেম।",    colors: ["Collector"], sizes: [] },
 ];
 
@@ -117,7 +117,7 @@ const products: P[] = [
   const [{ seg_count }] = await sql<[{ seg_count: number }]>`select count(*)::int as seg_count from segments`;
   const [{ prod_count }] = await sql<[{ prod_count: number }]>`select count(*)::int as prod_count from products`;
   console.log(`✓ Done. DB now has ${seg_count} segments and ${prod_count} products.`);
-  console.log(`  All ${segments.length} new segments are HIDDEN — invisible on storefront.`);
+  console.log(`  All ${segments.length} new segments are HIDDEN: invisible on storefront.`);
   console.log(`  Toggle live anytime via Admin → Segments → click the visibility icon.`);
   await sql.end();
 })().catch(async (e) => {

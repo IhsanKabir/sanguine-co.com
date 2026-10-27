@@ -11,7 +11,7 @@ const KEY = "ssg-session-fired";
  * Fires `session_start` once per browser session (sessionStorage)
  * and `page_view` on every route change. Mounted in the locale layout.
  *
- * Gated on the user's cookie-consent choice — if they have not consented
+ * Gated on the user's cookie-consent choice: if they have not consented
  * (or have explicitly declined), no events are sent. PDPO 2025 compliance.
  */
 export default function SessionTracker() {

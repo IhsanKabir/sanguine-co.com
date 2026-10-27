@@ -24,7 +24,7 @@ export default async function TopNav() {
   try {
     segments = await getVisibleSegments();
   } catch {
-    // DB not configured yet — the storefront still renders.
+    // DB not configured yet: the storefront still renders.
   }
 
   const segmentData = segments.map((s) => ({ id: s.id, name: s.name }));

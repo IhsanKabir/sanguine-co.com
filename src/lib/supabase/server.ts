@@ -19,7 +19,7 @@ export async function createSupabaseServerClient() {
               cookieStore.set(name, value, options);
             });
           } catch {
-            // Server Components cannot set cookies — this is called from
+            // Server Components cannot set cookies: this is called from
             // a layout/page where mutations aren't allowed. Safe to ignore;
             // the middleware refreshes sessions properly.
           }

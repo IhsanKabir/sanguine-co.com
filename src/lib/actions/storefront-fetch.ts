@@ -15,7 +15,7 @@ export type StorefrontProductLite = {
   nameBn: string | null;
   priceBdt: number;
   wasBdt: number | null;
-  // Quotation-pricing fields — without them client cards render raw ৳0 for
+  // Quotation-pricing fields: without them client cards render raw ৳0 for
   // preorder/estimate products instead of the range / on-request label.
   preorderOnly: boolean;
   priceMinBdt: number | null;

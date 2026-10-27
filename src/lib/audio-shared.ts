@@ -5,7 +5,7 @@ import { z } from "zod";
  *
  * Split from audio-settings.ts deliberately: that module imports the
  * Drizzle/postgres client, so anything a "use client" component needs at
- * runtime (the kind list, the schemas, the types) must live here instead —
+ * runtime (the kind list, the schemas, the types) must live here instead:
  * otherwise the DB driver gets pulled into the browser bundle and the
  * production build fails.
  */

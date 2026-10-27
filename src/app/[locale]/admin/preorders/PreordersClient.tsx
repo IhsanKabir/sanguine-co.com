@@ -50,7 +50,7 @@ export default function PreordersClient({ requests, segments, linkedOrders }: Pr
   const [filter, setFilter] = useState<string>("all");
   const [selected, setSelected] = useState<PreorderRequest | null>(null);
   const [, startTransition] = useTransition();
-  const segName = (id: string | null) => id ? (segments.find((s) => s.id === id)?.name ?? id) : "—";
+  const segName = (id: string | null) => id ? (segments.find((s) => s.id === id)?.name ?? id) : "-";
 
   const visible = useMemo(
     () => filter === "all" ? requests : requests.filter((r) => r.status === filter),
@@ -109,7 +109,7 @@ export default function PreordersClient({ requests, segments, linkedOrders }: Pr
               <tr key={r.id} style={{ cursor: "pointer" }} onClick={() => startTransition(() => setSelected(r))}>
                 <td style={{ fontSize: 12, color: "var(--ink-soft)" }}>{formatDate(new Date(r.createdAt))}</td>
                 <td>
-                  <div style={{ fontWeight: 500 }}>{r.customerName || "—"}</div>
+                  <div style={{ fontWeight: 500 }}>{r.customerName || "-"}</div>
                   <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>{r.customerEmail}</div>
                 </td>
                 <td>{segName(r.segmentId)}</td>
@@ -118,7 +118,7 @@ export default function PreordersClient({ requests, segments, linkedOrders }: Pr
                 </td>
                 <td>{(r.attachments ?? []).length}</td>
                 <td><span className={"pill " + (STATUS_PILL[r.status] || "pill-info")}>{r.status}</span></td>
-                <td style={{ textAlign: "right", fontWeight: 500 }}>{r.quotedPriceBdt ? formatBdt(r.quotedPriceBdt) : <span style={{ color: "var(--ink-soft)" }}>—</span>}</td>
+                <td style={{ textAlign: "right", fontWeight: 500 }}>{r.quotedPriceBdt ? formatBdt(r.quotedPriceBdt) : <span style={{ color: "var(--ink-soft)" }}>-</span>}</td>
               </tr>
             ))}
           </tbody>
@@ -244,7 +244,7 @@ function DetailDrawer({
           {/* Customer */}
           <div className="field"><label>Customer</label>
             <div style={{ fontSize: 14, lineHeight: 1.6 }}>
-              {request.customerName || "—"}<br/>
+              {request.customerName || "-"}<br/>
               <a href={`mailto:${request.customerEmail}`} style={{ color: "var(--purple-900)" }}>{request.customerEmail}</a>
               {request.customerPhone && <> · <a href={`tel:${request.customerPhone}`} style={{ color: "var(--purple-900)" }}>{request.customerPhone}</a></>}
             </div>
@@ -271,7 +271,7 @@ function DetailDrawer({
                 <label>Delivery address</label>
                 <div style={{ fontSize: 14, lineHeight: 1.5 }}>
                   {addr.line1}<br/>
-                  {addr.area ? addr.area + ", " : ""}{addr.city}{addr.postcode ? " — " + addr.postcode : ""}
+                  {addr.area ? addr.area + ", " : ""}{addr.city}{addr.postcode ? " " + addr.postcode : ""}
                 </div>
               </div>
             )}
@@ -300,7 +300,7 @@ function DetailDrawer({
             </div>
           )}
 
-          {/* Quote section — visible while not yet final */}
+          {/* Quote section: visible while not yet final */}
           {request.status !== "rejected" && request.status !== "converted" && (
             <div style={{ marginTop: 24, padding: 18, background: "#f9f4ec", border: "1px solid var(--gold-deep)" }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "var(--gold-deep)", marginBottom: 12 }}>QUOTE</div>
@@ -311,7 +311,7 @@ function DetailDrawer({
                 </div>
                 <div className="field">
                   <label>Total ({request.quantity}×)</label>
-                  <div style={{ fontSize: 18, fontFamily: "var(--serif)", padding: "10px 0" }}>{quotePrice ? formatBdt(parseInt(quotePrice, 10) * request.quantity) : "—"}</div>
+                  <div style={{ fontSize: 18, fontFamily: "var(--serif)", padding: "10px 0" }}>{quotePrice ? formatBdt(parseInt(quotePrice, 10) * request.quantity) : "-"}</div>
                 </div>
               </div>
               <div className="field" style={{ marginTop: 8 }}>
@@ -329,13 +329,13 @@ function DetailDrawer({
             </div>
           )}
 
-          {/* Deposit gate — a quoted request converts at FULL price until the
+          {/* Deposit gate: a quoted request converts at FULL price until the
               bKash deposit is marked received; 'confirmed' deducts it. */}
           {request.status === "quoted" && request.quotedPriceBdt && request.depositBdt ? (
             <div style={{ marginTop: 16, padding: 18, background: "#fdf6e8", border: "1px solid #e8d8a8" }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "#a07e2c", marginBottom: 8 }}>DEPOSIT · {formatBdt(request.depositBdt)}</div>
               <p style={{ fontSize: 13, color: "#6b5a2a", margin: "0 0 12px", lineHeight: 1.6 }}>
-                Once the customer&apos;s bKash prepayment of {formatBdt(request.depositBdt)} arrives, mark it received —
+                Once the customer&apos;s bKash prepayment of {formatBdt(request.depositBdt)} arrives, mark it received:
                 the converted order will then collect {formatBdt(request.quotedPriceBdt * request.quantity - request.depositBdt)} on delivery.
                 Converting <b>without</b> marking it charges the full {formatBdt(request.quotedPriceBdt * request.quantity)} COD.
               </p>
@@ -347,7 +347,7 @@ function DetailDrawer({
                   const res = await markPreorderDepositReceived(request.id);
                   if (res && "error" in res && res.error) { alert(res.error); return; }
                   // House pattern (quote/convert/reject do the same): close on
-                  // success — the revalidated list shows the CONFIRMED pill.
+                  // success: the revalidated list shows the CONFIRMED pill.
                   // Leaving the dialog open rendered stale quoted-state UI.
                   onClose();
                 })}
@@ -357,15 +357,15 @@ function DetailDrawer({
             </div>
           ) : null}
 
-          {/* Convert action — quoted (full COD) or confirmed (deposit deducted) */}
+          {/* Convert action: quoted (full COD) or confirmed (deposit deducted) */}
           {(request.status === "quoted" || request.status === "confirmed") && request.quotedPriceBdt && (
             <div style={{ marginTop: 16, padding: 18, background: "#eef7ee", border: "1px solid #4caf50" }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "#2e7d32", marginBottom: 8 }}>
-                {request.status === "confirmed" ? "DEPOSIT RECEIVED — READY TO CONVERT" : "CUSTOMER ACCEPTED?"}
+                {request.status === "confirmed" ? "DEPOSIT RECEIVED: READY TO CONVERT" : "CUSTOMER ACCEPTED?"}
               </div>
               <p style={{ fontSize: 13, color: "#2e4f33", margin: "0 0 12px", lineHeight: 1.6 }}>
                 {request.status === "confirmed"
-                  ? `The deposit is on record — the courier will collect the remainder on delivery.`
+                  ? `The deposit is on record: the courier will collect the remainder on delivery.`
                   : `Click below to convert this request into a real COD order. The customer will appear in your Orders queue and the piece will be paid for on delivery.`}
               </p>
               {showConvertConfirm ? (
@@ -409,12 +409,12 @@ function DetailDrawer({
           {/* Status footers for terminal states */}
           {request.status === "rejected" && request.rejectionReason && (
             <div style={{ marginTop: 16, padding: 14, background: "#fff4f4", border: "1px solid var(--err)", fontSize: 13, color: "#7a2828" }}>
-              <b>Rejected</b> — {request.rejectionReason}
+              <b>Rejected</b>: {request.rejectionReason}
             </div>
           )}
           {request.status === "converted" && request.convertedOrderId && (
             <div style={{ marginTop: 16, padding: 14, background: "#eef7ee", border: "1px solid #4caf50", fontSize: 13, color: "#2e4f33" }}>
-              <b>Converted</b> — order <Link href="/admin/orders" style={{ color: "#2e7d32", fontFamily: "var(--mono)" }}>{linkedOrder?.number ?? "created"}</Link>.
+              <b>Converted</b>: order <Link href="/admin/orders" style={{ color: "#2e7d32", fontFamily: "var(--mono)" }}>{linkedOrder?.number ?? "created"}</Link>.
               <BespokePipeline linkedOrder={linkedOrder} />
             </div>
           )}

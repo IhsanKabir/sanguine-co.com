@@ -78,7 +78,7 @@ export default function SearchDropdown() {
     setTimeout(() => inputRef.current?.focus(), 40);
   };
 
-  // Collapsed state — just the icon button.
+  // Collapsed state: just the icon button.
   if (!expanded) {
     return (
       <button
@@ -91,7 +91,7 @@ export default function SearchDropdown() {
     );
   }
 
-  // Expanded state — full search input with dropdown.
+  // Expanded state: full search input with dropdown.
   return (
     <div className="nav-search" ref={wrapRef}>
       <Icon name="search" size={16} />

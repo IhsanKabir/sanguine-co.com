@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Fineliner ornaments rendered as inline SVG. Three variants — `tide-line`,
- * `spiral`, `frond` — each ~80px tall. Used between major sections to give
+ * Fineliner ornaments rendered as inline SVG. Three variants: `tide-line`,
+ * `spiral`, `frond`: each ~80px tall. Used between major sections to give
  * the page a sense of pause without a heavy divider. Spare, geometric, hand-
  * drawn flavour but disciplined (no Disney-Celtic kitsch).
  *
@@ -56,7 +56,7 @@ function TideLine({ size }: { size: number }) {
   );
 }
 
-/** A simple spiral — Celtic-inspired but kept thin and geometric. */
+/** A simple spiral: Celtic-inspired but kept thin and geometric. */
 function Spiral({ size }: { size: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
@@ -74,7 +74,7 @@ function Spiral({ size }: { size: number }) {
   );
 }
 
-/** A sea-fern frond — single curved stem with three soft fronds. */
+/** A sea-fern frond: single curved stem with three soft fronds. */
 function Frond({ size }: { size: number }) {
   return (
     <svg width={size} height={size * 1.3} viewBox="0 0 80 104" fill="none">

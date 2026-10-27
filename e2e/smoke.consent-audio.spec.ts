@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 /**
  * EXECUTION-PLAN phase-1 spec ("audio-silent-without-consent"): a fresh
  * visitor who has NOT accepted cookies must trigger no audio whatsoever,
- * even after interacting — PDPO 2025 posture. Covers both the WebAudio
+ * even after interacting: PDPO 2025 posture. Covers both the WebAudio
  * synth path (AudioContext) and the new file path (HTMLAudioElement.play).
  */
 test("no audio without cookie consent, even after a click", async ({ page }) => {

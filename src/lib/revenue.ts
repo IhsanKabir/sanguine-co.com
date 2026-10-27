@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm";
 import { schema } from "@/lib/db";
 
 /**
- * What counts as revenue — ONE definition for the dashboard, analytics and
+ * What counts as revenue: ONE definition for the dashboard, analytics and
  * reports (they used to sum every order, cancelled ones included).
  *
  * - An order counts unless it is cancelled, or an online order whose payment

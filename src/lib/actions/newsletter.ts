@@ -16,7 +16,7 @@ export async function subscribeNewsletter(input: { email: string }): Promise<{ o
     ? parseInt(process.env.BREVO_NEWSLETTER_LIST_ID, 10)
     : null;
 
-  // Existing contacts don't get a second welcome letter — unconditionally
+  // Existing contacts don't get a second welcome letter: unconditionally
   // sending made this public action an unlimited email-anyone endpoint.
   // List membership is still refreshed below (idempotent upsert).
   const alreadySubscribed = await brevoContactExists(email);
@@ -38,7 +38,7 @@ export async function subscribeNewsletter(input: { email: string }): Promise<{ o
     await Promise.all(tasks);
   } catch (e) {
     captureError(e, { where: "subscribeNewsletter", email });
-    // Still return ok — the UX should not fail over an email send error.
+    // Still return ok: the UX should not fail over an email send error.
   }
 
   return { ok: true };

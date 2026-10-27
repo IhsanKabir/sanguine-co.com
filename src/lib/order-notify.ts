@@ -65,7 +65,7 @@ export async function notifyOrderPlaced(orderId: string): Promise<void> {
 
     if (phone) {
       const text = online
-        ? `Sanguine: order ${order.number} confirmed — ${formatBdt(order.totalBdt)} paid online. Nothing is due on delivery.`
+        ? `Sanguine: order ${order.number} confirmed. ${formatBdt(order.totalBdt)} paid online. Nothing is due on delivery.`
         : `Sanguine: order ${order.number} confirmed (COD ${formatBdt(order.totalBdt)}). Have cash ready for our courier.`;
       sendSms(phone, text)
         .then((r) => logOrderEvent({

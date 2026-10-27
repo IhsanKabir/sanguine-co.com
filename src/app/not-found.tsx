@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { fontClasses } from "./fonts";
 
-// Root-level 404 — reached only for paths outside the [locale] tree (the
+// Root-level 404: reached only for paths outside the [locale] tree (the
 // middleware redirects almost everything into a locale). Because the root
 // layout is a pass-through, this document renders its own <html>/<body>;
 // localized 404s live in [locale]/not-found.tsx.

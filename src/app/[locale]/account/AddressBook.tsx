@@ -146,9 +146,9 @@ export default function AddressBook({
                 )}
               </div>
               <div style={{ fontSize: 13, lineHeight: 1.6 }}>
-                <b>{a.fullName ?? "—"}</b><br />
+                <b>{a.fullName ?? "-"}</b><br />
                 {a.line1}{a.line2 ? `, ${a.line2}` : ""}<br />
-                {a.area ? `${a.area}, ` : ""}{a.city}{a.postcode ? ` — ${a.postcode}` : ""}<br />
+                {a.area ? `${a.area}, ` : ""}{a.city}{a.postcode ? ` ${a.postcode}` : ""}<br />
                 {a.phone}
               </div>
               <div style={{ display: "flex", gap: 6, marginTop: 12, alignItems: "center", flexWrap: "wrap" }}>

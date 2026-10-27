@@ -2,10 +2,10 @@
  * Role-based access control. Stored in Supabase auth.users.app_metadata.
  *
  * Roles:
- *   owner    — created via create-admin.ts. Single source of truth. Manages users.
- *   admin    — full access except /admin/users.
- *   subadmin — granular per-section access via `permissions` array.
- *   customer — default for any signed-in user that is not admin.
+ *   owner   : created via create-admin.ts. Single source of truth. Manages users.
+ *   admin   : full access except /admin/users.
+ *   subadmin: granular per-section access via `permissions` array.
+ *   customer: default for any signed-in user that is not admin.
  */
 
 export const PERMISSIONS = [

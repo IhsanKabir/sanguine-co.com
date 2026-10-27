@@ -48,7 +48,7 @@ export async function getAdminContext(): Promise<AdminContext | null> {
 
 /**
  * Allow any admin-tier role into the section. Used by the /admin layout.
- * Sub-admins still pass — their nav and per-page guards filter them down.
+ * Sub-admins still pass: their nav and per-page guards filter them down.
  */
 export async function requireAdmin(): Promise<AdminContext> {
   const ctx = await getAdminContext();

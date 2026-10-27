@@ -1,11 +1,11 @@
--- Sanguine — Append-only events log per order
+-- Sanguine: Append-only events log per order
 --
 -- One row per material thing that happens to an order: created, status change,
 -- courier booked, refund issued, customer email sent, etc. Renders as a
 -- timeline in the admin order drawer so the operator can see the full story.
 --
 -- Append-only by convention (no UPDATE / DELETE in app code). RLS service-role
--- only — admins read via server actions.
+-- only: admins read via server actions.
 
 create table if not exists order_events (
   id uuid primary key default gen_random_uuid(),

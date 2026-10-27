@@ -50,7 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       );
     }
   } catch {
-    // DB unavailable — return static-only sitemap
+    // DB unavailable: return static-only sitemap
   }
 
   return [...staticRoutes, ...segmentRoutes, ...productRoutes];

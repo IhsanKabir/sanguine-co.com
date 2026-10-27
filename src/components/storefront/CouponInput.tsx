@@ -45,7 +45,7 @@ export default function CouponInput({ compact = false }: { compact?: boolean }) 
         <div className="ca-body">
           <div className="ca-code">
             <b>{coupon.code}</b>
-            {coupon.description && <span className="ca-desc"> — {coupon.description}</span>}
+            {coupon.description && <span className="ca-desc"> · {coupon.description}</span>}
           </div>
           <div className="ca-savings">
             {coupon.freeShipping ? t("coupon.freeShipping") : t("coupon.saving", { amount: formatBdt(coupon.discountBdt, locale) })}

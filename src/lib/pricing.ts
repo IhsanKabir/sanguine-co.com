@@ -4,13 +4,13 @@ import { formatBdt } from "./utils";
  * Quotation-driven pricing (IMPROVEMENT-PLAN Phase 1, owner decisions 2026-07-13).
  *
  * A piece is either:
- *  - fixed  — regular stocked product with a real price (priceBdt >= 1), or
- *  - estimate — preorder-only with an owner-researched range (priceMinBdt–priceMaxBdt),
- *  - quote  — preorder-only with no estimate yet: "price on quotation".
+ *  - fixed : regular stocked product with a real price (priceBdt >= 1), or
+ *  - estimate: preorder-only with an owner-researched range (priceMinBdt–priceMaxBdt),
+ *  - quote : preorder-only with no estimate yet: "price on quotation".
  *
  * The customer prepays a DEPOSIT = pct × the eventually-quoted per-unit price.
  * The pct comes from the product override or the global commerce setting.
- * Pure module — safe in server and client components; DB reads live in
+ * Pure module: safe in server and client components; DB reads live in
  * `lib/commerce.ts`.
  */
 
@@ -40,7 +40,7 @@ export const DEFAULT_SHIPPING_RULES: ShippingRules = {
 
 /**
  * The one shipping calculation. The cart, the drawer and checkout show it;
- * createCodOrder charges it — same function, so the quote and the charge
+ * createCodOrder charges it: same function, so the quote and the charge
  * cannot disagree. A threshold of 0 disables free shipping.
  */
 export function shippingFor(rules: ShippingRules, city: string, subtotalBdt: number): number {
@@ -76,7 +76,7 @@ export function priceDisplay(p: PriceFields): PriceDisplay {
 }
 
 /**
- * The numeric part of a price display — "" for quote-only pieces so callers
+ * The numeric part of a price display: "" for quote-only pieces so callers
  * must render their own localized "Price on quotation" label.
  */
 export function priceDisplayText(d: PriceDisplay, locale: "en" | "bn" = "en"): string {
@@ -118,7 +118,7 @@ export function effectiveReturnWindowDays(
 }
 
 /**
- * schema.org offer fields for a product — never emits a zero price. Returns
+ * schema.org offer fields for a product: never emits a zero price. Returns
  * null when the piece is quote-only (a priced Offer would be a lie; the PDP
  * omits `offers` entirely in that case).
  */

@@ -22,7 +22,7 @@ import {
  * Admin actions for the uploadable ambient audio (EXECUTION-PLAN 4.2).
  *
  * The browser uploads straight to the `audio` Storage bucket with the
- * admin's session JWT (RLS enforces the `settings` permission — see
+ * admin's session JWT (RLS enforces the `settings` permission: see
  * migration 0015), then calls `saveAudioFile` to record the URL. Mirrors
  * the product-images flow so there is one upload idiom in the codebase.
  */
@@ -38,7 +38,7 @@ const saveSchema = z.object({
   sizeBytes: z.number().int().positive(),
 });
 
-/** The only origin we accept audio URLs from — our own public bucket. */
+/** The only origin we accept audio URLs from: our own public bucket. */
 function bucketPrefix(): string | null {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
   return base ? `${base}/storage/v1/object/public/${BUCKET}/` : null;
@@ -57,7 +57,7 @@ async function persist(next: AudioSettings): Promise<void> {
   }
 }
 
-/** Remove a blob from the bucket, best-effort — an orphan is not worth failing the save. */
+/** Remove a blob from the bucket, best-effort: an orphan is not worth failing the save. */
 async function removeBlob(path: string): Promise<void> {
   try {
     const sb = createSupabaseServiceClient();
@@ -78,7 +78,7 @@ export async function saveAudioFile(
 
   // NOTE: sizeBytes is browser-reported (the file went direct-to-bucket, so
   // this action never sees the bytes). The bucket's 256 KB file_size_limit
-  // (migration 0015) is the actual enforcement — this check is UX only.
+  // (migration 0015) is the actual enforcement: this check is UX only.
   if (sizeBytes > MAX_BYTES) {
     return { ok: false, error: "File is over the 250 KB limit." };
   }
@@ -95,10 +95,10 @@ export async function saveAudioFile(
     ...current,
     [kind]: { url, path, label, uploadedAt: new Date().toISOString() },
   });
-  // Replacing a sound leaves the old blob behind — clean it up after the
+  // Replacing a sound leaves the old blob behind: clean it up after the
   // settings row is safely written. Known TOCTOU: two simultaneous saves of
   // the same kind can orphan one blob (read → persist isn't transactional
-  // with Storage). Worst case is an orphaned file, never a broken setting —
+  // with Storage). Worst case is an orphaned file, never a broken setting:
   // removeBlob is best-effort by design, so we accept this for a three-file
   // bucket rather than adding locking.
   if (previous && previous.path !== path) await removeBlob(previous.path);

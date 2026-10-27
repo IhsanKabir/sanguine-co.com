@@ -1,4 +1,4 @@
-# Sanguine — Web
+# Sanguine: Web
 
 Production storefront for Sanguine. Bangladesh, COD-first soft launch.
 
@@ -31,7 +31,7 @@ npm run db:seed         # imports curated 12 products
 npm run dev
 ```
 
-Open <http://localhost:3000> — auto-redirects to `/en` (or `/bn` based on Accept-Language).
+Open <http://localhost:3000>: auto-redirects to `/en` (or `/bn` based on Accept-Language).
 
 ## Project structure
 

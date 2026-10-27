@@ -18,7 +18,7 @@ export default async function NewManualOrderPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  // Pull only live products in visible segments — same filter as the storefront.
+  // Pull only live products in visible segments: same filter as the storefront.
   const visibleSegmentIds = (
     await db.select({ id: schema.segments.id }).from(schema.segments).where(eq(schema.segments.hidden, false))
   ).map((s) => s.id);

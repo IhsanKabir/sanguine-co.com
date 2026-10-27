@@ -48,7 +48,7 @@
 .seg-btn:disabled { opacity: .3; cursor: not-allowed; }
 .seg-btn.danger:hover { color: var(--err); border-color: var(--err); }
 
-/* Admin modals — soft scale + fade entrance, oceanic register.
+/* Admin modals: soft scale + fade entrance, oceanic register.
  * Origin point at the centre so it reads as a panel rising into focus rather
  * than dropping in. Reduced-motion handled at the bottom of this file. */
 .seg-modal {

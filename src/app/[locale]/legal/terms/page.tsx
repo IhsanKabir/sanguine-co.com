@@ -26,11 +26,11 @@ function EnglishSection() {
       <p>Sanguine is a small maison operating from Dhaka, Bangladesh. We compose pieces, source pieces, and deliver them to your door. Our contact email is <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>.</p>
 
       <h2>Orders</h2>
-      <p>When you place an order, you make an offer to buy. The maison accepts the offer when we send you an order confirmation by email. Until that moment we may decline the order &mdash; for instance, if a piece is unexpectedly unavailable or the delivery address is outside our courier network.</p>
+      <p>When you place an order, you make an offer to buy. The maison accepts the offer when we send you an order confirmation by email. Until that moment we may decline the order, for instance if a piece is unexpectedly unavailable or the delivery address is outside our courier network.</p>
       <p>For bespoke pre-order requests, you submit a request and we return a quote. The quote is an offer from the maison; you accept it by reply, and only at that point is an order created.</p>
 
       <h2>Pricing and payment</h2>
-      <p>All prices are in Bangladeshi Taka (৳ / BDT). At present, all orders are paid for in cash on delivery &mdash; no deposit, no online payment, no card on file. The courier collects the full amount on arrival.</p>
+      <p>All prices are in Bangladeshi Taka (৳ / BDT). At present, all orders are paid for in cash on delivery: no deposit, no online payment, no card on file. The courier collects the full amount on arrival.</p>
       <p>We do not yet collect VAT. When the maison&rsquo;s Trade Licence and VAT registration become active, we will say so plainly and adjust the displayed prices to be inclusive of any required VAT.</p>
 
       <h2>Delivery</h2>
@@ -47,7 +47,7 @@ function EnglishSection() {
       <p>The text, photographs, illustrations, and other content on this site are the property of the maison or used with permission. You may save and share them for personal, non-commercial use; you may not republish them without asking.</p>
 
       <h2>Limitation of liability</h2>
-      <p>To the extent permitted by Bangladeshi law, the maison&rsquo;s liability for any single order is limited to the value of that order. Nothing in these terms limits liability that cannot, by law, be limited &mdash; for instance, in the case of personal injury caused by negligence.</p>
+      <p>To the extent permitted by Bangladeshi law, the maison&rsquo;s liability for any single order is limited to the value of that order. Nothing in these terms limits liability that cannot, by law, be limited, for instance in the case of personal injury caused by negligence.</p>
 
       <h2>Disputes</h2>
       <p>If something goes wrong, please write to <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a> first. We will try to resolve the matter directly. If a dispute remains, the courts of Dhaka, Bangladesh have exclusive jurisdiction, and Bangladeshi law applies.</p>
@@ -75,11 +75,11 @@ function BangleSection() {
       <p>সাঙ্গুইন একটি ছোট মেইসন, যা ঢাকা, বাংলাদেশ থেকে পরিচালিত। আমরা পিস তৈরি ও সংগ্রহ করি এবং আপনার দরজায় পৌঁছে দিই। যোগাযোগের ইমেইল: <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
 
       <h2>অর্ডার</h2>
-      <p>আপনি অর্ডার দিলে সেটি একটি ক্রয়ের প্রস্তাব হিসেবে গণ্য হয়। মেইসন প্রস্তাবটি গ্রহণ করে যখন আমরা আপনাকে ইমেইলে অর্ডার নিশ্চিতকরণ পাঠাই। তার আগ পর্যন্ত আমরা অর্ডার প্রত্যাখ্যান করতে পারি &mdash; যেমন কোনো পিস হঠাৎ অপ্রাপ্য হলে কিংবা ডেলিভারি ঠিকানা আমাদের কুরিয়ার নেটওয়ার্কের বাইরে হলে।</p>
+      <p>আপনি অর্ডার দিলে সেটি একটি ক্রয়ের প্রস্তাব হিসেবে গণ্য হয়। মেইসন প্রস্তাবটি গ্রহণ করে যখন আমরা আপনাকে ইমেইলে অর্ডার নিশ্চিতকরণ পাঠাই। তার আগ পর্যন্ত আমরা অর্ডার প্রত্যাখ্যান করতে পারি: যেমন কোনো পিস হঠাৎ অপ্রাপ্য হলে কিংবা ডেলিভারি ঠিকানা আমাদের কুরিয়ার নেটওয়ার্কের বাইরে হলে।</p>
       <p>বেসপোক প্রি-অর্ডারের ক্ষেত্রে আপনি একটি অনুরোধ জমা দেন এবং আমরা একটি কোট ফেরত দিই। সেই কোটটি মেইসনের প্রস্তাব; আপনি জবাবের মাধ্যমে গ্রহণ করলে কেবল তখনই অর্ডার তৈরি হয়।</p>
 
       <h2>মূল্য ও পরিশোধ</h2>
-      <p>সকল মূল্য বাংলাদেশি টাকায় (৳ / BDT)। বর্তমানে সকল অর্ডার ক্যাশ অন ডেলিভারিতে পরিশোধিত &mdash; কোনো জমা, কোনো অনলাইন পেমেন্ট, কোনো কার্ড সংরক্ষণ নয়। কুরিয়ার পৌঁছে গেলে সম্পূর্ণ অর্থ গ্রহণ করেন।</p>
+      <p>সকল মূল্য বাংলাদেশি টাকায় (৳ / BDT)। বর্তমানে সকল অর্ডার ক্যাশ অন ডেলিভারিতে পরিশোধিত: কোনো জমা, কোনো অনলাইন পেমেন্ট, কোনো কার্ড সংরক্ষণ নয়। কুরিয়ার পৌঁছে গেলে সম্পূর্ণ অর্থ গ্রহণ করেন।</p>
       <p>আমরা এখনো VAT সংগ্রহ করি না। মেইসনের ট্রেড লাইসেন্স ও VAT রেজিস্ট্রেশন সক্রিয় হলে আমরা স্পষ্টভাবে জানাব এবং প্রদর্শিত মূল্যে প্রয়োজনীয় VAT অন্তর্ভুক্ত করে নেব।</p>
 
       <h2>ডেলিভারি</h2>

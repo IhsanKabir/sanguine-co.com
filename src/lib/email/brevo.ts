@@ -15,7 +15,7 @@ type SendArgs = {
 
 /**
  * True if the address already exists as a Brevo contact. Returns false on
- * any error/missing config — callers use this to SKIP duplicate welcome
+ * any error/missing config: callers use this to SKIP duplicate welcome
  * emails, and "unknown" must not suppress a legitimate first welcome.
  */
 export async function brevoContactExists(email: string): Promise<boolean> {
@@ -57,7 +57,7 @@ export async function sendEmail(args: SendArgs): Promise<{ ok: boolean; id?: str
   const fromName = process.env.BREVO_FROM_NAME || "Sanguine";
 
   if (!apiKey || !fromEmail) {
-    console.warn("[brevo] missing BREVO_API_KEY or BREVO_FROM_EMAIL — skipping send");
+    console.warn("[brevo] missing BREVO_API_KEY or BREVO_FROM_EMAIL: skipping send");
     return { ok: false, error: "missing-config" };
   }
 

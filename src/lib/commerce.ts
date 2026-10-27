@@ -10,19 +10,19 @@ import {
 } from "./pricing";
 
 /**
- * Global commerce settings (site_settings.commerce, key/jsonb) — the owner's
+ * Global commerce settings (site_settings.commerce, key/jsonb): the owner's
  * levers for the quotation-driven pricing model:
- *   preorderDepositPct — % of the quoted price prepaid to confirm a preorder
- *   returnWindowDays   — default return window (products may override)
+ *   preorderDepositPct: % of the quoted price prepaid to confirm a preorder
+ *   returnWindowDays  : default return window (products may override)
  *   freeShippingThresholdBdt / shippingDhakaBdt / shippingOutsideBdt
- *                      — the shipping rules every cart, checkout and order
+ *                     : the shipping rules every cart, checkout and order
  *                        total uses (lib/pricing.ts#shippingFor)
  *   codPhoneCheck / codPhoneCheckMinBdt
- *                      — SMS code before a COD order at or over the minimum
+ *                     : SMS code before a COD order at or over the minimum
  *
  * Cached with tag-based invalidation exactly like lib/copy.ts: the admin
  * Settings action revalidates COMMERCE_CACHE_TAG after every save. Never
- * throws — the storefront must render on defaults if the DB is unreachable.
+ * throws: the storefront must render on defaults if the DB is unreachable.
  */
 
 export const COMMERCE_KEY = "commerce";

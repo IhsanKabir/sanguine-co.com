@@ -3,7 +3,7 @@
  * Translation check (run in CI next to typecheck + lint).
  *
  * Fails when:
- *  1. en.json and bn.json do not have exactly the same keys — a key missing
+ *  1. en.json and bn.json do not have exactly the same keys: a key missing
  *     from bn.json makes next-intl print the raw key ("pdp.save") on the
  *     Bangla site;
  *  2. the code calls t("some.key") / t.rich("some.key") with a literal key
@@ -42,7 +42,7 @@ function* walk(dir) {
   }
 }
 
-// t("a.b"), t.rich("a.b"), tm("a.b"), tr("a.b") — the translator names used in src/.
+// t("a.b"), t.rich("a.b"), tm("a.b"), tr("a.b"): the translator names used in src/.
 const CALL = /\b(?:t|tm|tr)(?:\.rich)?\(\s*"([A-Za-z0-9_.-]+)"/g;
 for (const file of walk(join(root, "src"))) {
   // Admin pages and the tracking page use their own helpers named `t`

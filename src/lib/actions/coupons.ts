@@ -12,7 +12,7 @@ export type CouponValidation =
 
 /**
  * Validate a coupon code + subtotal. Returns the discount in BDT.
- * Server-side only — never trusted from the client.
+ * Server-side only: never trusted from the client.
  */
 export async function validateCoupon(rawCode: string, subtotalBdt: number): Promise<CouponValidation> {
   const code = rawCode.trim().toUpperCase();
@@ -68,7 +68,7 @@ export async function recordCouponRedemption(args: {
     if (!c) return false;
 
     // Conditional UPDATE: only increment when the coupon still has capacity.
-    // Affects zero rows if a concurrent order took the last slot — race-safe.
+    // Affects zero rows if a concurrent order took the last slot: race-safe.
     // Use a raw SQL fragment for the column-vs-column comparison; some Drizzle
     // versions interpret `gt(column, column)` differently from raw SQL.
     const updated = await tx.update(schema.coupons)

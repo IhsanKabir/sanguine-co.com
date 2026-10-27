@@ -4,12 +4,12 @@
  * Each check is a small, READ-ONLY probe of one subsystem. They run in
  * parallel, each guarded by a timeout and try/catch so one slow/broken
  * integration can never hang or crash the board. Active probes only ever
- * hit safe endpoints (a `select 1`, an account lookup, an auth-token issue) —
+ * hit safe endpoints (a `select 1`, an account lookup, an auth-token issue):
  * nothing here sends an email/SMS or creates a courier order.
  *
  * Server-only: imports `db` and the Supabase service client. The client
  * component imports the RESULT types (via `import type`) and re-runs through
- * the `getHealthReport` server action — never this module directly.
+ * the `getHealthReport` server action: never this module directly.
  */
 import { sql, count, eq, lte, gt } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
@@ -46,7 +46,7 @@ type CheckDef = {
   category: HealthCategory;
   critical: boolean;
   timeoutMs?: number;
-  /** Touches Postgres — throttled through dbGate (see below). */
+  /** Touches Postgres: throttled through dbGate (see below). */
   usesDb?: boolean;
   run: () => Promise<Probe>;
 };
@@ -65,7 +65,7 @@ function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
 /**
  * DB checks run at most N at a time. Empirically (isolated 2026-07-13): when
  * every check fires its query in one synchronous burst, the Supabase
- * transaction pooler + postgres.js (prepare:false) wedges ONE victim query —
+ * transaction pooler + postgres.js (prepare:false) wedges ONE victim query:
  * it never settles, regardless of which check it belongs to. Any burst below
  * the threshold is fine, so a small gate removes the failure mode entirely
  * (~2 waves ≈ +1s board latency, well inside the per-check timeout).
@@ -84,7 +84,7 @@ function makeGate(max: number) {
     }
   };
 }
-// NOTE: the gate is created PER RUN (see runHealthChecks) — a module-level
+// NOTE: the gate is created PER RUN (see runHealthChecks): a module-level
 // gate would leak slots forever when a wedged query never settles, degrading
 // every subsequent board run in the same server process.
 type DbGate = ReturnType<typeof makeGate>;
@@ -120,7 +120,7 @@ const CHECKS: CheckDef[] = [
         cache: "no-store",
       });
       if (!res.ok) return { status: "fail", detail: `GoTrue /auth/v1/health returned ${res.status}.` };
-      return { status: "ok", detail: "GoTrue auth service is healthy — sign-in should work." };
+      return { status: "ok", detail: "GoTrue auth service is healthy: sign-in should work." };
     },
   },
   {
@@ -130,7 +130,7 @@ const CHECKS: CheckDef[] = [
     critical: false,
     run: async () => {
       if (missingEnv("SUPABASE_SERVICE_ROLE_KEY").length)
-        return { status: "warn", detail: "SUPABASE_SERVICE_ROLE_KEY not set — image/audio uploads disabled." };
+        return { status: "warn", detail: "SUPABASE_SERVICE_ROLE_KEY not set: image/audio uploads disabled." };
       const supabase = createSupabaseServiceClient();
       const { data, error } = await supabase.storage.listBuckets();
       if (error) return { status: "fail", detail: error.message };
@@ -144,12 +144,12 @@ const CHECKS: CheckDef[] = [
     critical: false,
     run: async () => {
       const key = process.env.BREVO_API_KEY;
-      if (!key) return { status: "warn", detail: "BREVO_API_KEY not set — transactional emails will not send." };
+      if (!key) return { status: "warn", detail: "BREVO_API_KEY not set: transactional emails will not send." };
       const res = await fetch("https://api.brevo.com/v3/account", {
         headers: { "api-key": key, accept: "application/json" },
         cache: "no-store",
       });
-      if (!res.ok) return { status: "fail", detail: `Brevo /account returned ${res.status} — key invalid or revoked.` };
+      if (!res.ok) return { status: "fail", detail: `Brevo /account returned ${res.status}: key invalid or revoked.` };
       const from = process.env.BREVO_FROM_EMAIL;
       return from
         ? { status: "ok", detail: `API key valid · sends as ${from}.` }
@@ -164,12 +164,12 @@ const CHECKS: CheckDef[] = [
     run: async () => {
       const missing = missingEnv("SSLWIRELESS_API_TOKEN", "SSLWIRELESS_SID");
       if (missing.length) return { status: "warn", detail: `Not configured (${missing.join(", ")}).` };
-      return { status: "ok", detail: "Credentials present (config check only — no test SMS sent)." };
+      return { status: "ok", detail: "Credentials present (config check only: no test SMS sent)." };
     },
   },
   {
     id: "shipping-pathao",
-    label: "Courier — Pathao",
+    label: "Courier: Pathao",
     category: "Integrations",
     critical: false,
     run: async () => {
@@ -190,22 +190,22 @@ const CHECKS: CheckDef[] = [
           grant_type: "password",
         }),
       });
-      if (!res.ok) return { status: "fail", detail: `Token endpoint returned ${res.status} — credentials rejected.` };
+      if (!res.ok) return { status: "fail", detail: `Token endpoint returned ${res.status}: credentials rejected.` };
       const data = (await res.json().catch(() => ({}))) as { access_token?: string };
       return data.access_token
-        ? { status: "ok", detail: "OAuth token issued — credentials valid, courier reachable." }
+        ? { status: "ok", detail: "OAuth token issued: credentials valid, courier reachable." }
         : { status: "fail", detail: "Token endpoint returned no access_token." };
     },
   },
   {
     id: "shipping-steadfast",
-    label: "Courier — Steadfast",
+    label: "Courier: Steadfast",
     category: "Integrations",
     critical: false,
     run: async () => {
       const missing = missingEnv("STEADFAST_BASE_URL", "STEADFAST_API_KEY", "STEADFAST_SECRET_KEY");
       if (missing.length) return { status: "warn", detail: `Not configured (${missing.join(", ")}).` };
-      return { status: "ok", detail: "Credentials present (config check only — no test order created)." };
+      return { status: "ok", detail: "Credentials present (config check only: no test order created)." };
     },
   },
   {
@@ -215,7 +215,7 @@ const CHECKS: CheckDef[] = [
     critical: false,
     usesDb: true,
     run: async () => {
-      // Sequential on purpose: the dbGate budgets one query per slot — a
+      // Sequential on purpose: the dbGate budgets one query per slot: a
       // Promise.all here would burst past the gate's accounting.
       const [p] = await db.select({ n: count() }).from(schema.products);
       const [s] = await db.select({ n: count() }).from(schema.segments);
@@ -235,12 +235,12 @@ const CHECKS: CheckDef[] = [
       const rows = await db.select({ key: schema.siteSettings.key }).from(schema.siteSettings);
       const keys = rows.map((r) => r.key);
       if (!keys.includes("brand"))
-        return { status: "warn", detail: "No 'brand' settings row — storefront falls back to JSON defaults." };
+        return { status: "warn", detail: "No 'brand' settings row: storefront falls back to JSON defaults." };
       return { status: "ok", detail: `Settings rows present: ${keys.join(", ")}.` };
     },
   },
   // ── Feature probes + data-invariant tripwires (Phase 5) ────────────────
-  // These answer "which FEATURE is broken" — each encodes a rule the earlier
+  // These answer "which FEATURE is broken": each encodes a rule the earlier
   // audit found violated in production, so regressions surface here first.
   {
     id: "pricing-invariants",
@@ -277,8 +277,8 @@ const CHECKS: CheckDef[] = [
       const badLines = Number(lines?.n ?? 0);
       const badOrders = Number(orders?.n ?? 0);
       if (badLines > 0 || badOrders > 0)
-        return { status: "fail", detail: `${badLines} ৳0 order line(s), ${badOrders} ৳0-subtotal order(s) — the checkout price guard has been bypassed. Investigate immediately.` };
-      return { status: "ok", detail: "No ৳0 order lines or subtotals — the checkout guard is holding." };
+        return { status: "fail", detail: `${badLines} ৳0 order line(s), ${badOrders} ৳0-subtotal order(s): the checkout price guard has been bypassed. Investigate immediately.` };
+      return { status: "ok", detail: "No ৳0 order lines or subtotals: the checkout guard is holding." };
     },
   },
   {
@@ -296,7 +296,7 @@ const CHECKS: CheckDef[] = [
         group by s.id
       `);
       const empty = rows.filter((r) => Number(r.n) === 0).map((r) => r.id);
-      if (rows.length === 0) return { status: "warn", detail: "No visible segments — the shop nav is empty." };
+      if (rows.length === 0) return { status: "warn", detail: "No visible segments: the shop nav is empty." };
       if (empty.length > 0) return { status: "warn", detail: `Visible segment(s) with zero live products: ${empty.join(", ")}` };
       return { status: "ok", detail: `${rows.length} visible segment(s), all stocked with live products.` };
     },
@@ -308,7 +308,7 @@ const CHECKS: CheckDef[] = [
     critical: false,
     usesDb: true,
     run: async () => {
-      // Zero bind params (cutoff computed in SQL) + one round trip — keeps
+      // Zero bind params (cutoff computed in SQL) + one round trip: keeps
       // this probe cheap under the dbGate that serializes the board's burst.
       const [row] = await db.execute<{ open: number; stale: number }>(sql`
         select count(*)::int as open,
@@ -358,7 +358,7 @@ const CHECKS: CheckDef[] = [
         q.quoted != null && q.advMax != null && (q.quoted > q.advMax * 1.5 || (q.advMin != null && q.quoted < q.advMin * 0.5)),
       );
       if (drifted.length > 0)
-        return { status: "warn", detail: `${drifted.length} quote(s) diverge >50% from the advertised estimate — customers saw a very different number.` };
+        return { status: "warn", detail: `${drifted.length} quote(s) diverge >50% from the advertised estimate: customers saw a very different number.` };
       return { status: "ok", detail: `${quoted.length} open quote(s), all within 50% of what was advertised.` };
     },
   },
@@ -371,7 +371,7 @@ const CHECKS: CheckDef[] = [
     run: async () => {
       // Exercises the REAL search path (same function the storefront calls).
       // The probe product must be one search can actually find: live AND in a
-      // non-hidden segment — an arbitrary live product in a hidden segment
+      // non-hidden segment: an arbitrary live product in a hidden segment
       // would produce a false FAIL.
       const [probe] = await db.execute<{ name: string }>(sql`
         select p.name from products p
@@ -396,7 +396,7 @@ const CHECKS: CheckDef[] = [
       const isLocal = SITE_URL.includes("localhost") || SITE_URL.includes("127.0.0.1");
       try {
         const res = await fetch(`${SITE_URL}/sitemap.xml`, { cache: "no-store" });
-        if (!res.ok) return { status: "fail", detail: `GET /sitemap.xml returned ${res.status} — Google can't discover the catalogue.` };
+        if (!res.ok) return { status: "fail", detail: `GET /sitemap.xml returned ${res.status}: Google can't discover the catalogue.` };
         const body = await res.text();
         if (!body.includes("/product/"))
           return { status: "warn", detail: "Sitemap responds but lists no product URLs." };
@@ -421,8 +421,8 @@ const CHECKS: CheckDef[] = [
       const [recent] = await db.select({ n: count() }).from(schema.events)
         .where(gt(schema.events.createdAt, cutoff));
       const n = Number(recent?.n ?? 0);
-      if (n === 0) return { status: "warn", detail: "No events recorded in 48h — tracking may be broken (or genuinely zero traffic)." };
-      return { status: "ok", detail: `${n} event(s) in the last 48h — pipeline alive.` };
+      if (n === 0) return { status: "warn", detail: "No events recorded in 48h: tracking may be broken (or genuinely zero traffic)." };
+      return { status: "ok", detail: `${n} event(s) in the last 48h: pipeline alive.` };
     },
   },
   {
@@ -435,7 +435,7 @@ const CHECKS: CheckDef[] = [
         const u = new URL(SITE_URL);
         if (u.protocol !== "https:") return { status: "warn", detail: `SITE_URL is not https: ${SITE_URL}` };
         if (u.hostname.endsWith("vercel.app"))
-          return { status: "warn", detail: `Still resolving to the Vercel host (${u.hostname}) — connect the custom domain.` };
+          return { status: "warn", detail: `Still resolving to the Vercel host (${u.hostname}): connect the custom domain.` };
         return { status: "ok", detail: SITE_URL };
       } catch {
         return { status: "fail", detail: `Invalid SITE_URL: ${SITE_URL}` };
@@ -467,7 +467,7 @@ async function runOne(def: CheckDef, dbGate: DbGate): Promise<HealthCheck> {
 /** Run every check in parallel and roll them up into an overall verdict. */
 export async function runHealthChecks(): Promise<HealthReport> {
   const started = Date.now();
-  const dbGate = makeGate(4);   // fresh per run — see note on makeGate
+  const dbGate = makeGate(4);   // fresh per run: see note on makeGate
   const checks = await Promise.all(CHECKS.map((def) => runOne(def, dbGate)));
   const counts = {
     ok: checks.filter((c) => c.status === "ok").length,

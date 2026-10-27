@@ -20,7 +20,7 @@ import { initPayment, isOnlinePaymentEnabled } from "@/lib/payments/sslcommerz";
 import { expireStaleUnpaidOrders, releaseUnpaidOrder } from "@/lib/payments/online-orders";
 import { checkPhoneCode, phoneCheckRequired, sendPhoneCode } from "@/lib/phone-code";
 
-const COD_FEE = 0;          // we eat the COD fee at launch — courier charges merchant ~1%
+const COD_FEE = 0;          // we eat the COD fee at launch: courier charges merchant ~1%
 
 const itemSchema = z.object({
   productId: z.string(),
@@ -34,7 +34,7 @@ const inputSchema = z.object({
     fullName: z.string().min(2).max(120),
     email: z.string().email(),
     // Deliveries are BD-only (courier network): normalize and require a real
-    // Bangladeshi mobile — same rule the SMS gateway applies at send time.
+    // Bangladeshi mobile: same rule the SMS gateway applies at send time.
     phone: z.string().min(10).max(20).refine((raw) => {
       const digits = raw.replace(/\D/g, "");
       return /^(?:88)?01[3-9]\d{8}$/.test(digits);
@@ -81,7 +81,7 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
   }
   const data = parsed.data;
 
-  // 1b. Burst guard — createCodOrder is a public unauthenticated action.
+  // 1b. Burst guard: createCodOrder is a public unauthenticated action.
   // Three orders per email/phone per 10 minutes stops accidental double-fires
   // and naive scripted abuse without inconveniencing a real customer
   // (legitimate repeat buyers can always write to the concierge).
@@ -100,7 +100,7 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
     };
   }
 
-  // 2. Re-fetch product prices from DB (anti-tampering — never trust client price)
+  // 2. Re-fetch product prices from DB (anti-tampering: never trust client price)
   const productIds = data.items.map((i) => i.productId);
   const products = await db.select().from(schema.products).where(inArray(schema.products.id, productIds));
   const byId = new Map(products.map((p) => [p.id, p]));
@@ -121,16 +121,16 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
     const p = byId.get(item.productId);
     if (!p) return { ok: false as const, error: `Product ${item.productId} not found` };
     if (p.status !== "live") return { ok: false as const, error: `${p.name} is no longer available` };
-    // Quotation model: preorder-only pieces have no cash-on-delivery price —
+    // Quotation model: preorder-only pieces have no cash-on-delivery price:
     // they are bought via the preorder → quote → deposit pipeline. Without
     // this guard the QuickView/stale-cart path sells them at priceBdt, which
     // is a ৳0 placeholder for range-priced pieces.
     if (p.preorderOnly) {
-      return { ok: false as const, error: `${p.name} is available by preorder only — please use the preorder form` };
+      return { ok: false as const, error: `${p.name} is available by preorder only. Please use the preorder form.` };
     }
     // A non-positive price is corrupt catalogue data, never a legitimate sale.
     if (p.priceBdt <= 0) {
-      return { ok: false as const, error: `${p.name} cannot be ordered right now — please contact the concierge` };
+      return { ok: false as const, error: `${p.name} cannot be ordered right now. Please contact the concierge.` };
     }
     const lineTotal = p.priceBdt * item.qty;
     subtotal += lineTotal;
@@ -193,7 +193,7 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
   // atomic guard inside this transaction throws `OUT_OF_STOCK:<name>` which
   // we surface as a friendly user-facing error.
   const trackingToken = randomBytes(16).toString("hex");
-  // Attach the signed-in customer when there is one — review eligibility,
+  // Attach the signed-in customer when there is one: review eligibility,
   // account ownership and the track-page gate all key off customerId.
   const currentUser = await getCurrentUser().catch(() => null);
   let order: typeof schema.orders.$inferSelect;
@@ -226,7 +226,7 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
     );
 
     for (const l of lines) {
-      // Guarded decrement of the option and the product total — if a
+      // Guarded decrement of the option and the product total: if a
       // concurrent order beat us to the last unit it throws OUT_OF_STOCK
       // and the whole transaction rolls back.
       await takeStock(tx, { ...l, name: l.nameSnapshot });

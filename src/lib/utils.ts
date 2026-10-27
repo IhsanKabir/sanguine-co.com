@@ -31,7 +31,7 @@ export function formatDate(d: Date | string, locale: "en" | "bn" = "en"): string
 /**
  * Normalize a Bangladeshi phone number to wa.me's international digit format
  * (8801XXXXXXXXX). Owners naturally enter the local 01XXXXXXXXX form in env
- * vars — a wa.me link built from that silently points at nothing.
+ * vars: a wa.me link built from that silently points at nothing.
  */
 export function normalizeBdWhatsApp(raw: string): string {
   const digits = raw.replace(/\D/g, "");

@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 type Props = {
   /** Tiny uppercase tag above the headline (e.g. "BOUTIQUE", "ATELIER"). */
   kicker?: string;
-  /** Display name — large serif italic. */
+  /** Display name: large serif italic. */
   name: string;
   /** Optional sub-line (description, blurb). */
   blurb?: string;
@@ -12,7 +12,7 @@ type Props = {
 };
 
 /**
- * Reusable oceanic header band for non-home pages — extends the homepage's
+ * Reusable oceanic header band for non-home pages: extends the homepage's
  * oceanic register to /shop, /cart, /account, /wishlist, /sign-in. Soft
  * sea-tinted gradient, gold-deep kicker, large serif name. Same vocabulary
  * as the home hero so visitors don't feel like they walked into a different
@@ -30,7 +30,7 @@ export default function OceanicBand({ kicker, name, blurb, trailing }: Props) {
         borderBottom: "1px solid var(--line)",
       }}
     >
-      {/* Faint horizon rule — the "tide line" thread that runs through all
+      {/* Faint horizon rule: the "tide line" thread that runs through all
        * customer-facing pages, picking up the gold accent. */}
       <div
         aria-hidden

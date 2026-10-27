@@ -33,7 +33,7 @@ const STATUS_STYLE: Record<string, string> = {
 };
 
 // The exact window (per-product, anchored to delivery) is enforced server-side
-// in requestReturn — the button shows for any delivered order and the server
+// in requestReturn: the button shows for any delivered order and the server
 // message states the precise window when it has closed.
 function canReturn(order: OrderRow) {
   return order.status === "delivered";
@@ -75,7 +75,7 @@ export default function AccountOrders({ orders, locale }: Props) {
                   {o.number}
                 </td>
                 <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>
-                  {o.createdAt ? formatDate(new Date(o.createdAt), locale) : "—"}
+                  {o.createdAt ? formatDate(new Date(o.createdAt), locale) : "-"}
                 </td>
                 <td>
                   <span className={"pill " + (STATUS_STYLE[o.status] ?? "pill-info")}>
@@ -93,7 +93,7 @@ export default function AccountOrders({ orders, locale }: Props) {
                       {o.shippingTracking}
                     </span>
                   ) : (
-                    <span style={{ color: "var(--line)", fontSize: 11 }}>—</span>
+                    <span style={{ color: "var(--line)", fontSize: 11 }}>-</span>
                   )}
                 </td>
                 <td style={{ fontWeight: 500 }}>

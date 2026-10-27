@@ -38,7 +38,7 @@ export default async function PackingSlipPage({ params }: Props) {
 
   return (
     <>
-      {/* Print-only stylesheet — applies on every render so Cmd/Ctrl+P just works. */}
+      {/* Print-only stylesheet: applies on every render so Cmd/Ctrl+P just works. */}
       <style>{`
         @page { size: A4; margin: 16mm 14mm; }
         @media print {
@@ -87,16 +87,16 @@ export default async function PackingSlipPage({ params }: Props) {
           <div style={{ flex: 1 }}>
             <h2>Deliver to</h2>
             <div style={{ fontSize: 14, lineHeight: 1.6 }}>
-              <b>{addr.fullName ?? "—"}</b><br />
+              <b>{addr.fullName ?? "-"}</b><br />
               {addr.line1}{addr.line2 ? `, ${addr.line2}` : ""}<br />
-              {addr.area ? `${addr.area}, ` : ""}{addr.city}{addr.postcode ? ` — ${addr.postcode}` : ""}<br />
+              {addr.area ? `${addr.area}, ` : ""}{addr.city}{addr.postcode ? ` ${addr.postcode}` : ""}<br />
               {addr.phone}
             </div>
           </div>
           <div style={{ flex: 1 }}>
             <h2>Payment</h2>
             <div style={{ fontSize: 14, lineHeight: 1.6 }}>
-              <b style={{ textTransform: "capitalize" }}>{order.paymentMethod}</b>{order.paymentMethod === "cod" && <> &mdash; collect <b>{formatBdt(order.totalBdt)}</b></>}<br />
+              <b style={{ textTransform: "capitalize" }}>{order.paymentMethod}</b>{order.paymentMethod === "cod" && <>: collect <b>{formatBdt(order.totalBdt)}</b></>}<br />
               {order.shippingCourier && <>Courier: <span style={{ textTransform: "capitalize" }}>{order.shippingCourier}</span><br /></>}
               {order.shippingTracking && <>Tracking: <span style={{ fontFamily: "'Courier New', monospace" }}>{order.shippingTracking}</span></>}
             </div>

@@ -6,8 +6,8 @@ import { releaseIfUnpaid, settleOnlinePayment } from "@/lib/payments/online-orde
 
 /**
  * SSLCommerz callbacks. The gateway POSTs a form to:
- *   success / fail / cancel — the shopper's browser, then redirected onward
- *   ipn                     — SSLCommerz's server (Instant Payment Notification)
+ *   success / fail / cancel: the shopper's browser, then redirected onward
+ *   ipn                    : SSLCommerz's server (Instant Payment Notification)
  *
  * Nothing in the POST body is trusted: a payment counts only once the
  * Validation API confirms it (settleOnlinePayment), and an order is released

@@ -48,7 +48,7 @@ export async function getLiveProducts(opts?: {
   if (typeof opts?.minPrice === "number") conds.push(gte(products.priceBdt, opts.minPrice));
   if (typeof opts?.maxPrice === "number") conds.push(lte(products.priceBdt, opts.maxPrice));
   if (opts?.colors && opts.colors.length > 0) {
-    // jsonb ?| array — true if any of the strings are present in the colours array.
+    // jsonb ?| array: true if any of the strings are present in the colours array.
     conds.push(sql`${products.colors} ?| ${opts.colors}`);
   }
   if (opts?.sizes && opts.sizes.length > 0) {
@@ -95,7 +95,7 @@ export async function getProductsByIds(ids: string[]) {
     eq(products.status, "live"),
     inArray(products.segmentId, visibleSegmentIds),
   ));
-  // Preserve the input order — client passes most-recent first.
+  // Preserve the input order: client passes most-recent first.
   const byId = new Map(rows.map((r) => [r.id, r]));
   return ids.map((id) => byId.get(id)).filter((p): p is NonNullable<typeof p> => !!p);
 }
@@ -103,7 +103,7 @@ export async function getProductsByIds(ids: string[]) {
 /**
  * Batch-fetch up to two images (hero + hover) for a list of products.
  * Returns a map keyed by productId. `hoverUrl` is the second image by
- * sortOrder — undefined when the product has only one image.
+ * sortOrder: undefined when the product has only one image.
  */
 export async function getHeroImagesFor(productIds: string[]): Promise<Map<string, { url: string; alt: string | null; hoverUrl?: string }>> {
   if (productIds.length === 0) return new Map();
@@ -158,7 +158,7 @@ export async function searchProducts(query: string, limit = 8) {
       inArray(products.segmentId, visibleSegmentIds),
       or(
         ilike(products.name, `%${escaped}%`),
-        // Bengali-locale customers search Bengali product names — matching
+        // Bengali-locale customers search Bengali product names: matching
         // only the Latin name returned nothing for them.
         ilike(products.nameBn, `%${escaped}%`),
         ilike(products.sku, `%${escaped}%`),

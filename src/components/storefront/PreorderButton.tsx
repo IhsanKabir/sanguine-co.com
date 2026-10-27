@@ -5,7 +5,7 @@ import { priceDisplayText, type PriceDisplay } from "@/lib/pricing";
 type Props = {
   slug: string;
   estimatedDelivery?: string | null;
-  /** Quotation-model price state — fixed / estimate range / quote-only. */
+  /** Quotation-model price state: fixed / estimate range / quote-only. */
   display: PriceDisplay;
   /** Effective deposit % (product override ?? global setting). */
   depositPct: number;

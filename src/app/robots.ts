@@ -8,12 +8,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         // `/api/og` must stay fetchable despite the `/api` + `/*?*` disallows
-        // below — Google only shows OG images in rich results / Discover if
+        // below: Google only shows OG images in rich results / Discover if
         // the image URL itself is crawlable. Longest-match precedence means
         // this allow rule wins for /api/og?slug=… on Google and Bing.
         allow: ["/", "/api/og"],
         // Every customer-facing URL is locale-prefixed (/en/…, /bn/…) because
-        // next-intl uses localePrefix:"always" — a bare "/account" prefix rule
+        // next-intl uses localePrefix:"always": a bare "/account" prefix rule
         // never matches "/en/account", so each rule is emitted per locale too.
         disallow: [
           "/admin", "/en/admin", "/bn/admin",           // private operations area

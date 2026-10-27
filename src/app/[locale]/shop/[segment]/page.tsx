@@ -12,7 +12,7 @@ import { SITE_URL as BASE } from "@/lib/site-url";
 
 // ISR: filtering/sorting happens client-side in ShopGrid over the full item
 // list (the server render never reads searchParams), and the page reads no
-// cookies — so the HTML is cacheable per segment. Admin edits purge it via
+// cookies: so the HTML is cacheable per segment. Admin edits purge it via
 // revalidateAllLocales(); 300s is the safety net.
 export const revalidate = 300;
 
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url,
       type: "website",
       locale: isBn ? "bn_BD" : "en_BD",
-      // Maison card — child openGraph replaces the root fallback wholesale.
+      // Maison card: child openGraph replaces the root fallback wholesale.
       images: [{ url: "/api/og", width: 1200, height: 630, alt: "Sanguine" }],
     },
     twitter: { card: "summary_large_image", title: name, description: blurb },

@@ -5,7 +5,7 @@ import { getProductBySlug, getProductImages, getSegmentBySlug } from "@/lib/quer
 import { captureError } from "@/lib/monitoring";
 
 /**
- * Dynamic Open Graph card — EXECUTION-PLAN Phase 2.3.
+ * Dynamic Open Graph card: EXECUTION-PLAN Phase 2.3.
  *
  *   /api/og              → generic maison card (1200×630 PNG)
  *   /api/og?slug=<slug>  → product card; unknown slug falls back to the
@@ -13,7 +13,7 @@ import { captureError } from "@/lib/monitoring";
  *
  * Why this exists: most products have no real photography yet (Composition
  * art is the visual identity at launch), so PDPs shared on WhatsApp /
- * Facebook — the primary BD channels — previously rendered with no card at
+ * Facebook (the primary BD channels) previously rendered with no card at
  * all. This route guarantees every shared link gets a branded 1200×630 card
  * in the maison register, overlaying the hero photo when one exists.
  *
@@ -60,7 +60,7 @@ const TAG_LABELS: Record<string, string> = {
 //
 // No Bengali face is bundled (Noto Serif Bengali alone is ~600 KB), so the
 // card always renders the product's English name and a "BDT" prefix instead
-// of ৳. The og:title/og:description meta on the PDP stay fully localised —
+// of ৳. The og:title/og:description meta on the PDP stay fully localised:
 // only the image text is EN. Revisit if Bangla-script cards become a brand
 // requirement.
 const FONT_DIR = path.join(process.cwd(), "src", "app", "api", "og", "_fonts");
@@ -70,7 +70,7 @@ let fontsPromise: Promise<FontSet> | null = null;
 
 function loadFonts(): Promise<FontSet> {
   // Module-level cache: fonts are read from disk once per lambda instance.
-  // The cache is cleared on rejection — otherwise one bad cold-start (e.g.
+  // The cache is cleared on rejection: otherwise one bad cold-start (e.g.
   // mis-traced font files) would pin a rejected promise and 500 every
   // subsequent request on that instance instead of retrying the disk read.
   fontsPromise ??= Promise.all([
@@ -89,7 +89,7 @@ function loadFonts(): Promise<FontSet> {
 // ── Shared visual pieces ─────────────────────────────────────────────────
 
 /**
- * Three layered tide-lines along the bottom edge — a static echo of the
+ * Three layered tide-lines along the bottom edge: a static echo of the
  * HeroTide parallax that anchors the storefront register.
  */
 function TideWaves() {
@@ -119,7 +119,7 @@ function TideWaves() {
   );
 }
 
-/** Italic-serif wordmark with the small gold MAISON sup — mirrors `.nav-brand`. */
+/** Italic-serif wordmark with the small gold MAISON sup: mirrors `.nav-brand`. */
 function Wordmark({ size = 40 }: { size?: number }) {
   return (
     <div style={{ display: "flex", alignItems: "baseline" }}>
@@ -225,8 +225,8 @@ const PHOTO_TIMEOUT_MS = 5_000;
 
 /**
  * Fetch the hero photo ourselves and inline it as a data URI instead of
- * handing satori the URL. Satori's internal fetch has no timeout — a slow
- * Supabase response would hang the render for every scraper — and its
+ * handing satori the URL. Satori's internal fetch has no timeout: a slow
+ * Supabase response would hang the render for every scraper: and its
  * failure would throw mid-stream and 500 the card. This way a slow or
  * broken photo degrades to the photo-less card layout instead.
  * The URL itself is trusted: recordProductImage validates the Supabase
@@ -372,7 +372,7 @@ function ProductCard({ p }: { p: ProductCardData }) {
 // Slugs are kebab-case in the catalogue; anything else is treated as unknown
 // (→ generic card) without touching the database. The 80-char cap matches
 // the searchProducts query cap. Note: unique-slug enumeration still costs
-// one DB lookup per CDN miss — acceptable under the soft-launch posture
+// one DB lookup per CDN miss: acceptable under the soft-launch posture
 // where real IP rate limiting is an accepted deferral (GAP-ANALYSIS §13.1
 // M-2); revisit alongside that item.
 const SLUG_RE = /^[a-z0-9-]{1,80}$/;
@@ -380,7 +380,7 @@ const SLUG_RE = /^[a-z0-9-]{1,80}$/;
 // Cards change only when the catalogue does; let the CDN absorb crawler
 // traffic. A day of s-maxage + a week of stale-while-revalidate means a
 // price edit propagates within 24h without any cold-render storms.
-// Dev skips caching — Next's own dev default is no-cache, and a custom
+// Dev skips caching: Next's own dev default is no-cache, and a custom
 // header here would override it and serve stale cards while iterating.
 const CACHE_CONTROL =
   process.env.NODE_ENV === "development"

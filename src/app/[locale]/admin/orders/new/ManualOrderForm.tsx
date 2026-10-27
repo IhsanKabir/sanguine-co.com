@@ -125,7 +125,7 @@ export default function ManualOrderForm({ products }: { products: Product[] }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end" }}>
         <div>
           <h1 className="admin-h1">New manual order</h1>
-          <p className="admin-sub">Create a phone-in or walk-in order on a customer&rsquo;s behalf. Same flow as a storefront order — emails the customer if checked, decrements stock, lands in the orders queue.</p>
+          <p className="admin-sub">Create a phone-in or walk-in order on a customer&rsquo;s behalf. Same flow as a storefront order: emails the customer if checked, decrements stock, lands in the orders queue.</p>
         </div>
         <Link href="/admin/orders" className="btn btn-ghost btn-sm">Cancel</Link>
       </div>
@@ -176,7 +176,7 @@ export default function ManualOrderForm({ products }: { products: Product[] }) {
                 <select value={it.productId} onChange={(e) => updateLine(i, { productId: e.target.value, color: "", size: "" })}>
                   {products.map((p) => (
                     <option key={p.id} value={p.id} disabled={p.stock === 0}>
-                      {p.name} ({p.sku}) — {p.stock} in stock — {formatBdt(p.priceBdt)}
+                      {p.name} ({p.sku}) · {p.stock} in stock · {formatBdt(p.priceBdt)}
                     </option>
                   ))}
                 </select>
@@ -185,22 +185,22 @@ export default function ManualOrderForm({ products }: { products: Product[] }) {
                 <label>Colour</label>
                 {colorOptions.length > 0 ? (
                   <select value={it.color} onChange={(e) => updateLine(i, { color: e.target.value })}>
-                    <option value="">—</option>
+                    <option value="">-</option>
                     {colorOptions.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 ) : (
-                  <input value={it.color} onChange={(e) => updateLine(i, { color: e.target.value })} placeholder="—" />
+                  <input value={it.color} onChange={(e) => updateLine(i, { color: e.target.value })} placeholder="-" />
                 )}
               </div>
               <div className="field" style={{ margin: 0 }}>
                 <label>Size</label>
                 {sizeOptions.length > 0 ? (
                   <select value={it.size} onChange={(e) => updateLine(i, { size: e.target.value })}>
-                    <option value="">—</option>
+                    <option value="">-</option>
                     {sizeOptions.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
                 ) : (
-                  <input value={it.size} onChange={(e) => updateLine(i, { size: e.target.value })} placeholder="—" />
+                  <input value={it.size} onChange={(e) => updateLine(i, { size: e.target.value })} placeholder="-" />
                 )}
               </div>
               <div className="field" style={{ margin: 0 }}>
@@ -231,7 +231,7 @@ export default function ManualOrderForm({ products }: { products: Product[] }) {
         </div>
         {subtotal >= FREE_SHIPPING_THRESHOLD && shipping > 0 && (
           <p style={{ fontSize: 11, color: "var(--gold-deep)", marginTop: 6 }}>
-            Note: subtotal is over {formatBdt(FREE_SHIPPING_THRESHOLD)} — storefront would normally complimentary-ship this.
+            Note: subtotal is over {formatBdt(FREE_SHIPPING_THRESHOLD)}: storefront would normally complimentary-ship this.
           </p>
         )}
       </fieldset>

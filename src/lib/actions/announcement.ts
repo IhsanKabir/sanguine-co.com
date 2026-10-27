@@ -12,7 +12,7 @@ import {
 
 /**
  * Save the scheduled announcement (EXECUTION-PLAN 4.3). Gated on the same
- * `editorial` permission as the copy library — the announcement bar is
+ * `editorial` permission as the copy library: the announcement bar is
  * explicitly part of the Editorial subadmin template's remit.
  */
 export async function updateAnnouncement(
@@ -37,7 +37,7 @@ export async function updateAnnouncement(
     .onConflictDoUpdate({ target: schema.siteSettings.key, set: { value: data } });
 
   revalidateTag(ANNOUNCEMENT_CACHE_TAG);
-  // SSG storefront pages bake the bar into their HTML — rebuild them so the
+  // SSG storefront pages bake the bar into their HTML: rebuild them so the
   // save is visible on the very next request (same idiom as the copy library).
   for (const locale of ["en", "bn"]) {
     revalidatePath(`/${locale}`, "layout");

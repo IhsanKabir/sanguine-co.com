@@ -111,7 +111,7 @@ export default function RefundPanel({ orderId, orderTotalBdt, depositPaidBdt = 0
               <input type="number" min={1} max={remaining} value={amount} onChange={(e) => setAmount(e.target.value)} required />
               {depositPaidBdt > 0 && (
                 <span style={{ fontSize: 11, color: "var(--ink-soft)", display: "block", marginTop: 4 }}>
-                  Paid as {formatBdt(orderTotalBdt - depositPaidBdt)} cash on delivery + {formatBdt(depositPaidBdt)} prepaid deposit (bKash) — refund each portion by its original method.
+                  Paid as {formatBdt(orderTotalBdt - depositPaidBdt)} cash on delivery + {formatBdt(depositPaidBdt)} prepaid deposit (bKash): refund each portion by its original method.
                 </span>
               )}
             </div>
@@ -127,7 +127,7 @@ export default function RefundPanel({ orderId, orderTotalBdt, depositPaidBdt = 0
             <input value={reason} onChange={(e) => setReason(e.target.value)} required maxLength={500} placeholder="e.g. customer cancelled at door, defective item" />
           </div>
           <div className="field" style={{ marginTop: 8 }}>
-            <label>Recipient (optional — bKash number, bank account, …)</label>
+            <label>Recipient (optional: bKash number, bank account, …)</label>
             <input value={recipientInfo} onChange={(e) => setRecipientInfo(e.target.value)} maxLength={200} />
           </div>
           <div className="field" style={{ marginTop: 8 }}>

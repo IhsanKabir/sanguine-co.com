@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
   # Nightly journey run (03:00 Dhaka ≈ 21:00 UTC): catches drift that lands
-  # between deploys — dependency rot, external endpoints, flaky journeys.
+  # between deploys: dependency rot, external endpoints, flaky journeys.
   schedule:
     - cron: "0 21 * * *"
 
@@ -43,10 +43,14 @@ jobs:
         run: npx eslint . --max-warnings 0
 
       # en.json and bn.json must hold the same keys, and every literal
-      # t("…") key in the storefront must exist — otherwise the Bangla site
+      # t("…") key in the storefront must exist: otherwise the Bangla site
       # shows raw keys or English.
       - name: Translation check
         run: node scripts/check-i18n.mjs
+
+      # House style: no em dashes anywhere (copy, code, comments, docs).
+      - name: No em dashes
+        run: node scripts/check-no-em-dash.mjs
 
   e2e-smoke:
     name: Playwright smoke
@@ -67,7 +71,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       # The runner has no Supabase credentials. db.ts throws at module load
-      # without a DATABASE_URL, so we provide a placeholder — postgres-js
+      # without a DATABASE_URL, so we provide a placeholder: postgres-js
       # connects lazily, so module init succeeds and queries fail at runtime
       # where the storefront's catch-paths degrade gracefully. E2E_SKIP_DB
       # makes the @db-tagged specs self-skip (see e2e/helpers.ts) since the

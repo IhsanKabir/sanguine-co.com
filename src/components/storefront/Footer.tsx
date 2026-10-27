@@ -8,7 +8,7 @@ export default async function Footer() {
   try {
     segments = await getVisibleSegments();
   } catch {
-    // DB unavailable — render fallback
+    // DB unavailable: render fallback
   }
 
   return (

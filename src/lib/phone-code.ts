@@ -14,7 +14,7 @@ import type { CommerceSettings } from "@/lib/commerce";
  *  - 6 digits, valid 10 minutes, 5 wrong tries per code;
  *  - at most 3 codes per phone per 15 minutes and 10 per IP per hour;
  *  - if the SMS can't be sent, the checkout goes through unverified and
- *    the order's timeline says so — a gateway outage must not stop sales.
+ *    the order's timeline says so: a gateway outage must not stop sales.
  */
 
 export const CODE_TTL_MIN = 10;

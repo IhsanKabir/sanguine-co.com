@@ -10,7 +10,7 @@ type Props = { children: React.ReactNode };
  *
  * Re-fires the `ssg-route-fade-in` keyframe on every pathname change *without*
  * remounting children. Earlier versions used a `key` on the wrapper div which
- * forced the entire route subtree to unmount and remount on every navigation —
+ * forced the entire route subtree to unmount and remount on every navigation:
  * that broke client effects mid-flight (cart hydration, session tracker) and
  * surfaced as a client-side exception on routes like /account post-checkout.
  *

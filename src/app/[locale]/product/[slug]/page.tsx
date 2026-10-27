@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const tm = await getTranslations({ locale });
   const description = (isBn && p.descriptionBn) || p.description || tm("pdp.descriptionFallback");
   const url = `${BASE}/${locale}/product/${slug}`;
-  // Branded 1200×630 card from /api/og — it overlays the first product photo
+  // Branded 1200×630 card from /api/og: it overlays the first product photo
   // when one exists and falls back to the maison card when none does, so
   // every PDP gets a real share preview (most products have no photography
   // yet). The raw photo stays as a secondary og:image for scrapers that
@@ -88,7 +88,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // availability when og:type is "product". Next.js's Metadata type
     // doesn't list "product" as an enum value, so we override the meta
     // tag through `other`. The `type: "website"` above only seeds defaults
-    // — when both are present, the explicit `og:type` wins in the head.
+    //: when both are present, the explicit `og:type` wins in the head.
     other: otherMeta,
     twitter: {
       card: "summary_large_image",
@@ -121,7 +121,7 @@ export default async function ProductPage({ params }: Props) {
     : new Map();
 
   // Quotation-driven pricing state (Phase 1): what the customer sees and what
-  // structured data may claim both come from the same helper — no surface may
+  // structured data may claim both come from the same helper: no surface may
   // ever render the ৳0 placeholder again.
   const commerce = await getCommerceSettings();
   const display = priceDisplay(p);
@@ -161,7 +161,7 @@ export default async function ProductPage({ params }: Props) {
   // Product schema with full Offer (shipping + returns) so Google Shopping
   // can render shipping cost and return-policy snippets in rich results.
   // shippingDetails is the standard for Bangladesh COD-only logistics:
-  // — Pathao Courier; the advertised rate is the saved inside-Dhaka rate
+  //: Pathao Courier; the advertised rate is the saved inside-Dhaka rate
   //   (Admin → Settings), the lowest a customer can pay.
   // hasMerchantReturnPolicy follows our /legal/returns: 14-day window,
   // courier-arranged pickup, return shipping paid by the customer unless the
@@ -173,7 +173,7 @@ export default async function ProductPage({ params }: Props) {
     sku: p.sku,
     description,
     image: photos.length > 0 ? photos.map((ph) => ph.url) : undefined,
-    // Quote-only pieces get NO offers block — a priced Offer would be a lie
+    // Quote-only pieces get NO offers block: a priced Offer would be a lie
     // and Google penalizes page/JSON-LD price mismatches.
     offers: offer ? {
       "@type": offer.type,
@@ -267,7 +267,7 @@ export default async function ProductPage({ params }: Props) {
         <div className="pdp-info">
           <div className="collection">{(segTag || "").toUpperCase()} · {p.sku}</div>
           <h1>{name}</h1>
-          {/* A "0.0 · 0 reviews" row reads as a damning score — render only with real reviews. */}
+          {/* A "0.0 · 0 reviews" row reads as a damning score: render only with real reviews. */}
           {p.reviewCount > 0 && (
             <div className="pdp-rating">
               <span className="stars">{"★★★★★".slice(0, Math.round(Number(p.rating)))}{"☆☆☆☆☆".slice(0, 5 - Math.round(Number(p.rating)))}</span>
@@ -355,7 +355,7 @@ export default async function ProductPage({ params }: Props) {
             />
           )}
 
-          {/* Scarcity signals describe sellable stock — meaningless (and
+          {/* Scarcity signals describe sellable stock: meaningless (and
               contradictory) on preorder-only pieces, so they're gated out. */}
           {!p.preorderOnly && p.stock > 0 && p.stock <= 5 && (
             <div className="pdp-scarcity">

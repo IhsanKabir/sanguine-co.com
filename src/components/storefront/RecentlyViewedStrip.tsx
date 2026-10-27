@@ -43,7 +43,7 @@ export default function RecentlyViewedStrip({ excludeId }: Props) {
       <div className="grid grid-4">
         {items.map((p) => {
           const name = (locale === "bn" && p.nameBn) || p.name;
-          // Same pricing rules as ProductCard — raw priceBdt would show ৳0
+          // Same pricing rules as ProductCard: raw priceBdt would show ৳0
           // for quotation/preorder products.
           const display = priceDisplay(p);
           return (

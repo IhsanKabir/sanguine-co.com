@@ -18,7 +18,7 @@ const SUPABASE_PUBLIC_PREFIX = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").repl
  * Supabase Storage using its authenticated session JWT (RLS allows admin-tier
  * roles to write the `product-images` bucket). The browser then calls this
  * server action to record the resulting URL + path on the `product_images`
- * table. We never push the file bytes through this action — only the URL.
+ * table. We never push the file bytes through this action: only the URL.
  */
 
 const recordSchema = z.object({
@@ -37,11 +37,11 @@ export async function recordProductImage(input: z.infer<typeof recordSchema>) {
 
   // Reject any URL that doesn't come from our own Supabase Storage bucket.
   // Prevents an admin (or compromised admin session) from injecting an
-  // attacker-controlled image URL — stored XSS via OG image / phishing image.
+  // attacker-controlled image URL: stored XSS via OG image / phishing image.
   if (!SUPABASE_PUBLIC_PREFIX || !data.url.startsWith(SUPABASE_PUBLIC_PREFIX)) {
     return { ok: false as const, error: "Image URL must come from our storage bucket." };
   }
-  // Cross-check that the URL and path agree — the URL should be the public
+  // Cross-check that the URL and path agree: the URL should be the public
   // CDN URL of the file at `path`. Eliminates URL-vs-path mismatch attacks.
   const expectedTail = data.path.replace(/^\/+/, "");
   if (!data.url.endsWith(expectedTail)) {

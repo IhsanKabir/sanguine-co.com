@@ -13,8 +13,8 @@ import { isValidStatus, queryTransaction, validatePayment } from "./sslcommerz";
  *         └──fail / cancel / timeout──▶ cancelled (stock + coupon given back)
  *
  * Every transition is a conditional UPDATE on status = 'pending_payment', so
- * the browser callback and the IPN racing each other — or a callback replayed
- * — can move the order at most once and send at most one confirmation.
+ * the browser callback and the IPN racing each other: or a callback replayed
+ *: can move the order at most once and send at most one confirmation.
  */
 
 export const UNPAID_ORDER_TTL_MIN = 60;
@@ -117,7 +117,7 @@ export async function settleOnlinePayment(valId: string, tranIdFromCallback: str
     await logOrderEvent({
       orderId: order.id,
       type: "note_added",
-      payload: { note: "SSLCommerz amount/currency did not match the order — not marked paid", amount: v.amount, currency: v.currency, valId: v.valId },
+      payload: { note: "SSLCommerz amount/currency did not match the order: not marked paid", amount: v.amount, currency: v.currency, valId: v.valId },
       actor: null,
     });
     return { outcome: "rejected", order, reason: "amount_mismatch" };
@@ -130,13 +130,13 @@ export async function settleOnlinePayment(valId: string, tranIdFromCallback: str
     .returning();
 
   if (!paid) {
-    // Already settled by the other path (callback vs IPN) — or the order was
+    // Already settled by the other path (callback vs IPN): or the order was
     // cancelled (timeout) before the money arrived. The latter needs a person.
     if (order.status === "paid") return { outcome: "already_paid", order };
     await logOrderEvent({
       orderId: order.id,
       type: "payment_received",
-      payload: { gateway: "sslcommerz", ref, amount: v.amount, note: `Payment validated while order was '${order.status}' — refund or fulfil manually` },
+      payload: { gateway: "sslcommerz", ref, amount: v.amount, note: `Payment validated while order was '${order.status}': refund or fulfil manually` },
       actor: null,
     });
     return { outcome: "rejected", order, reason: `order_${order.status}` };
