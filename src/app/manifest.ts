@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Sanguine",
     short_name: "Sanguine",
-    description: "Flowers and gifts, made to order in Dhaka.",
+    description: "Considered gifts from Dhaka.",
     start_url: "/en",
     display: "standalone",
     background_color: "#fdfbf7",

@@ -50,7 +50,7 @@ export default async function AtelierPage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Sanguine",
-    description: "A house of considered things, based in Dhaka, starting with flowers.",
+    description: "A house of considered things, based in Dhaka, opening one category at a time.",
     url: BASE,
     address: {
       "@type": "PostalAddress",

@@ -4,9 +4,11 @@ Read this before writing any customer-facing text: storefront copy (`src/message
 
 ## Who Sanguine is
 
-Sanguine is a house of considered things, based in Dhaka. It starts with flowers: bouquets made to order and delivered across Bangladesh. More houses will follow, each one opened only when it is ready. Until a house is open, the site does not sell, describe or imply its products.
+Sanguine is a house of considered things, based in Dhaka, with several categories (flowers, perfume, books, jewelry, clothing, watches, accessories, anime and manga, boardgames). Categories open one at a time; flowers opened first. Brand-level copy (home headline, tab title, tagline, About) is about Sanguine, never about one category.
 
-The tab title and the main claim are plain: **Sanguine · Flowers and gifts, Dhaka**.
+Copy that names categories must only name the ones customers can shop. On the homepage that list comes from the visible segments at render time (`src/lib/category-list.ts`), so unhiding a category in admin updates the copy by itself. Do not hard-code category names into brand copy, and do not describe hidden categories or their products.
+
+Home tab title: **Sanguine · Considered gifts, Dhaka**. Brand line: **Things worth keeping**.
 
 ## The voice: quiet confidence
 
@@ -37,7 +39,7 @@ Write natural, everyday Bangla that a Dhaka customer would say aloud, not a word
 
 | Instead of | Write |
 |---|---|
-| Perfume, flora & quiet ceremonies for the violet hour. | Flowers, arranged to be remembered. |
+| Perfume, flora & quiet ceremonies for the violet hour. | Things worth keeping. |
 | Enter the Boutique | Shop flowers |
 | The maison will write back within a day or two. | We'll reply within a day or two. |
 | Ceremonial packaging · Wax-sealed. | Gift wrapping · With a note, if you'd like one. |
