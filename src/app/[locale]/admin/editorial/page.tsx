@@ -1,5 +1,5 @@
 import { getBrand } from "@/lib/actions/admin";
-import { getCopyOverrides, flattenMessages } from "@/lib/copy";
+import { getCopyOverridesUncached, flattenMessages } from "@/lib/copy";
 import { getAnnouncementUncached } from "@/lib/announcement";
 import EditorialClient from "./EditorialClient";
 import AnnouncementEditor from "./AnnouncementEditor";
@@ -18,7 +18,7 @@ export default async function AdminEditorialPage() {
   const defaultsBn = flattenMessages(bnMessages as Record<string, unknown>);
 
   const [overrides, brand, announcement] = await Promise.all([
-    getCopyOverrides(),
+    getCopyOverridesUncached(),
     getBrand(),
     getAnnouncementUncached(),
   ]);
