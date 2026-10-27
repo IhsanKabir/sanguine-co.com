@@ -42,7 +42,7 @@ const WIDTH = 1200;
 const HEIGHT = 630;
 const PHOTO_WIDTH = 460;
 
-const TAGLINE = "Flowers, arranged to be remembered.";
+const TAGLINE = "Things worth keeping.";
 
 // Display labels for the product `tag` enum ('new'|'sale'|'limited'|'staff-pick').
 const TAG_LABELS: Record<string, string> = {

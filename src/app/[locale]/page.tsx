@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { priceDisplay, priceDisplayText } from "@/lib/pricing";
+import { categoryList } from "@/lib/category-list";
 import { Link } from "@/i18n/routing";
 import { getVisibleSegments, getLiveProducts, getHeroImagesFor } from "@/lib/queries";
 import Composition from "@/components/storefront/Composition";
@@ -40,9 +41,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isBn = locale === "bn";
   const url = `${BASE}/${locale}`;
   const title = t("home.metaTitle");
-  const description = t("home.metaDescription");
+  const openSegments = await getVisibleSegments().catch(() => []);
+  const description = t("home.metaDescription", { categories: categoryList(openSegments, isBn ? "bn" : "en") });
   return {
-    // The copy already carries the brand ("Sanguine · Perfume, flora…"), so
+    // The copy already carries the brand ("Sanguine · Considered gifts…"), so
     // skip the layout template that would append " · Sanguine" a second time.
     title: { absolute: title },
     description,
@@ -162,10 +164,15 @@ export default async function Home({ params }: Props) {
               {t("home.headlineLineOne")}<br />
               {t("home.headlineLineTwoStart")}<em>{t("home.headlineLineTwoEm")}</em>{t("home.headlineLineTwoEnd")}
             </h1>
-            <p>{t("home.lede")}</p>
+            <p>{t("home.lede", { categories: categoryList(segs, locale === "bn" ? "bn" : "en") })}</p>
             <div className="hero-btns">
-              {segs[0] && (
+              {segs.length === 1 && (
                 <Link href={`/shop/${segs[0].id}`} className="btn btn-gold" data-magnetic data-cursor-label={t("home.cursorEnter")}>
+                  {t("home.ctaShopOne", { name: locale === "bn" ? segs[0].nameBn || segs[0].name : segs[0].name.toLowerCase() })} <Icon name="arrow" size={14} />
+                </Link>
+              )}
+              {segs.length > 1 && (
+                <Link href="#departments" className="btn btn-gold" data-magnetic data-cursor-label={t("home.cursorEnter")}>
                   {t("home.ctaPrimary")} <Icon name="arrow" size={14} />
                 </Link>
               )}
