@@ -97,7 +97,7 @@ export default async function LocaleLayout({
           <Script src="/cursor.js" strategy="afterInteractive" />
           <Script src="/moments.js" strategy="lazyOnload" />
           <Script src="/atier.js" strategy="lazyOnload" />
-          {/* Cloudflare Analytics removed 2026-05-03 — Vercel Analytics +
+          {/* Cloudflare Analytics removed 2026-05-03: Vercel Analytics +
            *   Speed Insights are now the canonical telemetry stack. Two
            *   beacons per pageview is wasteful at our scale. */}
         </NextIntlClientProvider>

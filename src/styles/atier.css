@@ -1,4 +1,4 @@
-/* ===== Sanguine — A-tier visual layer ===== */
+/* ===== Sanguine: A-tier visual layer ===== */
 
 /* Mute toggle */
 .ssg-mute {
@@ -13,7 +13,7 @@
 .ssg-mute:hover { transform: scale(1.08); box-shadow: 0 10px 30px oklch(0.2 0.15 300 / 0.55); }
 .ssg-mute[data-muted="true"] .on { display: none; }
 .ssg-mute[data-muted="false"] .off { display: none; }
-/* Locked state — pre-consent. Dimmed and slightly de-saturated to signal
+/* Locked state: pre-consent. Dimmed and slightly de-saturated to signal
  * "this control isn't available yet". Tooltip from JS explains why. */
 .ssg-mute[data-locked="true"] { opacity: 0.45; cursor: not-allowed; }
 .ssg-mute[data-locked="true"]:hover { transform: none; }
@@ -28,7 +28,7 @@
   pointer-events: none;
 }
 .ssg-seal-loader.in { opacity: 1; pointer-events: auto; }
-/* pointer-events must reset with the fade — without it the invisible
+/* pointer-events must reset with the fade: without it the invisible
  * full-viewport overlay kept eating every click for ~800ms after load. */
 .ssg-seal-loader.out { opacity: 0; pointer-events: none; }
 .seal-disc { animation: sealPulse 1.4s ease-in-out infinite; }
@@ -70,7 +70,7 @@
 }
 .hero p .kw.in { opacity: 1; transform: none; filter: none; }
 
-/* Shared-element ghost — the cloned card */
+/* Shared-element ghost: the cloned card */
 /* Actual styling lives in inline transitions */
 
 /* WebGL hero canvas should sit BEHIND text but IN FRONT of the gradient */

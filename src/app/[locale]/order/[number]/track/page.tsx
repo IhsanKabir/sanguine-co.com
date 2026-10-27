@@ -120,7 +120,7 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
           {number}
         </h1>
         <p style={{ fontSize: 14, color: "var(--ink-soft)", marginTop: 12 }}>
-          {t("Placed", "তারিখ")} {order.createdAt ? formatDate(order.createdAt) : "—"} · {formatBdt(order.totalBdt, locale as "en" | "bn")} · {order.paymentMethod === "cod" ? t("Cash on Delivery", "ক্যাশ অন ডেলিভারি") : order.paymentMethod}
+          {t("Placed", "তারিখ")} {order.createdAt ? formatDate(order.createdAt) : "-"} · {formatBdt(order.totalBdt, locale as "en" | "bn")} · {order.paymentMethod === "cod" ? t("Cash on Delivery", "ক্যাশ অন ডেলিভারি") : order.paymentMethod}
         </p>
       </div>
 
@@ -165,7 +165,7 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
       <div className="panel" style={{ marginTop: 24, padding: 20 }}>
         <div className="pdp-label">{t("Delivering to", "যেখানে পৌঁছানো হবে")}</div>
         <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--purple-900)" }}>
-          {addr.fullName ?? "—"}<br/>{addr.line1 ?? ""}<br/>{addr.area ? addr.area + ", " : ""}{addr.city ?? ""}{addr.postcode ? " — " + addr.postcode : ""}<br/>{addr.phone ?? ""}
+          {addr.fullName ?? "-"}<br/>{addr.line1 ?? ""}<br/>{addr.area ? addr.area + ", " : ""}{addr.city ?? ""}{addr.postcode ? " " + addr.postcode : ""}<br/>{addr.phone ?? ""}
         </p>
       </div>
 

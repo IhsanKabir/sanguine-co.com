@@ -12,12 +12,12 @@ export {
 } from "./audio-shared";
 
 /**
- * Curated ambient audio (EXECUTION-PLAN 4.1 + 4.2) — server-side readers.
+ * Curated ambient audio (EXECUTION-PLAN 4.1 + 4.2): server-side readers.
  *
  * `site_settings.audio` holds an optional uploaded file per ambient sound.
  * The storefront bridge in the locale layout exposes the URLs to
  * public/atier.js as `window.SSG_AUDIO_URLS`; atier.js plays the file when
- * one exists and falls back to its synthesised WebAudio tone otherwise —
+ * one exists and falls back to its synthesised WebAudio tone otherwise:
  * including when a configured file 404s or fails to decode. Curation (real
  * recorded gongs, CC0/commissioned) is therefore an upload away and never a
  * deploy. Types and schemas live in audio-shared.ts (client-safe).
@@ -30,7 +30,7 @@ const EMPTY: AudioSettings = { gong: null, chime: null, seal: null };
 
 /**
  * Cached read for the storefront bridge. Missing row, malformed jsonb or an
- * unreachable DB all degrade to "no files" — synth tones keep working.
+ * unreachable DB all degrade to "no files": synth tones keep working.
  */
 export const getAudioSettings = unstable_cache(
   async (): Promise<AudioSettings> => {
@@ -51,7 +51,7 @@ export const getAudioSettings = unstable_cache(
   { tags: [AUDIO_CACHE_TAG] },
 );
 
-/** Uncached read for the admin page — always shows what is stored. */
+/** Uncached read for the admin page: always shows what is stored. */
 export async function getAudioSettingsUncached(): Promise<AudioSettings> {
   try {
     const rows = await db

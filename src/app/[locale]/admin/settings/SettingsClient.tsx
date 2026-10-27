@@ -25,11 +25,11 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
     setCommerceMsg(null);
     startCommerce(async () => {
       const res = await updateCommerceSettings({ preorderDepositPct: pct, returnWindowDays: days });
-      setCommerceMsg(res.ok ? "Saved — live across the storefront." : "Save failed.");
+      setCommerceMsg(res.ok ? "Saved: live across the storefront." : "Save failed.");
     });
   };
 
-  // Shipping rules — saved to the same commerce row; the cart, checkout,
+  // Shipping rules: saved to the same commerce row; the cart, checkout,
   // order total, product pages and /legal/shipping all read them.
   const [ship, setShip] = useState({
     freeShippingThresholdBdt: String(initialCommerce.freeShippingThresholdBdt),
@@ -53,11 +53,11 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
         shippingDhakaBdt: dhaka,
         shippingOutsideBdt: outside,
       });
-      setShipMsg(res.ok ? "Saved — cart, checkout and order totals now use these rates." : "Save failed.");
+      setShipMsg(res.ok ? "Saved: cart, checkout and order totals now use these rates." : "Save failed.");
     });
   };
 
-  // Cash-on-delivery phone check (lib/phone-code.ts) — same commerce row.
+  // Cash-on-delivery phone check (lib/phone-code.ts): same commerce row.
   const [codCheck, setCodCheck] = useState({
     on: initialCommerce.codPhoneCheck,
     min: String(initialCommerce.codPhoneCheckMinBdt),
@@ -70,7 +70,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
     setCodMsg(null);
     startCod(async () => {
       const res = await updateCommerceSettings({ codPhoneCheck: codCheck.on, codPhoneCheckMinBdt: min });
-      setCodMsg(res.ok ? "Saved — applies to the next checkout." : "Save failed.");
+      setCodMsg(res.ok ? "Saved: applies to the next checkout." : "Save failed.");
     });
   };
 
@@ -80,7 +80,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
       <p className="admin-sub">Shipping rules, payment methods, locales. Changes apply across the storefront.</p>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        {/* House details — moved to Editorial */}
+        {/* House details: moved to Editorial */}
         <div className="panel">
           <h3>House details</h3>
           <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 0, lineHeight: 1.6 }}>
@@ -89,11 +89,11 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
             edited per locale (English + বাংলা).
           </p>
           <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 10 }}>
-            Currently saved contact email: <b style={{ color: "var(--purple-900)" }}>{initialBrand.email || "—"}</b>
+            Currently saved contact email: <b style={{ color: "var(--purple-900)" }}>{initialBrand.email || "-"}</b>
           </p>
         </div>
 
-        {/* Quotation-driven pricing — the two live levers of the preorder model */}
+        {/* Quotation-driven pricing: the two live levers of the preorder model */}
         <div className="panel">
           <h3>Preorders & returns</h3>
           <div className="row">
@@ -126,7 +126,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
           </div>
         </div>
 
-        {/* Shipping — live */}
+        {/* Shipping: live */}
         <div className="panel">
           <h3>Shipping</h3>
           <div className="row">
@@ -148,7 +148,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
           <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 10, lineHeight: 1.6 }}>
             Used by the cart, checkout, the order total the customer pays, product pages, the
             home page and the Shipping policy. A city containing &ldquo;Dhaka&rdquo; gets the
-            Dhaka rate. Set the threshold to 0 to switch free shipping off &mdash; then also
+            Dhaka rate. Set the threshold to 0 to switch free shipping off: then also
             edit the announcement bar in Editorial if it mentions free shipping.
           </p>
           <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 8 }}>
@@ -159,7 +159,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
           </div>
         </div>
 
-        {/* Cash-on-delivery phone check — live */}
+        {/* Cash-on-delivery phone check: live */}
         <div className="panel">
           <h3>Cash on delivery: phone check</h3>
           <label style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 14 }}>
@@ -192,7 +192,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
           </div>
         </div>
 
-        {/* Payment methods — status only. Online methods need a payment
+        {/* Payment methods: status only. Online methods need a payment
             gateway integration; until then checkout offers COD alone, so no
             switch here may suggest otherwise. */}
         <div className="panel">
@@ -200,12 +200,12 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
           {([
             ["Cash on Delivery", "Always offered at checkout", true],
             [
-              "Online — bKash, Nagad, Rocket, card (SSLCommerz)",
+              "Online: bKash, Nagad, Rocket, card (SSLCommerz)",
               gateway.connected
                 ? gateway.live
                   ? "Connected to the LIVE gateway: real payments"
                   : "Connected to the SANDBOX: test payments only, no real money"
-                : "Not connected — set SSLCOMMERZ_STORE_ID and SSLCOMMERZ_STORE_PASSWORD in the hosting environment",
+                : "Not connected: set SSLCOMMERZ_STORE_ID and SSLCOMMERZ_STORE_PASSWORD in the hosting environment",
               gateway.connected,
             ],
           ] as const).map(([label, hint, live]) => (
@@ -237,7 +237,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
             <span className="pill pill-ok">Active</span>
           </div>
           <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 14, lineHeight: 1.6 }}>
-            Currency: <b>BDT (৳)</b> — single currency at launch. Customer-facing strings live in <code>messages/en.json</code> and <code>messages/bn.json</code>.
+            Currency: <b>BDT (৳)</b>: single currency at launch. Customer-facing strings live in <code>messages/en.json</code> and <code>messages/bn.json</code>.
           </p>
         </div>
       </div>

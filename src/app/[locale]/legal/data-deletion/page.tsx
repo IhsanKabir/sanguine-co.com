@@ -9,7 +9,7 @@ export default function DataDeletionPage() {
 
       <h2>Your right to be forgotten</h2>
       <p>
-        You may at any time ask the maison to delete the personal information we hold on you — your name, contact details,
+        You may at any time ask the maison to delete the personal information we hold on you: your name, contact details,
         addresses, wishlist, and account record. We will action the request within thirty days and write back to you to confirm.
       </p>
 
@@ -21,13 +21,13 @@ export default function DataDeletionPage() {
       </ul>
       <p>
         If you signed in with Google or Facebook, simply tell us so and we will remove the linked record. You may also revoke
-        the maison&apos;s access from the social provider directly — Facebook → Settings → Apps and Websites; Google → myaccount.google.com → Security → Third-party apps.
+        the maison&apos;s access from the social provider directly: Facebook → Settings → Apps and Websites; Google → myaccount.google.com → Security → Third-party apps.
       </p>
 
       <h2>What we cannot delete</h2>
       <p>
-        Bangladeshi tax law (NBR) requires us to retain a record of completed orders for seven years. Those records — invoice number,
-        amount, items, delivery address — must remain on file even after a deletion request. We will, on request, anonymise the personal
+        Bangladeshi tax law (NBR) requires us to retain a record of completed orders for seven years. Those records (invoice number,
+        amount, items, delivery address) must remain on file even after a deletion request. We will, on request, anonymise the personal
         identifiers attached to those order records (replace name with the placeholder <i>Customer-XXXX</i>) once the legal retention period has passed.
       </p>
 

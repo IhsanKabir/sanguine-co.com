@@ -6,7 +6,7 @@ import { skipWithoutDb, KNOWN_PRODUCT_SLUG, KNOWN_SEGMENT_ID, SEEDED_CART_ITEM }
  * of every flow the hardening phases touch, so pricing/latency/mobile changes
  * can't silently regress them. Deliberately avoids pinning behavior the plan
  * will change (৳0 price rendering, quick-view preorder bypass, animation
- * timings) — those get their own assertions in the phase that fixes them.
+ * timings): those get their own assertions in the phase that fixes them.
  */
 
 test.describe("baseline · cart + checkout shell", () => {
@@ -19,7 +19,7 @@ test.describe("baseline · cart + checkout shell", () => {
     );
     await page.goto("/en/cart");
     await expect(page.getByText(SEEDED_CART_ITEM.name).first()).toBeVisible();
-    // 1234 × 2 — formatBdt renders western digits with thousands separator on /en.
+    // 1234 × 2: formatBdt renders western digits with thousands separator on /en.
     await expect(page.getByText(/2,468/).first()).toBeVisible();
   });
 
@@ -62,7 +62,7 @@ test.describe("baseline · catalogue flows @db", () => {
   test("shop grid renders cards and honors sort URL state", async ({ page }) => {
     skipWithoutDb();
     // URL-state rendering path (RSC re-render on filter change) exercised via
-    // direct navigation — click-driven filter UX is redesigned in Phase 3, so
+    // direct navigation: click-driven filter UX is redesigned in Phase 3, so
     // only the URL contract is pinned here.
     const res = await page.goto(`/en/shop/${KNOWN_SEGMENT_ID}?sort=price-asc`);
     expect(res?.status()).toBe(200);

@@ -1,4 +1,4 @@
--- Sanguine — deposit is a PAYMENT, not a discount (retro-review fix)
+-- Sanguine: deposit is a PAYMENT, not a discount (retro-review fix)
 --
 -- convertPreorderToOrder briefly recorded the prepaid bKash deposit in
 -- coupon_discount_bdt. That made totalBdt exclude money the customer actually

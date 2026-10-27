@@ -39,7 +39,7 @@ async function getSessionId(): Promise<string> {
       maxAge: SESSION_DAYS * 24 * 60 * 60,
       path: "/",
     });
-  } catch { /* server component context — cookie set silently dropped */ }
+  } catch { /* server component context: cookie set silently dropped */ }
   return fresh;
 }
 
@@ -48,12 +48,12 @@ type TrackInput = {
   productId?: string;
   customerId?: string;
   payload?: Record<string, unknown>;
-  /** Optional — passed when called from a request handler that already has the path. */
+  /** Optional: passed when called from a request handler that already has the path. */
   path?: string;
 };
 
 /**
- * Track a behavior event. Server-side only. Fire-and-forget — never throws.
+ * Track a behavior event. Server-side only. Fire-and-forget: never throws.
  * Failures are logged but do not block the calling action.
  */
 export async function trackEvent(input: TrackInput): Promise<void> {

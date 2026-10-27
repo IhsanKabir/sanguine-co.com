@@ -1,9 +1,9 @@
--- Sanguine — Review moderation
+-- Sanguine: Review moderation
 --
 -- Add a status column so the maison can vet reviews before they appear on
 -- public PDPs. Default 'pending' for any new submission; admin approves
 -- (or rejects) from /admin/reviews. Existing rows are auto-approved on
--- backfill — they were inserted by seed/admin before moderation existed.
+-- backfill: they were inserted by seed/admin before moderation existed.
 
 alter table reviews
   add column if not exists status text not null default 'pending'

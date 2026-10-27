@@ -2,7 +2,7 @@ import { test } from "@playwright/test";
 
 /**
  * Specs that need real catalogue rows call this first. Locally `.env`
- * provides DATABASE_URL so they run; on the GitHub runner they skip —
+ * provides DATABASE_URL so they run; on the GitHub runner they skip:
  * the smoke tier must never depend on secrets it doesn't have. CI sets
  * E2E_SKIP_DB explicitly because it also sets a placeholder DATABASE_URL
  * (db.ts throws at module load without one), so the URL's presence alone
@@ -22,7 +22,7 @@ export const KNOWN_PRODUCT_SLUG = "the-100-rose-special";
 export const KNOWN_SEGMENT_ID = "flowers";
 
 /**
- * A localStorage cart line matching cart-context's CartItem shape — lets
+ * A localStorage cart line matching cart-context's CartItem shape: lets
  * cart/checkout specs render a deterministic bag without depending on any
  * add-to-bag UI path (which varies by product preorder state).
  */

@@ -97,9 +97,9 @@ export default function CouponsClient({ coupons }: { coupons: Coupon[] }) {
                   </td>
                   <td>{TYPE_LABELS[c.type] || c.type}</td>
                   <td style={{ fontWeight: 500 }}>
-                    {c.type === "percent" ? `${c.value}%` : c.type === "fixed" ? formatBdt(c.value) : "—"}
+                    {c.type === "percent" ? `${c.value}%` : c.type === "fixed" ? formatBdt(c.value) : "-"}
                   </td>
-                  <td style={{ color: "var(--ink-soft)" }}>{c.minSubtotalBdt > 0 ? formatBdt(c.minSubtotalBdt) : "—"}</td>
+                  <td style={{ color: "var(--ink-soft)" }}>{c.minSubtotalBdt > 0 ? formatBdt(c.minSubtotalBdt) : "-"}</td>
                   <td>
                     {c.usedCount}{c.maxUses !== null && c.maxUses !== undefined ? ` / ${c.maxUses}` : ""}
                     {remainingUses !== null && remainingUses === 0 && <span className="pill pill-err" style={{ marginLeft: 6 }}>used up</span>}
@@ -165,7 +165,7 @@ export default function CouponsClient({ coupons }: { coupons: Coupon[] }) {
                 </div>
               </div>
               <div className="field"><label>Description (optional, customer sees it)</label>
-                <input value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} placeholder="Eid 2026 — 15% off"/></div>
+                <input value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} placeholder="Eid 2026: 15% off"/></div>
 
               {editing.type !== "free_shipping" && (
                 <div className="row">

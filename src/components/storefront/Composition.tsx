@@ -18,7 +18,7 @@ type Props = {
 
 /**
  * Generative cover art keyed by category + product. Replaces real photography
- * at launch — the maison's primary visual identity until the photo budget arrives.
+ * at launch: the maison's primary visual identity until the photo budget arrives.
  *
  * The CSS in atelier.css uses --cmp-h (hue offset) and --cmp-i (initial letter)
  * to produce per-product variations.

@@ -78,7 +78,7 @@ export async function createPreorderRequest(
     attachments: data.attachments,
   }).returning();
 
-  // Customer + admin notification emails — fire-and-forget, never block.
+  // Customer + admin notification emails: fire-and-forget, never block.
   const customerPayload = {
     customerName: data.customerName,
     segmentName: seg[0].name,
@@ -144,7 +144,7 @@ export async function createProductPreorderRequest(
     return { ok: false as const, error: "This product is not available for preorder." };
   }
 
-  // Snapshot what the customer was shown (estimate range + deposit %) — the
+  // Snapshot what the customer was shown (estimate range + deposit %): the
   // quote may differ after research, but the advertised numbers must be on
   // record for the admin and for drift monitoring.
   const commerce = await getCommerceSettings();
@@ -268,16 +268,16 @@ export async function quotePreorderRequest(input: z.infer<typeof quoteSchema>) {
   // Terminal/paid states must not be silently re-quoted: converted already
   // has a real order, rejected was closed, confirmed has money on record.
   if (existing.status === "converted" || existing.status === "rejected") {
-    return { ok: false as const, error: `This request is already ${existing.status} — it cannot be re-quoted.` };
+    return { ok: false as const, error: `This request is already ${existing.status}: it cannot be re-quoted.` };
   }
   if (existing.status === "confirmed") {
-    return { ok: false as const, error: "Deposit already received on the current quote — convert it, or refund the deposit before re-quoting." };
+    return { ok: false as const, error: "Deposit already received on the current quote: convert it, or refund the deposit before re-quoting." };
   }
   const commerce = await getCommerceSettings();
   const depositPct = existing.advertisedDepositPct ?? effectiveDepositPct(null, commerce.preorderDepositPct);
   // Deposit secures the whole commission: pct × (per-unit quote × quantity).
   // Computing it per-unit made the quote email read "deposit ৳2,000 (20%)"
-  // under a ৳30,000 three-piece total — 6.7% in reality.
+  // under a ৳30,000 three-piece total: 6.7% in reality.
   const depositBdt = depositForQuote(data.quotedPriceBdt * existing.quantity, depositPct);
 
   const [row] = await db.update(schema.preorderRequests)
@@ -334,7 +334,7 @@ export async function rejectPreorderRequest(input: z.infer<typeof rejectSchema>)
 
 /**
  * Record that the bKash deposit actually arrived. Nothing else may flip a
- * request to 'confirmed' — the conversion only deducts the deposit from the
+ * request to 'confirmed': the conversion only deducts the deposit from the
  * COD total when this state is set, so a quoted-but-unpaid request can never
  * silently lose the deposit amount.
  */
@@ -346,7 +346,7 @@ export async function markPreorderDepositReceived(id: string) {
   if (req.status !== "quoted") {
     return { ok: false as const, error: `Only quoted requests can be marked deposit-received (this one is '${req.status}').` };
   }
-  if (!req.depositBdt) return { ok: false as const, error: "No deposit amount on record — re-quote first." };
+  if (!req.depositBdt) return { ok: false as const, error: "No deposit amount on record: re-quote first." };
   await db.update(schema.preorderRequests)
     .set({ status: "confirmed", updatedAt: new Date() })
     .where(eq(schema.preorderRequests.id, id));
@@ -371,11 +371,11 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
   // Idempotency guard: an admin double-click on "Convert" must not create a
   // second COD order, and rejected requests must never convert.
   if (req.status === "converted") return { ok: false as const, error: "Already converted to an order." };
-  if (req.status === "rejected") return { ok: false as const, error: "This request was rejected — re-quote it first." };
+  if (req.status === "rejected") return { ok: false as const, error: "This request was rejected: re-quote it first." };
   if (!req.quotedPriceBdt) return { ok: false as const, error: "Quote the request before converting." };
   if (!req.deliveryAddress) return { ok: false as const, error: "Customer did not provide a delivery address." };
 
-  // Product preorders keep their identity on the order line — the invoice,
+  // Product preorders keep their identity on the order line: the invoice,
   // emails and review eligibility all key off productId/name/sku.
   const [linkedProduct] = req.productId
     ? await db.select().from(schema.products).where(eq(schema.products.id, req.productId)).limit(1)
@@ -385,7 +385,7 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
   const subtotal = req.quotedPriceBdt * req.quantity;   // per-unit quote × qty
   // The deposit is deducted from the COD total ONLY when it was actually
   // received (status 'confirmed', set by markPreorderDepositReceived). A
-  // 'quoted' request converts at the full subtotal — assuming payment that
+  // 'quoted' request converts at the full subtotal: assuming payment that
   // never arrived would silently gift the deposit amount. Recorded in its
   // own depositPaidBdt column: it is a PAYMENT, not a discount (refund cap
   // and revenue both count it; the courier collects totalBdt).

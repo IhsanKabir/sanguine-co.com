@@ -38,7 +38,7 @@ export async function subscribeBackInStock(input: z.infer<typeof subscribeSchema
       gte(schema.stockNotifications.createdAt, oneHourAgo),
     ));
   if ((recent ?? 0) >= 10) {
-    // Same shape as success — no information leak about whether the email
+    // Same shape as success: no information leak about whether the email
     // exists in the system.
     return { ok: true as const, alreadyRegistered: true };
   }
@@ -73,7 +73,7 @@ export async function notifyBackInStock(productId: string) {
 
   const [product] = await db.select().from(schema.products).where(eq(schema.products.id, productId)).limit(1);
   if (!product) return { ok: false as const, error: "Product not found" };
-  if (product.stock <= 0) return { ok: false as const, error: "Product is still out of stock — restock before notifying." };
+  if (product.stock <= 0) return { ok: false as const, error: "Product is still out of stock: restock before notifying." };
 
   const pending = await db.select().from(schema.stockNotifications).where(and(
     eq(schema.stockNotifications.productId, productId),

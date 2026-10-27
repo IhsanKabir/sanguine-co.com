@@ -20,7 +20,7 @@ const submitSchema = z.object({
 });
 
 /**
- * A delivered order containing the product, owned by the user — matched by
+ * A delivered order containing the product, owned by the user: matched by
  * customerId OR guestEmail, because storefront orders placed while signed out
  * (or before checkout stamped customerId) only carry the email. Exported so
  * the PDP review-CTA gate applies the exact same rule.

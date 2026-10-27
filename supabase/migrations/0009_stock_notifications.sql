@@ -1,8 +1,8 @@
--- Sanguine — Notify-me-when-back-in-stock
+-- Sanguine: Notify-me-when-back-in-stock
 --
 -- A customer (or guest with an email) registers their interest in a sold-out
 -- piece. When admin restocks (stock 0 → positive), an email is sent and the
--- row is marked notified. We keep notified rows for analytics — they reveal
+-- row is marked notified. We keep notified rows for analytics: they reveal
 -- which pieces have the most repressed demand.
 
 create table if not exists stock_notifications (
@@ -17,7 +17,7 @@ create table if not exists stock_notifications (
 create index if not exists idx_stock_notif_product on stock_notifications(product_id) where notified_at is null;
 create index if not exists idx_stock_notif_email on stock_notifications(lower(email));
 
--- One pending registration per (product, email) — re-clicking "notify me"
+-- One pending registration per (product, email): re-clicking "notify me"
 -- should not duplicate.
 create unique index if not exists uq_stock_notif_pending
   on stock_notifications(product_id, lower(email))

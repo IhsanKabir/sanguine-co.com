@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-/** SEO plumbing that has silently broken before — keep it pinned. */
+/** SEO plumbing that has silently broken before: keep it pinned. */
 test.describe("SEO smoke", () => {
   test("robots.txt explicitly allows /api/og despite the /api disallow", async ({ request }) => {
     const res = await request.get("/robots.txt");

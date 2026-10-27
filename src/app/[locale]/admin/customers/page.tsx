@@ -134,11 +134,11 @@ export default async function AdminCustomersPage() {
                     <td style={{ color: "var(--ink-soft)", fontSize: 12 }}>
                       <Link href={`/admin/customers/${encodeURIComponent(c.email)}`} style={{ color: "inherit" }}>{c.email}</Link>
                     </td>
-                    <td style={{ fontFamily: "var(--mono)", fontSize: 11 }}>{c.phone || "—"}</td>
-                    <td>{c.city || "—"}</td>
+                    <td style={{ fontFamily: "var(--mono)", fontSize: 11 }}>{c.phone || "-"}</td>
+                    <td>{c.city || "-"}</td>
                     <td>{c.orderCount}</td>
                     {canSeeRevenue && <td style={{ fontWeight: 500 }}>{formatBdt(c.totalSpentBdt)}</td>}
-                    <td style={{ color: "var(--ink-soft)", fontSize: 12 }}>{c.lastOrderAt ? formatDate(c.lastOrderAt) : "—"}</td>
+                    <td style={{ color: "var(--ink-soft)", fontSize: 12 }}>{c.lastOrderAt ? formatDate(c.lastOrderAt) : "-"}</td>
                     <td>
                       {t
                         ? <span className={"pill " + t.pill}>{t.name}</span>

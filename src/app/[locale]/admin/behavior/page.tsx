@@ -31,7 +31,7 @@ export default async function AdminBehaviorPage({
   const sp = await searchParams;
   const days = parseInt(sp.days || "30") || 30;
   // ISO string, NOT a Date: drizzle's raw sql template passes params
-  // unserialized to postgres.js, whose wire encoder rejects Date objects —
+  // unserialized to postgres.js, whose wire encoder rejects Date objects:
   // every query below silently failed into its empty fallback, rendering the
   // whole page as zeros. (Same root cause isolated in the health board.)
   const since = new Date(Date.now() - days * 86400_000).toISOString();
@@ -50,7 +50,7 @@ export default async function AdminBehaviorPage({
   `).catch(logAndFallback("funnel", [{ sessions: 0, product_views: 0, adds: 0, checkouts: 0, orders: 0 }] as Array<{
     sessions: number; product_views: number; adds: number; checkouts: number; orders: number;
   }>));
-  // Defensive — drizzle has shipped versions where execute() returns
+  // Defensive: drizzle has shipped versions where execute() returns
   // `{ rows }` or `Row[]` depending on driver; pull the first row from either.
   const funnel = Array.isArray(funnelRows)
     ? funnelRows[0]
@@ -175,7 +175,7 @@ export default async function AdminBehaviorPage({
 
         <div className="chart">
           <div className="chart-hd"><h3>Daily volume</h3></div>
-          {dailyVolume.length === 0 ? <p style={{ color: "var(--ink-soft)" }}>No data yet — open the storefront to fire events.</p> : (
+          {dailyVolume.length === 0 ? <p style={{ color: "var(--ink-soft)" }}>No data yet: open the storefront to fire events.</p> : (
             <div className="barchart-wrap">
               <div className="barchart">
                 {dailyVolume.map((d) => (
@@ -208,7 +208,7 @@ export default async function AdminBehaviorPage({
                 </tbody>
               </table>
               <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 8 }}>
-                Zero-result searches are catalogue-expansion signals — what customers want that you don&apos;t sell.
+                Zero-result searches are catalogue-expansion signals: what customers want that you don&apos;t sell.
               </p>
             </div>
           )}

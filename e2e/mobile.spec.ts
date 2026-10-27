@@ -3,7 +3,7 @@ import { skipWithoutDb, KNOWN_PRODUCT_SLUG, KNOWN_SEGMENT_ID } from "./helpers";
 
 /**
  * Phase-4 mobile pins (IMPROVEMENT-PLAN.md): viewport/touch behavior that
- * broke silently before — horizontal overflow, the invisible quick-view
+ * broke silently before: horizontal overflow, the invisible quick-view
  * overlay hijacking card taps, and PDP thumbs with no resolvable size.
  */
 test.use({ ...devices["iPhone 12"], defaultBrowserType: "chromium" });
@@ -20,7 +20,7 @@ test.describe("mobile · 390px touch profile", () => {
   test("tapping the bottom of a product card navigates to the PDP @db", async ({ page }) => {
     skipWithoutDb();
     await page.goto(`/en/shop/${KNOWN_SEGMENT_ID}`);
-    // Dismiss the cookie banner first — it overlays the lower viewport (and
+    // Dismiss the cookie banner first: it overlays the lower viewport (and
     // the first failure screenshot showed the tap landing on it, which is
     // the layer-stacking class of bug this suite exists to catch). Wait for
     // it to actually leave before computing tap coordinates.

@@ -14,7 +14,7 @@ type Segment = { id: string; name: string };
  *
  * The server-rendered TopNav can't read `usePathname`, so the chip rendering
  * is split out here. An animated underline draws in on hover (preview) and
- * stays drawn when the chip's segment matches the current route — same
+ * stays drawn when the chip's segment matches the current route: same
  * oceanic motion grammar used by the section ornaments.
  */
 export default function CatStrip({

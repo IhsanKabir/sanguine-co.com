@@ -28,7 +28,7 @@ function isoToLocalInput(iso: string | null): string {
 
 /**
  * datetime-local value → ISO UTC. Empty → null.
- * `new Date("YYYY-MM-DDTHH:MM")` parses in the BROWSER's OS timezone — which
+ * `new Date("YYYY-MM-DDTHH:MM")` parses in the BROWSER's OS timezone: which
  * is Asia/Dhaka only if the curator's machine is set that way. The hint text
  * under the form states this; a fixed-TZ conversion (Temporal/date-fns-tz)
  * is the upgrade path if remote admins ever schedule announcements.
@@ -68,7 +68,7 @@ export default function AnnouncementEditor({ initial }: Props) {
 
   const windowHint =
     !a.startAt && !a.endAt
-      ? "No window set — shows continuously while enabled."
+      ? "No window set: shows continuously while enabled."
       : "Times are interpreted in your browser's OS timezone (set your machine to Asia/Dhaka) and stored as UTC.";
 
   return (
@@ -90,7 +90,7 @@ export default function AnnouncementEditor({ initial }: Props) {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <div className="field">
-          <label>Text — EN</label>
+          <label>Text: EN</label>
           <textarea
             rows={2}
             maxLength={200}
@@ -100,14 +100,14 @@ export default function AnnouncementEditor({ initial }: Props) {
           />
         </div>
         <div className="field">
-          <label>Text — বাংলা</label>
+          <label>Text: বাংলা</label>
           <textarea
             rows={2}
             maxLength={200}
             value={a.textBn}
             onChange={(e) => set("textBn", e.target.value)}
             lang="bn"
-            placeholder="ঈদ কালেকশন — বৃহস্পতিবার পর্যন্ত ফ্রি ডেলিভারি"
+            placeholder="ঈদ কালেকশন: বৃহস্পতিবার পর্যন্ত ফ্রি ডেলিভারি"
           />
         </div>
       </div>

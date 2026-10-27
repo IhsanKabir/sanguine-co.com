@@ -219,7 +219,7 @@ export default function OrdersClient({ orders, lines }: Props) {
                   </td>
                   <td style={{ fontFamily: "var(--mono)", color: "var(--purple-900)", fontWeight: 500 }}>{o.number}</td>
                   <td>
-                    <div style={{ fontWeight: 500 }}>{addr.fullName ?? "—"}</div>
+                    <div style={{ fontWeight: 500 }}>{addr.fullName ?? "-"}</div>
                     <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>{o.guestEmail}</div>
                   </td>
                   <td>{itemCount}</td>
@@ -230,7 +230,7 @@ export default function OrdersClient({ orders, lines }: Props) {
                     </span>
                   </td>
                   <td style={{ fontSize: 11, color: "var(--ink-soft)" }}>
-                    {o.shippingCourier ? `${o.shippingCourier} · ${o.shippingTracking}` : "—"}
+                    {o.shippingCourier ? `${o.shippingCourier} · ${o.shippingTracking}` : "-"}
                   </td>
                   <td style={{ color: "var(--ink-soft)", fontSize: 12 }}>{formatDate(o.createdAt!)}</td>
                 </tr>
@@ -271,10 +271,10 @@ export default function OrdersClient({ orders, lines }: Props) {
                   const a = parseShippingAddress(selected.shippingAddress);
                   return (
                     <>
-                      <div style={{ fontWeight: 500 }}>{a.fullName ?? "—"}</div>
+                      <div style={{ fontWeight: 500 }}>{a.fullName ?? "-"}</div>
                       <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>
                         {selected.guestEmail}<br/>{a.phone ?? ""}<br/>
-                        {a.line1 ?? ""}<br/>{a.area ? a.area + ", " : ""}{a.city ?? ""}{a.postcode ? " — " + a.postcode : ""}
+                        {a.line1 ?? ""}<br/>{a.area ? a.area + ", " : ""}{a.city ?? ""}{a.postcode ? " " + a.postcode : ""}
                       </div>
                     </>
                   );
@@ -407,11 +407,11 @@ function Timeline({ events, loading }: { events: OrderEvent[]; loading: boolean 
           const p = (e.payload as Record<string, unknown>) ?? {};
           const date = new Date(e.createdAt);
           let detail: string | null = null;
-          if (e.type === "status_changed") detail = `${p.from ?? "—"} → ${p.to ?? "—"}${p.source === "courier" ? ` (reported by ${p.courier ?? "courier"})` : ""}`;
+          if (e.type === "status_changed") detail = `${p.from ?? "-"} → ${p.to ?? "-"}${p.source === "courier" ? ` (reported by ${p.courier ?? "courier"})` : ""}`;
           else if (e.type === "courier_status") detail = `${p.courier ?? ""} · ${p.status ?? ""}`.trim();
-          else if (e.type === "phone_check") detail = p.verified ? "Phone verified by SMS code" : `Phone NOT verified${p.reason ? ` (${p.reason})` : ""} — confirm by phone before shipping`;
+          else if (e.type === "phone_check") detail = p.verified ? "Phone verified by SMS code" : `Phone NOT verified${p.reason ? ` (${p.reason})` : ""}: confirm by phone before shipping`;
           else if (e.type === "courier_booked") detail = `${p.courier ?? ""} · ${p.tracking ?? ""}`.trim();
-          else if (e.type === "refund_issued") detail = `${typeof p.amount === "number" ? `৳${(p.amount as number).toLocaleString("en-IN")}` : ""}${p.method ? ` · ${p.method}` : ""}${p.reason ? ` — ${p.reason}` : ""}`;
+          else if (e.type === "refund_issued") detail = `${typeof p.amount === "number" ? `৳${(p.amount as number).toLocaleString("en-IN")}` : ""}${p.method ? ` · ${p.method}` : ""}${p.reason ? `: ${p.reason}` : ""}`;
           else if (e.type === "note_added" && typeof p.note === "string") detail = p.note;
           return (
             <li key={e.id} style={{ padding: "8px 0", borderBottom: "1px solid var(--line)", fontSize: 12 }}>

@@ -28,7 +28,7 @@ export async function sendSms(rawPhone: string, message: string): Promise<{ ok: 
   const apiToken = process.env.SSLWIRELESS_API_TOKEN;
   const sid = process.env.SSLWIRELESS_SID;
   if (!apiToken || !sid) {
-    console.warn("[sms] missing SSLWIRELESS credentials — skipping send");
+    console.warn("[sms] missing SSLWIRELESS credentials: skipping send");
     return { ok: false, error: "missing-config" };
   }
   const phone = normalisePhone(rawPhone);

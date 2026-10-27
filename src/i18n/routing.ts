@@ -9,7 +9,7 @@ export const routing = defineRouting({
   localePrefix: "always",
   // Auto-detecting the locale from Accept-Language makes every response vary
   // by request header, so next-intl marks them no-store and writes a
-  // NEXT_LOCALE cookie — both of which forbid CDN/edge caching. Disabling it
+  // NEXT_LOCALE cookie: both of which forbid CDN/edge caching. Disabling it
   // lets the prerendered home/shop pages be edge-cached (a POP near the
   // visitor instead of a Mumbai round-trip). Cost: a bare-root visit lands on
   // the default locale (en) rather than a browser guess; the switcher still

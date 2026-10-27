@@ -143,7 +143,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
             ].map(({ k, v }) => (
               <div key={k} style={{ padding: "12px 16px", background: "white", border: "1px solid var(--line)", borderRadius: 2 }}>
                 <div style={{ fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--ink-soft)", fontFamily: "var(--mono)", marginBottom: 4 }}>{k}</div>
-                <div style={{ fontSize: 13, color: v ? "var(--purple-900)" : "var(--line)", fontWeight: v ? 500 : 400 }}>{v || "—"}</div>
+                <div style={{ fontSize: 13, color: v ? "var(--purple-900)" : "var(--line)", fontWeight: v ? 500 : 400 }}>{v || "-"}</div>
               </div>
             ))}
             <div style={{ padding: "12px 16px", background: "white", border: "1px solid var(--line)", borderRadius: 2 }}>
@@ -178,7 +178,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
                 </div>
                 <b>{a.fullName}</b><br />
                 {a.line1}{a.line2 ? `, ${a.line2}` : ""}<br />
-                {a.area ? `${a.area}, ` : ""}{a.city}{a.postcode ? ` — ${a.postcode}` : ""}<br />
+                {a.area ? `${a.area}, ` : ""}{a.city}{a.postcode ? ` ${a.postcode}` : ""}<br />
                 <span style={{ color: "var(--ink-soft)", fontSize: 12 }}>{a.phone}</span>
               </div>
             ))}
@@ -199,7 +199,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
                 <td style={{ fontFamily: "var(--mono)", color: "var(--purple-900)", fontWeight: 500 }}>
                   <Link href={`/admin/orders`} style={{ color: "inherit" }}>{o.number}</Link>
                 </td>
-                <td>{o.createdAt ? formatDate(new Date(o.createdAt)) : "—"}</td>
+                <td>{o.createdAt ? formatDate(new Date(o.createdAt)) : "-"}</td>
                 <td>
                   <span className={"pill " + (o.status === "delivered" ? "pill-ok" : o.status === "shipped" ? "pill-info" : o.status === "cancelled" || o.status === "refunded" ? "pill-err" : "pill-warn")}>
                     {o.status.replace("_", " ")}
@@ -207,7 +207,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
                 </td>
                 <td style={{ fontWeight: 500 }}>{formatBdt(o.totalBdt)}</td>
                 <td style={{ fontSize: 12, color: "var(--ink-soft)", textTransform: "capitalize" }}>
-                  {o.shippingCourier ?? "—"}
+                  {o.shippingCourier ?? "-"}
                 </td>
               </tr>
             ))}
@@ -231,7 +231,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
                     <td>{r.segmentId}</td>
                     <td style={{ maxWidth: 360, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 13, color: "var(--ink-soft)" }}>{r.description}</td>
                     <td><span className={"pill " + (r.status === "converted" ? "pill-ok" : r.status === "rejected" ? "pill-err" : "pill-warn")}>{r.status}</span></td>
-                    <td>{r.quotedPriceBdt ? formatBdt(r.quotedPriceBdt) : "—"}</td>
+                    <td>{r.quotedPriceBdt ? formatBdt(r.quotedPriceBdt) : "-"}</td>
                   </tr>
                 ))}
               </tbody>

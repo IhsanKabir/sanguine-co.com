@@ -22,7 +22,7 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale });
-  // Result pages are thin and endless (one per query) — keep them out of the index.
+  // Result pages are thin and endless (one per query): keep them out of the index.
   return { title: t("searchPage.title"), robots: { index: false, follow: true } };
 }
 

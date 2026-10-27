@@ -1,9 +1,9 @@
--- Sanguine — quotation-driven pricing model (IMPROVEMENT-PLAN Phase 1)
+-- Sanguine: quotation-driven pricing model (IMPROVEMENT-PLAN Phase 1)
 --
 -- Owner decision (2026-07-13): the actual selling price of a preorder piece is
 -- established by quotation after research. Until then the catalogue can carry
 -- at most an ESTIMATED RANGE. The preorder prepayment ("deposit") is a
--- configurable PERCENTAGE of the quoted actual price — global default lives in
+-- configurable PERCENTAGE of the quoted actual price: global default lives in
 -- site_settings.commerce (key/jsonb, no schema change), overridable per product.
 -- Return window: 7-day default, overridable per product.
 --
@@ -42,7 +42,7 @@ alter table preorder_requests
   add column if not exists deposit_bdt integer;
 
 -- Data repair: zero-priced preorder rows carry the owner's estimate in the
--- deprecated preorder_price_bdt — surface it as the range ceiling so nothing
+-- deprecated preorder_price_bdt: surface it as the range ceiling so nothing
 -- customer-facing ever renders ৳0 again.
 update products
 set price_max_bdt = preorder_price_bdt

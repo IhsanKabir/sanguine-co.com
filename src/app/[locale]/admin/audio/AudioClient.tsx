@@ -12,9 +12,9 @@ const MAX_BYTES = 250 * 1024;
 const ACCEPT = "audio/ogg,audio/mpeg,.ogg,.mp3";
 
 const KIND_COPY: Record<AudioKind, { name: string; when: string }> = {
-  gong: { name: "Gong", when: "First user gesture after arriving — the maison's doorbell." },
-  chime: { name: "Chime", when: "Unmuting sound — a small confirmation." },
-  seal: { name: "Seal", when: "Route transitions — the wax-seal press." },
+  gong: { name: "Gong", when: "First user gesture after arriving: the maison's doorbell." },
+  chime: { name: "Chime", when: "Unmuting sound: a small confirmation." },
+  seal: { name: "Seal", when: "Route transitions: the wax-seal press." },
 };
 
 /**
@@ -22,7 +22,7 @@ const KIND_COPY: Record<AudioKind, { name: string; when: string }> = {
  * browser-direct to the `audio` bucket with the admin's session JWT
  * (RLS gates on the `settings` permission), then the URL is recorded via
  * the server action. While no file is uploaded the storefront keeps the
- * synthesised WebAudio tone — "Reset to synth" is the one-click rollback.
+ * synthesised WebAudio tone: "Reset to synth" is the one-click rollback.
  */
 export default function AudioClient({ initial }: { initial: AudioSettings }) {
   const [settings, setSettings] = useState<AudioSettings>(initial);
@@ -45,7 +45,7 @@ export default function AudioClient({ initial }: { initial: AudioSettings }) {
     setBusyKind(kind);
     try {
       const sb = createSupabaseBrowserClient();
-      // Extension from the MIME type, not the filename — a renamed mp3 keeps
+      // Extension from the MIME type, not the filename: a renamed mp3 keeps
       // an honest storage path.
       const ext = file.type === "audio/mpeg" ? "mp3" : "ogg";
       const path = `${kind}/${crypto.randomUUID()}.${ext}`;
@@ -97,7 +97,7 @@ export default function AudioClient({ initial }: { initial: AudioSettings }) {
       <h1 className="admin-h1">Ambient audio</h1>
       <p className="admin-sub">
         The storefront&apos;s three ambient cues. Without an upload each one is synthesised in the
-        browser — upload a curated recording (.ogg or .mp3, ≤ 250 KB, CC0 or commissioned) to
+        browser: upload a curated recording (.ogg or .mp3, ≤ 250 KB, CC0 or commissioned) to
         replace it. Keep the licence note in the file name.
       </p>
 
@@ -149,7 +149,7 @@ export default function AudioClient({ initial }: { initial: AudioSettings }) {
 
       <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 16 }}>
         Changes reach the storefront on the next page load. Sounds stay consent-gated and muted
-        by default — uploading a file never makes the site louder, only nicer once a visitor
+        by default: uploading a file never makes the site louder, only nicer once a visitor
         opts in.
       </p>
     </>

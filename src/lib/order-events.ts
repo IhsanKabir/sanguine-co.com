@@ -16,7 +16,7 @@ export type OrderEventType =
   | "phone_check";      // COD phone code result at checkout (payload: verified, reason?)   // a new status reported by the courier sync (payload: courier, status, outcome)
 
 /**
- * Log a material event against an order. Append-only — never throws on a
+ * Log a material event against an order. Append-only: never throws on a
  * write failure (event-log gaps are recoverable; a crashed user action is not).
  *
  * Snapshots the actor's email at write time so the timeline still shows

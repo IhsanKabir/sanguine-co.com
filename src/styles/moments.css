@@ -1,4 +1,4 @@
-/* ===== Sanguine — Signature Moments ===== */
+/* ===== Sanguine: Signature Moments ===== */
 
 /* Mask-reveal characters in section headings */
 .mask-char {
@@ -26,10 +26,10 @@
 /* Disable old CSS marquee animation since JS now drives it */
 .marquee-track { animation: none !important; }
 
-/* Disable old hero h1/p/btn entrance — gold dust handles h1, others remain */
+/* Disable old hero h1/p/btn entrance: gold dust handles h1, others remain */
 .hero h1 { animation: none !important; }
 
-/* Loupe — border + inner shadow only. The old backdrop-filter re-sampled the
+/* Loupe: border + inner shadow only. The old backdrop-filter re-sampled the
  * page under the cursor EVERY frame it moved, making the PDP (where Add to
  * Bag lives) the most sluggish page on integrated GPUs. */
 #ssg-cursor[data-mode="loupe"] .cur-loupe::before {

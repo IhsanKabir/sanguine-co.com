@@ -1,4 +1,4 @@
-// Sanguine — Signature Moments
+// Sanguine: Signature Moments
 // 1. Hero gold-dust headline assembly (canvas particles -> letterforms)
 // 2. Scroll-velocity coupled marquee
 // 3. Scroll-driven hero parallax (depth layers)
@@ -105,7 +105,7 @@
       }
     }
 
-    // Particles — capped well below the old 1200: the per-frame physics loop
+    // Particles: capped well below the old 1200: the per-frame physics loop
     // saturated low-end main threads exactly during first click attempts.
     const N = Math.min(targets.length, 400);
     const particles = [];
@@ -165,7 +165,7 @@
     requestAnimationFrame(tick);
   };
   // Desktop-with-headroom only, and deferred to idle: the getImageData scan +
-  // particle loop are pure decoration — they must never delay the user's
+  // particle loop are pure decoration: they must never delay the user's
   // first interaction on the landing page.
   const dustCapable =
     window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
@@ -180,7 +180,7 @@
   const maskReveal = () => {
     // Bengali is a complex script: conjuncts and dependent vowel signs must
     // shape with adjacent characters. Splitting into per-code-unit inline
-    // blocks renders dotted circles and broken letterforms — skip the effect
+    // blocks renders dotted circles and broken letterforms: skip the effect
     // entirely on the bn locale (headings appear normally).
     if ((document.documentElement.lang || '').toLowerCase().startsWith('bn')) return;
     document.querySelectorAll('.section-hd h2:not(.mask-init)').forEach(h => {
@@ -195,7 +195,7 @@
         h.appendChild(s);
       });
     });
-    // Observe — when parent .section-hd reveals, animate chars
+    // Observe: when parent .section-hd reveals, animate chars
     document.querySelectorAll('.section-hd[data-reveal]').forEach(s => {
       const obs = new MutationObserver(() => {
         if (s.classList.contains('reveal-in')) {
@@ -211,7 +211,7 @@
     });
   };
   setTimeout(maskReveal, 300);
-  // Re-run on route changes — debounce to one rAF to avoid firing synchronously
+  // Re-run on route changes: debounce to one rAF to avoid firing synchronously
   // on every React DOM commit (which would call querySelectorAll + innerHTML on each).
   let maskPending = false;
   const mo = new MutationObserver(() => {

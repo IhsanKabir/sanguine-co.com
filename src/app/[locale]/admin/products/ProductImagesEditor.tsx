@@ -78,7 +78,7 @@ export default function ProductImagesEditor({ productId, productSku }: Props) {
           productId,
           url: urlData.publicUrl,
           path,
-          alt: `${productSku} — ${file.name.split(".")[0]}`,
+          alt: `${productSku}: ${file.name.split(".")[0]}`,
         });
         if (!result.ok) {
           setError(result.error ?? "Could not record image.");

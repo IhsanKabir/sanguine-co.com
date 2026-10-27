@@ -3,18 +3,18 @@
 /**
  * Hand-rolled SVG-keyframe wax-seal animation. Plays once on mount, ~3
  * seconds total. The sequence:
- *   0.0s — paper appears (parchment underlay fades in)
- *   0.4s — molten wax pour-blob drops + spreads (scale 0 → 1.05 → 1)
- *   1.4s — stamp pressure (slight darken + radial glow)
- *   1.9s — crest emerges from the wax (opacity 0 → 1, gentle scale-in)
- *   2.6s — settle (subtle bob, finish)
+ *   0.0s: paper appears (parchment underlay fades in)
+ *   0.4s: molten wax pour-blob drops + spreads (scale 0 → 1.05 → 1)
+ *   1.4s: stamp pressure (slight darken + radial glow)
+ *   1.9s: crest emerges from the wax (opacity 0 → 1, gentle scale-in)
+ *   2.6s: settle (subtle bob, finish)
  *
  * No JS animation library required. Uses CSS @keyframes + animation-delay
  * for sequencing. Honours `prefers-reduced-motion`: skips animation, paints
  * the final frame immediately.
  *
  * Used on /order/[number] above "Thank you, {name}". The single most
- * emotional moment in the storefront flow — worth the careful production.
+ * emotional moment in the storefront flow: worth the careful production.
  */
 export default function WaxSeal({ size = 200 }: { size?: number }) {
   return (
@@ -30,13 +30,13 @@ export default function WaxSeal({ size = 200 }: { size?: number }) {
     >
       <svg viewBox="0 0 200 200" width={size} height={size}>
         <defs>
-          {/* The wax mass — radial darken so it has depth */}
+          {/* The wax mass: radial darken so it has depth */}
           <radialGradient id="seal-wax" cx="0.5" cy="0.4" r="0.6">
             <stop offset="0%" stopColor="oklch(0.40 0.14 25)" />
             <stop offset="55%" stopColor="oklch(0.32 0.16 25)" />
             <stop offset="100%" stopColor="oklch(0.22 0.14 22)" />
           </radialGradient>
-          {/* The crest highlight — soft gold from above */}
+          {/* The crest highlight: soft gold from above */}
           <radialGradient id="seal-glow" cx="0.5" cy="0.35" r="0.55">
             <stop offset="0%" stopColor="oklch(0.78 0.10 80 / 0.45)" />
             <stop offset="80%" stopColor="oklch(0.78 0.10 80 / 0)" />
@@ -48,11 +48,11 @@ export default function WaxSeal({ size = 200 }: { size?: number }) {
           </linearGradient>
         </defs>
 
-        {/* Paper underlay — kept very subtle, just gives the seal something
+        {/* Paper underlay: kept very subtle, just gives the seal something
             to "press into" rather than floating in space. */}
         <circle cx="100" cy="100" r="92" fill="oklch(0.95 0.012 75)" className="seal-paper" />
 
-        {/* The wax disc — molten irregular edge, scales in with a slight
+        {/* The wax disc: molten irregular edge, scales in with a slight
             overshoot to feel like it's spreading on impact. */}
         <path
           className="seal-wax"
@@ -66,13 +66,13 @@ export default function WaxSeal({ size = 200 }: { size?: number }) {
           fill="url(#seal-wax)"
         />
 
-        {/* Inner ring — the impression edge */}
+        {/* Inner ring: the impression edge */}
         <circle cx="100" cy="100" r="62" fill="none" stroke="oklch(0.20 0.10 22)" strokeWidth="1" opacity="0.4" className="seal-ring" />
 
         {/* Glow under the crest */}
         <circle cx="100" cy="100" r="48" fill="url(#seal-glow)" className="seal-glow" />
 
-        {/* The crest — a stylised "S" inside two concentric circles, kept
+        {/* The crest: a stylised "S" inside two concentric circles, kept
             geometric so it reads as maison signet rather than royal coat. */}
         <g className="seal-crest">
           <circle cx="100" cy="100" r="38" fill="none" stroke="url(#seal-crest)" strokeWidth="1" />
@@ -102,7 +102,7 @@ export default function WaxSeal({ size = 200 }: { size?: number }) {
           >MMXXVI</text>
         </g>
 
-        {/* Two small drips at the bottom — the wax is fresh */}
+        {/* Two small drips at the bottom: the wax is fresh */}
         <g className="seal-drips">
           <ellipse cx="78" cy="180" rx="3" ry="5" fill="oklch(0.32 0.14 22)" />
           <ellipse cx="124" cy="184" rx="2" ry="4" fill="oklch(0.32 0.14 22)" opacity="0.85" />

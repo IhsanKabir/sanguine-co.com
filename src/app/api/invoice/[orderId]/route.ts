@@ -45,7 +45,7 @@ export async function GET(
   const addr = parseShippingAddress(order.shippingAddress);
   const placed = order.createdAt
     ? new Date(order.createdAt).toLocaleDateString("en-BD", { day: "numeric", month: "long", year: "numeric" })
-    : "—";
+    : "-";
 
   const lineRows = lines
     .map(
@@ -67,7 +67,7 @@ export async function GET(
       ? `<tr><td colspan="3" style="text-align:right;padding:6px 0;font-size:13px;color:#666">Discount${order.couponCode ? ` · ${order.couponCode}` : ""}</td><td style="text-align:right;padding:6px 0;font-size:13px;color:#2d7d46">− ${fmt(order.couponDiscountBdt)}</td></tr>`
       : "";
 
-  // Prepaid preorder deposit — a payment already received, shown between
+  // Prepaid preorder deposit: a payment already received, shown between
   // subtotal and the COD total so the arithmetic reads honestly.
   const depositRow =
     order.depositPaidBdt && order.depositPaidBdt > 0
@@ -114,9 +114,9 @@ export async function GET(
   <div>
     <div class="mono" style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8b7bb0;margin-bottom:8px">Billed to</div>
     <div style="font-size:14px;line-height:1.6;color:#2d1b4e">
-      ${addr.fullName ?? "—"}<br/>
+      ${addr.fullName ?? "-"}<br/>
       ${addr.line1 ?? ""}${addr.line2 ? ", " + addr.line2 : ""}<br/>
-      ${addr.area ? addr.area + ", " : ""}${addr.city ?? ""}${addr.postcode ? " — " + addr.postcode : ""}<br/>
+      ${addr.area ? addr.area + ", " : ""}${addr.city ?? ""}${addr.postcode ? " " + addr.postcode : ""}<br/>
       ${addr.phone ?? ""}
     </div>
   </div>

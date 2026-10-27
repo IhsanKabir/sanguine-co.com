@@ -151,8 +151,8 @@ function SalesView({ data }: { data: SalesData }) {
         <div className="chart">
           <div className="chart-hd"><h3>By segment</h3></div>
           {bySegment.length === 0 ? <p style={{ color: "var(--ink-soft)", fontSize: 13 }}>No data.</p> : bySegment.map((s) => (
-            <div key={s.segment_id || "—"} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--line)", fontSize: 13 }}>
-              <span>{s.segment_name || s.segment_id || "—"}</span>
+            <div key={s.segment_id || "-"} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--line)", fontSize: 13 }}>
+              <span>{s.segment_name || s.segment_id || "-"}</span>
               <span><b>{s.units}</b> units{canSeeRevenue && <> · {formatBdt(s.revenue)}</>}</span>
             </div>
           ))}
@@ -206,8 +206,8 @@ function CodView({ data }: { data: CodData }) {
   const { summary, stale } = data;
   const grouped: Record<string, { status: string; count: number; total: number }[]> = {};
   for (const r of summary) {
-    grouped[r.courier ?? "—"] ??= [];
-    grouped[r.courier ?? "—"].push({ status: r.status, count: r.count, total: r.total });
+    grouped[r.courier ?? "-"] ??= [];
+    grouped[r.courier ?? "-"].push({ status: r.status, count: r.count, total: r.total });
   }
   const totalOutstanding = summary
     .filter((s) => s.status === "cod_pending" || s.status === "shipped")
@@ -260,8 +260,8 @@ function CodView({ data }: { data: CodData }) {
                     <td className="mono" style={{ fontSize: 11 }}>{s.number}</td>
                     <td><span className={"pill " + (s.days_old > 14 ? "pill-err" : "pill-warn")}>{s.days_old} days</span></td>
                     <td><span className={"pill " + (s.status === "shipped" ? "pill-info" : "pill-warn")}>{s.status}</span></td>
-                    <td style={{ textTransform: "capitalize" }}>{s.courier || "— not booked"}</td>
-                    <td className="mono" style={{ fontSize: 11 }}>{s.tracking || "—"}</td>
+                    <td style={{ textTransform: "capitalize" }}>{s.courier || "Not booked"}</td>
+                    <td className="mono" style={{ fontSize: 11 }}>{s.tracking || "-"}</td>
                     <td style={{ fontWeight: 500 }}>{formatBdt(s.total)}</td>
                   </tr>
                 ))}

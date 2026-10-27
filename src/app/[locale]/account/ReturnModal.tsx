@@ -32,7 +32,7 @@ export default function ReturnModal({ orderId, orderNumber, onClose }: Props) {
 
   const onSubmit = () => {
     setError(null);
-    const full = notes.trim() ? `${reason} — ${notes.trim()}` : reason;
+    const full = notes.trim() ? `${reason}: ${notes.trim()}` : reason;
     startTransition(async () => {
       const r = await requestReturn({ orderId, reason: full });
       if (r.ok) setDone(true);

@@ -30,7 +30,7 @@
   .ssg-cursor, .ssg-idle { display: none !important; }
 }
 
-/* Drawer swipe-to-dismiss visual — the React drawer's class is `.drawer`
+/* Drawer swipe-to-dismiss visual: the React drawer's class is `.drawer`
  * (the old `.cart-drawer` selectors matched nothing; feature was dead). */
 .drawer.dragging { transition: none !important; }
 .drawer .drawer-handle {

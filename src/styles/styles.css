@@ -1,5 +1,5 @@
 :root{
-  /* Luxury plum palette — deep violet darks, warm ivory ground, amber gold accents.
+  /* Luxury plum palette: deep violet darks, warm ivory ground, amber gold accents.
    * Token names retain `--purple-*` for backward-compat with all surface CSS. */
   --purple-950:oklch(0.17 0.13 308);--purple-900:oklch(0.28 0.14 305);--purple-800:oklch(0.40 0.13 302);
   --purple-700:oklch(0.52 0.11 300);--purple-600:oklch(0.62 0.10 298);--purple-400:oklch(0.74 0.08 295);
@@ -16,7 +16,7 @@
 *{box-sizing:border-box}html,body{margin:0;padding:0}
 body{font-family:var(--sans);background:var(--cream);color:var(--ink);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;position:relative}
 
-/* Watercolour grain — site-wide, fixed, low opacity, multiply-blend.
+/* Watercolour grain: site-wide, fixed, low opacity, multiply-blend.
  * Inline SVG noise so we don't need a separate asset. ~5% opacity is the
  * sweet spot: visible texture, no readability impact. Honours reduced-motion
  * by leaving the grain static (it's not animated). */
@@ -35,7 +35,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .topbar{background:var(--purple-950);color:var(--purple-100);font-size:12px;letter-spacing:.07em;text-transform:uppercase;text-align:center;padding:8px 16px;position:relative}
 .topbar b{color:var(--gold);font-weight:500;letter-spacing:.12em}
 /* Scheduled announcement variants (admin → Editorial). Only "neutral" and
- * "celebration" exist by design — a red "warn" tone would fight the register. */
+ * "celebration" exist by design: a red "warn" tone would fight the register. */
 .topbar--celebration{background:var(--gold-deep);color:var(--cream)}
 .topbar--celebration b{color:var(--cream)}
 .topbar-dismiss{
@@ -62,7 +62,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 
 .cat-strip{background:var(--cream);border-bottom:1px solid var(--line);overflow-x:auto}
 .cat-strip-inner{max-width:1400px;margin:0 auto;display:flex;gap:4px;padding:0 32px;justify-content:center}
-/* Cat-chip — animated underline draws in on hover (preview) and stays drawn
+/* Cat-chip: animated underline draws in on hover (preview) and stays drawn
  * when the segment is the active route. Matches the oceanic register: a tide
  * line underneath the label that ebbs in and out instead of a hard border. */
 .cat-chip{
@@ -121,7 +121,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 /* Hero: HeroTide.tsx paints a 3-layer parallax horizon as the background.
  * The gradient below is a paint-fallback before the SVG mounts; once the
  * SVG renders it covers everything underneath. The ::before radial sun-glow
- * is the only warm light source — keeps the gold accent in the picture. */
+ * is the only warm light source: keeps the gold accent in the picture. */
 .hero{background:linear-gradient(180deg,var(--purple-950) 0%,var(--purple-900) 55%,var(--purple-700) 85%,var(--purple-600) 100%);color:var(--cream);position:relative;overflow:hidden;min-height:78vh}
 .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 68% 38%,oklch(0.82 0.10 80 / 0.12),transparent 45%);pointer-events:none;z-index:1}
 .hero-inner{max-width:1400px;margin:0 auto;padding:96px 32px;display:grid;grid-template-columns:1.618fr 1fr;gap:64px;align-items:center;position:relative;z-index:2}
@@ -152,7 +152,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .footer-bottom{display:flex;justify-content:space-between;padding-top:24px;font-size:12px;color:var(--purple-400);letter-spacing:.1em}
 
 .crumbs{max-width:1400px;margin:0 auto;padding:24px 32px 0;font-size:12px;letter-spacing:.1em;color:var(--ink-soft);text-transform:uppercase}
-/* Separator between ANY adjacent crumbs — the old span+span selector skipped
+/* Separator between ANY adjacent crumbs: the old span+span selector skipped
  * link+span pairs, gluing "Maison" to the next crumb ("MAISONORDER…"). */
 .crumbs > * + *::before{content:"/";margin:0 10px;color:var(--line)}
 .crumbs .current{color:var(--purple-900)}
@@ -161,11 +161,11 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .pdp-gallery{display:grid;grid-template-columns:88px 1fr;gap:12px}
 .pdp-thumbs{display:flex;flex-direction:column;gap:8px}
 .pdp-thumb{aspect-ratio:1;border:1px solid var(--line);cursor:pointer;overflow:hidden;transition:border-color .12s,box-shadow .12s}
-/* Selection must read instantly — the 1px border change was invisible while
+/* Selection must read instantly: the 1px border change was invisible while
  * the (slow) full-size photo loaded, so clicks felt like they did nothing. */
 .pdp-thumb.active{border:2px solid var(--purple-800);box-shadow:0 0 0 2px oklch(0.45 0.18 300 / 0.25)}
 /* overflow:hidden + object-fit (set on the img) clip uploads of ANY aspect
- * ratio to the 3:4 frame — a portrait photo taller than 3:4 previously
+ * ratio to the 3:4 frame: a portrait photo taller than 3:4 previously
  * overflowed the grid row and spilled across the info column. */
 .pdp-main-img{aspect-ratio:3/4;overflow:hidden;position:relative;background:var(--purple-50)}
 .pdp-img-veil{position:absolute;inset:0;display:grid;place-items:center;background:oklch(0.98 0.005 90 / 0.55);z-index:2}
@@ -217,7 +217,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .pdp-sticky-bar__info{flex:1;min-width:0}
 .pdp-sticky-bar__name{display:block;font-family:var(--serif);font-size:15px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pdp-sticky-bar__variant{display:block;font-size:11px;color:var(--purple-200);letter-spacing:.08em;margin-top:2px}
-/* Only show on mobile — desktops have the inline button visible */
+/* Only show on mobile: desktops have the inline button visible */
 @media(min-width:768px){.pdp-sticky-bar{display:none}}
 .fly-dot{
   position:fixed;
@@ -279,7 +279,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .filter-pill{padding:8px 16px;min-height:44px;border:1px solid var(--line);font-size:12px;letter-spacing:.1em;text-transform:uppercase;background:#fff;color:var(--ink-soft);cursor:pointer;display:inline-flex;align-items:center}
 .filter-pill.active{background:var(--purple-900);color:var(--cream);border-color:var(--purple-900)}
 
-/* Overlay + drawer — oceanic register.
+/* Overlay + drawer: oceanic register.
  * Overlay fades through a soft sea-tinted veil with light backdrop-blur so the
  * page below feels like it's seen through shallow water. The drawer eases in
  * over .55s using the same `cubic-bezier(.16,.84,.32,1)` we use for hero rises,
@@ -287,7 +287,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
  * reduced-motion below. */
 /* Timings tightened from .45/.55s: interactions past ~200ms read as sluggish,
  * and the full-viewport backdrop-blur forced expensive re-blurs every frame
- * of the drawer slide on integrated GPUs — a slightly deeper veil reads the
+ * of the drawer slide on integrated GPUs: a slightly deeper veil reads the
  * same without the per-frame cost. */
 .overlay{position:fixed;inset:0;background:oklch(0.22 0.06 220 / 0.5);z-index:100;animation:ssg-overlay-in .18s cubic-bezier(.16,.84,.32,1)}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:420px;background:#fff;z-index:101;display:flex;flex-direction:column;animation:ssg-drawer-in .28s cubic-bezier(.16,.84,.32,1);box-shadow:-30px 0 80px oklch(0.22 0.06 220 / 0.18)}
@@ -393,7 +393,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
   .grid-3{grid-template-columns:repeat(2,1fr)}
   .cat-grid{grid-template-columns:repeat(2,1fr)}
 
-  /* PDP — thumbs sized explicitly: their 88px came only from the desktop
+  /* PDP: thumbs sized explicitly: their 88px came only from the desktop
    * grid track, so on phones they blew up to intrinsic image width (or
    * collapsed to 0). Hero image renders first; the thumb strip follows. */
   .pdp{grid-template-columns:1fr;gap:28px;padding:20px 24px}
@@ -403,7 +403,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
   .pdp-main-img{order:1}
   .pdp-info h1{font-size:32px}
   .pdp-feats{grid-template-columns:1fr}
-  /* iOS zooms any focused control under 16px — checkout/search/coupon
+  /* iOS zooms any focused control under 16px: checkout/search/coupon
    * inputs were 12-15px, leaving the page stuck zoomed after every focus. */
   input,select,textarea{font-size:16px}
 
@@ -469,7 +469,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
   .nav-search{width:min(260px, calc(100vw - 170px))}
 }
 
-/* ── Admin on small screens — usable, not just visible ─────────────────────
+/* ── Admin on small screens: usable, not just visible ─────────────────────
  * The fixed 240px sidebar left ~135px for ALL content on a phone. The rail
  * becomes a horizontally-scrollable strip and grids collapse. */
 @media (max-width: 900px) {
@@ -484,7 +484,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
   .chart-row{grid-template-columns:1fr}
 }
 
-/* ── iOS safe areas — fixed bottom bars must clear the home indicator ────── */
+/* ── iOS safe areas: fixed bottom bars must clear the home indicator ────── */
 @supports (padding: env(safe-area-inset-bottom)) {
   .pdp-sticky-bar{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
 }

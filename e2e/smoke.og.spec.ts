@@ -3,7 +3,7 @@ import { skipWithoutDb, KNOWN_PRODUCT_SLUG } from "./helpers";
 
 /**
  * /api/og acceptance (EXECUTION-PLAN 2.3): always a 1200×630 PNG, never a
- * 404 — share scrapers must get a card whatever they ask for.
+ * 404: share scrapers must get a card whatever they ask for.
  */
 test.describe("OG card route", () => {
   test("generic maison card renders as PNG", async ({ request }) => {

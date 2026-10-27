@@ -242,7 +242,7 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
         </div>
       </div>
 
-      {/* Delivery address (optional — admin will follow up if missing) */}
+      {/* Delivery address (optional: admin will follow up if missing) */}
       <div>
         <label style={{ fontSize: 11, letterSpacing: ".15em", color: "var(--ink-soft)", textTransform: "uppercase" }}>{t("preorderForm.addressOptionalCall")}</label>
         <div style={{ marginTop: 8, display: "grid", gap: 10 }}>

@@ -12,12 +12,12 @@ const OVERALL: Record<HealthReport["overall"], { pill: string; word: string; blu
   degraded: {
     pill: "pill-warn",
     word: "Degraded",
-    blurb: "Some features need attention — see the warnings and failures below.",
+    blurb: "Some features need attention: see the warnings and failures below.",
   },
   down: {
     pill: "pill-err",
     word: "Down",
-    blurb: "A critical system is failing — the storefront may be unavailable to customers.",
+    blurb: "A critical system is failing: the storefront may be unavailable to customers.",
   },
 };
 

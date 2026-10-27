@@ -2,7 +2,7 @@
   <rect width="1200" height="630" fill="#122030"/>
   <rect x="22" y="22" width="1156" height="586" fill="none" stroke="#C8A86E" stroke-width="0.6" opacity="0.18"/>
 
-  <!-- wave mark — left -->
+  <!-- wave mark: left -->
   <path d="M 80,315 C 200,315 248,200 360,200 C 472,200 520,315 640,315"
     stroke="#C8A86E" stroke-width="2.4" fill="none" stroke-linecap="round"/>
   <path d="M 115,345 C 224,345 268,246 360,246 C 452,246 496,345 605,345"
@@ -11,7 +11,7 @@
   <!-- divider -->
   <line x1="700" y1="130" x2="700" y2="500" stroke="#C8A86E" stroke-width="0.5" opacity="0.15"/>
 
-  <!-- wordmark — right, Georgia italic as system font fallback -->
+  <!-- wordmark: right, Georgia italic as system font fallback -->
   <text x="940" y="308"
     font-family="Georgia, 'Times New Roman', serif"
     font-style="italic"

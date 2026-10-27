@@ -1,4 +1,4 @@
-/* ===== Sanguine — Cursor & Motion Layer ===== */
+/* ===== Sanguine: Cursor & Motion Layer ===== */
 
 /* Hide native cursor ONLY once cursor.js has mounted (it stamps
  * .ssg-cursor-on on <html>). Plain CSS applied at parse time left users
@@ -17,7 +17,7 @@
   .cur-ring::after { animation: none !important; }
 }
 
-/* Section ornaments — fineliner SVGs that breathe. 14s inhale-exhale. */
+/* Section ornaments: fineliner SVGs that breathe. 14s inhale-exhale. */
 .ssg-ornament svg {
   animation: ssg-ornament-breathe 14s ease-in-out infinite;
   transform-origin: center;
@@ -51,16 +51,16 @@
   transition: opacity .25s ease, transform .35s cubic-bezier(.2,.9,.3,1);
 }
 
-/* ===== Default — soft ripple (oceanic register, replaces hard ring) =====
+/* ===== Default: soft ripple (oceanic register, replaces hard ring) =====
  * Two stacked layers under .cur-ring so it reads as a tide-ripple, not a
  * crosshair. The outer pulse breathes (4s cycle) so the cursor feels alive.
  * `backdrop-filter: blur` produces the "moving through water" distortion
- * exactly where the cursor sits — works on Chrome/Safari/Edge, gracefully
+ * exactly where the cursor sits: works on Chrome/Safari/Edge, gracefully
  * degrades on Firefox where backdrop-filter isn't fully supported.
  *
  * Honoured by reduced-motion via the existing #ssg-cursor-root display:none
  * higher up in this file. */
-/* Silver diamond cursor — square rotated 45° with a violet-silver glow.
+/* Silver diamond cursor: square rotated 45° with a violet-silver glow.
  * Slow twinkling rotation gives the "sparkle" effect without being distracting. */
 .cur-ring {
   width: 16px; height: 16px;
@@ -94,7 +94,7 @@
 #ssg-cursor[data-mode="default"] .cur-dot,
 #ssg-cursor[data-mode="text"] .cur-dot { opacity: 1; }
 
-/* link hover — subtle ring expansion, no fill */
+/* link hover: subtle ring expansion, no fill */
 #ssg-cursor.hover-link .cur-ring {
   transform: translate(-50%, -50%) scale(1.2);
   background: transparent;
@@ -104,7 +104,7 @@
 }
 #ssg-cursor.hover-link .cur-dot { opacity: 1; }
 
-/* text mode — vertical I-beam */
+/* text mode: vertical I-beam */
 #ssg-cursor[data-mode="text"] .cur-ring {
   width: 2px; height: 22px; border-radius: 0;
   background: var(--purple-900); border: none;
@@ -192,7 +192,7 @@
 #ssg-cursor[data-mode="crosshair"] .cur-cross { opacity: 1; color: var(--purple-800); }
 #ssg-cursor[data-mode="crosshair"].hover-link .cur-cross { color: var(--gold); transform: translate(-50%, -50%) scale(1.3); }
 
-/* ===== Watches — sweeping hand ===== */
+/* ===== Watches: sweeping hand ===== */
 #ssg-cursor[data-mode="watches"] .cur-ring { opacity: 1; width: 44px; height: 44px; border-color: var(--gold-deep); }
 #ssg-cursor[data-mode="watches"]::after {
   content: "";
@@ -206,7 +206,7 @@
 }
 #ssg-cursor[data-mode="watches"] .cur-dot { opacity: 1; background: var(--gold); }
 
-/* ===== Anime — angular reticle ===== */
+/* ===== Anime: angular reticle ===== */
 #ssg-cursor[data-mode="anime"]::before,
 #ssg-cursor[data-mode="anime"]::after {
   content: ""; position: absolute;
@@ -227,12 +227,12 @@
 }
 #ssg-cursor[data-mode="anime"] .cur-dot { opacity: 1; background: var(--purple-900); }
 
-/* ===== Jewelry — sparkle ===== */
+/* ===== Jewelry: sparkle ===== */
 #ssg-cursor[data-mode="jewelry"] .cur-sparkle { opacity: 1; color: var(--gold); animation: sparkleSpin 3s linear infinite; }
 @keyframes sparkleSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 #ssg-cursor[data-mode="jewelry"].down .cur-sparkle { transform: translate(-50%, -50%) scale(1.6); }
 
-/* ===== Admin — precision crosshair + HUD ===== */
+/* ===== Admin: precision crosshair + HUD ===== */
 #ssg-cursor[data-mode="admin"] .cur-cross { opacity: 1; color: var(--gold); }
 #ssg-cursor[data-mode="admin"] .cur-hud { opacity: 1; }
 .cur-hud {
@@ -248,7 +248,7 @@
   white-space: nowrap;
 }
 
-/* ===== Floating label — hidden; diamond cursor is sufficient ===== */
+/* ===== Floating label: hidden; diamond cursor is sufficient ===== */
 .cur-label { display: none; }
 
 /* ===== Page transition curtain ===== */
@@ -321,7 +321,7 @@
   transform: perspective(1000px) rotateX(var(--tilt-x, 0)) rotateY(var(--tilt-y, 0)) translateZ(10px);
 }
 
-/* Hero text — letter shimmer */
+/* Hero text: letter shimmer */
 .hero h1 em {
   background: linear-gradient(120deg, var(--gold) 30%, oklch(0.95 0.1 85) 50%, var(--gold) 70%);
   background-size: 200% 100%;
@@ -374,7 +374,7 @@
 .hero p, .hero .btn { animation: heroRise 1s cubic-bezier(.2,.9,.3,1) .5s both; }
 @keyframes heroRise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
 
-/* Hero visual — slow pan */
+/* Hero visual: slow pan */
 .hero-visual {
   animation: heroPan 18s ease-in-out infinite alternate;
 }
@@ -389,7 +389,7 @@
   animation: drawSection 1.2s cubic-bezier(.7,0,.3,1) .3s both;
 }
 
-/* Toast — wax-stamp */
+/* Toast: wax-stamp */
 .toast {
   animation: stampIn .35s cubic-bezier(.2, 1.6, .3, 1) !important;
 }
@@ -399,7 +399,7 @@
   100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
 }
 
-/* Buttons — magnetic readiness + arrow nudge */
+/* Buttons: magnetic readiness + arrow nudge */
 .btn { transition: transform .3s cubic-bezier(.2, .8, .3, 1), background .15s, color .15s, border-color .15s; }
 .btn svg { transition: transform .25s cubic-bezier(.2, .8, .3, 1); }
 .btn:hover svg { transform: translateX(4px); }
@@ -415,9 +415,9 @@
 }
 .cat-tile:hover::before { border-color: var(--gold); }
 
-/* Hide cursor on admin from custom cursor's perspective — admin uses HUD mode */
+/* Hide cursor on admin from custom cursor's perspective: admin uses HUD mode */
 
-/* ===== PDP gallery — image cross-fade ===== */
+/* ===== PDP gallery: image cross-fade ===== */
 .pdp-img-fade {
   animation: ssg-pdp-img-in .34s cubic-bezier(.2,.8,.3,1);
 }
@@ -426,7 +426,7 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* ===== Cart line items — soft enter ===== */
+/* ===== Cart line items: soft enter ===== */
 .cart-line {
   animation: ssg-cart-line-in .42s cubic-bezier(.16,.84,.32,1);
 }
@@ -444,7 +444,7 @@
   to   { opacity: 0; transform: translateX(-12px) scaleY(0); }
 }
 
-/* ===== Empty states — quiet rise + breathe ===== */
+/* ===== Empty states: quiet rise + breathe ===== */
 .empty-state {
   animation: ssg-empty-rise .8s cubic-bezier(.16,.84,.32,1);
 }
@@ -469,7 +469,7 @@
   to { opacity: 0; transform: translate(-50%, 12px) scale(.96); }
 }
 
-/* ===== Page transitions — View Transitions API +
+/* ===== Page transitions: View Transitions API +
  * fallback fade for browsers without support. The .ssg-route-fade class is
  * applied by the locale-level RouteTransition wrapper on route change. */
 ::view-transition-old(root),
@@ -478,7 +478,7 @@
   animation-timing-function: cubic-bezier(.16,.84,.32,1);
 }
 /* .18s opacity-only (was .42s fade+rise): the RSC roundtrip already costs
- * real time — deliberately hiding the arrived page for almost half a second
+ * real time: deliberately hiding the arrived page for almost half a second
  * on top of it read as "my click was slow". No translate: shifting the whole
  * route re-rasterizes a full-page layer on every navigation. */
 .ssg-route-fade {

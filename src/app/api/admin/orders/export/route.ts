@@ -77,7 +77,7 @@ export async function GET() {
     };
     const orderLines = linesByOrder.get(o.id) ?? [];
     if (orderLines.length === 0) {
-      // Order with no lines — still emit a row so it's not lost from the export.
+      // Order with no lines: still emit a row so it's not lost from the export.
       rows.push([
         o.number, o.createdAt?.toISOString() ?? "", o.status, o.paymentMethod,
         addr.fullName ?? "", o.guestEmail ?? "", addr.phone ?? o.guestPhone ?? "",

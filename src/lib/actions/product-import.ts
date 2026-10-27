@@ -131,7 +131,7 @@ export async function importProductsCsv(input: z.infer<typeof importInputSchema>
   }
   const unknown = headers.filter((h) => h && !ALL_COLUMNS.includes(h as never));
   if (unknown.length > 0) {
-    // Warning, not fatal — we just ignore extra columns.
+    // Warning, not fatal: we just ignore extra columns.
     result.errors.push({ row: 0, messages: [`Ignoring unknown columns: ${unknown.join(", ")}`] });
   }
 
@@ -157,7 +157,7 @@ export async function importProductsCsv(input: z.infer<typeof importInputSchema>
     if (!segmentId) errs.push("segment_id is required");
     else if (!validSegments.has(segmentId)) errs.push(`segment_id '${segmentId}' does not exist`);
     const priceBdt = parseInt(priceRaw, 10);
-    // ৳0 placeholders caused the zero-price checkout hole — CSV rows import as
+    // ৳0 placeholders caused the zero-price checkout hole: CSV rows import as
     // buy-now products, so they need a real price. Preorder-only/quotation
     // pieces are configured in the product editor, not via CSV.
     if (!Number.isFinite(priceBdt) || priceBdt < 1) errs.push("price_bdt must be a positive integer (৳1 or more)");

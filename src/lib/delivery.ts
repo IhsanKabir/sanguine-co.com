@@ -4,7 +4,7 @@
  * typically takes up to 2 working days inside Dhaka and up to 4 to a
  * divisional city. Friday is the weekly holiday and is skipped; public
  * holidays are not modelled, which is why every surface labels the result
- * an estimate. Pure module — safe in server and client components.
+ * an estimate. Pure module: safe in server and client components.
  */
 
 export const DISPATCH_WORKING_DAYS = 1;

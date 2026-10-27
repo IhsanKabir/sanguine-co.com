@@ -57,11 +57,11 @@ export default async function AccountPage({ params }: Props) {
   type OrderSelect = typeof schema.orders.$inferSelect;
   type PreorderSelect = typeof schema.preorderRequests.$inferSelect;
 
-  // Preorder requests + their quote state — previously the quote lived only
+  // Preorder requests + their quote state: previously the quote lived only
   // in email; the customer could never see it in their account.
   let preorders: PreorderSelect[] = [];
   try {
-    // Email clause only when the session actually has an email — matching
+    // Email clause only when the session actually has an email: matching
     // "" against any legacy empty customerEmail row would leak requests.
     const emailClause = user.email
       ? or(
@@ -177,7 +177,7 @@ export default async function AccountPage({ params }: Props) {
       <div className="acct-stats">
         {[
           { k: t("accountPage.ordersPlaced"),  v: String(orders.length) },
-          { k: t("accountPage.lifetimeSpend"), v: lifetimeSpend > 0 ? formatBdt(lifetimeSpend, loc) : "—" },
+          { k: t("accountPage.lifetimeSpend"), v: lifetimeSpend > 0 ? formatBdt(lifetimeSpend, loc) : "-" },
           { k: t("accountPage.loyaltyTier"),   v: tier.name },
           { k: t("accountPage.wishlist"),      v: wishlistCount > 0 ? t("accountPage.wishlistCount", { count: wishlistCount }) : t("accountPage.empty") },
         ].map(({ k, v }) => (
@@ -234,7 +234,7 @@ export default async function AccountPage({ params }: Props) {
         />
       </section>
 
-      {/* ─── Preorder requests — quote + deposit status ─────────────────── */}
+      {/* ─── Preorder requests: quote + deposit status ─────────────────── */}
       {preorders.length > 0 && (
         <section style={{ marginTop: 28 }}>
           <h2 className="serif" style={{ fontSize: 22, fontWeight: 500, color: "var(--purple-900)", margin: "0 0 4px" }}>

@@ -114,7 +114,7 @@ export default function ImportClient() {
             {preview && preview.validRows > 0 && !preview.committed && (
               confirmApply ? (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13 }}>
-                  <span style={{ color: "var(--ink-soft)" }}>Apply {preview.toCreate} new, {preview.toUpdate} updated — cannot be undone</span>
+                  <span style={{ color: "var(--ink-soft)" }}>Apply {preview.toCreate} new, {preview.toUpdate} updated: cannot be undone</span>
                   <button type="button" className="btn btn-primary btn-sm" onClick={doApply} style={{ padding: "3px 10px" }}>Confirm</button>
                   <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirmApply(false)} style={{ padding: "3px 8px" }}>Cancel</button>
                 </span>

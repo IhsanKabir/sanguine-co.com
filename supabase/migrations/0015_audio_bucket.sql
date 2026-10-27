@@ -1,12 +1,12 @@
--- Sanguine — Admin-uploadable ambient audio (EXECUTION-PLAN 4.2)
+-- Sanguine: Admin-uploadable ambient audio (EXECUTION-PLAN 4.2)
 --
 -- New `audio` Storage bucket holding up to three short ambient files
 -- (gong / chime / seal) that replace the synthesised WebAudio tones in
 -- public/atier.js. The storefront reads the file URLs from the
--- `site_settings.audio` row (no schema change — site_settings is key/jsonb)
+-- `site_settings.audio` row (no schema change: site_settings is key/jsonb)
 -- and falls back to the synth tones whenever a file is absent or fails.
 --
--- Writes are gated on the `settings` permission per the execution plan —
+-- Writes are gated on the `settings` permission per the execution plan:
 -- audio is house-infrastructure, not day-to-day editorial copy. Owner and
 -- admin pass implicitly; a subadmin needs `settings` in their JWT
 -- app_metadata.permissions (same idiom as 0012).

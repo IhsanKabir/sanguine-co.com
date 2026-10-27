@@ -84,7 +84,7 @@ export async function checkOptionStock(
   for (const l of lines) {
     const rows = variants.get(l.productId);
     if (!rows || rows.length === 0) {
-      if (l.productStock < l.qty) return `${l.name} — only ${l.productStock} in stock`;
+      if (l.productStock < l.qty) return `${l.name}: only ${l.productStock} in stock`;
       continue;
     }
     // A line missing a side the piece is counted by (a size, a colour).
@@ -101,7 +101,7 @@ export async function checkOptionStock(
     if (row.stock < need) {
       return row.stock === 0
         ? `${l.name} in ${label} is sold out.`
-        : `${l.name} in ${label} — only ${row.stock} left.`;
+        : `${l.name} in ${label}: only ${row.stock} left.`;
     }
   }
   return null;

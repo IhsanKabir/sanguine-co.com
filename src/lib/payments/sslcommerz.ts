@@ -1,5 +1,5 @@
 /**
- * SSLCommerz (v4) — the Bangladeshi gateway that covers bKash, Nagad,
+ * SSLCommerz (v4): the Bangladeshi gateway that covers bKash, Nagad,
  * Rocket and Visa/Mastercard/Amex behind one hosted payment page.
  *
  * Off unless SSLCOMMERZ_STORE_ID and SSLCOMMERZ_STORE_PASSWORD are set.
@@ -40,7 +40,7 @@ export function isOnlinePaymentEnabled(): boolean {
 }
 
 export type InitPaymentInput = {
-  tranId: string;          // our order number — unique per attempt
+  tranId: string;          // our order number: unique per attempt
   totalBdt: number;
   numItems: number;
   productName: string;
@@ -115,7 +115,7 @@ export type ValidatedPayment = {
   currency: string;
   bankTranId: string | null;
   cardType: string | null;
-  riskLevel: string | null; // "0" safe, "1" risky — SSLCommerz advises holding risky ones
+  riskLevel: string | null; // "0" safe, "1" risky: SSLCommerz advises holding risky ones
   riskTitle: string | null;
 };
 

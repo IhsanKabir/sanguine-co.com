@@ -103,7 +103,7 @@ export default function ReviewsModerationClient({ status, counts, reviews, produ
 
               {r.status === "rejected" && r.rejectionReason && (
                 <div style={{ marginTop: 10, padding: 10, background: "#fff4f4", border: "1px solid var(--err)", fontSize: 12, color: "#7a2828" }}>
-                  Declined — {r.rejectionReason}
+                  Declined: {r.rejectionReason}
                 </div>
               )}
 
@@ -130,7 +130,7 @@ export default function ReviewsModerationClient({ status, counts, reviews, produ
               )}
 
               {/* Approved notes must be removable too (mistaken approvals,
-                  test data) — moderateReview re-aggregates the product's
+                  test data): moderateReview re-aggregates the product's
                   rating and count from approved rows, so pulling one down
                   keeps the PDP honest. */}
               {r.status === "approved" && (
@@ -157,7 +157,7 @@ export default function ReviewsModerationClient({ status, counts, reviews, produ
           <div className="seg-confirm">
             <h3 className="serif" style={{ margin: "0 0 12px" }}>Decline this note?</h3>
             <p style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.6, margin: "0 0 12px" }}>
-              Internal note — the customer is not shown a reason. Used for your record only.
+              Internal note: the customer is not shown a reason. Used for your record only.
             </p>
             <textarea
               value={rejecting.reason}

@@ -108,7 +108,7 @@ export async function createManualOrder(input: z.infer<typeof manualSchema>) {
       await tx.insert(schema.orderLines).values(lines.map((l) => ({ ...l, orderId: o.id })));
 
       for (const l of lines) {
-        // Guarded decrement (option + total) — aborts the transaction if a
+        // Guarded decrement (option + total): aborts the transaction if a
         // concurrent order took the unit between read and write.
         await takeStock(tx, { ...l, name: l.nameSnapshot });
         await tx.insert(schema.inventoryLog).values({

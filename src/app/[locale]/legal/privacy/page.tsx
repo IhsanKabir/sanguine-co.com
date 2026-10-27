@@ -24,10 +24,10 @@ function EnglishSection() {
       <p>When you browse, we set a session cookie so your bag is remembered between pages, and a small analytics cookie so we can understand which pieces are most-loved. We do not run advertising trackers and we do not sell our visitor lists.</p>
 
       <h2>What we do with it</h2>
-      <p>We use your details to fulfil your order, to answer your questions if you write to us, and — only if you opt in — to send you the seasonal Letter from the Maison. We never share your information with anyone except:</p>
+      <p>We use your details to fulfil your order, to answer your questions if you write to us, and (only if you opt in) to send you the seasonal Letter from the Maison. We never share your information with anyone except:</p>
       <ul>
         <li>the courier delivering your parcel (Pathao, Steadfast)</li>
-        <li>the payment provider processing your payment, if any (none at present — we collect cash on delivery)</li>
+        <li>the payment provider processing your payment, if any (none at present: we collect cash on delivery)</li>
         <li>the email and SMS providers that send you transactional messages (Brevo, SSL Wireless)</li>
         <li>the hosting and database services that operate the website (Vercel, Supabase)</li>
       </ul>
@@ -43,13 +43,13 @@ function EnglishSection() {
 
       <h2>Cookies</h2>
       <ul>
-        <li><b>ssg-cart-v1</b> &mdash; your bag, kept in your browser only.</li>
-        <li><b>ssg-wish-v1</b> &mdash; your wishlist, same.</li>
-        <li><b>ssg-coupon-v1</b> &mdash; a coupon you have applied, kept in your browser.</li>
-        <li><b>ssg-route</b> &mdash; last-visited route, for back-button etiquette.</li>
-        <li><b>ssg_sid</b> &mdash; anonymous session identifier so we can count visits, not visitors. Expires in 30 days.</li>
-        <li><b>ssg-cookie-consent-v1</b> &mdash; your preference about whether we use the analytics cookie above.</li>
-        <li><b>sb-*</b> &mdash; Supabase Auth session cookies if you are signed in.</li>
+        <li><b>ssg-cart-v1</b>: your bag, kept in your browser only.</li>
+        <li><b>ssg-wish-v1</b>: your wishlist, same.</li>
+        <li><b>ssg-coupon-v1</b>: a coupon you have applied, kept in your browser.</li>
+        <li><b>ssg-route</b>: last-visited route, for back-button etiquette.</li>
+        <li><b>ssg_sid</b>: anonymous session identifier so we can count visits, not visitors. Expires in 30 days.</li>
+        <li><b>ssg-cookie-consent-v1</b>: your preference about whether we use the analytics cookie above.</li>
+        <li><b>sb-*</b>: Supabase Auth session cookies if you are signed in.</li>
       </ul>
 
       <h2>Contact</h2>
@@ -71,10 +71,10 @@ function BangleSection() {
       <p>আপনি যখন সাইটটি ব্রাউজ করেন, পাতায় পাতায় আপনার ব্যাগ মনে রাখার জন্য একটি সেশন কুকি এবং কোন পিসগুলো সবচেয়ে পছন্দ হচ্ছে তা বুঝতে একটি ছোট অ্যানালিটিক্স কুকি স্থাপন করা হয়। আমরা কোনো বিজ্ঞাপন ট্র্যাকার চালাই না এবং আমাদের দর্শকতালিকা কারো কাছে বিক্রি করি না।</p>
 
       <h2>আমরা যা করি এই তথ্য দিয়ে</h2>
-      <p>আপনার তথ্য আমরা ব্যবহার করি আপনার অর্ডার পূরণ করতে, আপনি লিখলে আপনার প্রশ্নের উত্তর দিতে, এবং&nbsp;&mdash; কেবল আপনি অনুমতি দিলে&nbsp;&mdash; ঋতুর Letter from the Maison পাঠাতে। আমরা আপনার তথ্য কখনও কারও সঙ্গে শেয়ার করি না, কেবল নিম্নলিখিত পরিষেবাদাতাদের ব্যতিরেকে:</p>
+      <p>আপনার তথ্য আমরা ব্যবহার করি আপনার অর্ডার পূরণ করতে, আপনি লিখলে আপনার প্রশ্নের উত্তর দিতে, এবং (কেবল আপনি অনুমতি দিলে) ঋতুর Letter from the Maison পাঠাতে। আমরা আপনার তথ্য কখনও কারও সঙ্গে শেয়ার করি না, কেবল নিম্নলিখিত পরিষেবাদাতাদের ব্যতিরেকে:</p>
       <ul>
         <li>আপনার পার্সেল পৌঁছে দেয়া কুরিয়ার (Pathao, Steadfast)</li>
-        <li>পেমেন্ট প্রসেসর, যদি থাকে (বর্তমানে নেই &mdash; আমরা ক্যাশ অন ডেলিভারিতে নিই)</li>
+        <li>পেমেন্ট প্রসেসর, যদি থাকে (বর্তমানে নেই: আমরা ক্যাশ অন ডেলিভারিতে নিই)</li>
         <li>ট্রানজ্যাকশনাল ইমেইল ও SMS পাঠানো প্রদানকারী (Brevo, SSL Wireless)</li>
         <li>হোস্টিং ও ডাটাবেস পরিষেবা যা ওয়েবসাইটটি চালায় (Vercel, Supabase)</li>
       </ul>
@@ -90,13 +90,13 @@ function BangleSection() {
 
       <h2>কুকিজ</h2>
       <ul>
-        <li><b>ssg-cart-v1</b> &mdash; আপনার ব্যাগ, কেবল আপনার ব্রাউজারে।</li>
-        <li><b>ssg-wish-v1</b> &mdash; আপনার উইশলিস্ট, একইভাবে।</li>
-        <li><b>ssg-coupon-v1</b> &mdash; প্রয়োগ করা কুপন, ব্রাউজারে।</li>
-        <li><b>ssg-route</b> &mdash; সর্বশেষ ভিজিট করা রুট, ব্যাক-বাটনের শিষ্টাচারের জন্য।</li>
-        <li><b>ssg_sid</b> &mdash; বেনামি সেশন আইডেন্টিফায়ার যাতে আমরা ভিজিট গণনা করতে পারি, ভিজিটর নয়। ত্রিশ দিনে মেয়াদ উত্তীর্ণ।</li>
-        <li><b>ssg-cookie-consent-v1</b> &mdash; উপরোক্ত অ্যানালিটিক্স কুকি ব্যবহারের ব্যাপারে আপনার সম্মতি।</li>
-        <li><b>sb-*</b> &mdash; Supabase Auth সেশন কুকি, যদি আপনি সাইন-ইন থাকেন।</li>
+        <li><b>ssg-cart-v1</b>: আপনার ব্যাগ, কেবল আপনার ব্রাউজারে।</li>
+        <li><b>ssg-wish-v1</b>: আপনার উইশলিস্ট, একইভাবে।</li>
+        <li><b>ssg-coupon-v1</b>: প্রয়োগ করা কুপন, ব্রাউজারে।</li>
+        <li><b>ssg-route</b>: সর্বশেষ ভিজিট করা রুট, ব্যাক-বাটনের শিষ্টাচারের জন্য।</li>
+        <li><b>ssg_sid</b>: বেনামি সেশন আইডেন্টিফায়ার যাতে আমরা ভিজিট গণনা করতে পারি, ভিজিটর নয়। ত্রিশ দিনে মেয়াদ উত্তীর্ণ।</li>
+        <li><b>ssg-cookie-consent-v1</b>: উপরোক্ত অ্যানালিটিক্স কুকি ব্যবহারের ব্যাপারে আপনার সম্মতি।</li>
+        <li><b>sb-*</b>: Supabase Auth সেশন কুকি, যদি আপনি সাইন-ইন থাকেন।</li>
       </ul>
 
       <h2>যোগাযোগ</h2>

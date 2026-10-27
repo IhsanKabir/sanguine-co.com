@@ -85,7 +85,7 @@ export default function OptionStockEditor({ productId, name, onClose }: { produc
               <tbody>
                 {colors.map((c) => (
                   <tr key={c}>
-                    <td style={{ fontWeight: 500 }}>{c || "—"}</td>
+                    <td style={{ fontWeight: 500 }}>{c || "-"}</td>
                     {sizes.map((s) => {
                       const k = `${c}|${s}`;
                       return (

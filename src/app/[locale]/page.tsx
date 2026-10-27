@@ -16,7 +16,7 @@ import { getCommerceSettings } from "@/lib/commerce";
 import { formatBdt } from "@/lib/utils";
 
 // ISR: the homepage fires several catalogue queries per request and reads no
-// cookies/auth — cache the rendered page. Admin edits still appear instantly
+// cookies/auth: cache the rendered page. Admin edits still appear instantly
 // because every admin action calls revalidateAllLocales() (revalidatePath
 // purges this cache); 300s is only the safety net. Speed Insights showed the
 // query-heavy routes gating FCP/LCP (home RES 72).
@@ -27,7 +27,7 @@ type Props = { params: Promise<{ locale: string }> };
 /**
  * Per-locale homepage metadata.
  *
- * The previous setup fell through to root-layout defaults — same title and
+ * The previous setup fell through to root-layout defaults: same title and
  * description for `/en` and `/bn`, no canonical, no in-page hreflang. The
  * homepage is the brand's highest-priority crawl target so it gets the most
  * specific metadata. Sources copy from next-intl messages so the admin copy
@@ -189,7 +189,7 @@ export default async function Home({ params }: Props) {
         </div>
       </section>
 
-      {/* ─── Marquee — concise trust points ──────────────────────── */}
+      {/* ─── Marquee: concise trust points ──────────────────────── */}
       <div className="marquee" data-cursor="default">
         <div className="marquee-track">
           {/* Listed twice so the scrolling track loops seamlessly. */}
@@ -271,7 +271,7 @@ export default async function Home({ params }: Props) {
             {bento.map((p, i) => {
               const cls = ["b-1", "b-2", "b-3", "b-4", "b-3", "b-5"][i] || "b-3";
               const seg = segs.find((s) => s.id === p.segmentId);
-              // Pricing rules, not raw priceBdt — quotation/preorder pieces
+              // Pricing rules, not raw priceBdt: quotation/preorder pieces
               // showed ৳0 here (and the hardcoded en-IN ignored bn).
               const display = priceDisplay(p);
               return (

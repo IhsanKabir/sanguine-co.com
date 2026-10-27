@@ -5,7 +5,7 @@
  * Curates 4 segments × 3 products. Drops watches (price too high for unproven),
  * books, anime, boardgames (commodity), and flowers (fragile for nationwide).
  *
- * Prices in whole BDT — adjust before launch based on market research.
+ * Prices in whole BDT: adjust before launch based on market research.
  */
 import * as dotenv from "dotenv";
 dotenv.config({ override: true });
@@ -115,7 +115,7 @@ const products: P[] = [
     segment_id: "accessories",
     price_bdt: 2800, was_bdt: null, stock: 30, tag: null,
     rating: 4.5, review_count: 22,
-    description: "A 40cm silk square in three colourways. Hand-rolled hem. Folded as a TV-fold or tossed in carelessly — both are correct.",
+    description: "A 40cm silk square in three colourways. Hand-rolled hem. Folded as a TV-fold or tossed in carelessly: both are correct.",
     description_bn: "৪০ সেমি সিল্ক স্কোয়ার, তিনটি রঙে। হাতে গোলানো হেম।",
     colors: ["Damson", "Gold", "Smoke"],
     sizes: [],
@@ -181,7 +181,7 @@ const products: P[] = [
   },
   {
     id: "p012", sku: "JEW-SIG-012", slug: "signet-house-of-violet",
-    name: "Signet — House of Violet", name_bn: "সিগনেট — হাউস অফ ভায়োলেট",
+    name: "Signet (House of Violet", name_bn: "সিগনেট) হাউস অফ ভায়োলেট",
     segment_id: "jewelry",
     price_bdt: 22500, was_bdt: null, stock: 6, tag: null,
     rating: 4.6, review_count: 9,

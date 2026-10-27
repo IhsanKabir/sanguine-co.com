@@ -38,7 +38,7 @@ export const COPY_CACHE_TAG = "site-copy-overrides";
 // the very next request without us having to mark every page as dynamic.
 //
 // Returns the parsed overrides or an empty map if the row is missing or the
-// DB is unreachable (build-time, transient outage) — never throws so the
+// DB is unreachable (build-time, transient outage): never throws so the
 // storefront always renders.
 export const getCopyOverrides = unstable_cache(
   async (): Promise<CopyOverrides> => {
@@ -90,7 +90,7 @@ export function applyCopyOverrides<T extends Record<string, unknown>>(
 
 /**
  * Walk a nested messages object and return a flat dotted-path keyed map of
- * every string leaf. ICU placeholders inside the strings are preserved as-is —
+ * every string leaf. ICU placeholders inside the strings are preserved as-is:
  * the admin form will surface them as plain text and trust the editor to keep
  * tokens like `{count}` intact.
  */

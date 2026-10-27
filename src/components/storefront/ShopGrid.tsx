@@ -66,7 +66,7 @@ export default function ShopGrid({
   const filteredItems = useMemo(() => {
     let items = [...allItems];
     if (tag) items = items.filter((p) => p.tag === tag);
-    // Effective price (fixed / estimate ceiling) — quote-only pieces have no
+    // Effective price (fixed / estimate ceiling): quote-only pieces have no
     // comparable price, so a max-price filter excludes them by design.
     if (typeof minPrice === "number" && !isNaN(minPrice)) {
       items = items.filter((p) => priceSortValue(p) >= minPrice);

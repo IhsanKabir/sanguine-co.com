@@ -30,7 +30,7 @@ function colorToHex(name: string): string {
 type Props = {
   product: Product;
   segmentTag?: string | null;
-  /** Optional hero image (real photograph) — falls back to Composition art if omitted. */
+  /** Optional hero image (real photograph): falls back to Composition art if omitted. */
   heroImage?: { url: string; alt: string | null; hoverUrl?: string } | null;
   /** Show the quick-view trigger (defaults true). Disable on tight grids. */
   quickView?: boolean;
@@ -42,7 +42,7 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
   const name = (locale === "bn" && p.nameBn) || p.name;
   const colors = (p.colors as string[] | null) ?? [];
 
-  // Preorder-only pieces must go through the PDP's preorder flow — the
+  // Preorder-only pieces must go through the PDP's preorder flow: the
   // quick-view Add-to-bag would sell them at the ৳0/list price placeholder.
   const showQuickView = quickView && p.stock > 0 && !p.preorderOnly;
   const display = priceDisplay(p);
