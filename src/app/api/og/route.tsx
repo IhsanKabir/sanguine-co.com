@@ -42,7 +42,7 @@ const WIDTH = 1200;
 const HEIGHT = 630;
 const PHOTO_WIDTH = 460;
 
-const TAGLINE = "Garments, flora & small ceremonies for the violet hour.";
+const TAGLINE = "Flowers, arranged to be remembered.";
 
 // Display labels for the product `tag` enum ('new'|'sale'|'limited'|'staff-pick').
 const TAG_LABELS: Record<string, string> = {
@@ -119,7 +119,7 @@ function TideWaves() {
   );
 }
 
-/** Italic-serif wordmark with the small gold MAISON sup: mirrors `.nav-brand`. */
+/** Italic-serif wordmark with the small gold DHAKA sup: mirrors `.nav-brand`. */
 function Wordmark({ size = 40 }: { size?: number }) {
   return (
     <div style={{ display: "flex", alignItems: "baseline" }}>
@@ -144,7 +144,7 @@ function Wordmark({ size = 40 }: { size?: number }) {
           marginLeft: 12,
         }}
       >
-        MAISON
+        DHAKA
       </span>
     </div>
   );
@@ -174,7 +174,7 @@ function MaisonCard() {
           marginTop: -36,
         }}
       >
-        <span style={{ fontSize: 22, letterSpacing: 8, color: GOLD }}>MAISON</span>
+        <span style={{ fontSize: 22, letterSpacing: 8, color: GOLD }}>DHAKA</span>
         <span
           style={{
             fontFamily: "Cormorant Garamond",

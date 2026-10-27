@@ -160,8 +160,7 @@ export default async function Home({ params }: Props) {
             <div className="hero-kicker">{t("home.kicker")}</div>
             <h1>
               {t("home.headlineLineOne")}<br />
-              {t("home.headlineLineTwoStart")}<em>{t("home.headlineLineTwoEm")}</em><br />
-              {t("home.headlineLineThree")}
+              {t("home.headlineLineTwoStart")}<em>{t("home.headlineLineTwoEm")}</em>{t("home.headlineLineTwoEnd")}
             </h1>
             <p>{t("home.lede")}</p>
             <div className="hero-btns">
@@ -170,17 +169,15 @@ export default async function Home({ params }: Props) {
                   {t("home.ctaPrimary")} <Icon name="arrow" size={14} />
                 </Link>
               )}
-              {segs.length > 0 && (
-                <Link href="#departments" className="btn btn-ghost" data-magnetic style={{ borderColor: "var(--mauve)", color: "var(--mauve)" }}>
-                  {t("home.ctaSecondary")}
-                </Link>
-              )}
+              <Link href="/atelier" className="btn btn-ghost" data-magnetic style={{ borderColor: "var(--mauve)", color: "var(--mauve)" }}>
+                {t("home.ctaSecondary")}
+              </Link>
             </div>
           </div>
           <div className="hero-still" aria-hidden="true">
             <div className="hs-frame" />
             <div className="hs-ring" />
-            <div className="hs-numeral">MMXXVI</div>
+            <div className="hs-numeral">2026</div>
             <div className="hs-rail">
               <span>{t("brand.name")}</span><span>·</span><span>{t("home.stillRail")}</span>
             </div>
@@ -311,7 +308,7 @@ export default async function Home({ params }: Props) {
             <h2>{t.rich("home.note.title", { em: (c) => <em>{c}</em> })}</h2>
             <p>{t("home.note.p1")}</p>
             <p>{t("home.note.p2")}</p>
-            <div className="journal-sig">{t("home.note.sig")}<small>{t("brand.name")} · MMXXVI</small></div>
+            <div className="journal-sig">{t("home.note.sig")}<small>{t("brand.name")} · {t("home.stillRail")}</small></div>
           </div>
         </div>
       </section>

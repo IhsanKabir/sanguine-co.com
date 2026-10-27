@@ -23,21 +23,21 @@ type Props = {
 };
 
 const TIMELINE_EN = [
-  { status: "pending",        label: "Order received",      desc: "The atelier has received your order and is preparing the piece." },
-  { status: "cod_pending",    label: "Awaiting fulfilment", desc: "Cash-on-Delivery order. We are arranging your courier." },
-  { status: "paid",           label: "Payment confirmed",   desc: "Payment received. Preparing dispatch." },
-  { status: "processing",     label: "Preparing",           desc: "Wax-sealing the parcel." },
-  { status: "shipped",        label: "On its way",          desc: "The courier has the parcel." },
-  { status: "delivered",      label: "Delivered",           desc: "We hope it brings you joy." },
+  { status: "pending",        label: "Order received",      desc: "We have your order and are preparing it." },
+  { status: "cod_pending",    label: "Arranging delivery",  desc: "Cash on delivery order. We are booking your courier." },
+  { status: "paid",           label: "Payment confirmed",   desc: "Payment received. Getting it ready to send." },
+  { status: "processing",     label: "Preparing",           desc: "Packing your order." },
+  { status: "shipped",        label: "On its way",          desc: "The courier has your parcel." },
+  { status: "delivered",      label: "Delivered",           desc: "It has arrived. We hope you like it." },
 ] as const;
 
 const TIMELINE_BN = [
-  { status: "pending",        label: "অর্ডার গৃহীত",            desc: "অ্যাটেলিয়ার আপনার অর্ডার পেয়েছে এবং পিসটি প্রস্তুত করছে।" },
-  { status: "cod_pending",    label: "পূরণের অপেক্ষায়",        desc: "ক্যাশ অন ডেলিভারি অর্ডার। আমরা কুরিয়ারের ব্যবস্থা করছি।" },
-  { status: "paid",           label: "পেমেন্ট নিশ্চিত",         desc: "পেমেন্ট গৃহীত। প্রেরণের প্রস্তুতি চলছে।" },
-  { status: "processing",     label: "প্রস্তুত করা হচ্ছে",        desc: "পার্সেল মোমে সিল করা হচ্ছে।" },
-  { status: "shipped",        label: "পথে",                  desc: "কুরিয়ারের কাছে পার্সেল।" },
-  { status: "delivered",      label: "পৌঁছানো হয়েছে",          desc: "এটি যেন আপনাকে আনন্দ দেয়।" },
+  { status: "pending",        label: "অর্ডার পেয়েছি",          desc: "আপনার অর্ডার পেয়েছি, প্রস্তুত করা হচ্ছে।" },
+  { status: "cod_pending",    label: "ডেলিভারির ব্যবস্থা",       desc: "ক্যাশ অন ডেলিভারি অর্ডার। কুরিয়ার ঠিক করা হচ্ছে।" },
+  { status: "paid",           label: "পেমেন্ট নিশ্চিত",         desc: "পেমেন্ট পেয়েছি। পাঠানোর জন্য প্রস্তুত করা হচ্ছে।" },
+  { status: "processing",     label: "প্রস্তুত হচ্ছে",           desc: "আপনার অর্ডার প্যাক করা হচ্ছে।" },
+  { status: "shipped",        label: "পথে",                  desc: "পার্সেলটি কুরিয়ারের কাছে।" },
+  { status: "delivered",      label: "পৌঁছে গেছে",            desc: "পৌঁছে গেছে। আশা করি ভালো লাগবে।" },
 ] as const;
 
 const STATUS_INDEX: Record<string, number> = {
@@ -90,7 +90,7 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
   if (order.status === "cancelled" || order.status === "refunded") {
     return (
       <section className="section" style={{ maxWidth: 720 }}>
-        <div className="crumbs"><Link href="/">{t("Maison", "মেইসন")}</Link><span className="current">{t("Order", "অর্ডার")} {number}</span></div>
+        <div className="crumbs"><Link href="/">{t("Home", "হোম")}</Link><span className="current">{t("Order", "অর্ডার")} {number}</span></div>
         <div className="empty-state">
           <Icon name="x" size={36}/>
           <h3>{t(`Order ${order.status}`, `অর্ডার ${order.status === "cancelled" ? "বাতিল" : "ফেরত"}`)}</h3>
@@ -110,7 +110,7 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
   return (
     <section className="section" style={{ maxWidth: 760 }}>
       <div className="crumbs">
-        <Link href="/">{t("Maison", "মেইসন")}</Link>
+        <Link href="/">{t("Home", "হোম")}</Link>
         <span className="current">{t("Order", "অর্ডার")} {number}</span>
       </div>
 

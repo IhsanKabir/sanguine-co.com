@@ -23,10 +23,10 @@ type Props = { params: Promise<{ locale: string }> };
 
 // ─── Loyalty tiers (mirrored from LoyaltyCard for header badge) ──────────────
 const TIER_NAMES = [
-  { min: 0,       name: "Maison Initié",     color: "var(--purple-400)" },
-  { min: 10_000,  name: "Atelier Guest",      color: "var(--mauve)" },
-  { min: 50_000,  name: "Patron de Maison",   color: "var(--gold)" },
-  { min: 150_000, name: "Grand Élite",         color: "oklch(0.78 0.15 78)" },
+  { min: 0,       name: "Member",     color: "var(--purple-400)" },
+  { min: 10_000,  name: "Insider",      color: "var(--mauve)" },
+  { min: 50_000,  name: "Circle",   color: "var(--gold)" },
+  { min: 150_000, name: "Inner Circle",         color: "oklch(0.78 0.15 78)" },
 ];
 
 function getTierName(spend: number) {

@@ -9,7 +9,7 @@ export const organizationLd = {
   name: "Sanguine",
   url: BASE,
   logo: `${BASE}/logo.png`,
-  description: "A Bangladeshi maison for perfume, flora, books and small ceremonies, slowly assembled with the patience of a florist.",
+  description: "Sanguine is a house of considered things, based in Dhaka. It starts with flowers: bouquets made to order and delivered across Bangladesh.",
   email: "concierge@sanguine-co.com",
   address: {
     "@type": "PostalAddress",

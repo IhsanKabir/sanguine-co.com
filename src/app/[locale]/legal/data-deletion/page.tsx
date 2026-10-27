@@ -4,12 +4,12 @@ export default function DataDeletionPage() {
   return (
     <>
       <div className="legal-kicker">DATA DELETION</div>
-      <h1>How to remove your data from the maison.</h1>
+      <h1>How to remove your data from Sanguine.</h1>
       <p className="legal-lede">Last updated: 2 May 2026.</p>
 
       <h2>Your right to be forgotten</h2>
       <p>
-        You may at any time ask the maison to delete the personal information we hold on you: your name, contact details,
+        You may at any time ask Sanguine to delete the personal information we hold on you: your name, contact details,
         addresses, wishlist, and account record. We will action the request within thirty days and write back to you to confirm.
       </p>
 
@@ -21,7 +21,7 @@ export default function DataDeletionPage() {
       </ul>
       <p>
         If you signed in with Google or Facebook, simply tell us so and we will remove the linked record. You may also revoke
-        the maison&apos;s access from the social provider directly: Facebook → Settings → Apps and Websites; Google → myaccount.google.com → Security → Third-party apps.
+        Sanguine&apos;s access from the social provider directly: Facebook → Settings → Apps and Websites; Google → myaccount.google.com → Security → Third-party apps.
       </p>
 
       <h2>What we cannot delete</h2>
