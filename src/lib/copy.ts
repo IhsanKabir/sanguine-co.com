@@ -40,23 +40,35 @@ export const COPY_CACHE_TAG = "site-copy-overrides";
 // Returns the parsed overrides or an empty map if the row is missing or the
 // DB is unreachable (build-time, transient outage): never throws so the
 // storefront always renders.
+/**
+ * Straight from the database, no cache. The admin editor must use this: it
+ * saves what it loads, so loading a stale cached copy and saving it would
+ * write the stale text back (which happened on 2026-10-27 and pinned the
+ * whole storefront to its previous wording).
+ */
+export async function getCopyOverridesUncached(): Promise<CopyOverrides> {
+  try {
+    const rows = await db
+      .select()
+      .from(schema.siteSettings)
+      .where(eq(schema.siteSettings.key, COPY_KEY))
+      .limit(1);
+    if (!rows[0]) return EMPTY_OVERRIDES;
+    const parsed = overridesSchema.safeParse(rows[0].value);
+    return parsed.success ? parsed.data : EMPTY_OVERRIDES;
+  } catch {
+    return EMPTY_OVERRIDES;
+  }
+}
+
+// Vercel's data cache outlives deploys and the tag is only busted by an admin
+// save, so a direct database edit could otherwise stay invisible forever. The
+// 5-minute revalidate bounds that. The key carries a version: bump it when
+// the cached value must be discarded on the next deploy.
 export const getCopyOverrides = unstable_cache(
-  async (): Promise<CopyOverrides> => {
-    try {
-      const rows = await db
-        .select()
-        .from(schema.siteSettings)
-        .where(eq(schema.siteSettings.key, COPY_KEY))
-        .limit(1);
-      if (!rows[0]) return EMPTY_OVERRIDES;
-      const parsed = overridesSchema.safeParse(rows[0].value);
-      return parsed.success ? parsed.data : EMPTY_OVERRIDES;
-    } catch {
-      return EMPTY_OVERRIDES;
-    }
-  },
-  ["site-copy-overrides"],
-  { tags: [COPY_CACHE_TAG] },
+  getCopyOverridesUncached,
+  ["site-copy-overrides-v2"],
+  { tags: [COPY_CACHE_TAG], revalidate: 300 },
 );
 
 /**

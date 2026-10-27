@@ -63,9 +63,21 @@ export default function EditorialClient({
     return result;
   }, [groups, filterLower, en, bn]);
 
+  // Fields the admin edited or reset in this session. Only these change on
+  // save. Diffing every field against the shipped defaults instead turned a
+  // copy update into hundreds of accidental overrides: after a deploy changed
+  // the defaults, one save pinned the whole old wording back in place.
+  const [touchedEn, setTouchedEn] = useState<Set<string>>(() => new Set());
+  const [touchedBn, setTouchedBn] = useState<Set<string>>(() => new Set());
+
   const setValue = (locale: "en" | "bn", path: string, value: string) => {
-    if (locale === "en") setEn((m) => ({ ...m, [path]: value }));
-    else setBn((m) => ({ ...m, [path]: value }));
+    if (locale === "en") {
+      setEn((m) => ({ ...m, [path]: value }));
+      setTouchedEn((s) => new Set(s).add(path));
+    } else {
+      setBn((m) => ({ ...m, [path]: value }));
+      setTouchedBn((s) => new Set(s).add(path));
+    }
   };
 
   const resetToDefault = (locale: "en" | "bn", path: string) => {
@@ -73,17 +85,25 @@ export default function EditorialClient({
   };
 
   const buildOverridePayload = (): { en: Map; bn: Map } => {
-    // Send only entries that actually differ from the static default. Empties
-    // and matches are stripped server-side too, but trimming here keeps the
-    // payload small.
-    const diff = (current: Map, defaults: Map): Map => {
+    // Start from what is stored, keep only keys the site still has, then apply
+    // this session's edits. An edit back to the default (or a blank) removes
+    // that override.
+    const build = (stored: Map, current: Map, defaults: Map, touched: Set<string>): Map => {
       const out: Map = {};
-      for (const [k, v] of Object.entries(current)) {
-        if (v !== defaults[k]) out[k] = v;
+      for (const [k, v] of Object.entries(stored)) {
+        if (k in defaults && v !== "") out[k] = v;
+      }
+      for (const k of touched) {
+        const v = current[k] ?? "";
+        if (v === "" || v === defaults[k]) delete out[k];
+        else out[k] = v;
       }
       return out;
     };
-    return { en: diff(en, defaultsEn), bn: diff(bn, defaultsBn) };
+    return {
+      en: build(overridesEn, en, defaultsEn, touchedEn),
+      bn: build(overridesBn, bn, defaultsBn, touchedBn),
+    };
   };
 
   // Both panels save the same underlying state: the form is one editable
