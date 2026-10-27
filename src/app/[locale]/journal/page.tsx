@@ -14,7 +14,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = t("journal.metaTitle");
   const description = t("journal.metaDescription");
   return {
-    title,
+    // The copy already carries the brand ("The Journal · Sanguine"), so skip
+    // the layout template that would append " · Sanguine" a second time.
+    title: { absolute: title },
     description,
     alternates: {
       canonical: url,
