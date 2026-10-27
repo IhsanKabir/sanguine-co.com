@@ -17,7 +17,7 @@ type Tier = {
 const TIERS: Tier[] = [
   {
     key: "initie",
-    name: "Maison Initié",
+    name: "Member",
     badge: "I",
     color: "var(--purple-400)",
     min: 0,
@@ -30,7 +30,7 @@ const TIERS: Tier[] = [
   },
   {
     key: "atelier",
-    name: "Atelier Guest",
+    name: "Insider",
     badge: "AG",
     color: "var(--mauve)",
     min: 10000,
@@ -43,7 +43,7 @@ const TIERS: Tier[] = [
   },
   {
     key: "patron",
-    name: "Patron de Maison",
+    name: "Circle",
     badge: "PM",
     color: "var(--gold)",
     min: 50000,
@@ -57,7 +57,7 @@ const TIERS: Tier[] = [
   },
   {
     key: "elite",
-    name: "Grand Élite",
+    name: "Inner Circle",
     badge: "GÉ",
     color: "oklch(0.78 0.15 78)",
     min: 150000,

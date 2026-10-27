@@ -73,7 +73,7 @@ export default function WaxSeal({ size = 200 }: { size?: number }) {
         <circle cx="100" cy="100" r="48" fill="url(#seal-glow)" className="seal-glow" />
 
         {/* The crest: a stylised "S" inside two concentric circles, kept
-            geometric so it reads as maison signet rather than royal coat. */}
+            geometric so it reads as a signet rather than a royal coat. */}
         <g className="seal-crest">
           <circle cx="100" cy="100" r="38" fill="none" stroke="url(#seal-crest)" strokeWidth="1" />
           <circle cx="100" cy="100" r="32" fill="none" stroke="url(#seal-crest)" strokeWidth="0.5" opacity="0.6" />
@@ -99,7 +99,7 @@ export default function WaxSeal({ size = 200 }: { size?: number }) {
             fontSize="8"
             fill="url(#seal-crest)"
             letterSpacing="2"
-          >MMXXVI</text>
+          >2026</text>
         </g>
 
         {/* Two small drips at the bottom: the wax is fresh */}

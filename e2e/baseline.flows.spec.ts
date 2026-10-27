@@ -79,7 +79,7 @@ test.describe("baseline · catalogue flows @db", () => {
   test("Enter in the header search opens the full results page", async ({ page }) => {
     skipWithoutDb();
     await page.goto("/en");
-    await page.getByRole("button", { name: "Search the collection…" }).first().click();
+    await page.getByRole("button", { name: "Search Sanguine…" }).first().click();
     const input = page.locator(".nav-search input");
     await input.fill("rose");
     await expect(page.locator(".search-row").first()).toBeVisible();

@@ -52,7 +52,7 @@ export default async function Footer() {
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© MMXXVI {t("brand.name")} · {t("footer.rights")}</span>
+          <span>© 2026 {t("brand.name")} · {t("footer.rights")}</span>
           <span>
             <Link href="/legal/privacy">{t("footer.privacy")}</Link>
             {" · "}

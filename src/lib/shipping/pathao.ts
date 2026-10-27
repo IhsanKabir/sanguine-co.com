@@ -74,7 +74,7 @@ export async function createPathaoOrder(input: PathaoOrderInput): Promise<{ cons
       recipient_area: input.recipientArea,
       delivery_type: 48,             // 48 hours (normal)
       item_type: 2,                  // 1: Document, 2: Parcel
-      special_instruction: "Handle with care · maison parcel",
+      special_instruction: "Handle with care · Sanguine",
       item_quantity: input.itemQty,
       item_weight: Math.max(0.5, input.itemWeight),
       amount_to_collect: input.amountToCollect,

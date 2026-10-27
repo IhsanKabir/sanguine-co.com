@@ -35,7 +35,7 @@ const attachmentSchema = z.object({
 
 const requestSchema = z.object({
   segmentId: z.string().min(1).max(80),
-  description: z.string().min(10, "Tell the maison a little more (10+ characters).").max(4000),
+  description: z.string().min(10, "Tell us a little more (at least 10 characters).").max(4000),
   quantity: z.number().int().min(1).max(50),
   budgetHintBdt: z.number().int().min(0).max(10_000_000).optional().nullable(),
   targetDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),

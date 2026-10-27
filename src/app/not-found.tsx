@@ -27,9 +27,9 @@ export default function RootNotFound() {
           <p style={{ fontSize: 13, letterSpacing: ".35em", textTransform: "uppercase", opacity: 0.6 }}>
             Sanguine
           </p>
-          <h1 style={{ fontSize: 42, fontWeight: 500, margin: 0 }}>This page has wandered off.</h1>
+          <h1 style={{ fontSize: 42, fontWeight: 500, margin: 0 }}>Page not found.</h1>
           <Link href="/en" style={{ color: "#7b2d43", textDecoration: "underline", fontSize: 15 }}>
-            Return to the maison
+            Back to Sanguine
           </Link>
         </main>
       </body>

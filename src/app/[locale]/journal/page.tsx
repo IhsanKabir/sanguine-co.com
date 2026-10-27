@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Link } from "@/i18n/routing";
 import Ornament from "@/components/storefront/Ornament";
 import { SITE_URL as BASE } from "@/lib/site-url";
 
@@ -40,42 +39,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// kicker / title / excerpt / season are message keys (journal.*).
-const ISSUES = [
-  {
-    issue: "I.",
-    kicker: "journal.i1Kicker",
-    title: "journal.i1Title",
-    excerpt: "journal.i1Excerpt",
-    season: "journal.season",
-    href: "/shop/clothing" as const,
-  },
-  {
-    issue: "II.",
-    kicker: "journal.i2Kicker",
-    title: "journal.i2Title",
-    excerpt: "journal.i2Excerpt",
-    season: "journal.season",
-    href: "/shop/flowers" as const,
-  },
-  {
-    issue: "III.",
-    kicker: "journal.i3Kicker",
-    title: "journal.i3Title",
-    excerpt: "journal.i3Excerpt",
-    season: "journal.season",
-    href: "/shop/watches" as const,
-  },
-  {
-    issue: "IV.",
-    kicker: "journal.i4Kicker",
-    title: "journal.i4Title",
-    excerpt: "journal.i4Excerpt",
-    season: "journal.season",
-    href: "/shop/books" as const,
-  },
-];
-
 export default async function JournalPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -95,15 +58,6 @@ export default async function JournalPage({ params }: Props) {
 
       <div className="jnl-wrap">
         <div className="jnl-grid">
-          {ISSUES.map((entry) => (
-            <Link key={entry.issue} href={entry.href} className="jnl-entry">
-              <div className="jnl-entry-kicker">{t(entry.kicker)}</div>
-              <div className="jnl-issue" aria-hidden="true">{entry.issue}</div>
-              <h2>{t(entry.title)}</h2>
-              <p className="jnl-excerpt">{t(entry.excerpt)}</p>
-              <span className="jnl-meta">{t(entry.season)}</span>
-            </Link>
-          ))}
           <div className="jnl-future">
             <p>{t.rich("journal.future", { br: () => <br /> })}</p>
           </div>

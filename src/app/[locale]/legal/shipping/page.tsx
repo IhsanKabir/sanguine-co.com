@@ -24,7 +24,7 @@ function EnglishSection({ c }: { c: CommerceSettings }) {
       <p className="legal-lede">Last updated: 2 May 2026.</p>
 
       <h2>Where we ship</h2>
-      <p>The maison ships nationwide within Bangladesh: sixty-four districts, every upazila served by Pathao or Steadfast. We do not ship internationally at this time; if you are abroad and would like a piece sent within Bangladesh, you may of course place the order and have it delivered to a Bangladeshi address.</p>
+      <p>Sanguine ships nationwide within Bangladesh: sixty-four districts, every upazila served by Pathao or Steadfast. We do not ship internationally at this time; if you are abroad and would like a piece sent within Bangladesh, you may of course place the order and have it delivered to a Bangladeshi address.</p>
 
       <h2>How we ship</h2>
       <p>Stock orders are typically dispatched within one working day of order confirmation. Bespoke pieces are dispatched on the date stated in the quote.</p>
@@ -56,7 +56,7 @@ function EnglishSection({ c }: { c: CommerceSettings }) {
       <p>When your parcel is collected, we email and SMS you the tracking number from your courier. You can also see live tracking on your order page after signing in.</p>
 
       <h2>Failed deliveries</h2>
-      <p>The courier will attempt delivery up to two times. If both attempts fail, the parcel is held at the nearest depot for seven days, after which it is returned to the maison. If your parcel is returned to us, we will write to you to arrange re-delivery (charged at cost) or a refund.</p>
+      <p>The courier will attempt delivery up to two times. If both attempts fail, the parcel is held at the nearest depot for seven days, after which it is returned to Sanguine. If your parcel is returned to us, we will write to you to arrange re-delivery (charged at cost) or a refund.</p>
 
       <h2>Contact</h2>
       <p>Sanguine, Dhaka, Bangladesh. <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>
@@ -73,7 +73,7 @@ function BangleSection({ c }: { c: CommerceSettings }) {
       <p className="legal-lede">সর্বশেষ আপডেট: ২ মে ২০২৬।</p>
 
       <h2>কোথায় পাঠাই</h2>
-      <p>মেইসন বাংলাদেশের সারা দেশে পাঠায়: চৌষট্টি জেলা, Pathao বা Steadfast যেসব উপজেলায় পরিষেবা দেয় সব। বর্তমানে আমরা আন্তর্জাতিক শিপিং করি না; আপনি বিদেশে থেকেও বাংলাদেশের কোনো ঠিকানায় ডেলিভারির জন্য অবশ্যই অর্ডার করতে পারেন।</p>
+      <p>সাঙ্গুইন বাংলাদেশের সারা দেশে পাঠায়: চৌষট্টি জেলা, Pathao বা Steadfast যেসব উপজেলায় পরিষেবা দেয় সব। বর্তমানে আমরা আন্তর্জাতিক শিপিং করি না; আপনি বিদেশে থেকেও বাংলাদেশের কোনো ঠিকানায় ডেলিভারির জন্য অবশ্যই অর্ডার করতে পারেন।</p>
 
       <h2>কীভাবে পাঠাই</h2>
       <p>স্টক অর্ডার সাধারণত অর্ডার নিশ্চিতকরণের এক কর্মদিবসের মধ্যে প্রেরিত হয়। বেসপোক পিস কোটে উল্লিখিত তারিখে প্রেরিত হয়।</p>
@@ -105,7 +105,7 @@ function BangleSection({ c }: { c: CommerceSettings }) {
       <p>পার্সেল সংগ্রহ করা হলে আমরা আপনার কুরিয়ারের ট্র্যাকিং নম্বর ইমেইল ও SMS-এ পাঠাই। সাইন-ইনের পর আপনার অর্ডার পাতায়ও সরাসরি ট্র্যাকিং দেখতে পারেন।</p>
 
       <h2>ডেলিভারি ব্যর্থ হলে</h2>
-      <p>কুরিয়ার সর্বোচ্চ দু&rsquo;বার ডেলিভারির চেষ্টা করবে। দুটি প্রচেষ্টা ব্যর্থ হলে পার্সেল নিকটস্থ ডিপোয় সাত দিন রাখা হবে, এর পর মেইসনে ফেরত আসবে। আপনার পার্সেল ফিরে এলে আমরা পুনরায় ডেলিভারি (খরচ গ্রাহকের) কিংবা অর্থ ফেরতের জন্য আপনাকে লিখব।</p>
+      <p>কুরিয়ার সর্বোচ্চ দু&rsquo;বার ডেলিভারির চেষ্টা করবে। দুটি প্রচেষ্টা ব্যর্থ হলে পার্সেল নিকটস্থ ডিপোয় সাত দিন রাখা হবে, এর পর সাঙ্গুইনে ফেরত আসবে। আপনার পার্সেল ফিরে এলে আমরা পুনরায় ডেলিভারি (খরচ গ্রাহকের) কিংবা অর্থ ফেরতের জন্য আপনাকে লিখব।</p>
 
       <h2>যোগাযোগ</h2>
       <p>সাঙ্গুইন, ঢাকা, বাংলাদেশ। <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a></p>

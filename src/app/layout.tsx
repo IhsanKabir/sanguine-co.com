@@ -6,7 +6,7 @@ import { SITE_URL as BASE } from "@/lib/site-url";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   title: { default: "Sanguine", template: "%s · Sanguine" },
-  description: "Garments, flora & small ceremonies for the violet hour. A Bangladeshi maison, slowly assembled.",
+  description: "Bouquets made to order in Dhaka and delivered across Bangladesh. Prices confirmed before you commit. Pay when it arrives.",
   applicationName: "Sanguine",
   // Both tokens stay: the first is the original May property, the second is
   // the owner's live Search Console property for sanguine-co.com (2026-07-14).
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     alternateLocale: ["bn_BD"],
     url: BASE,
     title: "Sanguine",
-    description: "Garments, flora & small ceremonies for the violet hour.",
+    description: "Flowers, arranged to be remembered. Made to order in Dhaka.",
     // Generic maison card rendered by /api/og (wordmark + tagline, 1200×630).
     // Pages with richer context (PDP) override this with their own card.
     images: [{ url: "/api/og", width: 1200, height: 630, alt: "Sanguine" }],
