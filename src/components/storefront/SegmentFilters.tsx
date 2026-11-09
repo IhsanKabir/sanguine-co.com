@@ -119,6 +119,7 @@ export default function SegmentFilters(props: Props) {
 
         <label className="filter-sort-inline">
           <select
+            aria-label={tr("filters.sort")}
             value={sortActive}
             onChange={(e) => updateParam("sort", e.target.value === "featured" ? null : e.target.value)}
             aria-busy={pending}

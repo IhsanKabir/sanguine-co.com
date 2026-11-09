@@ -154,6 +154,7 @@ function ShopGridView({
             <ProductCard
               key={p.id}
               priority={i < PRIORITY_CARDS}
+              headingLevel={2}
               product={p}
               segmentTag={segmentTag}
               heroImage={heroImages[p.id] ?? null}
@@ -167,7 +168,7 @@ function ShopGridView({
             <p style={{ color: "var(--ink-soft)" }}>
               {t.rich("shopGrid.widen", {
                 a: (chunks) => (
-                  <Link href={resetHref ?? `/shop/${segmentSlug}`} style={{ color: "var(--purple-900)" }}>
+                  <Link href={resetHref ?? `/shop/${segmentSlug}`} style={{ color: "var(--purple-900)", textDecoration: "underline" }}>
                     {chunks}
                   </Link>
                 ),

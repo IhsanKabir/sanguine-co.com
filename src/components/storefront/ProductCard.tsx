@@ -40,9 +40,11 @@ type Props = {
   quickView?: boolean;
   /** Above-the-fold card: preload the photo at high priority (LCP). */
   priority?: boolean;
+  /** h2 where the card sits directly under the page h1 (shop grid). */
+  headingLevel?: 2 | 3;
 };
 
-export default function ProductCard({ product: p, segmentTag, heroImage, quickView = true, priority = false }: Props) {
+export default function ProductCard({ product: p, segmentTag, heroImage, quickView = true, priority = false, headingLevel = 3 }: Props) {
   const locale = useLocale() as "en" | "bn";
   const t = useTranslations();
   const name = (locale === "bn" && p.nameBn) || p.name;
@@ -120,7 +122,7 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
         </div>
         <div className="prod-body">
           {segmentTag && <div className="prod-meta">{segmentTag}</div>}
-          <h3 className="prod-name">{name}</h3>
+          {headingLevel === 2 ? <h2 className="prod-name">{name}</h2> : <h3 className="prod-name">{name}</h3>}
           <div className="prod-price">
             {p.preorderOnly && (
               <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--gold-deep)", marginRight: 8 }}>

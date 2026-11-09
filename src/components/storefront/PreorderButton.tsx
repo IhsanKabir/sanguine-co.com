@@ -38,7 +38,7 @@ export default function PreorderButton({
           <div style={{ color: "var(--gold-deep)", fontWeight: 500 }}>
             {t("preorder.priceLine", { price: priceText })}
             {display.kind === "estimate" && (
-              <span style={{ fontWeight: 400, opacity: 0.7 }}>{t("preorder.estimatedSuffix")}</span>
+              <span style={{ fontWeight: 400 }}>{t("preorder.estimatedSuffix")}</span>
             )}
           </div>
         ) : (
