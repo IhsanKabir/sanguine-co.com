@@ -104,6 +104,9 @@ export default async function Home({ params }: Props) {
 
   const showSetupBanner = segments === null;
   const segs = segments ?? [];
+  // Category label in the page language (the Bangla site was showing the English tag).
+  const segTag = (seg?: { tag: string | null; tagBn: string | null }) =>
+    (locale === "bn" && seg?.tagBn) || seg?.tag || undefined;
   const news = newArrivals ?? [];
   const eds = editors ?? [];
   // Single batched fetch of hero images for every product on the page.
@@ -255,7 +258,7 @@ export default async function Home({ params }: Props) {
               const seg = segs.find((s) => s.id === p.segmentId);
               return (
                 <div key={p.id} data-reveal data-reveal-delay={i + 1}>
-                  <ProductCard product={p} segmentTag={seg?.tag} heroImage={heroImages.get(p.id) ?? null} />
+                  <ProductCard product={p} segmentTag={segTag(seg)} heroImage={heroImages.get(p.id) ?? null} />
                 </div>
               );
             })}
@@ -289,8 +292,8 @@ export default async function Home({ params }: Props) {
                 >
                   <Composition cat={p.segmentId || "clothing"} sku={p.sku} name={p.name} tag={p.tag} image={heroImages.get(p.id) ?? null} />
                   <div className="b-overlay">
-                    <div className="b-kicker">{seg?.tag}</div>
-                    <h3 className="b-name">{p.name}</h3>
+                    <div className="b-kicker">{segTag(seg)}</div>
+                    <h3 className="b-name">{(locale === "bn" && p.nameBn) || p.name}</h3>
                     <div className="b-price">
                       {display.kind === "quote" ? t("pdp.priceOnQuote") : priceDisplayText(display, locale as "en" | "bn")}
                     </div>
