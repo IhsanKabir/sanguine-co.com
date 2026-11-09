@@ -118,7 +118,6 @@
     "freeShipping": "ফ্রি ডেলিভারি",
     "freeShippingNote": "৳৫,০০০-এর বেশিতে",
     "codTitle": "ক্যাশ অন ডেলিভারি",
-    "codNote": "সারা বাংলাদেশে",
     "authentic": "সাঙ্গুইন থেকে",
     "authenticNote": "আমরাই বিক্রি ও ডেলিভারি করি",
     "giftService": "গিফট র‍্যাপিং",
@@ -146,16 +145,17 @@
     "preorderOnly": "অর্ডার অনুযায়ী তৈরি",
     "shippingNote": "{threshold}-এর বেশিতে ফ্রি ডেলিভারি · অন্যথায় {dhaka}–{outside}",
     "returnsTitle": "{days} দিনে রিটার্ন",
-    "returnsNote": "ডেলিভারির {days} দিনের মধ্যে আমরা নিয়ে যাই",
     "whatsappText": "হ্যালো, আমি {name} সম্পর্কে জানতে চাই: {url}",
     "whatsappLink": "এই পিস নিয়ে প্রশ্ন? WhatsApp-এ জিজ্ঞেস করুন →",
     "styleKicker": "সঙ্গে মানাবে",
     "completeLook": "এর সঙ্গে ভালো যায়",
     "shippingNoteNoFree": "ডেলিভারি ঢাকায় {dhaka} · অন্যত্র {outside}",
-    "deliveryEstimate": "আজ অর্ডার করলে ঢাকায় পৌঁছাবে {dhaka}-এর মধ্যে, অন্যত্র {outside}-এর মধ্যে",
     "sizeGuide": "সাইজ গাইড",
     "materials": "বিস্তারিত",
-    "care": "যত্ন"
+    "care": "যত্ন",
+    "trustLabel": "ডেলিভারি, পেমেন্ট ও রিটার্ন",
+    "trustArrives": "ঢাকায় পৌঁছাবে {date}-এর মধ্যে",
+    "trustDispatch": "১ কার্যদিবসের মধ্যে পাঠানো হয়"
   },
   "cart": {
     "title": "আপনার ব্যাগ",

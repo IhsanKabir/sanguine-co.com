@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { CONSENT_KEY as KEY } from "@/lib/consent-key";
+
+const KEY = "ssg-cookie-consent-v1";
 
 type Choice = { choice: "accept" | "decline"; at: number };
 
@@ -24,10 +25,23 @@ export function readConsent(): Choice | null {
 export default function CookieConsent() {
   const locale = useLocale();
   const isBn = locale === "bn";
-  // Rendered on the server so it is part of first paint (it used to appear
-  // after hydration, late enough to hurt Speed Index). CONSENT_BOOT_SCRIPT
-  // in the layout hides it via html.cc-done for visitors who already chose.
-  const [dismissed, setDismissed] = useState(false);
+  // Shown on the visitor's first scroll, tap or key press, not on arrival:
+  // on a phone it covered the product price and trust line, and appearing
+  // mid-load hurt Speed Index. Analytics waits for consent either way.
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(KEY)) return;
+    } catch { /* private mode: still ask */ }
+    const events = ["scroll", "pointerdown", "keydown"] as const;
+    const show = () => {
+      setVisible(true);
+      events.forEach((e) => window.removeEventListener(e, show));
+    };
+    events.forEach((e) => window.addEventListener(e, show, { passive: true, once: true }));
+    return () => events.forEach((e) => window.removeEventListener(e, show));
+  }, []);
 
   const persist = (choice: "accept" | "decline") => {
     try {
@@ -35,11 +49,10 @@ export default function CookieConsent() {
       // Notify other tabs / listeners (e.g. SessionTracker)
       window.dispatchEvent(new StorageEvent("storage", { key: KEY }));
     } catch {}
-    document.documentElement.classList.add("cc-done");
-    setDismissed(true);
+    setVisible(false);
   };
 
-  if (dismissed) return null;
+  if (!visible) return null;
   return (
     <div className="cookie-banner" role="dialog" aria-label={isBn ? "কুকি পছন্দ" : "Cookie preferences"}>
       <div className="cb-text">

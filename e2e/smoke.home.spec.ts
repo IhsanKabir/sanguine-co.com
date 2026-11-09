@@ -21,9 +21,14 @@ test.describe("home smoke", () => {
   test("cookie consent banner appears for a fresh visitor", async ({ page }) => {
     await page.goto("/en");
     // The consent UI persists its choice under this key; a fresh context has
-    // none, so the banner must be in the DOM.
+    // none, so the banner must appear on the first interaction (it waits for
+    // a scroll, tap or key press so it never covers the first screen).
     const stored = await page.evaluate(() => localStorage.getItem("ssg-cookie-consent-v1"));
     expect(stored).toBeNull();
-    await expect(page.locator("text=/cookie/i").first()).toBeVisible();
+    // Retry: a scroll before hydration has no listener to hear it yet.
+    await expect(async () => {
+      await page.mouse.wheel(0, 200);
+      await expect(page.locator(".cookie-banner")).toBeVisible({ timeout: 1_000 });
+    }).toPass({ timeout: 30_000 });
   });
 });
