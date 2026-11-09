@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
-
-const KEY = "ssg-cookie-consent-v1";
+import { CONSENT_KEY as KEY } from "@/lib/consent-key";
 
 type Choice = { choice: "accept" | "decline"; at: number };
 
@@ -25,13 +24,10 @@ export function readConsent(): Choice | null {
 export default function CookieConsent() {
   const locale = useLocale();
   const isBn = locale === "bn";
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    try {
-      if (!localStorage.getItem(KEY)) setVisible(true);
-    } catch { /* private mode */ }
-  }, []);
+  // Rendered on the server so it is part of first paint (it used to appear
+  // after hydration, late enough to hurt Speed Index). CONSENT_BOOT_SCRIPT
+  // in the layout hides it via html.cc-done for visitors who already chose.
+  const [dismissed, setDismissed] = useState(false);
 
   const persist = (choice: "accept" | "decline") => {
     try {
@@ -39,10 +35,11 @@ export default function CookieConsent() {
       // Notify other tabs / listeners (e.g. SessionTracker)
       window.dispatchEvent(new StorageEvent("storage", { key: KEY }));
     } catch {}
-    setVisible(false);
+    document.documentElement.classList.add("cc-done");
+    setDismissed(true);
   };
 
-  if (!visible) return null;
+  if (dismissed) return null;
   return (
     <div className="cookie-banner" role="dialog" aria-label={isBn ? "কুকি পছন্দ" : "Cookie preferences"}>
       <div className="cb-text">

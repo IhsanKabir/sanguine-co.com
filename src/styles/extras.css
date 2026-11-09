@@ -667,8 +667,8 @@
   align-items: center;
   z-index: 95;
   box-shadow: 0 16px 40px -10px rgba(20, 10, 50, .5);
-  animation: cookieSlideUp .35s cubic-bezier(.2, .7, .2, 1);
 }
+html.cc-done .cookie-banner { display: none; }
 .cookie-banner .cb-text {
   font-size: 13px;
   line-height: 1.6;
@@ -693,10 +693,6 @@
   border-color: var(--purple-700);
   color: var(--purple-200);
 }
-@keyframes cookieSlideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
 @media (max-width: 640px) {
   .cookie-banner {
     grid-template-columns: 1fr;
@@ -709,9 +705,6 @@
   .cookie-banner .cb-actions button {
     flex: 1;
   }
-}
-@media (prefers-reduced-motion: reduce) {
-  .cookie-banner { animation: none; }
 }
 
 /* Legal pages */

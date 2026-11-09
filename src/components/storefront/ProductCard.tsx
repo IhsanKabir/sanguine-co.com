@@ -27,6 +27,10 @@ function colorToHex(name: string): string {
   return COLOR_MAP[name.toLowerCase()] ?? "#d5cfc6";
 }
 
+/** Card photos render ~200 to 400 px wide: 60 is visually indistinguishable
+ *  from the default 75 there and roughly a quarter smaller. */
+const CARD_QUALITY = 60;
+
 type Props = {
   product: Product;
   segmentTag?: string | null;
@@ -63,6 +67,7 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 style={{ objectFit: "cover" }}
                 className="card-img-primary"
+                quality={CARD_QUALITY}
                 priority={priority}
                 fetchPriority={priority ? "high" : undefined}
               />
@@ -74,6 +79,7 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   style={{ objectFit: "cover" }}
                   className="card-img-hover"
+                  quality={CARD_QUALITY}
                 />
               )}
             </>

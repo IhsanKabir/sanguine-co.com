@@ -1,4 +1,4 @@
-import { Inter, Cormorant_Garamond, JetBrains_Mono, Noto_Serif_Bengali, Noto_Sans_Bengali } from "next/font/google";
+import { Inter, Cormorant_Garamond, Noto_Serif_Bengali, Noto_Sans_Bengali } from "next/font/google";
 
 // Shared by the [locale] layout (the <html> owner) and the root not-found
 // document. Lives in its own module so both can compose the same variables.
@@ -16,14 +16,8 @@ export const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
-export const jbMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
-  display: "swap",
-  // Only small labels use it; preloading it competed with the LCP image.
-  preload: false,
-});
+// JetBrains Mono was dropped (Nov 2026): it only set small labels and was a
+// fifth font file on every first load. --mono (styles.css) now maps to Inter.
 
 // Bangla. Neither Latin family above has Bengali glyphs, so Bangla text used
 // whatever the device had (FreeSans, Nirmala UI, …) and looked different on
@@ -50,4 +44,4 @@ export const notoSansBengali = Noto_Sans_Bengali({
   adjustFontFallback: false,
 });
 
-export const fontClasses = `${inter.variable} ${cormorant.variable} ${jbMono.variable} ${notoSerifBengali.variable} ${notoSansBengali.variable}`;
+export const fontClasses = `${inter.variable} ${cormorant.variable} ${notoSerifBengali.variable} ${notoSansBengali.variable}`;
