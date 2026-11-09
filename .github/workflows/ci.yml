@@ -20,7 +20,9 @@ concurrency:
 jobs:
   typecheck-lint:
     name: Typecheck + Lint
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moved to 26.04 in Nov 2026 and Playwright 1.60
+    # cannot install Chromium there. Move up once Playwright supports it.
+    runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +56,9 @@ jobs:
 
   e2e-smoke:
     name: Playwright smoke
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moved to 26.04 in Nov 2026 and Playwright 1.60
+    # cannot install Chromium there. Move up once Playwright supports it.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
