@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useMemo, useTransition, useState, useOptimistic } from "react";
 import { useTranslations } from "next-intl";
 
@@ -15,6 +15,9 @@ type Props = {
   totalCount: number;
   /** Params that "clear all" keeps (e.g. the search query). */
   preserveParams?: string[];
+  /** Current query string, passed in by ShopGrid so this bar can also render
+   *  in the server-rendered (unfiltered) fallback. */
+  query: string;
 };
 
 // Labels are message keys (filters.*), resolved per locale at render.
@@ -37,7 +40,6 @@ export default function SegmentFilters(props: Props) {
   const tr = useTranslations();
   const router = useRouter();
   const pathname = usePathname();
-  const params = useSearchParams();
   const [pending, startTransition] = useTransition();
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -45,7 +47,7 @@ export default function SegmentFilters(props: Props) {
   // render is in flight (the URL stays the source of truth on settle). On BD
   // mobile networks the old server-roundtrip-then-repaint made every filter
   // tap look frozen.
-  const [optimisticQs, setOptimisticQs] = useOptimistic(params.toString());
+  const [optimisticQs, setOptimisticQs] = useOptimistic(props.query);
   const active = useMemo(() => new URLSearchParams(optimisticQs), [optimisticQs]);
 
   const minActive = active.get("min") ?? "";

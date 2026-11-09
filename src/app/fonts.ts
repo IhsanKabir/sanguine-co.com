@@ -21,6 +21,8 @@ export const jbMono = JetBrains_Mono({
   weight: ["400", "500"],
   variable: "--font-mono",
   display: "swap",
+  // Only small labels use it; preloading it competed with the LCP image.
+  preload: false,
 });
 
 // Bangla. Neither Latin family above has Bengali glyphs, so Bangla text used

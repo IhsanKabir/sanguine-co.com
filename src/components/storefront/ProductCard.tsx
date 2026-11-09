@@ -34,9 +34,11 @@ type Props = {
   heroImage?: { url: string; alt: string | null; hoverUrl?: string } | null;
   /** Show the quick-view trigger (defaults true). Disable on tight grids. */
   quickView?: boolean;
+  /** Above-the-fold card: preload the photo at high priority (LCP). */
+  priority?: boolean;
 };
 
-export default function ProductCard({ product: p, segmentTag, heroImage, quickView = true }: Props) {
+export default function ProductCard({ product: p, segmentTag, heroImage, quickView = true, priority = false }: Props) {
   const locale = useLocale() as "en" | "bn";
   const t = useTranslations();
   const name = (locale === "bn" && p.nameBn) || p.name;
@@ -61,6 +63,7 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 style={{ objectFit: "cover" }}
                 className="card-img-primary"
+                priority={priority}
               />
               {heroImage.hoverUrl && (
                 <Image

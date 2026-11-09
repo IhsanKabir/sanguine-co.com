@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { Product } from "@/lib/schema";
@@ -31,7 +31,33 @@ type Props = {
   preserveParams?: string[];
 };
 
-export default function ShopGrid({
+/** Cards above the fold on a phone (2-column grid): loaded eagerly at high
+ *  priority, since the first one is the shop page LCP element. */
+const PRIORITY_CARDS = 2;
+
+const NO_PARAMS = new URLSearchParams();
+
+/**
+ * useSearchParams makes Next client-render everything under the nearest
+ * Suspense boundary on a static page, which left the shop HTML with no
+ * product images (LCP load delay ~2.7 s). The fallback is therefore the
+ * real grid, unfiltered, so the photos are in the server HTML; the live
+ * grid swaps in after hydration and applies any filters in the URL.
+ */
+export default function ShopGrid(props: Props) {
+  return (
+    <Suspense fallback={<ShopGridView {...props} params={NO_PARAMS} />}>
+      <ShopGridLive {...props} />
+    </Suspense>
+  );
+}
+
+function ShopGridLive(props: Props) {
+  const params = useSearchParams();
+  return <ShopGridView {...props} params={params} />;
+}
+
+function ShopGridView({
   allItems,
   heroImages,
   availableColors,
@@ -44,9 +70,9 @@ export default function ShopGrid({
   showPreorder,
   resetHref,
   preserveParams,
-}: Props) {
+  params,
+}: Props & { params: Pick<URLSearchParams, "get" | "toString"> }) {
   const t = useTranslations();
-  const params = useSearchParams();
 
   const minPrice = params.get("min") ? parseInt(params.get("min")!, 10) : undefined;
   const maxPrice = params.get("max") ? parseInt(params.get("max")!, 10) : undefined;
@@ -117,15 +143,17 @@ export default function ShopGrid({
           availableTags={availableTags}
           priceMin={priceMin ?? 0}
           priceMax={priceMax ?? 0}
+          query={params.toString()}
           shownCount={filteredItems.length}
           totalCount={allItems.length}
         />
       )}
       {filteredItems.length > 0 ? (
         <div className="grid grid-4">
-          {filteredItems.map((p) => (
+          {filteredItems.map((p, i) => (
             <ProductCard
               key={p.id}
+              priority={i < PRIORITY_CARDS}
               product={p}
               segmentTag={segmentTag}
               heroImage={heroImages[p.id] ?? null}
