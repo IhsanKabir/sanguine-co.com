@@ -97,6 +97,23 @@ export default async function AdminBehaviorPage({
   `).catch(logAndFallback("topPages", [] as Array<{ path: string; views: number }>));
   const topPages = Array.isArray(topPagesRaw) ? topPagesRaw : (topPagesRaw as { rows?: typeof topPagesRaw }).rows ?? [];
 
+  // Visit sources, from the payload SessionTracker records in the browser.
+  // A utm_source tag wins over the referring site; neither means direct.
+  // Visits before 2026-11 carry no source and count as direct.
+  const sourcesRaw = await db.execute<{ source: string; campaign: string | null; visits: number }>(sql`
+    select
+      coalesce(nullif(payload->>'utm_source', ''), nullif(payload->>'ref_host', ''), 'direct') as source,
+      nullif(payload->>'utm_campaign', '') as campaign,
+      count(*)::int as visits
+    from events
+    where type = 'session_start'
+      and created_at >= ${since}::timestamptz
+    group by 1, 2
+    order by visits desc
+    limit 15
+  `).catch(logAndFallback("sources", [] as Array<{ source: string; campaign: string | null; visits: number }>));
+  const sources = Array.isArray(sourcesRaw) ? sourcesRaw : (sourcesRaw as { rows?: typeof sourcesRaw }).rows ?? [];
+
   const dailyVolumeRaw = await db.execute<{ day: string; sessions: number; orders: number }>(sql`
     select to_char(created_at, 'YYYY-MM-DD') as day,
            count(*) filter (where type = 'session_start')::int as sessions,
@@ -233,6 +250,29 @@ export default async function AdminBehaviorPage({
             </div>
           )}
         </div>
+      </div>
+
+      <div className="chart" style={{ marginTop: 16 }}>
+        <div className="chart-hd"><h3>Where visitors come from</h3></div>
+        <p style={{ color: "var(--ink-soft)", fontSize: 12, margin: "0 0 10px" }}>
+          Visitors who accepted analytics cookies. For every visit, see Vercel Analytics → Referrers.
+        </p>
+        {sources.length === 0 ? <p style={{ color: "var(--ink-soft)", fontSize: 13 }}>No visits yet.</p> : (
+          <div className="table" style={{ border: "none" }}>
+            <table>
+              <thead><tr><th>Source</th><th>Campaign</th><th>Visits</th></tr></thead>
+              <tbody>
+                {sources.map((s) => (
+                  <tr key={`${s.source}|${s.campaign ?? ""}`}>
+                    <td>{s.source === "direct" ? "Direct / unknown" : s.source}</td>
+                    <td className="mono" style={{ fontSize: 12 }}>{s.campaign ?? "-"}</td>
+                    <td>{s.visits}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <div className="chart" style={{ marginTop: 16 }}>
