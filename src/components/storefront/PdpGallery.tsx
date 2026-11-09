@@ -113,11 +113,14 @@ export default function PdpGallery({ photos, fallback, activeIndex, onIndexChang
               width={900}
               height={1200}
               priority
+              fetchPriority="high"
               sizes="(max-width: 768px) 100vw, 50vw"
               // height:100% + cover clips ANY upload shape to the 3:4 frame:
               // height:auto let portrait photos overflow across the info column.
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-              className="pdp-img-fade"
+              // Fade only on a swap: on first load the photo is the LCP
+              // element and an opacity-0 start delays it.
+              className={imgKey > 0 ? "pdp-img-fade" : undefined}
               onLoad={() => setLoading(false)}
               onError={() => setLoading(false)}
             />

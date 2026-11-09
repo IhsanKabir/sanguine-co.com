@@ -64,6 +64,7 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
                 style={{ objectFit: "cover" }}
                 className="card-img-primary"
                 priority={priority}
+                fetchPriority={priority ? "high" : undefined}
               />
               {heroImage.hoverUrl && (
                 <Image
