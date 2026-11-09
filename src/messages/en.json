@@ -54,7 +54,7 @@
       "cod": "Cash on delivery",
       "gift": "Gift wrapping",
       "freeDelivery": "Free delivery over {threshold}",
-      "returns": "14-day returns",
+      "returns": "{days}-day returns",
       "certified": "Delivered nationwide"
     },
     "note": {
@@ -514,7 +514,7 @@
     "reasonLabel": "Reason for return",
     "notesLabel": "More detail (optional)",
     "notesPlaceholder": "Tell us what happened…",
-    "windowNote": "Returns are accepted within each piece's return window (14 days from delivery unless its page says otherwise). Pieces must be in their original condition and packaging.",
+    "windowNote": "Returns are accepted within each piece's return window, shown on its page. Pieces must be in their original condition and packaging.",
     "submitting": "Submitting…",
     "submit": "Submit request"
   },

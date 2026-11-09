@@ -91,6 +91,7 @@ export default async function Home({ params }: Props) {
   const t = await getTranslations();
   const commerce = await getCommerceSettings();
   const freeOver = formatBdt(commerce.freeShippingThresholdBdt, locale as "en" | "bn");
+  const returnDays = locale === "bn" ? commerce.returnWindowDays.toLocaleString("bn-BD") : String(commerce.returnWindowDays);
   // A threshold of 0 switches free shipping off: drop that marquee point.
   const marqueeKeys = commerce.freeShippingThresholdBdt > 0
     ? MARQUEE_KEYS
@@ -203,7 +204,7 @@ export default async function Home({ params }: Props) {
         <div className="marquee-track">
           {/* Listed twice so the scrolling track loops seamlessly. */}
           {[...marqueeKeys, ...marqueeKeys].map((k, i) => (
-            <span key={k + i} aria-hidden={i >= marqueeKeys.length || undefined}>{t(`home.marquee.${k}`, { threshold: freeOver })}</span>
+            <span key={k + i} aria-hidden={i >= marqueeKeys.length || undefined}>{t(`home.marquee.${k}`, { threshold: freeOver, days: returnDays })}</span>
           ))}
         </div>
       </div>
