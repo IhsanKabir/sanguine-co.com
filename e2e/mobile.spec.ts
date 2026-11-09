@@ -24,7 +24,13 @@ test.describe("mobile · 390px touch profile", () => {
     // the first failure screenshot showed the tap landing on it, which is
     // the layer-stacking class of bug this suite exists to catch). Wait for
     // it to actually leave before computing tap coordinates.
+    // It appears on the first scroll (once hydrated), so scroll until it
+    // shows, then dismiss it.
     const consent = page.getByRole("button", { name: /essential only/i });
+    await expect(async () => {
+      await page.mouse.wheel(0, 50);
+      await expect(consent).toBeVisible({ timeout: 1_000 });
+    }).toPass({ timeout: 30_000 });
     await consent.click({ timeout: 10_000 }).catch(() => {});
     await consent.waitFor({ state: "hidden", timeout: 5_000 }).catch(() => {});
     const cover = page.locator(".card-cover").first();

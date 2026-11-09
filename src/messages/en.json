@@ -118,7 +118,6 @@
     "freeShipping": "Free delivery",
     "freeShippingNote": "Over ৳5,000",
     "codTitle": "Cash on delivery",
-    "codNote": "Across Bangladesh",
     "authentic": "From Sanguine",
     "authenticNote": "Sold and delivered by us",
     "giftService": "Gift wrapping",
@@ -146,16 +145,17 @@
     "preorderOnly": "Made to order",
     "shippingNote": "Free delivery over {threshold} · Otherwise {dhaka}–{outside}",
     "returnsTitle": "{days}-day returns",
-    "returnsNote": "We collect it within {days} days of delivery",
     "whatsappText": "Hello, I'm interested in {name}: {url}",
     "whatsappLink": "Questions about this piece? Ask us on WhatsApp →",
     "styleKicker": "PAIR IT WITH",
     "completeLook": "Goes well with",
     "shippingNoteNoFree": "Delivery {dhaka} in Dhaka · {outside} elsewhere",
-    "deliveryEstimate": "Order today and it arrives by {dhaka} in Dhaka, {outside} elsewhere",
     "sizeGuide": "Size guide",
     "materials": "Details",
-    "care": "Care"
+    "care": "Care",
+    "trustLabel": "Delivery, payment and returns",
+    "trustArrives": "Arrives by {date} in Dhaka",
+    "trustDispatch": "Dispatched within 1 working day"
   },
   "cart": {
     "title": "Your bag",

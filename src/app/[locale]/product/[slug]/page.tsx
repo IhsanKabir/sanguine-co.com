@@ -297,6 +297,23 @@ export default async function ProductPage({ params }: Props) {
               </>
             )}
           </div>
+          {/* Trust line: delivery, payment and returns sit right under the
+              price so they are on the first screen on a phone. */}
+          <ul className="pdp-trust" aria-label={t("pdp.trustLabel")}>
+            {sellableNow ? (
+              <li><Icon name="arrow" size={13} /><DeliveryEstimate /></li>
+            ) : p.preorderOnly || p.preorderEnabled ? (
+              <li>
+                <Icon name="arrow" size={13} />
+                <span>{p.estimatedDelivery ? t("preorder.estimatedDelivery", { when: p.estimatedDelivery }) : t("pdp.preorderOnly")}</span>
+              </li>
+            ) : null}
+            <li><Icon name="check" size={13} /><span>{t("pdp.codTitle")}</span></li>
+            <li>
+              <Icon name="check" size={13} />
+              <Link href="/legal/returns">{t("pdp.returnsTitle", { days: returnDays })}</Link>
+            </li>
+          </ul>
           <div style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.7, marginBottom: p.modelNote ? 12 : 24 }}>
             {description}
           </div>
@@ -392,7 +409,6 @@ export default async function ProductPage({ params }: Props) {
                   outside: formatBdt(commerce.shippingOutsideBdt, locale as "en" | "bn"),
                 })}
           </div>
-          {sellableNow && <DeliveryEstimate />}
 
           {(sizeGuide || details || care) && (
             <div className="pdp-more">
@@ -418,8 +434,6 @@ export default async function ProductPage({ params }: Props) {
           )}
 
           <div className="pdp-feats">
-            <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.returnsTitle", { days: returnDays })}</b> {t("pdp.returnsNote", { days: returnDays })}</div></div>
-            <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.codTitle")}</b>{t("pdp.codNote")}</div></div>
             <div className="pdp-feat"><Icon name="check" size={18} /><div><b>{t("pdp.authentic")}</b>{t("pdp.authenticNote")}</div></div>
             <div className="pdp-feat"><Icon name="feather" size={18} /><div><b>{t("pdp.giftService")}</b>{t("pdp.giftServiceNote")}</div></div>
           </div>

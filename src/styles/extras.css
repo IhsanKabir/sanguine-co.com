@@ -668,7 +668,6 @@
   z-index: 95;
   box-shadow: 0 16px 40px -10px rgba(20, 10, 50, .5);
 }
-html.cc-done .cookie-banner { display: none; }
 .cookie-banner .cb-text {
   font-size: 13px;
   line-height: 1.6;
@@ -693,17 +692,27 @@ html.cc-done .cookie-banner { display: none; }
   border-color: var(--purple-700);
   color: var(--purple-200);
 }
+/* Phones: a compact bar (text beside two small stacked buttons, ~80px)
+   so a first visit still sees the product price and trust line. */
 @media (max-width: 640px) {
   .cookie-banner {
-    grid-template-columns: 1fr;
+    left: 8px;
+    right: 8px;
     bottom: 8px;
-    padding: 14px 16px;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  .cookie-banner .cb-text {
+    font-size: 12px;
+    line-height: 1.45;
   }
   .cookie-banner .cb-actions {
-    width: 100%;
+    flex-direction: column-reverse;
+    gap: 6px;
   }
-  .cookie-banner .cb-actions button {
-    flex: 1;
+  .cookie-banner .cb-actions .btn {
+    padding: 7px 12px;
+    font-size: 10px;
   }
 }
 

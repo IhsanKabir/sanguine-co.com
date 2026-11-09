@@ -186,6 +186,10 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .pdp-price{display:flex;align-items:baseline;gap:12px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--line)}
 .pdp-price .now{font-family:var(--serif);font-size:36px;color:var(--purple-900)}
 .pdp-price .was{font-size:17px;color:var(--ink-soft);text-decoration:line-through}
+.pdp-trust{list-style:none;margin:-12px 0 20px;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--purple-900)}
+.pdp-trust li{display:flex;align-items:center;gap:6px}
+.pdp-trust svg{color:var(--gold-deep);flex:none}
+.pdp-trust a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 .pdp-price .save{background:var(--gold);color:var(--purple-950);padding:4px 10px;font-size:11px;letter-spacing:.15em}
 .swatch-row{display:flex;gap:10px;margin:12px 0 20px;flex-wrap:wrap}
 .swatch{min-width:52px;padding:12px 16px;min-height:44px;border:1px solid var(--line);text-align:center;font-size:13px;cursor:pointer;background:#fff;display:inline-flex;align-items:center;justify-content:center}
@@ -449,6 +453,18 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
   .pdp-price .now{font-size:28px}
   .pdp-actions{grid-template-columns:1fr}
   .crumbs{padding:12px 16px 0}
+  /* First screen on a phone: photo, name, price and the trust line
+     (delivery, COD, returns). The 3:4 photo plus breadcrumb used to fill
+     the whole screen, leaving even the price below the fold. */
+  .crumbs:has(+ .pdp){display:none}
+  .pdp{gap:14px;padding-top:12px}
+  .pdp-gallery{gap:8px}
+  .pdp-main-img{aspect-ratio:auto;height:min(133vw,48svh)}
+  .pdp-thumb{width:48px;height:48px;flex:0 0 48px}
+  .pdp-info{padding:0}
+  .pdp-info h1{font-size:26px;margin:4px 0 6px}
+  .pdp-price{margin-bottom:16px;padding-bottom:16px}
+  .pdp-trust{margin-top:-6px}
 
   /* Footer */
   .footer-grid{grid-template-columns:1fr;gap:20px}
@@ -516,7 +532,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .pdp-info-table{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
 .pdp-info-table th,.pdp-info-table td{border:1px solid var(--line);padding:6px 10px;text-align:left;white-space:nowrap}
 .pdp-info-table th{background:var(--purple-50);color:var(--purple-900);font-weight:500}
-.pdp-delivery-estimate{margin-top:-4px}
+
 @media (prefers-reduced-motion: reduce){.pdp-more summary::after{transition:none}}
 
 /* Bangla: no letter-spacing, anywhere.
