@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getSegmentBySlug, getLiveProducts, getHeroImagesFor } from "@/lib/queries";
 import { Link } from "@/i18n/routing";
+import { uniqueOptions } from "@/lib/option-labels";
 import ShopGrid from "@/components/storefront/ShopGrid";
 import JsonLd from "@/components/seo/JsonLd";
 import { priceSortValue } from "@/lib/pricing";
@@ -92,8 +93,8 @@ export default async function SegmentPage({ params }: Props) {
   const heroImagesObj = Object.fromEntries(heroImages.entries());
 
   // Distinct values for filter chips.
-  const availableColors = Array.from(new Set(allItems.flatMap((p) => (p.colors as string[] | null) ?? []))).sort();
-  const availableSizes = Array.from(new Set(allItems.flatMap((p) => (p.sizes as string[] | null) ?? []))).sort();
+  const availableColors = uniqueOptions(allItems.flatMap((p) => (p.colors as string[] | null) ?? []));
+  const availableSizes = uniqueOptions(allItems.flatMap((p) => (p.sizes as string[] | null) ?? []));
   const availableTags = Array.from(new Set(allItems.map((p) => p.tag).filter((t): t is string => !!t))).sort();
   // Filter bounds use the effective (quotation-model) price; quote-only pieces
   // have no comparable price and are excluded from the bounds.

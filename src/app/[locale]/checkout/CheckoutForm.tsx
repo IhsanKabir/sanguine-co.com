@@ -6,6 +6,7 @@ import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { formatBdt } from "@/lib/utils";
+import { colorLabel, sizeLabel } from "@/lib/option-labels";
 import { createCodOrder, requestPhoneCode, startOnlinePayment } from "@/lib/actions/orders";
 import { track } from "@/lib/actions/track";
 import Composition from "@/components/storefront/Composition";
@@ -359,7 +360,7 @@ export default function CheckoutForm({
               <div>
                 <div className="serif" style={{ fontSize: 15, color: "var(--purple-900)" }}>{i.name}</div>
                 <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>
-                  {i.color || ""}{i.size ? ` · ${i.size}` : ""} · {t("checkout.qty", { qty: i.qty })}
+                  {i.color ? colorLabel(i.color, locale) : ""}{i.size ? ` · ${sizeLabel(i.size, locale)}` : ""} · {t("checkout.qty", { qty: i.qty })}
                 </div>
               </div>
               <div style={{ fontSize: 13, fontWeight: 500 }}>{formatBdt(i.priceBdt * i.qty, locale)}</div>

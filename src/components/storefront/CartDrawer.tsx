@@ -4,6 +4,7 @@ import { useCart } from "@/lib/cart-context";
 import { useTranslations, useLocale } from "next-intl";
 import { Link, useRouter } from "@/i18n/routing";
 import { formatBdt } from "@/lib/utils";
+import { colorLabel, sizeLabel } from "@/lib/option-labels";
 import Composition from "./Composition";
 import Icon from "./Icon";
 import CouponInput from "./CouponInput";
@@ -93,7 +94,7 @@ export default function CartDrawer() {
                       <Link href={`/product/${i.slug}`} className="name" onClick={closeDrawer}>
                         {i.name}
                       </Link>
-                      <div className="meta">{i.color || ""}{i.size ? ` · ${i.size}` : ""}</div>
+                      <div className="meta">{i.color ? colorLabel(i.color, locale) : ""}{i.size ? ` · ${sizeLabel(i.size, locale)}` : ""}</div>
                       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10 }}>
                         <div className="qty qty-sm">
                           <button onClick={() => dec(k)} aria-label={t("common.decrease")}>−</button>
@@ -128,7 +129,7 @@ export default function CartDrawer() {
                     <Composition cat={i.cat} sku={i.sku} name={i.name} small style={{ aspectRatio: "3/4" }} />
                     <div>
                       <Link href={`/product/${i.slug}`} className="name" onClick={closeDrawer}>{i.name}</Link>
-                      <div className="meta">{i.color || ""}{i.size ? ` · ${i.size}` : ""}</div>
+                      <div className="meta">{i.color ? colorLabel(i.color, locale) : ""}{i.size ? ` · ${sizeLabel(i.size, locale)}` : ""}</div>
                       <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
                         <div className="rm" onClick={() => animateAway(k, moveToCart)} role="button" tabIndex={0} style={{ color: "var(--purple-900)" }}>
                           {t("cart.moveToBag")}

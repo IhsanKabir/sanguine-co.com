@@ -2,7 +2,9 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useMemo, useTransition, useState, useOptimistic } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { formatBdt } from "@/lib/utils";
+import { colorLabel, sizeLabel } from "@/lib/option-labels";
 
 type Props = {
   segmentSlug: string;
@@ -38,6 +40,7 @@ const TAG_LABELS: Record<string, string> = {
 
 export default function SegmentFilters(props: Props) {
   const tr = useTranslations();
+  const locale = useLocale() as "en" | "bn";
   const router = useRouter();
   const pathname = usePathname();
   const [pending, startTransition] = useTransition();
@@ -176,7 +179,7 @@ export default function SegmentFilters(props: Props) {
               <div className="filter-price">
                 <input
                   type="number"
-                  placeholder={`৳${props.priceMin}`}
+                  placeholder={formatBdt(props.priceMin, locale)}
                   value={minActive}
                   onChange={(e) => updateParam("min", e.target.value || null)}
                   aria-busy={pending}
@@ -185,7 +188,7 @@ export default function SegmentFilters(props: Props) {
                 <span className="filter-price-dash">–</span>
                 <input
                   type="number"
-                  placeholder={`৳${props.priceMax}`}
+                  placeholder={formatBdt(props.priceMax, locale)}
                   value={maxActive}
                   onChange={(e) => updateParam("max", e.target.value || null)}
                   aria-busy={pending}
@@ -208,7 +211,7 @@ export default function SegmentFilters(props: Props) {
                     onClick={() => toggleListParam("color", c)}
                     className={"filter-pill " + (colorList.includes(c) ? "active" : "")}
                   >
-                    {c}
+                    {colorLabel(c, locale)}
                   </button>
                 ))}
               </div>
@@ -229,7 +232,7 @@ export default function SegmentFilters(props: Props) {
                     className={"filter-pill " + (sizeList.includes(s) ? "active" : "")}
                     style={{ fontFamily: "var(--mono)" }}
                   >
-                    {s}
+                    {sizeLabel(s, locale)}
                   </button>
                 ))}
               </div>

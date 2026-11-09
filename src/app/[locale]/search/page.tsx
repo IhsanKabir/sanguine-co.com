@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { searchProducts, getHeroImagesFor, getVisibleSegments } from "@/lib/queries";
 import { Link } from "@/i18n/routing";
+import { uniqueOptions } from "@/lib/option-labels";
 import ShopGrid from "@/components/storefront/ShopGrid";
 import { priceSortValue } from "@/lib/pricing";
 
@@ -43,8 +44,8 @@ export default async function SearchPage({ params, searchParams }: Props) {
     ? Object.fromEntries((await getHeroImagesFor(items.map((i) => i.id)).catch(() => new Map())).entries())
     : {};
 
-  const availableColors = Array.from(new Set(items.flatMap((p) => (p.colors as string[] | null) ?? []))).sort();
-  const availableSizes = Array.from(new Set(items.flatMap((p) => (p.sizes as string[] | null) ?? []))).sort();
+  const availableColors = uniqueOptions(items.flatMap((p) => (p.colors as string[] | null) ?? []));
+  const availableSizes = uniqueOptions(items.flatMap((p) => (p.sizes as string[] | null) ?? []));
   const availableTags = Array.from(new Set(items.map((p) => p.tag).filter((v): v is string => !!v))).sort();
   const priceValues = items.map(priceSortValue).filter((v) => v < Number.MAX_SAFE_INTEGER);
   const priceMin = priceValues.length > 0 ? Math.min(...priceValues) : 0;

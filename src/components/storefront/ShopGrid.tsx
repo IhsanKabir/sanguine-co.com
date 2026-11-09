@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import type { Product } from "@/lib/schema";
 import { Link } from "@/i18n/routing";
 import { priceSortValue } from "@/lib/pricing";
+import { sameOption } from "@/lib/option-labels";
 import ProductCard from "./ProductCard";
 import SegmentFilters from "./SegmentFilters";
 
@@ -101,10 +102,10 @@ function ShopGridView({
       items = items.filter((p) => priceSortValue(p) <= maxPrice);
     }
     if (colors.length > 0) {
-      items = items.filter((p) => (p.colors as string[] | null)?.some((c) => colors.includes(c)));
+      items = items.filter((p) => (p.colors as string[] | null)?.some((c) => colors.some((f) => sameOption(f, c))));
     }
     if (sizes.length > 0) {
-      items = items.filter((p) => (p.sizes as string[] | null)?.some((s) => sizes.includes(s)));
+      items = items.filter((p) => (p.sizes as string[] | null)?.some((s) => sizes.some((f) => sameOption(f, s))));
     }
 
     switch (sort) {
