@@ -1,9 +1,10 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getVisibleSegments } from "@/lib/queries";
 import { Link } from "@/i18n/routing";
 
 export default async function Footer() {
   const t = await getTranslations();
+  const locale = await getLocale();
   let segments: Awaited<ReturnType<typeof getVisibleSegments>> = [];
   try {
     segments = await getVisibleSegments();
@@ -26,7 +27,7 @@ export default async function Footer() {
             <ul>
               {segments.slice(0, 5).map((c) => (
                 <li key={c.id}>
-                  <Link href={`/shop/${c.id}`}>{c.name}</Link>
+                  <Link href={`/shop/${c.id}`}>{(locale === "bn" && c.nameBn) || c.name}</Link>
                 </li>
               ))}
             </ul>
@@ -52,7 +53,7 @@ export default async function Footer() {
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© 2026 {t("brand.name")} · {t("footer.rights")}</span>
+          <span>© {(2026).toLocaleString(locale === "bn" ? "bn-BD" : "en", { useGrouping: false })} {t("brand.name")} · {t("footer.rights")}</span>
           <span>
             <Link href="/legal/privacy">{t("footer.privacy")}</Link>
             {" · "}

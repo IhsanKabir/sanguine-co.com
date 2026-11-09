@@ -91,7 +91,8 @@ export default async function Home({ params }: Props) {
   const t = await getTranslations();
   const commerce = await getCommerceSettings();
   const freeOver = formatBdt(commerce.freeShippingThresholdBdt, locale as "en" | "bn");
-  const returnDays = locale === "bn" ? commerce.returnWindowDays.toLocaleString("bn-BD") : String(commerce.returnWindowDays);
+  // The bn message formats {days, number}, so this stays a number.
+  const returnDays = commerce.returnWindowDays;
   // A threshold of 0 switches free shipping off: drop that marquee point.
   const marqueeKeys = commerce.freeShippingThresholdBdt > 0
     ? MARQUEE_KEYS
@@ -108,6 +109,8 @@ export default async function Home({ params }: Props) {
   // Category label in the page language (the Bangla site was showing the English tag).
   const segTag = (seg?: { tag: string | null; tagBn: string | null }) =>
     (locale === "bn" && seg?.tagBn) || seg?.tag || undefined;
+  const segName = (seg: { name: string; nameBn: string | null }) =>
+    (locale === "bn" && seg.nameBn) || seg.name;
   const news = newArrivals ?? [];
   const eds = editors ?? [];
   // Single batched fetch of hero images for every product on the page.
@@ -228,12 +231,12 @@ export default async function Home({ params }: Props) {
                 data-reveal
                 data-reveal-delay={(i % 3) + 1}
                 data-cursor={CAT_CURSOR[c.id] || "magnify"}
-                data-cursor-label={c.name}
+                data-cursor-label={segName(c)}
               >
-                <Composition cat={c.id} sku={c.id} name={c.name} style={{ position: "absolute", inset: 0 }} />
+                <Composition cat={c.id} sku={c.id} name={segName(c)} style={{ position: "absolute", inset: 0 }} />
                 <div className="cat-tile-lbl">
-                  <div className="kicker">{c.tag}</div>
-                  <div className="name">{c.name}</div>
+                  <div className="kicker">{segTag(c)}</div>
+                  <div className="name">{segName(c)}</div>
                 </div>
               </Link>
             ))}

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useCart, type CartItem } from "@/lib/cart-context";
 import { useLocale, useTranslations } from "next-intl";
+import { colorLabel, sizeLabel } from "@/lib/option-labels";
 import { formatBdt } from "@/lib/utils";
 import { track } from "@/lib/actions/track";
 import Icon from "./Icon";
@@ -42,7 +43,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
   const chosen = (colors.length === 0 || color) && (sizes.length === 0 || size);
   const optionLeft = chosen ? stockOf(optionStock, color, size) : null;
   const optionSoldOut = optionLeft !== null && optionLeft <= 0;
-  const optionName = [color, size].filter(Boolean).join(" · ");
+  const optionName = [color && colorLabel(color, locale), size && sizeLabel(size, locale)].filter(Boolean).join(" · ");
   const [added, setAdded] = useState(false);
   const [stickyVisible, setStickyVisible] = useState(false);
   const [flyPos, setFlyPos] = useState<{ x: number; y: number } | null>(null);
@@ -120,7 +121,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
       )}
       {colors.length > 0 && (
         <>
-          <div className="pdp-label">{t("pdp.optionLabel", { value: color })}</div>
+          <div className="pdp-label">{t("pdp.optionLabel", { value: colorLabel(color, locale) })}</div>
           <div className="swatch-row">
             {colors.map((c) => (
               <div
@@ -133,7 +134,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
                 onClick={() => setColor(c)}
                 onKeyDown={(e) => { if (e.key === "Enter") setColor(c); }}
               >
-                {c}
+                {colorLabel(c, locale)}
               </div>
             ))}
           </div>
@@ -141,7 +142,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
       )}
       {sizes.length > 0 && (
         <>
-          <div className="pdp-label">{size ? t("pdp.sizeLabel", { value: size }) : t("common.size")}</div>
+          <div className="pdp-label">{size ? t("pdp.sizeLabel", { value: sizeLabel(size, locale) }) : t("common.size")}</div>
           <div className="swatch-row" ref={sizeRowRef}>
             {sizes.map((s) => (
               <div
@@ -155,7 +156,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
                 onClick={() => setSize(s)}
                 onKeyDown={(e) => { if (e.key === "Enter") setSize(s); }}
               >
-                {s}
+                {sizeLabel(s, locale)}
               </div>
             ))}
           </div>
@@ -170,7 +171,7 @@ export default function PdpActionsClient({ product, colors = [], sizes = [], col
       <div className="pdp-label">{t("common.quantity")}</div>
       <div className="qty">
         <button onClick={() => setQty(Math.max(1, qty - 1))} aria-label={t("common.decrease")}>−</button>
-        <span aria-live="polite">{qty}</span>
+        <span aria-live="polite">{qty.toLocaleString(locale === "bn" ? "bn-BD" : "en")}</span>
         <button
           onClick={() => setQty(optionLeft !== null ? Math.min(qty + 1, Math.max(1, optionLeft)) : qty + 1)}
           aria-label={t("common.increase")}

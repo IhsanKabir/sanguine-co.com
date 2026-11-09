@@ -27,7 +27,7 @@ export default async function TopNav() {
     // DB not configured yet: the storefront still renders.
   }
 
-  const segmentData = segments.map((s) => ({ id: s.id, name: s.name }));
+  const segmentData = segments.map((s) => ({ id: s.id, name: (locale === "bn" && s.nameBn) || s.name }));
 
   // Scheduled announcement (admin-managed) wins over the static translation;
   // a disabled/absent row keeps the original always-on topbar untouched.

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { SITE_URL as BASE } from "@/lib/site-url";
 
-type Slug = "privacy" | "terms" | "returns" | "shipping";
+type Slug = "privacy" | "terms" | "returns" | "shipping" | "data-deletion";
 
 const COPY: Record<Slug, { en: { title: string; description: string }; bn: { title: string; description: string } }> = {
   privacy: {
@@ -16,6 +16,10 @@ const COPY: Record<Slug, { en: { title: string; description: string }; bn: { tit
   returns: {
     en: { title: "Returns", description: "Sanguine return policy: eligible items, courier pickup, refund timeline." },
     bn: { title: "ফেরত", description: "সাঙ্গুইনের ফেরত নীতি: যোগ্য পিস, কুরিয়ার পিকআপ, রিফান্ড সময়রেখা।" },
+  },
+  "data-deletion": {
+    en: { title: "Data Deletion", description: "How to ask Sanguine to delete your personal information, and what the law requires us to keep." },
+    bn: { title: "তথ্য মুছে ফেলা", description: "সাঙ্গুইনের কাছে থাকা আপনার ব্যক্তিগত তথ্য মুছে ফেলার অনুরোধ কীভাবে করবেন, এবং আইন অনুযায়ী কী রাখতে হয়।" },
   },
   shipping: {
     en: { title: "Shipping", description: "Shipping rates, courier partners (Pathao, Steadfast) and delivery timeline across Bangladesh." },

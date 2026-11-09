@@ -3,6 +3,7 @@
 import type { Product } from "@/lib/schema";
 import { Link } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
+import { colorLabel } from "@/lib/option-labels";
 import Image from "next/image";
 import { formatBdt } from "@/lib/utils";
 import { priceDisplay, priceDisplayText } from "@/lib/pricing";
@@ -126,7 +127,7 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
           <div className="prod-price">
             {p.preorderOnly && (
               <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--gold-deep)", marginRight: 8 }}>
-                Preorder
+                {t("pdp.preorderOnly")}
               </span>
             )}
             {display.kind === "fixed" && p.wasBdt && p.wasBdt > display.amountBdt ? (
@@ -137,7 +138,7 @@ export default function ProductCard({ product: p, segmentTag, heroImage, quickVi
           {colors.length > 0 && (
             <div className="card-color-dots">
               {colors.slice(0, 5).map((c) => (
-                <span key={c} className="card-color-dot" style={{ background: colorToHex(c) }} title={c} />
+                <span key={c} className="card-color-dot" style={{ background: colorToHex(c) }} title={colorLabel(c, locale)} />
               ))}
               {colors.length > 5 && <span className="card-color-dot-more">+{colors.length - 5}</span>}
             </div>
