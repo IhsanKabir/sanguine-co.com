@@ -21,13 +21,13 @@ function EnglishSection({ c }: { c: CommerceSettings }) {
     <>
       <div className="legal-kicker">SHIPPING</div>
       <h1>How we deliver, and how long it takes.</h1>
-      <p className="legal-lede">Last updated: 2 May 2026.</p>
+      <p className="legal-lede">Last updated: 10 November 2026.</p>
 
       <h2>Where we ship</h2>
       <p>Sanguine ships nationwide within Bangladesh: sixty-four districts, every upazila served by Pathao or Steadfast. We do not ship internationally at this time; if you are abroad and would like a piece sent within Bangladesh, you may of course place the order and have it delivered to a Bangladeshi address.</p>
 
       <h2>How we ship</h2>
-      <p>Stock orders are typically dispatched within one working day of order confirmation. Bespoke pieces are dispatched on the date stated in the quote.</p>
+      <p>Inside Dhaka, stock orders arrive within 48 hours of order confirmation. Elsewhere they are dispatched within one working day. Bespoke pieces are dispatched on the date stated in the quote.</p>
       <p>We use:</p>
       <ul>
         <li><b>Pathao Courier</b>: primary, for Dhaka and the major divisional cities</li>
@@ -38,7 +38,7 @@ function EnglishSection({ c }: { c: CommerceSettings }) {
       <table className="legal-table">
         <thead><tr><th>Destination</th><th>Typical</th><th>Maximum</th></tr></thead>
         <tbody>
-          <tr><td>Within Dhaka</td><td>1&ndash;2 working days</td><td>4 working days</td></tr>
+          <tr><td>Within Dhaka</td><td>Within 48 hours</td><td>4 working days</td></tr>
           <tr><td>Outside Dhaka, divisional cities</td><td>2&ndash;4 working days</td><td>7 working days</td></tr>
           <tr><td>Rural addresses</td><td>3&ndash;7 working days</td><td>10 working days</td></tr>
         </tbody>
@@ -70,13 +70,13 @@ function BangleSection({ c }: { c: CommerceSettings }) {
     <>
       <div className="legal-kicker">শিপিং</div>
       <h1>আমরা কীভাবে পৌঁছে দিই, এবং কতদিন লাগে।</h1>
-      <p className="legal-lede">সর্বশেষ আপডেট: ২ মে ২০২৬।</p>
+      <p className="legal-lede">সর্বশেষ আপডেট: ১০ নভেম্বর ২০২৬।</p>
 
       <h2>কোথায় পাঠাই</h2>
       <p>সাঙ্গুইন বাংলাদেশের সারা দেশে পাঠায়: চৌষট্টি জেলা, Pathao বা Steadfast যেসব উপজেলায় পরিষেবা দেয় সব। বর্তমানে আমরা আন্তর্জাতিক শিপিং করি না; আপনি বিদেশে থেকেও বাংলাদেশের কোনো ঠিকানায় ডেলিভারির জন্য অবশ্যই অর্ডার করতে পারেন।</p>
 
       <h2>কীভাবে পাঠাই</h2>
-      <p>স্টক অর্ডার সাধারণত অর্ডার নিশ্চিতকরণের এক কর্মদিবসের মধ্যে প্রেরিত হয়। বেসপোক পিস কোটে উল্লিখিত তারিখে প্রেরিত হয়।</p>
+      <p>ঢাকার ভেতরে স্টক অর্ডার নিশ্চিতকরণের ৪৮ ঘণ্টার মধ্যে পৌঁছায়। বাইরে এক কর্মদিবসের মধ্যে প্রেরিত হয়। বেসপোক পিস কোটে উল্লিখিত তারিখে প্রেরিত হয়।</p>
       <p>আমরা ব্যবহার করি:</p>
       <ul>
         <li><b>Pathao Courier</b>: প্রাথমিক, ঢাকা ও বিভাগীয় শহরগুলোর জন্য</li>
@@ -87,7 +87,7 @@ function BangleSection({ c }: { c: CommerceSettings }) {
       <table className="legal-table">
         <thead><tr><th>গন্তব্য</th><th>সাধারণ</th><th>সর্বোচ্চ</th></tr></thead>
         <tbody>
-          <tr><td>ঢাকার ভেতরে</td><td>১&ndash;২ কর্মদিবস</td><td>৪ কর্মদিবস</td></tr>
+          <tr><td>ঢাকার ভেতরে</td><td>৪৮ ঘণ্টার মধ্যে</td><td>৪ কর্মদিবস</td></tr>
           <tr><td>ঢাকার বাইরে, বিভাগীয় শহর</td><td>২&ndash;৪ কর্মদিবস</td><td>৭ কর্মদিবস</td></tr>
           <tr><td>গ্রামীণ ঠিকানা</td><td>৩&ndash;৭ কর্মদিবস</td><td>১০ কর্মদিবস</td></tr>
         </tbody>

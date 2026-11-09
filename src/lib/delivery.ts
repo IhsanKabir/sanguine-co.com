@@ -1,14 +1,13 @@
 /**
  * Delivery-date estimate, from the figures /legal/shipping publishes:
- * stock orders are dispatched within ONE working day, then the courier
- * typically takes up to 2 working days inside Dhaka and up to 4 to a
- * divisional city. Friday is the weekly holiday and is skipped; public
+ * inside Dhaka a stock order arrives within 48 hours (owner, 2026-11-10);
+ * elsewhere it is dispatched within ONE working day and the courier
+ * typically takes up to 4 working days to a divisional city. Friday is the weekly holiday and is skipped; public
  * holidays are not modelled, which is why every surface labels the result
  * an estimate. Pure module: safe in server and client components.
  */
 
 export const DISPATCH_WORKING_DAYS = 1;
-export const TRANSIT_WORKING_DAYS_DHAKA = 2;
 export const TRANSIT_WORKING_DAYS_OUTSIDE = 4;
 
 const FRIDAY = 5;
@@ -23,10 +22,12 @@ export function addWorkingDays(from: Date, days: number): Date {
   return d;
 }
 
+export const DHAKA_DELIVERY_HOURS = 48;
+
 /** Latest typical arrival for an order placed at `now`. */
 export function estimatedArrival(now: Date, insideDhaka: boolean): Date {
-  const transit = insideDhaka ? TRANSIT_WORKING_DAYS_DHAKA : TRANSIT_WORKING_DAYS_OUTSIDE;
-  return addWorkingDays(now, DISPATCH_WORKING_DAYS + transit);
+  if (insideDhaka) return new Date(now.getTime() + DHAKA_DELIVERY_HOURS * 60 * 60 * 1000);
+  return addWorkingDays(now, DISPATCH_WORKING_DAYS + TRANSIT_WORKING_DAYS_OUTSIDE);
 }
 
 /** "Thu, 9 Oct" / "বৃহঃ, ৯ অক্টো" */

@@ -155,7 +155,7 @@
     "care": "Care",
     "trustLabel": "Delivery, payment and returns",
     "trustArrives": "Arrives by {date} in Dhaka",
-    "trustDispatch": "Dispatched within 1 working day"
+    "trustDispatch": "Delivered within 48 hours in Dhaka"
   },
   "cart": {
     "title": "Your bag",

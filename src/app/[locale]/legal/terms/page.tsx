@@ -19,7 +19,7 @@ function EnglishSection({ days }: { days: number }) {
     <>
       <div className="legal-kicker">TERMS OF SERVICE</div>
       <h1>The terms that apply when you buy from Sanguine.</h1>
-      <p className="legal-lede">Last updated: 9 November 2026.</p>
+      <p className="legal-lede">Last updated: 10 November 2026.</p>
 
       <h2>About these terms</h2>
       <p>Welcome to Sanguine. By placing an order or creating an account, you agree to the following. They are written plainly and we mean every line. Where the terms are silent, the laws of Bangladesh apply.</p>
@@ -36,7 +36,7 @@ function EnglishSection({ days }: { days: number }) {
       <p>We do not yet collect VAT. When Sanguine&rsquo;s Trade Licence and VAT registration become active, we will say so plainly and adjust the displayed prices to be inclusive of any required VAT.</p>
 
       <h2>Delivery</h2>
-      <p>We ship nationwide via Pathao Courier and Steadfast Courier. Delivery is typically two to four working days within Dhaka and three to seven working days elsewhere in Bangladesh, but courier delays do happen and we cannot guarantee a specific date unless we have agreed it with you in writing.</p>
+      <p>We ship nationwide via Pathao Courier and Steadfast Courier. Delivery is within 48 hours inside Dhaka and typically three to seven working days elsewhere in Bangladesh, but courier delays do happen and we cannot guarantee a specific date unless we have agreed it with you in writing.</p>
       <p>For bespoke pieces, the timeline begins when the quote is accepted and is stated in the quote itself.</p>
 
       <h2>Returns and refunds</h2>
@@ -68,7 +68,7 @@ function BangleSection({ days }: { days: number }) {
     <>
       <div className="legal-kicker">পরিষেবার শর্তাবলি</div>
       <h1>সাঙ্গুইন এবং আপনি যেসব শর্তে ব্যবসা করতে সম্মত হই।</h1>
-      <p className="legal-lede">সর্বশেষ আপডেট: ৯ নভেম্বর ২০২৬।</p>
+      <p className="legal-lede">সর্বশেষ আপডেট: ১০ নভেম্বর ২০২৬।</p>
 
       <h2>এই শর্তাবলি সম্পর্কে</h2>
       <p>সাঙ্গুইনে স্বাগতম। অর্ডার দেয়া বা অ্যাকাউন্ট তৈরি করার মাধ্যমে আপনি নিম্নলিখিত শর্তগুলোয় সম্মতি প্রকাশ করছেন। প্রতিটি বাক্য সরাসরি লেখা, এবং প্রতিটিতেই আমরা যা বলেছি তা-ই বুঝিয়েছি। যেখানে শর্তগুলো নীরব, সেখানে বাংলাদেশের আইন প্রযোজ্য।</p>
@@ -85,7 +85,7 @@ function BangleSection({ days }: { days: number }) {
       <p>আমরা এখনো VAT সংগ্রহ করি না। সাঙ্গুইনের ট্রেড লাইসেন্স ও VAT রেজিস্ট্রেশন সক্রিয় হলে আমরা স্পষ্টভাবে জানাব এবং প্রদর্শিত মূল্যে প্রয়োজনীয় VAT অন্তর্ভুক্ত করে নেব।</p>
 
       <h2>ডেলিভারি</h2>
-      <p>আমরা সারা দেশে Pathao ও Steadfast কুরিয়ারের মাধ্যমে পাঠাই। সাধারণত ঢাকার ভেতরে দুই থেকে চার কর্মদিবস এবং বাইরে তিন থেকে সাত কর্মদিবস। কুরিয়ারজনিত বিলম্ব ঘটে; লিখিতভাবে নির্দিষ্ট তারিখ সম্মত না হলে আমরা গ্যারান্টি দিতে পারি না।</p>
+      <p>আমরা সারা দেশে Pathao ও Steadfast কুরিয়ারের মাধ্যমে পাঠাই। ঢাকার ভেতরে ৪৮ ঘণ্টার মধ্যে এবং বাইরে সাধারণত তিন থেকে সাত কর্মদিবস। কুরিয়ারজনিত বিলম্ব ঘটে; লিখিতভাবে নির্দিষ্ট তারিখ সম্মত না হলে আমরা গ্যারান্টি দিতে পারি না।</p>
       <p>বেসপোক পিসের ক্ষেত্রে কোট গৃহীত হওয়ার দিন থেকে সময় গণনা শুরু হয়, এবং তা কোটেই উল্লেখ থাকে।</p>
 
       <h2>ফেরত ও অর্থ ফেরত</h2>
