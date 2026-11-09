@@ -241,7 +241,11 @@
     "payNow": "Pay {amount} securely",
     "redirecting": "Opening the payment page…",
     "paymentFailed": "The payment didn't go through, so your order wasn't placed. Your bag is unchanged. Try again or choose cash on delivery.",
-    "paymentCancelled": "Payment cancelled. Your order wasn't placed and your bag is unchanged."
+    "paymentCancelled": "Payment cancelled. Your order wasn't placed and your bag is unchanged.",
+    "deliveryDateLabel": "Deliver on (optional)",
+    "deliveryDateHint": "Leave empty for the earliest delivery.",
+    "giftMessageLabel": "Gift message (optional)",
+    "giftMessagePlaceholder": "We write it by hand on a card."
   },
   "wishlist": {
     "title": "Your wishlist",

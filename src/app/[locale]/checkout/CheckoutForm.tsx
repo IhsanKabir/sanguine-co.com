@@ -16,6 +16,7 @@ import CouponInput from "@/components/storefront/CouponInput";
 import { shippingFor } from "@/lib/pricing";
 import { estimatedArrival, formatArrival } from "@/lib/delivery";
 import { useShippingRules } from "@/lib/shipping-rules-context";
+import DeliveryOptionsFields from "@/components/storefront/DeliveryOptionsFields";
 
 type Prefill = {
   fullName: string;
@@ -65,6 +66,8 @@ export default function CheckoutForm({
     postcode: prefill?.postcode ?? "",
   });
   const [notes, setNotes] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [giftMessage, setGiftMessage] = useState("");
   const [method, setMethod] = useState<"cod" | "online">("cod");
   const [redirecting, setRedirecting] = useState(false);
 
@@ -138,6 +141,8 @@ export default function CheckoutForm({
       items: items.map((i) => ({ productId: i.productId, qty: i.qty, color: i.color, size: i.size })),
       couponCode: coupon?.code || null,
       notes: notes || null,
+      deliveryDate: deliveryDate || null,
+      giftMessage: giftMessage.trim() || null,
       phoneCode: phoneCode ?? (activeCode ? { id: activeCode.id, code: code.trim() } : null),
     };
     startTransition(async () => {
@@ -242,6 +247,7 @@ export default function CheckoutForm({
             </div>
             <div className="row"><div className="field" style={{ gridColumn: "1/-1" }}><label>{t("checkout.notesLabel")}</label>
               <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("checkout.notesPlaceholder")}/></div></div>
+            <DeliveryOptionsFields date={deliveryDate} onDate={setDeliveryDate} gift={giftMessage} onGift={setGiftMessage} />
             <button className="btn btn-primary" style={{ marginTop: 18 }} onClick={() => {
               const v = validateStep1();
               if (v) { setError(v); return; }

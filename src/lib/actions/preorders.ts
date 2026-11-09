@@ -17,6 +17,7 @@ import {
 import { SITE_URL } from "@/lib/site-url";
 import { priceDisplay, effectiveDepositPct, depositForQuote } from "@/lib/pricing";
 import { getCommerceSettings } from "@/lib/commerce";
+import { isValidDeliveryDate, GIFT_MESSAGE_MAX } from "@/lib/delivery";
 
 const attachmentSchema = z.object({
   url: z.string().url(),
@@ -119,6 +120,9 @@ const productPreorderSchema = z.object({
   notes: z.string().max(1000).optional().nullable(),
   customerName: z.string().min(1).max(120),
   customerPhone: z.string().min(6).max(40).optional().nullable(),
+  /** Optional "deliver on" day and card message (0022). */
+  targetDate: z.string().optional().nullable(),
+  giftMessage: z.string().trim().max(GIFT_MESSAGE_MAX).optional().nullable(),
   /** Guests only: where the quote goes. Signed-in customers use their account email. */
   customerEmail: z.string().trim().email().max(200).optional().nullable(),
   deliveryAddress: z.object({
@@ -144,6 +148,9 @@ export async function createProductPreorderRequest(
   const parsed = productPreorderSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "Please check the form and try again." };
   const data = parsed.data;
+  if (data.targetDate && !isValidDeliveryDate(data.targetDate, new Date())) {
+    return { ok: false as const, error: "Please choose a delivery date from tomorrow onwards." };
+  }
   const email = (user?.email || data.customerEmail || "").trim();
   if (!email) return { ok: false as const, error: "Please add your email so we can send you the price." };
 
@@ -199,6 +206,8 @@ export async function createProductPreorderRequest(
     color: data.color || null,
     size: data.size || null,
     deliveryAddress: data.deliveryAddress ?? null,
+    targetDate: data.targetDate || null,
+    giftMessage: data.giftMessage || null,
     attachments: [],
     advertisedMinBdt,
     advertisedMaxBdt,

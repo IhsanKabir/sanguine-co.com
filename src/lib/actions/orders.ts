@@ -12,6 +12,7 @@ import { getCurrentUser } from "@/lib/auth-utils";
 
 import { SITE_URL } from "@/lib/site-url";
 import { headers } from "next/headers";
+import { isValidDeliveryDate, GIFT_MESSAGE_MAX } from "@/lib/delivery";
 
 import { shippingFor } from "@/lib/pricing";
 import { getCommerceSettings, shippingRulesOf } from "@/lib/commerce";
@@ -52,6 +53,10 @@ const inputSchema = z.object({
   items: z.array(itemSchema).min(1).max(50),
   couponCode: z.string().max(40).optional().nullable(),
   notes: z.string().max(400).optional().nullable(),
+  // Optional "deliver on" day (YYYY-MM-DD, checked against the allowed
+  // window below) and the card message.
+  deliveryDate: z.string().optional().nullable(),
+  giftMessage: z.string().trim().max(GIFT_MESSAGE_MAX).optional().nullable(),
   // SMS code for cash-on-delivery (lib/phone-code.ts); only read for COD.
   phoneCode: z.object({
     id: z.string().uuid(),
@@ -80,6 +85,9 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
     return { ok: false as const, error: "Invalid input", details: parsed.error.flatten() };
   }
   const data = parsed.data;
+  if (data.deliveryDate && !isValidDeliveryDate(data.deliveryDate, new Date())) {
+    return { ok: false as const, error: "Please choose a delivery date from tomorrow onwards." };
+  }
 
   // 1b. Burst guard: createCodOrder is a public unauthenticated action.
   // Three orders per email/phone per 10 minutes stops accidental double-fires
@@ -219,6 +227,8 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
       },
       trackingToken,
       notes: data.notes || null,
+      deliveryDate: data.deliveryDate || null,
+      giftMessage: data.giftMessage || null,
     }).returning();
 
     await tx.insert(schema.orderLines).values(

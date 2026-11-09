@@ -66,6 +66,8 @@ export async function GET() {
     "line_unit_price_bdt",
     "line_total_bdt",
     "notes",
+    "delivery_date",
+    "gift_message",
   ];
 
   const rows: string[] = [headers.join(",")];
@@ -87,6 +89,8 @@ export async function GET() {
         o.subtotalBdt, o.shippingBdt, o.codFeeBdt, o.totalBdt,
         "", "", "", "", "", "", "",
         o.notes ?? "",
+        o.deliveryDate ?? "",
+        o.giftMessage ?? "",
       ].map(esc).join(","));
       continue;
     }
@@ -101,6 +105,8 @@ export async function GET() {
         l.skuSnapshot, l.nameSnapshot, l.color ?? "", l.size ?? "",
         l.qty, l.unitPriceBdt, l.lineTotalBdt,
         o.notes ?? "",
+        o.deliveryDate ?? "",
+        o.giftMessage ?? "",
       ].map(esc).join(","));
     }
   }

@@ -1,4 +1,4 @@
-import { pgTable, text, integer, boolean, uuid, timestamp, jsonb, numeric, primaryKey, unique, index, check } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, boolean, uuid, timestamp, jsonb, numeric, primaryKey, unique, index, check, date } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 // ─── Catalogue ─────────────────────────────────────────────────────────
@@ -162,6 +162,8 @@ export const orders = pgTable("orders", {
   // page requires either a matching ?t= query param OR a signed-in customer who owns the order.
   trackingToken: text("tracking_token").notNull(),
   notes: text("notes"),
+  deliveryDate: date("delivery_date"),            // customer-chosen day, null = earliest (0022)
+  giftMessage: text("gift_message"),              // card message (0022)
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
@@ -366,6 +368,7 @@ export const preorderRequests = pgTable("preorder_requests", {
   quantity: integer("quantity").default(1).notNull(),
   budgetHintBdt: integer("budget_hint_bdt"),
   targetDate: text("target_date"),                 // YYYY-MM-DD as text for simplicity
+  giftMessage: text("gift_message"),               // card message (0022)
   color: text("color"),
   size: text("size"),
 

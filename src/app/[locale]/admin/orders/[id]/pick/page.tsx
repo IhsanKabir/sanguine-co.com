@@ -160,6 +160,16 @@ export default async function PackingSlipPage({ params }: Props) {
           </tbody>
         </table>
 
+        {(order.deliveryDate || order.giftMessage) && (
+          <div style={{ marginTop: 22, padding: 12, background: "#f9f4ec", border: "1px solid #e8d8a8" }}>
+            <h2 style={{ marginBottom: 6 }}>Delivery</h2>
+            {order.deliveryDate && <div style={{ fontSize: 13 }}><b>Deliver on:</b> {order.deliveryDate}</div>}
+            {order.giftMessage && (
+              <div style={{ fontSize: 13, lineHeight: 1.6, whiteSpace: "pre-wrap", marginTop: 6 }}><b>Card message:</b> {order.giftMessage}</div>
+            )}
+          </div>
+        )}
+
         {order.notes && (
           <div style={{ marginTop: 22, padding: 12, background: "#f9f4ec", border: "1px solid #e8d8a8" }}>
             <h2 style={{ marginBottom: 6 }}>Notes</h2>
