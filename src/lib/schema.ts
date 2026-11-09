@@ -357,7 +357,7 @@ export const preorderRequests = pgTable("preorder_requests", {
   segmentId: text("segment_id").references(() => segments.id),
   // productId is set for product-level preorders; null for bespoke segment requests.
   productId: text("product_id").references(() => products.id),
-  customerId: uuid("customer_id").notNull(),
+  customerId: uuid("customer_id"),                // null for a guest product preorder (0021)
   customerEmail: text("customer_email").notNull(),
   customerPhone: text("customer_phone"),
   customerName: text("customer_name"),

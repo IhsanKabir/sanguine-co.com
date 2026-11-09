@@ -2,13 +2,15 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 import { createProductPreorderRequest } from "@/lib/actions/preorders";
 
 type Props = {
   productId: string;
   productName: string;
-  userId: string;
+  /** Empty for a guest, who types an email for the quote instead. */
   userEmail: string;
+  signInHref: string;
   colors: string[];
   sizes: string[];
 };
@@ -17,12 +19,16 @@ export default function ProductPreorderForm({
   productName,
   productId,
   userEmail,
+  signInHref,
   colors,
   sizes,
 }: Props) {
   const t = useTranslations();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const isGuest = !userEmail;
+  const contactEmail = userEmail || guestEmail.trim();
   const [quantity, setQuantity] = useState(1);
   const [color, setColor] = useState(colors[0] ?? "");
   const [size, setSize] = useState(sizes[0] ?? "");
@@ -49,6 +55,7 @@ export default function ProductPreorderForm({
           notes: notes.trim() || null,
           customerName: name.trim(),
           customerPhone: phone.trim() || null,
+          customerEmail: isGuest ? guestEmail.trim() : null,
           deliveryAddress: line1.trim()
             ? { line1: line1.trim(), area: area.trim() || null, city: city.trim(), postcode: postcode.trim() || null }
             : null,
@@ -66,7 +73,7 @@ export default function ProductPreorderForm({
       <div style={{ padding: 32, background: "#f9f4ec", border: "1px solid var(--gold-deep)" }}>
         <h2 className="serif" style={{ fontSize: 32, color: "var(--purple-900)", margin: 0 }}>{t("preorderForm.doneTitle")}</h2>
         <p style={{ fontSize: 15, color: "var(--ink-soft)", lineHeight: 1.7, margin: "12px 0 0" }}>
-          {t.rich("preorderForm.doneBody", { product: productName, email: userEmail, em: (c) => <em>{c}</em>, b: (c) => <b>{c}</b> })}
+          {t.rich("preorderForm.doneBody", { product: productName, email: contactEmail, em: (c) => <em>{c}</em>, b: (c) => <b>{c}</b> })}
         </p>
         <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 18 }}>{t("preorderForm.doneNote")}</p>
       </div>
@@ -85,6 +92,26 @@ export default function ProductPreorderForm({
           <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+8801XXXXXXXXX" />
         </div>
       </div>
+
+      {isGuest && (
+        <div className="field">
+          <label>{t("common.email")}</label>
+          <input
+            type="email"
+            value={guestEmail}
+            onChange={(e) => setGuestEmail(e.target.value)}
+            required
+            maxLength={200}
+            autoComplete="email"
+            placeholder={t("common.emailPlaceholder")}
+          />
+          <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 6 }}>
+            {t.rich("preorderForm.guestEmailNote", {
+              a: (c) => <Link href={signInHref} style={{ color: "var(--purple-900)", textDecoration: "underline" }}>{c}</Link>,
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="row" style={{ gridTemplateColumns: colors.length > 0 && sizes.length > 0 ? "1fr 1fr 1fr" : colors.length > 0 || sizes.length > 0 ? "1fr 1fr" : "1fr" }}>
         <div className="field">

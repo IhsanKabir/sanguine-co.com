@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { db, schema } from "@/lib/db";
@@ -24,10 +24,8 @@ export default async function ProductPreorderPage({ params }: Props) {
 
   if (!product || !product.preorderEnabled) notFound();
 
+  // No sign-in wall: guests preorder with their email (0021).
   const user = await getCurrentUser();
-  if (!user) {
-    redirect(`/${locale}/sign-in?next=/${locale}/preorder/product/${slug}`);
-  }
 
   const seg = product.segmentId
     ? await db.select().from(schema.segments).where(eq(schema.segments.id, product.segmentId)).limit(1).then((r) => r[0] ?? null)
@@ -86,8 +84,8 @@ export default async function ProductPreorderPage({ params }: Props) {
         <ProductPreorderForm
           productId={product.id}
           productName={name}
-          userId={user.id}
-          userEmail={user.email ?? ""}
+          userEmail={user?.email ?? ""}
+          signInHref={`/sign-in?next=/${locale}/preorder/product/${slug}`}
           colors={(product.colors as string[] | null) || []}
           sizes={(product.sizes as string[] | null) || []}
         />

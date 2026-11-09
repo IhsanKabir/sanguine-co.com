@@ -686,7 +686,8 @@
     "payNote": "Nothing is charged now. We'll send you a bKash request for the deposit to confirm your piece.",
     "doneTitle": "Preorder received.",
     "doneBody": "We have your preorder for <em>{product}</em>. We'll email <b>{email}</b> within a day or two to confirm it and send a bKash deposit request.",
-    "doneNote": "Nothing has been charged yet. Your piece is secured once the deposit is paid."
+    "doneNote": "Nothing has been charged yet. Your piece is secured once the deposit is paid.",
+    "guestEmailNote": "We send the price here. Have an account? <a>Sign in</a>."
   },
   "preorderPage": {
     "kicker": "PREORDER",
