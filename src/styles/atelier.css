@@ -982,5 +982,5 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 :root {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --font-mono: var(--mono);
 }

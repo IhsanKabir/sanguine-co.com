@@ -133,7 +133,7 @@
   backdrop-filter: blur(2px);
 }
 .cur-enter {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--mono);
   font-size: 10px; letter-spacing: .25em;
   color: var(--gold);
   font-weight: 500;
@@ -232,7 +232,7 @@
   position: absolute;
   top: 18px; left: 18px;
   transform: translate(0, 0);
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--mono);
   font-size: 10px; letter-spacing: .15em;
   color: var(--gold);
   background: oklch(0.18 0.08 300 / 0.85);

@@ -19,6 +19,7 @@ import RouteTransition from "@/components/storefront/RouteTransition";
 import SessionTracker from "@/components/storefront/SessionTracker";
 import FloatingChat from "@/components/storefront/FloatingChat";
 import CookieConsent from "@/components/storefront/CookieConsent";
+import { CONSENT_BOOT_SCRIPT } from "@/lib/consent-key";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -50,6 +51,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={fontClasses} suppressHydrationWarning>
       <body suppressHydrationWarning>
+        <script dangerouslySetInnerHTML={{ __html: CONSENT_BOOT_SCRIPT }} />
         <JsonLd data={[organizationLd, websiteLd]} />
         <NextIntlClientProvider messages={messages}>
           <SessionTracker />
