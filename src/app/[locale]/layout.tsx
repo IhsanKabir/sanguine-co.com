@@ -89,13 +89,12 @@ export default async function LocaleLayout({
           }}
         />
       )}
-          {/* Atelier motion + custom cursor (ported verbatim from prototype). */}
           {/* cursor.js runs the scroll reveal, so it stays afterInteractive.
-           *  moments.js (marquee/parallax/magnetic effects) and atier.js
-           *  (sound, seal loader, drawer handle) are decoration: lazyOnload
-           *  keeps them off the critical path until the page has loaded. */}
+           *  atier.js (sound, seal loader, drawer handle) is decoration:
+           *  lazyOnload keeps it off the critical path. moments.js (gold-dust
+           *  headline, JS-driven marquee, parallax, letter-split headings) was
+           *  removed: its per-frame loops cost ~1.3 s of main thread on load. */}
           <Script src="/cursor.js" strategy="afterInteractive" />
-          <Script src="/moments.js" strategy="lazyOnload" />
           <Script src="/atier.js" strategy="lazyOnload" />
           {/* Cloudflare Analytics removed 2026-05-03: Vercel Analytics +
            *   Speed Insights are now the canonical telemetry stack. Two

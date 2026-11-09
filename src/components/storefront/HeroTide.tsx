@@ -1,93 +1,13 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-
 /**
- * Three-layer painted horizon as a hero background. Drifts at different
- * parallax rates as the visitor scrolls the first 100vh, and each layer also
- * has a slow ambient sway so the scene "breathes" while stationary.
+ * Three-layer painted horizon as a hero background (sky with sun and cloud
+ * strokes, distant water, foreground tide).
  *
- * Layers (back to front):
- *   1. Sky gradient + slow-moving sun + drifting cloud strokes
- *   2. Distant water: pale cyan band with a long horizon ripple
- *   3. Foreground tide: deeper teal, two soft wavelets, slight bob
- *
- * Honours `prefers-reduced-motion`: skips the rAF loop, paints a static frame.
- *
- * Pure SVG with `transform` on each layer: compositor-friendly, no canvas,
- * no library. ~3 KB rendered, GPU-accelerated.
+ * Drawn once, not animated. It used to sway and parallax every frame via a
+ * requestAnimationFrame loop; SVG <g> layers are not composited, so each
+ * frame repainted the whole scene. On phones that kept the main thread busy
+ * for seconds after load (Lighthouse total blocking time 3.2 s on /en).
  */
 export default function HeroTide() {
-  const skyRef = useRef<SVGGElement | null>(null);
-  const seaRef = useRef<SVGGElement | null>(null);
-  const tideRef = useRef<SVGGElement | null>(null);
-  const cloudRef = useRef<SVGGElement | null>(null);
-  const cleanupRef = useRef<(() => void) | null>(null);
-
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
-
-    // Cursor-tide parallax: mouse position drives a small extra horizontal
-    // offset on each layer, in opposite directions to depth. Disabled on
-    // touch devices (no real cursor) where it would be noise. Tracked as
-    // -1..1 normalised so we can scale per-layer without re-reading rect.
-    const hasCursor = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    let cursorX = 0; // -1 (left edge) .. 1 (right edge)
-    if (hasCursor) {
-      const onMove = (e: MouseEvent) => {
-        cursorX = (e.clientX / window.innerWidth) * 2 - 1;
-      };
-      window.addEventListener("mousemove", onMove, { passive: true });
-      // Cleanup wired into the rAF cleanup below.
-      const cleanupMove = () => window.removeEventListener("mousemove", onMove);
-      // Stash on ref so the rAF cleanup can call it.
-      cleanupRef.current = cleanupMove;
-    }
-
-    let raf = 0;
-    const start = performance.now();
-
-    const tick = (now: number) => {
-      const t = (now - start) / 1000; // seconds
-      const scroll = window.scrollY || 0;
-
-      // Parallax: each layer drifts up at a different rate as we scroll.
-      // Sky moves slowest, foreground tide fastest. The visitor's eye reads
-      // this as depth without consciously parsing it.
-      const skyY  = scroll * 0.05;
-      const seaY  = scroll * 0.12;
-      const tideY = scroll * 0.22;
-
-      // Ambient sway: a tiny periodic drift so the scene moves while idle.
-      // 22-second sky cycle, 11-second sea, 7-second tide. Asymmetric so
-      // they never line up: the brain stops trying to predict them.
-      const skySway  = Math.sin(t * 2 * Math.PI / 22) * 6;
-      const seaSway  = Math.sin(t * 2 * Math.PI / 11) * 4;
-      const tideSway = Math.sin(t * 2 * Math.PI / 7) * 3;
-      const cloudSway = ((t * 6) % 1400) - 700;  // slow rightward drift, looping
-
-      // Cursor-tide: each layer offsets by a small amount in the cursor's
-      // horizontal direction. Sky drifts opposite to foreground (eye-tracking
-      // illusion) at lower amplitude. Max ~8 px so it stays atmospheric.
-      const cursorSky  = -cursorX * 4;   // sky moves opposite, gentlest
-      const cursorSea  = cursorX * 5;
-      const cursorTide = cursorX * 8;    // foreground tracks the cursor most
-
-      if (skyRef.current)   skyRef.current.style.transform   = `translate3d(${skySway + cursorSky}px, ${-skyY}px, 0)`;
-      if (seaRef.current)   seaRef.current.style.transform   = `translate3d(${seaSway + cursorSea}px, ${-seaY + Math.sin(t * 2 * Math.PI / 9) * 2}px, 0)`;
-      if (tideRef.current)  tideRef.current.style.transform  = `translate3d(${tideSway + cursorTide}px, ${-tideY}px, 0)`;
-      if (cloudRef.current) cloudRef.current.style.transform = `translate3d(${cloudSway + cursorSky * 1.5}px, 0, 0)`;
-
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(raf);
-      cleanupRef.current?.();
-    };
-  }, []);
-
   return (
     <svg
       className="hero-tide"
@@ -129,14 +49,14 @@ export default function HeroTide() {
       </defs>
 
       {/* Sky band: top 60% of the viewport */}
-      <g ref={skyRef} style={{ willChange: "transform" }}>
+      <g>
         <rect x="0" y="0" width="1440" height="560" fill="url(#ht-sky)" />
         {/* Sun, slightly off-centre */}
         <circle cx="980" cy="320" r="220" fill="url(#ht-sun)" />
       </g>
 
       {/* Cloud strokes: drift across the sky */}
-      <g ref={cloudRef} style={{ willChange: "transform", opacity: 0.5 }}>
+      <g opacity="0.5">
         <path d="M -200 200 Q -50 195, 100 200 T 400 195 T 700 198 T 1000 195 T 1300 200 T 1600 198"
               stroke="oklch(0.93 0.025 200)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
         <path d="M -200 260 Q 0 258, 200 262 T 600 260 T 1000 258 T 1400 262 T 1800 260"
@@ -146,7 +66,7 @@ export default function HeroTide() {
       </g>
 
       {/* Mid sea: band from 56% to 76% */}
-      <g ref={seaRef} style={{ willChange: "transform" }}>
+      <g>
         <path d="M 0 540 Q 360 532, 720 540 T 1440 540 L 1440 700 L 0 700 Z" fill="url(#ht-sea)" />
         {/* Horizon ripple */}
         <path d="M 0 545 Q 240 543, 480 547 T 960 545 T 1440 547"
@@ -154,7 +74,7 @@ export default function HeroTide() {
       </g>
 
       {/* Foreground tide: bottom 28%, with two soft wavelets */}
-      <g ref={tideRef} style={{ willChange: "transform" }}>
+      <g>
         <path d="M 0 660 Q 200 655, 400 665 T 800 660 T 1200 665 T 1440 660 L 1440 900 L 0 900 Z"
               fill="url(#ht-tide)" />
         {/* Foam highlight */}
