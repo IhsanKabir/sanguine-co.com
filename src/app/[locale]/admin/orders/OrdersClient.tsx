@@ -281,6 +281,17 @@ export default function OrdersClient({ orders, lines }: Props) {
                 })()}
               </div>
 
+              {(selected.deliveryDate || selected.giftMessage || selected.notes) && (
+                <div className="panel" style={{ padding: 16, marginBottom: 14 }}>
+                  <div className="pdp-label">Delivery</div>
+                  <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+                    {selected.deliveryDate && <div><b>Deliver on:</b> {selected.deliveryDate}</div>}
+                    {selected.giftMessage && <div style={{ whiteSpace: "pre-wrap" }}><b>Card:</b> {selected.giftMessage}</div>}
+                    {selected.notes && <div style={{ whiteSpace: "pre-wrap" }}><b>Notes:</b> {selected.notes}</div>}
+                  </div>
+                </div>
+              )}
+
               <div className="panel" style={{ padding: 16, marginBottom: 14 }}>
                 <div className="pdp-label">Items</div>
                 {linesFor(selected.id).map((l) => (

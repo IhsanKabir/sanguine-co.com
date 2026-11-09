@@ -263,6 +263,9 @@ function DetailDrawer({
             {request.budgetHintBdt != null && (
               <div className="field"><label>Budget hint</label><div style={{ fontSize: 14 }}>{formatBdt(request.budgetHintBdt)}</div></div>
             )}
+            {request.giftMessage && (
+              <div className="field"><label>Card message</label><div style={{ fontSize: 14, whiteSpace: "pre-wrap" }}>{request.giftMessage}</div></div>
+            )}
             {request.targetDate && (
               <div className="field"><label>Wanted by</label><div style={{ fontSize: 14 }}>{request.targetDate}</div></div>
             )}

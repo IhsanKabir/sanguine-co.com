@@ -3,6 +3,7 @@
 import { useState, useTransition, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
+import DeliveryOptionsFields from "@/components/storefront/DeliveryOptionsFields";
 import { createProductPreorderRequest } from "@/lib/actions/preorders";
 
 type Props = {
@@ -33,6 +34,8 @@ export default function ProductPreorderForm({
   const [color, setColor] = useState(colors[0] ?? "");
   const [size, setSize] = useState(sizes[0] ?? "");
   const [notes, setNotes] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [giftMessage, setGiftMessage] = useState("");
   const [line1, setLine1] = useState("");
   const [area, setArea] = useState("");
   const [city, setCity] = useState("Dhaka");
@@ -56,6 +59,8 @@ export default function ProductPreorderForm({
           customerName: name.trim(),
           customerPhone: phone.trim() || null,
           customerEmail: isGuest ? guestEmail.trim() : null,
+          targetDate: deliveryDate || null,
+          giftMessage: giftMessage.trim() || null,
           deliveryAddress: line1.trim()
             ? { line1: line1.trim(), area: area.trim() || null, city: city.trim(), postcode: postcode.trim() || null }
             : null,
@@ -135,6 +140,8 @@ export default function ProductPreorderForm({
           </div>
         )}
       </div>
+
+      <DeliveryOptionsFields date={deliveryDate} onDate={setDeliveryDate} gift={giftMessage} onGift={setGiftMessage} />
 
       <div className="field">
         <label>{t("preorderForm.notes")}</label>

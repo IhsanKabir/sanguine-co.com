@@ -37,3 +37,27 @@ export function formatArrival(d: Date, locale: "en" | "bn"): string {
     month: "short",
   });
 }
+
+/** Furthest ahead a customer can schedule a delivery. */
+export const MAX_SCHEDULE_DAYS = 60;
+export const GIFT_MESSAGE_MAX = 200;
+
+/** "YYYY-MM-DD" for a moment, in Dhaka time. */
+function dhakaDay(d: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(d);
+}
+
+/**
+ * Bounds for a chosen delivery date: from tomorrow (Dhaka time) so there is
+ * time to make the bouquet, up to MAX_SCHEDULE_DAYS ahead.
+ */
+export function deliveryDateBounds(now: Date): { min: string; max: string } {
+  const day = 24 * 60 * 60 * 1000;
+  return { min: dhakaDay(new Date(now.getTime() + day)), max: dhakaDay(new Date(now.getTime() + MAX_SCHEDULE_DAYS * day)) };
+}
+
+export function isValidDeliveryDate(value: string, now: Date): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const { min, max } = deliveryDateBounds(now);
+  return value >= min && value <= max;
+}
