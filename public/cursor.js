@@ -7,9 +7,14 @@
   const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
   // ===== Scroll reveal: runs on ALL devices (touch + pointer) =====
+  // Content is visible by default (CSS). Only sections still below the first
+  // screen are hidden here, then revealed on scroll, so nothing a visitor can
+  // already see ever waits for this script. Hiding everything until JS ran
+  // delayed the homepage's main content by seconds on phones.
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {
+        e.target.classList.remove('reveal-pending');
         e.target.classList.add('reveal-in');
         io.unobserve(e.target);
       }
@@ -20,9 +25,10 @@
     document.querySelectorAll('[data-reveal]:not(.reveal-init)').forEach(el => {
       el.classList.add('reveal-init');
       const r = el.getBoundingClientRect();
-      if (r.top < window.innerHeight && r.bottom > 0) {
-        requestAnimationFrame(() => el.classList.add('reveal-in'));
+      if (reduced || (r.top < window.innerHeight && r.bottom > 0)) {
+        el.classList.add('reveal-in');
       } else {
+        el.classList.add('reveal-pending');
         io.observe(el);
       }
     });

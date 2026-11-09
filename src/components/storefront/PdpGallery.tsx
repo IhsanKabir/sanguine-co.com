@@ -81,8 +81,16 @@ export default function PdpGallery({ photos, fallback, activeIndex, onIndexChang
                 aria-label={t("pdp.viewPhoto", { n: i + 1 })}
                 style={{ padding: 0, border: "none", cursor: "pointer", background: "transparent" }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.url} alt={p.alt ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                {/* Resized thumbnail: a raw <img> here downloaded every full-size
+                    original (~300 KB each) alongside the main photo. */}
+                <Image
+                  src={p.url}
+                  alt={p.alt ?? ""}
+                  width={120}
+                  height={160}
+                  sizes="96px"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
               </button>
             ))
           : [0, 1, 2, 3].map((i) => (

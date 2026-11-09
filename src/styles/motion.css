@@ -17,15 +17,8 @@
   .cur-ring::after { animation: none !important; }
 }
 
-/* Section ornaments: fineliner SVGs that breathe. 14s inhale-exhale. */
-.ssg-ornament svg {
-  animation: ssg-ornament-breathe 14s ease-in-out infinite;
-  transform-origin: center;
-}
-@keyframes ssg-ornament-breathe {
-  0%, 100% { opacity: 0.78; transform: scale(1); }
-  50%      { opacity: 1;    transform: scale(1.03); }
-}
+/* Section ornaments are still. A 14s infinite "breathe" on every ornament SVG
+   kept the page repainting long after load. */
 
 #ssg-cursor-root { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
 #ssg-cursor-trail { position: fixed; inset: 0; pointer-events: none; z-index: 9998; }
@@ -274,14 +267,17 @@
 .ssg-curtain.in::after { opacity: 1; }
 
 /* ===== Scroll reveal ===== */
+/* Visible by default. cursor.js adds .reveal-pending only to sections that
+   start below the first screen, and swaps it for .reveal-in on scroll, so
+   above-the-fold content never waits for JavaScript. */
 [data-reveal] {
-  opacity: 0; transform: translateY(30px);
   transition: opacity .8s cubic-bezier(.2, .8, .3, 1), transform .8s cubic-bezier(.2, .8, .3, 1);
 }
-[data-reveal="rise"] { transform: translateY(40px); }
-[data-reveal="fade"] { transform: none; }
-[data-reveal="left"] { transform: translateX(-30px); }
-[data-reveal="right"] { transform: translateX(30px); }
+[data-reveal].reveal-pending { opacity: 0; transform: translateY(30px); }
+[data-reveal="rise"].reveal-pending { transform: translateY(40px); }
+[data-reveal="fade"].reveal-pending { transform: none; }
+[data-reveal="left"].reveal-pending { transform: translateX(-30px); }
+[data-reveal="right"].reveal-pending { transform: translateX(30px); }
 [data-reveal-delay="1"] { transition-delay: .08s; }
 [data-reveal-delay="2"] { transition-delay: .16s; }
 [data-reveal-delay="3"] { transition-delay: .24s; }
@@ -289,13 +285,6 @@
 [data-reveal-delay="5"] { transition-delay: .40s; }
 [data-reveal-delay="6"] { transition-delay: .48s; }
 .reveal-in { opacity: 1 !important; transform: none !important; }
-/* Safety net: [data-reveal] starts invisible and only cursor.js reveals it.
-   cursor.js tags every element it takes over with .reveal-init; anything it
-   has not reached 2.5s after paint (script slow, blocked or failed) is shown
-   anyway instead of leaving whole sections blank. Elements the script does
-   handle keep their scroll-triggered reveal. */
-[data-reveal]:not(.reveal-init) { animation: ssg-reveal-fallback .6s ease 2.5s forwards; }
-@keyframes ssg-reveal-fallback { to { opacity: 1; transform: none; } }
 
 /* Theatrical: ornament line draws on reveal */
 .ornament-rule {
@@ -321,16 +310,9 @@
   transform: perspective(1000px) rotateX(var(--tilt-x, 0)) rotateY(var(--tilt-y, 0)) translateZ(10px);
 }
 
-/* Hero text: letter shimmer */
-.hero h1 em {
-  background: linear-gradient(120deg, var(--gold) 30%, oklch(0.95 0.1 85) 50%, var(--gold) 70%);
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shimmer 4s ease-in-out infinite;
-}
-@keyframes shimmer { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+/* Hero emphasis: plain gold. An infinite background-position shimmer on
+   clipped text repainted the largest text on the page every frame. */
+.hero h1 em { color: var(--gold); }
 
 /* Marquee strip */
 .marquee {
@@ -369,9 +351,9 @@
 }
 @keyframes drawLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-/* Hero h1 entrance */
-.hero h1 { animation: heroRise 1.2s cubic-bezier(.2,.9,.3,1) .15s both; }
-.hero p, .hero .btn { animation: heroRise 1s cubic-bezier(.2,.9,.3,1) .5s both; }
+/* Hero entrance: the headline is the page's largest text (its LCP), so it
+   paints immediately; only the line and buttons under it rise in. */
+.hero p, .hero .btn { animation: heroRise .6s cubic-bezier(.2,.9,.3,1) both; }
 @keyframes heroRise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
 
 /* Hero visual: slow pan */
