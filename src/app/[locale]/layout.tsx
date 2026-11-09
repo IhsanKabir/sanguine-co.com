@@ -8,7 +8,6 @@ import { routing } from "@/i18n/routing";
 import { fontClasses } from "@/app/fonts";
 import { organizationLd, websiteLd } from "@/lib/site-ld";
 import JsonLd from "@/components/seo/JsonLd";
-import { getAudioSettings } from "@/lib/audio-settings";
 import { getCommerceSettings, shippingRulesOf } from "@/lib/commerce";
 import { ShippingRulesProvider } from "@/lib/shipping-rules-context";
 import TopNav from "@/components/storefront/TopNav";
@@ -40,17 +39,9 @@ export default async function LocaleLayout({
   const messages = await getMessages();
   const t = await getTranslations();
 
-  // Admin-uploaded ambient audio (EXECUTION-PLAN 4.2). Only the URLs cross
-  // to the client; atier.js plays the file when present and falls back to
-  // its synth tone otherwise. Cached + tag-busted like the copy library.
-  const audio = await getAudioSettings();
   // Saved shipping rules (Admin → Settings) for the browser-side cart,
-  // drawer and checkout; cached and tag-busted on save like the audio row.
+  // drawer and checkout; cached and tag-busted on save.
   const shippingRules = shippingRulesOf(await getCommerceSettings());
-  const audioUrls: Record<string, string> = {};
-  if (audio.gong) audioUrls.gong = audio.gong.url;
-  if (audio.chime) audioUrls.chime = audio.chime.url;
-  if (audio.seal) audioUrls.seal = audio.seal.url;
 
   // This layout owns <html> (the root layout is a pass-through): `lang` comes
   // statically from the [locale] param, so crawlers get the correct lang="bn"
@@ -75,27 +66,11 @@ export default async function LocaleLayout({
         </WishlistProvider>
       </CartProvider>
       </ShippingRulesProvider>
-      {/* Plain inline tag (not next/script): executes during HTML parse, so
-       *  window.SSG_AUDIO_URLS exists before the afterInteractive atier.js
-       *  reads it. URLs are server-validated against our own bucket prefix;
-       *  the </>/& escapes are defence-in-depth against script breakout. */}
-      {Object.keys(audioUrls).length > 0 && (
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.SSG_AUDIO_URLS=${JSON.stringify(audioUrls)
-              .replace(/</g, "\\u003c")
-              .replace(/>/g, "\\u003e")
-              .replace(/&/g, "\\u0026")};`,
-          }}
-        />
-      )}
           {/* cursor.js runs the scroll reveal, so it stays afterInteractive.
-           *  atier.js (sound, seal loader, drawer handle) is decoration:
-           *  lazyOnload keeps it off the critical path. moments.js (gold-dust
-           *  headline, JS-driven marquee, parallax, letter-split headings) was
-           *  removed: its per-frame loops cost ~1.3 s of main thread on load. */}
+           *  moments.js and atier.js (sound, wax-seal loader, word-by-word
+           *  hero line, canvas orrery) were removed for speed: atier.js alone
+           *  cost ~1.3 s of main thread and delayed the home LCP text. */}
           <Script src="/cursor.js" strategy="afterInteractive" />
-          <Script src="/atier.js" strategy="lazyOnload" />
           {/* Cloudflare Analytics removed 2026-05-03: Vercel Analytics +
            *   Speed Insights are now the canonical telemetry stack. Two
            *   beacons per pageview is wasteful at our scale. */}

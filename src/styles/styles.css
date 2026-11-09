@@ -15,8 +15,9 @@
 }
 /* English pages: the only Bengali-block glyph is the taka sign (U+09F3), and
  * it pulled the 106 KB Noto Sans Bengali file onto every English page. Point
- * the Bengali slots at installed fonts only; the sign renders from the system. */
-html[lang="en"]{--font-bn-sans:"Noto Sans Bengali";--font-bn-serif:"Noto Serif Bengali"}
+ * the Bengali slots at system fonts (not the family names: next/font declares
+ * its faces under those exact names) so the sign renders from the system. */
+html[lang="en"]{--font-bn-sans:system-ui;--font-bn-serif:system-ui}
 *{box-sizing:border-box}html,body{margin:0;padding:0}
 body{font-family:var(--sans);background:var(--cream);color:var(--ink);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;position:relative}
 
