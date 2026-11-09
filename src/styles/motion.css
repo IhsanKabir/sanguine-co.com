@@ -351,10 +351,8 @@
 }
 @keyframes drawLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-/* Hero entrance: the headline is the page's largest text (its LCP), so it
-   paints immediately; only the line and buttons under it rise in. */
-.hero p, .hero .btn { animation: heroRise .6s cubic-bezier(.2,.9,.3,1) both; }
-@keyframes heroRise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+/* Hero: no entrance animation. On phones the line under the headline is the
+   LCP element, and fading it in from opacity 0 delayed LCP by 1 to 2 s. */
 
 /* Hero visual: slow pan */
 .hero-visual {
@@ -476,7 +474,6 @@
   [data-reveal] { opacity: 1 !important; transform: none !important; }
   .marquee-track { animation: none; }
   .hero-visual { animation: none; }
-  .hero h1, .hero p, .hero .btn { animation: none; }
   .cur-sparkle { animation: none; }
   .pdp-img-fade,
   .cart-line,
