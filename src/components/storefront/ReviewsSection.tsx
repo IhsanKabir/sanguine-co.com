@@ -62,7 +62,7 @@ export default function ReviewsSection({ productId, reviews, canWrite, signedInB
       {!canWrite && !signedInButIneligible && (
         <p style={{ fontSize: 13, color: "var(--ink-soft)", margin: "0 0 24px" }}>
           {t("reviews.whoCanWrite")}{" "}
-          {t.rich("reviews.signInPrompt", { a: (chunks) => <a href={signInHref} style={{ color: "var(--purple-900)" }}>{chunks}</a> })}
+          {t.rich("reviews.signInPrompt", { a: (chunks) => <a href={signInHref} style={{ color: "var(--purple-900)", textDecoration: "underline" }}>{chunks}</a> })}
         </p>
       )}
 
