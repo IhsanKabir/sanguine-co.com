@@ -163,7 +163,7 @@ export default async function ProductPage({ params }: Props) {
   // shippingDetails is the standard for Bangladesh COD-only logistics:
   //: Pathao Courier; the advertised rate is the saved inside-Dhaka rate
   //   (Admin → Settings), the lowest a customer can pay.
-  // hasMerchantReturnPolicy follows our /legal/returns: 14-day window,
+  // hasMerchantReturnPolicy follows our /legal/returns: the piece's window,
   // courier-arranged pickup, return shipping paid by the customer unless the
   // piece is defective or incorrect, BDT refund.
   const productLd = {

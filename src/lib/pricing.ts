@@ -15,9 +15,9 @@ import { formatBdt } from "./utils";
  */
 
 export const DEFAULT_PREORDER_DEPOSIT_PCT = 20;
-// 14 days matches the published returns policy (/legal/returns). The admin
-// commerce setting still overrides this once it has been saved.
-export const DEFAULT_RETURN_WINDOW_DAYS = 14;
+// Fallback only: the window customers see is the Admin → Settings value
+// (products may override it). /legal/returns and the marquee read that value.
+export const DEFAULT_RETURN_WINDOW_DAYS = 3;
 
 // Shipping rules. These are only the DEFAULTS: the live values are saved in
 // Admin → Settings (site_settings.commerce) and read through

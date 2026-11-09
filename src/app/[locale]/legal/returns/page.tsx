@@ -1,6 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { legalMetadata } from "../_metadata";
+import { getCommerceSettings } from "@/lib/commerce";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -9,18 +10,21 @@ export const generateMetadata = ({ params }: Props) => legalMetadata("returns", 
 export default async function ReturnsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return locale === "bn" ? <BangleSection /> : <EnglishSection />;
+  // The stock-piece window is the Admin → Settings value, so the policy page
+  // can never disagree with the product pages and the return flow.
+  const { returnWindowDays: days } = await getCommerceSettings();
+  return locale === "bn" ? <BangleSection days={days} /> : <EnglishSection days={days} />;
 }
 
-function EnglishSection() {
+function EnglishSection({ days }: { days: number }) {
   return (
     <>
       <div className="legal-kicker">RETURNS &amp; REFUNDS</div>
       <h1>How returns work, and what cannot be returned.</h1>
-      <p className="legal-lede">Last updated: 1 October 2026.</p>
+      <p className="legal-lede">Last updated: 9 November 2026.</p>
 
-      <h2>Stock pieces: fourteen days</h2>
-      <p>A piece bought from our in-stock collection may be returned within <b>fourteen days of delivery</b>, in its original condition (unworn, unwashed, with tags and packaging intact). The fourteen-day window matches the prevailing standard of Bangladeshi e-commerce.</p>
+      <h2>Stock pieces: {days} {days === 1 ? "day" : "days"}</h2>
+      <p>A piece bought from our in-stock collection may be returned within <b>{days} {days === 1 ? "day" : "days"} of delivery</b>, in its original condition (unworn, unwashed, with tags and packaging intact). A piece&rsquo;s own page shows its window if it differs.</p>
       <p>To begin a return, sign in and open <Link href="/account">your account</Link>: each delivered order has a <b>Return</b> button. If you ordered without an account, write to <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a> with your order number (SSG-XXXX) and a sentence about why you are returning. We will book a collection through our courier; Sanguine covers return shipping for any defective or incorrect piece, otherwise return shipping is at the customer&rsquo;s cost (typically ৳60&ndash;120).</p>
       <p>Once the piece arrives back with us and we have checked its condition, we will refund you within seven working days. Refunds for cash-on-delivery orders are made by bKash or bank transfer to a number/account you nominate.</p>
 
@@ -32,7 +36,7 @@ function EnglishSection() {
       <h2>Items not returnable</h2>
       <p>In addition to bespoke pieces, the following are not returnable for reasons of hygiene or fragility:</p>
       <ul>
-        <li>Open perfume bottles (sealed, unopened bottles may be returned within fourteen days)</li>
+        <li>Open perfume bottles (sealed, unopened bottles may be returned within the same window)</li>
         <li>Cut flowers and bouquets</li>
         <li>Pieces marked &ldquo;final sale&rdquo; at the time of purchase</li>
       </ul>
@@ -49,15 +53,15 @@ function EnglishSection() {
   );
 }
 
-function BangleSection() {
+function BangleSection({ days }: { days: number }) {
   return (
     <>
       <div className="legal-kicker">ফেরত ও অর্থ ফেরত</div>
       <h1>ফেরত কীভাবে কাজ করে, এবং কী ফেরত দেওয়া যায় না।</h1>
-      <p className="legal-lede">সর্বশেষ আপডেট: ১ অক্টোবর ২০২৬।</p>
+      <p className="legal-lede">সর্বশেষ আপডেট: ৯ নভেম্বর ২০২৬।</p>
 
-      <h2>স্টক পিস: চৌদ্দ দিন</h2>
-      <p>আমাদের ইন-স্টক সংগ্রহ থেকে কেনা একটি পিস ডেলিভারির <b>চৌদ্দ দিনের মধ্যে</b> মূল অবস্থায় ফেরত দেওয়া যায় (পরা হয়নি, ধোয়া হয়নি, ট্যাগ ও প্যাকেজিং অক্ষত)। চৌদ্দ দিনের সময়সীমাটি বাংলাদেশী ই-কমার্সের প্রচলিত মানদণ্ডের সঙ্গে সঙ্গতিপূর্ণ।</p>
+      <h2>স্টক পিস: {days.toLocaleString("bn-BD")} দিন</h2>
+      <p>আমাদের ইন-স্টক সংগ্রহ থেকে কেনা একটি পিস ডেলিভারির <b>{days.toLocaleString("bn-BD")} দিনের মধ্যে</b> মূল অবস্থায় ফেরত দেওয়া যায় (পরা হয়নি, ধোয়া হয়নি, ট্যাগ ও প্যাকেজিং অক্ষত)। কোনো পিসের সময়সীমা ভিন্ন হলে তা সেই পিসের পাতায় লেখা থাকে।</p>
       <p>ফেরত শুরু করতে সাইন ইন করে <Link href="/account">আপনার অ্যাকাউন্ট</Link> খুলুন: ডেলিভারি হওয়া প্রতিটি অর্ডারে <b>রিটার্ন</b> বোতাম আছে। অ্যাকাউন্ট ছাড়া অর্ডার করে থাকলে আপনার অর্ডার নম্বর (SSG-XXXX) এবং কারণসংক্রান্ত একটি সংক্ষিপ্ত বার্তা দিয়ে <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>-এ লিখুন। আমরা আমাদের কুরিয়ারের মাধ্যমে কালেকশন বুক করব; ত্রুটিযুক্ত বা ভুল পিসের ক্ষেত্রে ফেরতের শিপিং সাঙ্গুইন বহন করে, অন্যথায় ফেরতের শিপিং গ্রাহকের খরচে (সাধারণত ৳৬০&ndash;১২০)।</p>
       <p>পিসটি আমাদের কাছে ফিরে আসা ও অবস্থা যাচাই হওয়ার পর সাত কর্মদিবসের মধ্যে আপনাকে অর্থ ফেরত দেওয়া হবে। ক্যাশ অন ডেলিভারি অর্ডারের ফেরত আপনার নির্দেশিত bKash বা ব্যাংক অ্যাকাউন্টে পাঠানো হবে।</p>
 
@@ -69,7 +73,7 @@ function BangleSection() {
       <h2>ফেরতযোগ্য নয় এমন আইটেম</h2>
       <p>বেসপোক পিস ছাড়াও, স্বাস্থ্য বা ভঙ্গুরতার কারণে নিম্নলিখিত আইটেম ফেরতযোগ্য নয়:</p>
       <ul>
-        <li>খোলা পারফিউম বোতল (বন্ধ, না-খোলা বোতল চৌদ্দ দিনের মধ্যে ফেরত দেওয়া যাবে)</li>
+        <li>খোলা পারফিউম বোতল (বন্ধ, না-খোলা বোতল একই সময়সীমার মধ্যে ফেরত দেওয়া যাবে)</li>
         <li>কাটা ফুল ও ফুলের তোড়া</li>
         <li>কেনার সময় &ldquo;final sale&rdquo; চিহ্নিত পিস</li>
       </ul>
