@@ -26,7 +26,8 @@ test("no audio without cookie consent, even after a click", async ({ page }) => 
   });
 
   await page.goto("/en");
-  // First pointer gesture is exactly what arms the gong in atier.js.
+  // The storefront plays no audio since atier.js was removed (Nov 2026);
+  // this guards against a sound effect coming back without consent gating.
   await page.mouse.click(400, 300);
   await page.waitForTimeout(500);
 
