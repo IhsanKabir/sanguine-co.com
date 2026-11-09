@@ -47,15 +47,9 @@ export default function CookieConsent() {
     <div className="cookie-banner" role="dialog" aria-label={isBn ? "কুকি পছন্দ" : "Cookie preferences"}>
       <div className="cb-text">
         {isBn ? (
-          <>
-            <b>কুকি সম্পর্কে ছোট একটি কথা।</b>{" "}
-            আমরা আপনার ব্যাগ মনে রাখতে একটি সেশন কুকি এবং কোন পিসগুলো বেশি যত্নে দেখা হচ্ছে তা বুঝতে একটি ছোট অ্যানালিটিক্স কুকি ব্যবহার করি। কোনো ট্র্যাকিং পিক্সেল নেই, কোনো বিজ্ঞাপন নেই। আমাদের <Link href="/legal/privacy">গোপনীয়তা নীতি</Link> পড়ে নিন।
-          </>
+          <>আপনার ব্যাগ মনে রাখতে ও ভিজিট গুনতে আমরা কুকি ব্যবহার করি। কোনো বিজ্ঞাপন নেই। <Link href="/legal/privacy">গোপনীয়তা নীতি</Link></>
         ) : (
-          <>
-            <b>A small note on cookies.</b>{" "}
-            We use a session cookie to keep your bag and a tiny analytics cookie to understand which pieces are most cared for. No tracking pixels, no ads. Read our <Link href="/legal/privacy">privacy policy</Link>.
-          </>
+          <>We use cookies to keep your bag and count visits. No ads. <Link href="/legal/privacy">Privacy policy</Link></>
         )}
       </div>
       <div className="cb-actions">
