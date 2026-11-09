@@ -3,9 +3,9 @@
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { requireUser } from "@/lib/auth-utils";
+import { requireUser, getCurrentUser } from "@/lib/auth-utils";
 import { requirePermission } from "@/lib/auth-utils";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/brevo";
@@ -119,6 +119,8 @@ const productPreorderSchema = z.object({
   notes: z.string().max(1000).optional().nullable(),
   customerName: z.string().min(1).max(120),
   customerPhone: z.string().min(6).max(40).optional().nullable(),
+  /** Guests only: where the quote goes. Signed-in customers use their account email. */
+  customerEmail: z.string().trim().email().max(200).optional().nullable(),
   deliveryAddress: z.object({
     line1: z.string().min(1).max(200),
     area: z.string().max(80).optional().nullable(),
@@ -127,13 +129,36 @@ const productPreorderSchema = z.object({
   }).optional().nullable(),
 });
 
+/** Same burst guard as checkout: three requests per email per 10 minutes. */
+const PREORDER_RATE_WINDOW_MIN = 10;
+const PREORDER_RATE_MAX = 3;
+
 export type ProductPreorderInput = z.infer<typeof productPreorderSchema>;
 
 export async function createProductPreorderRequest(
   input: ProductPreorderInput,
 ): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
-  const user = await requireUser();
-  const data = productPreorderSchema.parse(input);
+  // Guests can preorder (0021): an account was a sign-up wall before the
+  // only way to buy. The quote goes to this email either way.
+  const user = await getCurrentUser();
+  const parsed = productPreorderSchema.safeParse(input);
+  if (!parsed.success) return { ok: false as const, error: "Please check the form and try again." };
+  const data = parsed.data;
+  const email = (user?.email || data.customerEmail || "").trim();
+  if (!email) return { ok: false as const, error: "Please add your email so we can send you the price." };
+
+  const windowStart = new Date(Date.now() - PREORDER_RATE_WINDOW_MIN * 60 * 1000);
+  const [recent] = await db.select({ n: sql<number>`count(*)::int` }).from(schema.preorderRequests)
+    .where(and(
+      sql`${schema.preorderRequests.createdAt} > ${windowStart.toISOString()}::timestamptz`,
+      sql`lower(${schema.preorderRequests.customerEmail}) = lower(${email})`,
+    ));
+  if (Number(recent?.n ?? 0) >= PREORDER_RATE_MAX) {
+    return {
+      ok: false as const,
+      error: "We have received several requests from you in the last few minutes. Please wait a little, or write to concierge@sanguine-co.com.",
+    };
+  }
 
   const [product] = await db.select().from(schema.products)
     .where(eq(schema.products.id, data.productId)).limit(1);
@@ -165,8 +190,8 @@ export async function createProductPreorderRequest(
   const [row] = await db.insert(schema.preorderRequests).values({
     productId: data.productId,
     segmentId: product.segmentId ?? null,
-    customerId: user.id,
-    customerEmail: user.email ?? "",
+    customerId: user?.id ?? null,
+    customerEmail: email,
     customerName: data.customerName,
     customerPhone: data.customerPhone || null,
     description,
@@ -180,7 +205,7 @@ export async function createProductPreorderRequest(
     advertisedDepositPct,
   }).returning();
 
-  if (user.email) {
+  {
     const { subject, html } = preorderReceivedEmail({
       customerName: data.customerName,
       segmentName: product.name,
@@ -190,7 +215,7 @@ export async function createProductPreorderRequest(
       targetDate: null,
       attachmentCount: 0,
     });
-    sendEmail({ to: user.email, toName: data.customerName, subject, html }).catch(() => {});
+    sendEmail({ to: email, toName: data.customerName, subject, html }).catch(() => {});
   }
   const adminEmail = process.env.PREORDER_ADMIN_EMAIL || process.env.BREVO_FROM_EMAIL;
   if (adminEmail) {
@@ -204,7 +229,7 @@ export async function createProductPreorderRequest(
       targetDate: null,
       attachmentCount: 0,
       requestId: row.id,
-      customerEmail: user.email ?? "",
+      customerEmail: email,
       customerPhone: data.customerPhone || null,
       adminUrl: `${baseUrl}/en/admin/preorders?id=${row.id}`,
     });

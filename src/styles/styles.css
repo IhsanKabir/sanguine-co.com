@@ -464,7 +464,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
   .pdp-info{padding:0}
   .pdp-info h1{font-size:26px;margin:4px 0 6px}
   .pdp-price{margin-bottom:16px;padding-bottom:16px}
-  .pdp-trust{margin-top:-6px}
+  .pdp-trust{margin-top:-6px;margin-bottom:12px}
 
   /* Footer */
   .footer-grid{grid-template-columns:1fr;gap:20px}

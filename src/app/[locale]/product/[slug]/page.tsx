@@ -314,14 +314,6 @@ export default async function ProductPage({ params }: Props) {
               <Link href="/legal/returns">{t("pdp.returnsTitle", { days: returnDays })}</Link>
             </li>
           </ul>
-          <div style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.7, marginBottom: p.modelNote ? 12 : 24 }}>
-            {description}
-          </div>
-          {p.modelNote && (
-            <div style={{ fontSize: 12, color: "var(--ink-soft)", fontStyle: "italic", marginBottom: 24 }}>
-              {p.modelNote}
-            </div>
-          )}
           {p.preorderOnly ? (
             <PreorderButton
               slug={p.slug}
@@ -393,6 +385,17 @@ export default async function ProductPage({ params }: Props) {
           )}
           {p.preorderOnly && (
             <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>{t("pdp.preorderOnly")}</div>
+          )}
+
+          {/* Description after the buy/preorder button: on a phone the
+              button now sits on the first screen with the price. */}
+          <div style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.7, marginTop: 20, marginBottom: p.modelNote ? 12 : 20 }}>
+            {description}
+          </div>
+          {p.modelNote && (
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", fontStyle: "italic", marginBottom: 20 }}>
+              {p.modelNote}
+            </div>
           )}
 
           {/* Shipping estimate */}
