@@ -15,6 +15,7 @@ import {
   preorderAdminNotifyEmail,
 } from "@/lib/email/templates";
 import { SITE_URL } from "@/lib/site-url";
+import { normalizeBdWhatsApp } from "@/lib/utils";
 import { priceDisplay, effectiveDepositPct, depositForQuote } from "@/lib/pricing";
 import { getCommerceSettings } from "@/lib/commerce";
 import { isValidDeliveryDate, GIFT_MESSAGE_MAX } from "@/lib/delivery";
@@ -119,7 +120,8 @@ const productPreorderSchema = z.object({
   size: z.string().max(40).optional().nullable(),
   notes: z.string().max(1000).optional().nullable(),
   customerName: z.string().min(1).max(120),
-  customerPhone: z.string().min(6).max(40).optional().nullable(),
+  /** Required: the quote goes out on WhatsApp first, and the courier calls it. */
+  customerPhone: z.string().trim().min(6).max(40),
   /** Optional "deliver on" day and card message (0022). */
   targetDate: z.string().optional().nullable(),
   giftMessage: z.string().trim().max(GIFT_MESSAGE_MAX).optional().nullable(),
@@ -153,6 +155,9 @@ export async function createProductPreorderRequest(
   }
   const email = (user?.email || data.customerEmail || "").trim();
   if (!email) return { ok: false as const, error: "Please add your email so we can send you the price." };
+  if (normalizeBdWhatsApp(data.customerPhone).length < 10) {
+    return { ok: false as const, error: "Please add a phone number we can reach on WhatsApp." };
+  }
 
   const windowStart = new Date(Date.now() - PREORDER_RATE_WINDOW_MIN * 60 * 1000);
   const [recent] = await db.select({ n: sql<number>`count(*)::int` }).from(schema.preorderRequests)
@@ -348,7 +353,8 @@ export async function quotePreorderRequest(input: z.infer<typeof quoteSchema>) {
   }
 
   revalidatePath("/[locale]/admin/preorders", "page");
-  return { ok: true as const };
+  // Returned so the admin can send the same quote on WhatsApp straight away.
+  return { ok: true as const, quotedPriceBdt: data.quotedPriceBdt, depositBdt };
 }
 
 const rejectSchema = z.object({

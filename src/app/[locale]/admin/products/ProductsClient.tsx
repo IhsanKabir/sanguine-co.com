@@ -463,6 +463,12 @@ export default function ProductsClient({ segments, products, trackedIds }: Props
                     <div className="field"><label>Deposit % (blank = global setting)</label><input type="number" min={1} max={100} value={editing.preorderDepositPct} onChange={(e) => setEditing({ ...editing, preorderDepositPct: e.target.value })} placeholder="e.g. 20"/></div>
                   </div>
                   <div className="row" style={{ marginTop: 10 }}>
+                    <div className="field"><label>Usual price (৳, private)</label><input type="number" min={1} value={editing.preorderPriceBdt} onChange={(e) => setEditing({ ...editing, preorderPriceBdt: e.target.value })} placeholder="e.g. 2500"/></div>
+                  </div>
+                  <p style={{ fontSize: 11, color: "var(--ink-soft)", margin: "6px 0 0", lineHeight: 1.6 }}>
+                    Never shown to customers. It pre-fills the quote on each new request, so a usual order is quoted in one click.
+                  </p>
+                  <div className="row" style={{ marginTop: 10 }}>
                     <div className="field"><label>Estimated price: min (৳)</label><input type="number" min={1} value={editing.priceMinBdt} onChange={(e) => setEditing({ ...editing, priceMinBdt: e.target.value })} placeholder="After research"/></div>
                     <div className="field"><label>Estimated price: max (৳)</label><input type="number" min={1} value={editing.priceMaxBdt} onChange={(e) => setEditing({ ...editing, priceMaxBdt: e.target.value })} placeholder="After research"/></div>
                   </div>

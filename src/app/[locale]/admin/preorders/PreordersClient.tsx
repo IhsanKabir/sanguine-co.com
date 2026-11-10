@@ -13,6 +13,7 @@ import type { PreorderRequest, Segment } from "@/lib/schema";
 import { formatBdt, formatDate } from "@/lib/utils";
 import { Link } from "@/i18n/routing";
 import Icon from "@/components/storefront/Icon";
+import { quoteWhatsAppUrl } from "@/lib/quote-message";
 
 const STATUS_PILL: Record<string, string> = {
   new: "pill-info",
@@ -40,13 +41,22 @@ export type LinkedOrderInfo = {
   shippingTracking: string | null;
 };
 
+export type RequestProductInfo = {
+  id: string;
+  name: string;
+  nameBn: string | null;
+  /** Private usual price: pre-fills the quote. */
+  usualPriceBdt: number | null;
+};
+
 type Props = {
   requests: PreorderRequest[];
   segments: Segment[];
   linkedOrders: Record<string, LinkedOrderInfo>;
+  products: Record<string, RequestProductInfo>;
 };
 
-export default function PreordersClient({ requests, segments, linkedOrders }: Props) {
+export default function PreordersClient({ requests, segments, linkedOrders, products }: Props) {
   const [filter, setFilter] = useState<string>("all");
   const [selected, setSelected] = useState<PreorderRequest | null>(null);
   const [, startTransition] = useTransition();
@@ -130,6 +140,7 @@ export default function PreordersClient({ requests, segments, linkedOrders }: Pr
           request={selected}
           segmentName={segName(selected.segmentId)}
           linkedOrder={linkedFor(selected)}
+          product={selected.productId ? products[selected.productId] : undefined}
           onClose={() => setSelected(null)}
         />
       )}
@@ -141,11 +152,13 @@ function DetailDrawer({
   linkedOrder,
   request,
   segmentName,
+  product,
   onClose,
 }: {
   request: PreorderRequest;
   segmentName: string;
   linkedOrder?: LinkedOrderInfo;
+  product?: RequestProductInfo;
   onClose: () => void;
 }) {
   const [pending, startTransition] = useTransition();
@@ -154,7 +167,24 @@ function DetailDrawer({
   const [loadingUrls, setLoadingUrls] = useState(false);
 
   // Quote inputs
-  const [quotePrice, setQuotePrice] = useState(request.quotedPriceBdt?.toString() ?? "");
+  // A new request starts from the product's private usual price.
+  const usualPrice = request.quotedPriceBdt ? null : product?.usualPriceBdt ?? null;
+  const [quotePrice, setQuotePrice] = useState((request.quotedPriceBdt ?? usualPrice)?.toString() ?? "");
+  // Set once a quote is saved: the drawer stays open on the WhatsApp step.
+  const [sentQuote, setSentQuote] = useState<{ quotedPriceBdt: number; depositBdt: number } | null>(null);
+
+  const whatsAppUrl = (quotedPriceBdt: number, depositBdt: number | null) =>
+    request.customerPhone
+      ? quoteWhatsAppUrl(request.customerPhone, {
+          customerName: request.customerName,
+          productName: product?.name ?? segmentName,
+          productNameBn: product?.nameBn,
+          quantity: request.quantity,
+          quotedPriceBdt,
+          depositBdt,
+          targetDate: request.targetDate,
+        })
+      : null;
   const [adminNotes, setAdminNotes] = useState(request.adminNotes ?? "");
 
   // Reject input
@@ -191,7 +221,7 @@ function DetailDrawer({
         quotedPriceBdt: price,
         adminNotes: adminNotes.trim() || null,
       });
-      if (r.ok) onClose();
+      if (r.ok) setSentQuote({ quotedPriceBdt: r.quotedPriceBdt, depositBdt: r.depositBdt });
       else setError(r.error);
     });
   };
@@ -303,14 +333,26 @@ function DetailDrawer({
             </div>
           )}
 
+          {/* Just quoted: email is on its way; WhatsApp is one more tap. */}
+          {sentQuote && (
+            <QuoteSentPanel
+              email={request.customerEmail}
+              whatsAppUrl={whatsAppUrl(sentQuote.quotedPriceBdt, sentQuote.depositBdt)}
+              onDone={onClose}
+            />
+          )}
+
           {/* Quote section: visible while not yet final */}
-          {request.status !== "rejected" && request.status !== "converted" && (
+          {!sentQuote && request.status !== "rejected" && request.status !== "converted" && (
             <div style={{ marginTop: 24, padding: 18, background: "#f9f4ec", border: "1px solid var(--gold-deep)" }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "var(--gold-deep)", marginBottom: 12 }}>QUOTE</div>
               <div className="row">
                 <div className="field">
                   <label>Quote price (৳ per unit)</label>
                   <input type="number" min={1} value={quotePrice} onChange={(e) => setQuotePrice(e.target.value)} placeholder="8000" />
+                  {usualPrice !== null && (
+                    <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4 }}>Pre-filled with the usual price.</div>
+                  )}
                 </div>
                 <div className="field">
                   <label>Total ({request.quantity}×)</label>
@@ -328,6 +370,12 @@ function DetailDrawer({
                 {request.status === "new" && (
                   <button type="button" className="btn btn-ghost btn-sm" onClick={onMarkReviewing} disabled={pending}>Mark as reviewing</button>
                 )}
+                {(request.status === "quoted" || request.status === "confirmed") && request.quotedPriceBdt && (() => {
+                  const url = whatsAppUrl(request.quotedPriceBdt, request.depositBdt);
+                  return url ? (
+                    <a className="btn btn-ghost btn-sm" href={url} target="_blank" rel="noopener noreferrer">Resend on WhatsApp</a>
+                  ) : null;
+                })()}
               </div>
             </div>
           )}
@@ -490,6 +538,28 @@ function BespokePipeline({ linkedOrder }: { linkedOrder?: LinkedOrderInfo }) {
           <span className="mono" style={{ marginLeft: 8 }}>{linkedOrder.shippingTracking}</span>
         </p>
       )}
+    </div>
+  );
+}
+
+function QuoteSentPanel({ email, whatsAppUrl, onDone }: { email: string | null; whatsAppUrl: string | null; onDone: () => void }) {
+  return (
+    <div style={{ marginTop: 24, padding: 18, background: "#f3f8f1", border: "1px solid var(--ok, #4a7a3a)" }}>
+      <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "var(--ok, #4a7a3a)", marginBottom: 8 }}>QUOTE SENT</div>
+      <p style={{ fontSize: 14, lineHeight: 1.6, margin: "0 0 12px" }}>
+        {email ? <>Emailed to {email}.</> : <>Saved.</>}{" "}
+        {whatsAppUrl
+          ? "Send it on WhatsApp too: customers usually answer there first."
+          : "No phone number on this request, so WhatsApp is not available."}
+      </p>
+      <div style={{ display: "flex", gap: 8 }}>
+        {whatsAppUrl && (
+          <a className="btn btn-primary btn-sm" href={whatsAppUrl} target="_blank" rel="noopener noreferrer" onClick={onDone}>
+            Send on WhatsApp
+          </a>
+        )}
+        <button type="button" className="btn btn-ghost btn-sm" onClick={onDone}>Done</button>
+      </div>
     </div>
   );
 }

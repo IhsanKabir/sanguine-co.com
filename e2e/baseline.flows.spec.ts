@@ -59,6 +59,16 @@ test.describe("baseline · catalogue flows @db", () => {
     await expect(page.locator("form").first()).toBeVisible();
   });
 
+  test("the private usual price never reaches the page source", async ({ request }) => {
+    skipWithoutDb();
+    // Client components serialize every product field into the HTML, so a
+    // non-null preorderPriceBdt here would publish the owner's private price.
+    for (const path of [`/en/shop/${KNOWN_SEGMENT_ID}`, `/en/product/${KNOWN_PRODUCT_SLUG}`, "/en/wishlist"]) {
+      const html = await (await request.get(path)).text();
+      expect(html, path).not.toMatch(/preorderPriceBdt[^,}]{0,6}[0-9]/);
+    }
+  });
+
   test("shop grid renders cards and honors sort URL state", async ({ page }) => {
     skipWithoutDb();
     // URL-state rendering path (RSC re-render on filter change) exercised via

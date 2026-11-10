@@ -57,7 +57,7 @@ export default function ProductPreorderForm({
           size: sizes.length > 0 ? size || null : null,
           notes: notes.trim() || null,
           customerName: name.trim(),
-          customerPhone: phone.trim() || null,
+          customerPhone: phone.trim(),
           customerEmail: isGuest ? guestEmail.trim() : null,
           targetDate: deliveryDate || null,
           giftMessage: giftMessage.trim() || null,
@@ -93,8 +93,8 @@ export default function ProductPreorderForm({
           <input value={name} onChange={(e) => setName(e.target.value)} required minLength={1} maxLength={120} placeholder={t("preorderForm.namePlaceholder")} />
         </div>
         <div className="field">
-          <label>{t("common.phone")}</label>
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+8801XXXXXXXXX" />
+          <label>{t("preorderForm.phoneWhatsApp")}</label>
+          <input type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required minLength={6} maxLength={40} placeholder="01XXXXXXXXX" />
         </div>
       </div>
 

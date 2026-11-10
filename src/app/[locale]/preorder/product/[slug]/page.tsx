@@ -5,7 +5,7 @@ import { db, schema } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-utils";
 import { getProductImages } from "@/lib/queries";
-import { formatBdt } from "@/lib/utils";
+import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import ProductPreorderForm from "./ProductPreorderForm";
 import { localizeEstimate } from "@/lib/delivery";
 
@@ -38,8 +38,9 @@ export default async function ProductPreorderPage({ params }: Props) {
   const name = (isBn && product.nameBn) || product.name;
   const segName = seg ? ((isBn && seg.nameBn) || seg.name) : "";
 
-  const displayPrice = product.preorderPriceBdt ?? product.priceBdt;
-  const hasDifferentPrice = product.preorderPriceBdt && product.preorderPriceBdt !== product.priceBdt;
+  // Same pricing rules as the shop card and PDP: a hidden price reads
+  // "Price on request", never a stale or private figure.
+  const display = priceDisplay(product);
 
   return (
     <>
@@ -63,12 +64,7 @@ export default async function ProductPreorderPage({ params }: Props) {
               {name}
             </h1>
             <div style={{ fontSize: 20, fontWeight: 500, color: "var(--purple-900)", marginBottom: 6 }}>
-              {formatBdt(displayPrice, locale as "en" | "bn")}
-              {hasDifferentPrice && (
-                <span style={{ fontSize: 13, color: "var(--ink-soft)", marginLeft: 10, fontWeight: 400 }}>
-                  {t("preorderPage.priceNote", { price: formatBdt(product.priceBdt, locale as "en" | "bn") })}
-                </span>
-              )}
+              {display.kind === "quote" ? t("pdp.priceOnQuote") : priceDisplayText(display, locale as "en" | "bn")}
             </div>
             {product.estimatedDelivery && (
               <div style={{ fontSize: 13, color: "var(--gold-deep)" }}>

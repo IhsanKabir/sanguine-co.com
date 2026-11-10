@@ -46,7 +46,9 @@ export const products = pgTable("products", {
   preorderEnabled: boolean("preorder_enabled").default(false).notNull(),
   preorderOnly: boolean("preorder_only").default(false).notNull(),
   estimatedDelivery: text("estimated_delivery"),   // e.g. "4–6 weeks"
-  preorderPriceBdt: integer("preorder_price_bdt"), // DEPRECATED (0016): kept for rollback; app no longer reads it
+  // Private "usual price": pre-fills the admin quote, never shown on the
+  // storefront (was the pre-0016 preorder price; the column was reused).
+  preorderPriceBdt: integer("preorder_price_bdt"),
   // Quotation-driven pricing (0016): the actual price of a preorder piece is
   // set by quotation after research; until then the catalogue carries at most
   // an estimated range. Deposit % of the quoted price is what the customer

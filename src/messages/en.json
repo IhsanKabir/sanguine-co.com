@@ -691,13 +691,13 @@
     "doneTitle": "Preorder received.",
     "doneBody": "We have your preorder for <em>{product}</em>. We'll email <b>{email}</b> within a day or two to confirm it and send a bKash deposit request.",
     "doneNote": "Nothing has been charged yet. Your piece is secured once the deposit is paid.",
-    "guestEmailNote": "We send the price here. Have an account? <a>Sign in</a>."
+    "guestEmailNote": "We send the price here. Have an account? <a>Sign in</a>.",
+    "phoneWhatsApp": "Phone (WhatsApp)"
   },
   "preorderPage": {
     "kicker": "PREORDER",
     "crumb": "Preorder",
-    "priceNote": "preorder price · usually {price}",
-    "intro": "Fill in the details below and we'll confirm by email within a day or two. A bKash deposit secures your piece."
+    "intro": "Fill in the details below and we'll send your price on WhatsApp and by email. A bKash deposit secures your piece."
   },
   "bespoke": {
     "crumb": "Request",

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { db, schema } from "@/lib/db";
+import { publicProduct } from "@/lib/queries";
 import WishlistClient from "./WishlistClient";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +20,7 @@ export default async function WishlistPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const [products, segments] = await Promise.all([
-    db.select().from(schema.products).catch(() => []),
+    db.select().from(schema.products).then((rows) => rows.map(publicProduct)).catch(() => []),
     db.select().from(schema.segments).catch(() => []),
   ]);
   return (
