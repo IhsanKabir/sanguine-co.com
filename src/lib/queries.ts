@@ -27,6 +27,15 @@ export async function getSegmentBySlug(id: string) {
 // ─── Products ──────────────────────────────────────────────────────────
 import { gte, lte } from "drizzle-orm";
 
+/**
+ * Blank the admin's private "usual price" before a row leaves this module.
+ * Storefront rows are handed to client components, which serialize every
+ * field into the page source, so a private figure here is public there.
+ */
+export function publicProduct<T extends { preorderPriceBdt: number | null }>(p: T): T {
+  return { ...p, preorderPriceBdt: null };
+}
+
 export async function getLiveProducts(opts?: {
   segmentId?: string;
   tag?: string;
@@ -66,7 +75,8 @@ export async function getLiveProducts(opts?: {
   })();
 
   const q = db.select().from(products).where(and(...conds)).orderBy(orderBy);
-  return opts?.limit ? q.limit(opts.limit) : q;
+  const rows = await (opts?.limit ? q.limit(opts.limit) : q);
+  return rows.map(publicProduct);
 }
 
 export async function getProductBySlug(slug: string) {
@@ -75,7 +85,7 @@ export async function getProductBySlug(slug: string) {
     eq(products.status, "live"),
     inArray(products.segmentId, visibleSegmentIds),
   )).limit(1);
-  return rows[0] ?? null;
+  return rows[0] ? publicProduct(rows[0]) : null;
 }
 
 export async function getProductImages(productId: string) {
@@ -97,7 +107,7 @@ export async function getProductsByIds(ids: string[]) {
   ));
   // Preserve the input order: client passes most-recent first.
   const byId = new Map(rows.map((r) => [r.id, r]));
-  return ids.map((id) => byId.get(id)).filter((p): p is NonNullable<typeof p> => !!p);
+  return ids.map((id) => byId.get(id)).filter((p): p is NonNullable<typeof p> => !!p).map(publicProduct);
 }
 
 /**
@@ -123,9 +133,10 @@ export async function getHeroImagesFor(productIds: string[]): Promise<Map<string
 }
 
 export async function getRelatedProducts(productId: string, segmentId: string, limit = 4) {
-  return db.select().from(products)
+  const rows = await db.select().from(products)
     .where(and(eq(products.status, "live"), eq(products.segmentId, segmentId), sql`${products.id} != ${productId}`))
     .limit(limit);
+  return rows.map(publicProduct);
 }
 
 /**
@@ -152,7 +163,7 @@ export async function searchProducts(query: string, limit = 8) {
   // capped at a sane length so a 4 KB input can't get pushed through.
   const trimmed = query.trim().slice(0, 80);
   const escaped = trimmed.replace(/[\\%_]/g, "\\$&");
-  return db.select().from(products).where(
+  const rows = await db.select().from(products).where(
     and(
       eq(products.status, "live"),
       inArray(products.segmentId, visibleSegmentIds),
@@ -165,4 +176,5 @@ export async function searchProducts(query: string, limit = 8) {
       ),
     ),
   ).limit(limit);
+  return rows.map(publicProduct);
 }
