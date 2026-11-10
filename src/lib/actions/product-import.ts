@@ -260,6 +260,6 @@ export async function importProductsCsv(input: z.infer<typeof importInputSchema>
 
   result.committed = true;
   revalidatePath("/[locale]/admin/products", "page");
-  for (const locale of ["en", "bn"]) revalidatePath(`/${locale}`, "layout");
+  revalidatePath("/[locale]", "layout");
   return result;
 }

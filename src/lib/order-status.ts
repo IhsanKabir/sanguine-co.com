@@ -93,7 +93,7 @@ export async function applyOrderStatus(
       });
     }
     // Stock badges on product pages and grids reflect the restore.
-    for (const locale of ["en", "bn"]) revalidatePath(`/${locale}`, "layout");
+    revalidatePath("/[locale]", "layout");
   }
 
   if (status === "delivered") {

@@ -52,9 +52,7 @@ async function persist(next: AudioSettings): Promise<void> {
     .onConflictDoUpdate({ target: schema.siteSettings.key, set: { value: data } });
   revalidateTag(AUDIO_CACHE_TAG);
   // The URL bridge is baked into every page's HTML via the locale layout.
-  for (const locale of ["en", "bn"]) {
-    revalidatePath(`/${locale}`, "layout");
-  }
+  revalidatePath("/[locale]", "layout");
 }
 
 /** Remove a blob from the bucket, best-effort: an orphan is not worth failing the save. */
