@@ -65,6 +65,8 @@ export const products = pgTable("products", {
   care: text("care"),
   careBn: text("care_bn"),
   lookProductIds: jsonb("look_product_ids").$type<string[]>().default([]),
+  // Occasion ids from lib/occasions.ts (0023): drives /occasion/<id>.
+  occasions: jsonb("occasions").$type<string[]>().default([]).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

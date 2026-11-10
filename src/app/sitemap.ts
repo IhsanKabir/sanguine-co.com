@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { db, schema } from "@/lib/db";
 import { eq, and, inArray } from "drizzle-orm";
 import { routing } from "@/i18n/routing";
+import { getOccasionsInUse } from "@/lib/queries";
 
 import { SITE_URL as BASE } from "@/lib/site-url";
 const LOCALES = routing.locales;
@@ -31,7 +32,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let segmentRoutes: MetadataRoute.Sitemap = [];
   let productRoutes: MetadataRoute.Sitemap = [];
+  let occasionRoutes: MetadataRoute.Sitemap = [];
   try {
+    // Only occasions with live pieces: empty occasion pages are thin content.
+    const occasions = await getOccasionsInUse();
+    occasionRoutes = occasions.flatMap((id) => entry(`/occasion/${id}`, { priority: 0.7, changeFrequency: "weekly" }));
+
     const segs = await db.select().from(schema.segments).where(eq(schema.segments.hidden, false));
     segmentRoutes = segs.flatMap((s) => entry(`/shop/${s.id}`, { priority: 0.8, changeFrequency: "weekly" }));
 
@@ -53,5 +59,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB unavailable: return static-only sitemap
   }
 
-  return [...staticRoutes, ...segmentRoutes, ...productRoutes];
+  return [...staticRoutes, ...segmentRoutes, ...occasionRoutes, ...productRoutes];
 }

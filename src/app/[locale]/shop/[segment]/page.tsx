@@ -8,6 +8,8 @@ import { uniqueOptions } from "@/lib/option-labels";
 import ShopGrid from "@/components/storefront/ShopGrid";
 import JsonLd from "@/components/seo/JsonLd";
 import { priceSortValue } from "@/lib/pricing";
+import OccasionChips from "@/components/storefront/OccasionChips";
+import { occasionsInUse } from "@/lib/occasions";
 
 import { SITE_URL as BASE } from "@/lib/site-url";
 
@@ -155,6 +157,7 @@ export default async function SegmentPage({ params }: Props) {
               ? t("shop.blurbStock", { blurb, count: allItems.length })
               : t("shop.blurbOnly", { blurb })}
           </p>
+          <OccasionChips ids={occasionsInUse(allItems)} locale={locale} />
         </div>
 
         {showStock && (

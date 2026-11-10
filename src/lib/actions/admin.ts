@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { OCCASION_IDS } from "@/lib/occasions";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { COPY_CACHE_TAG } from "@/lib/copy";
 import { COMMERCE_KEY, COMMERCE_CACHE_TAG, COMMERCE_DEFAULTS, commerceSchema, getCommerceSettings, type CommerceSettings } from "@/lib/commerce";
@@ -170,6 +171,7 @@ const prodSchema = z.object({
   care: z.string().max(2000).optional().nullable(),
   careBn: z.string().max(2000).optional().nullable(),
   lookProductIds: z.array(z.string()).optional(),
+  occasions: z.array(z.enum(OCCASION_IDS)).max(OCCASION_IDS.length).optional(),
   // Quotation model (0016): estimated range + per-product deposit/return overrides.
   priceMinBdt: z.number().int().min(1).optional().nullable(),
   priceMaxBdt: z.number().int().min(1).optional().nullable(),
@@ -221,6 +223,7 @@ export async function createProduct(input: z.infer<typeof prodSchema>) {
     descriptionBn: data.descriptionBn || null,
     colors: data.colors || [],
     sizes: data.sizes || [],
+    occasions: data.occasions || [],
     preorderEnabled: data.preorderEnabled ?? false,
     preorderOnly: data.preorderOnly ?? false,
     estimatedDelivery: data.estimatedDelivery || null,
@@ -259,7 +262,7 @@ export async function updateProduct(id: string, patch: Partial<z.infer<typeof pr
   if (priceError) return { ok: false as const, error: priceError };
 
   const update: Record<string, unknown> = {};
-  for (const k of ["name","nameBn","sku","segmentId","priceBdt","wasBdt","stock","tag","description","descriptionBn","colors","sizes","preorderEnabled","preorderOnly","estimatedDelivery","preorderPriceBdt","modelNote","details","detailsBn","care","careBn","lookProductIds","priceMinBdt","priceMaxBdt","preorderDepositPct","returnWindowDays"] as const) {
+  for (const k of ["name","nameBn","sku","segmentId","priceBdt","wasBdt","stock","tag","description","descriptionBn","colors","sizes","preorderEnabled","preorderOnly","estimatedDelivery","preorderPriceBdt","modelNote","details","detailsBn","care","careBn","lookProductIds","occasions","priceMinBdt","priceMaxBdt","preorderDepositPct","returnWindowDays"] as const) {
     if (safe[k] !== undefined) (update as Record<string, unknown>)[k] = safe[k];
   }
   if (typeof safe.sku === "string") update.sku = safe.sku.toUpperCase();

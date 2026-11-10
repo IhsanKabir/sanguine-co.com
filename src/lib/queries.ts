@@ -1,6 +1,7 @@
 import { db } from "./db";
 import { segments, products, productImages, orders, orderLines } from "./schema";
 import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { occasionsInUse, type OccasionId } from "./occasions";
 
 // Reusable subquery: ids of segments that are NOT hidden.
 // Products in hidden segments are excluded from every customer-facing query.
@@ -77,6 +78,15 @@ export async function getLiveProducts(opts?: {
   const q = db.select().from(products).where(and(...conds)).orderBy(orderBy);
   const rows = await (opts?.limit ? q.limit(opts.limit) : q);
   return rows.map(publicProduct);
+}
+
+/** Occasion ids that at least one live, visible product carries (home row). */
+export async function getOccasionsInUse(): Promise<OccasionId[]> {
+  const rows = await db.select({ occasions: products.occasions }).from(products).where(and(
+    eq(products.status, "live"),
+    inArray(products.segmentId, visibleSegmentIds),
+  ));
+  return occasionsInUse(rows);
 }
 
 export async function getProductBySlug(slug: string) {
