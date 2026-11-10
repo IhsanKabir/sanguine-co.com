@@ -17,6 +17,11 @@ type Props = { children: React.ReactNode };
  * Strategy: toggle the animation class off then back on. Setting `animation:
  * none` and forcing a reflow before re-applying restarts the keyframe cleanly.
  * Reduced-motion is honoured by the keyframe rule in motion.css.
+ *
+ * Not on the first load: the wrapper used to start with the class, so the
+ * server-rendered page began at opacity 0 and the hero text became visible
+ * one fade (~200 ms) after first paint. Lighthouse then timed LCP after the
+ * page scripts had loaded (home: render delay 2.6 s, score 96 to 83).
  */
 export default function RouteTransition({ children }: Props) {
   const pathname = usePathname();
@@ -38,7 +43,7 @@ export default function RouteTransition({ children }: Props) {
   }, [pathname]);
 
   return (
-    <div ref={ref} className="ssg-route-fade" style={{ minHeight: "inherit" }}>
+    <div ref={ref} style={{ minHeight: "inherit" }}>
       {children}
     </div>
   );
