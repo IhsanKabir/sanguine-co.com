@@ -132,13 +132,17 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
  * The gradient below is a paint-fallback before the SVG mounts; once the
  * SVG renders it covers everything underneath. The ::before radial sun-glow
  * is the only warm light source: keeps the gold accent in the picture. */
-.hero{background:linear-gradient(180deg,var(--purple-950) 0%,var(--purple-900) 55%,var(--purple-700) 85%,var(--purple-600) 100%);color:var(--cream);position:relative;overflow:hidden;min-height:78vh}
-.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 68% 38%,oklch(0.82 0.10 80 / 0.12),transparent 45%);pointer-events:none;z-index:1}
-.hero-inner{max-width:1400px;margin:0 auto;padding:96px 32px;display:grid;grid-template-columns:1.618fr 1fr;gap:64px;align-items:center;position:relative;z-index:2}
-.hero h1{font-family:var(--serif);font-size:88px;line-height:.95;font-weight:400;margin:0 0 24px;letter-spacing:-.02em}
-.hero h1 em{color:var(--gold);font-style:italic}
-.hero p{font-size:17px;color:var(--purple-200);max-width:480px;margin:0 0 32px;line-height:1.6}
-.hero-kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;display:flex;align-items:center;gap:10px}
+/* Hero (A+): cream ground, a real bouquet photo leads (right on desktop,
+ * full-bleed on top on phones). The photo is the LCP image. */
+.hero{background:var(--cream);color:var(--ink);position:relative;overflow:hidden}
+.hero-inner{max-width:1400px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:1fr;gap:56px;align-items:center;position:relative}
+.hero-photo .hero-inner{grid-template-columns:1fr 1fr}
+.hero-media{position:relative;display:block;aspect-ratio:4/5;max-height:76vh;width:100%;overflow:hidden;background:var(--line);order:2}
+.hero-copy{order:1}
+.hero h1{font-family:var(--serif);font-size:88px;line-height:.95;font-weight:400;margin:0 0 24px;letter-spacing:-.02em;color:var(--ink)}
+.hero h1 em{color:var(--purple-900);font-style:italic;font-weight:500}
+.hero p{font-size:17px;color:var(--ink-soft);max-width:480px;margin:0 0 32px;line-height:1.6}
+.hero-kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:24px;display:flex;align-items:center;gap:10px}
 .hero-kicker::before,.hero-kicker::after{content:"";height:1px;width:32px;background:var(--gold);opacity:.6}
 .hero-visual{aspect-ratio:4/5;background:repeating-linear-gradient(135deg,oklch(.35 .18 300) 0 10px,oklch(.42 .20 300) 10px 20px);display:grid;place-items:center;color:var(--gold);font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;border:1px solid var(--gold);position:relative}
 .hero-visual::after{content:"";position:absolute;inset:12px;border:1px solid var(--gold);opacity:.3}
@@ -397,10 +401,11 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 /* ─── Responsive / Mobile ────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   /* Hero */
-  .hero-inner{grid-template-columns:1fr;gap:32px;padding:56px 24px 40px}
+  .hero-inner,.hero-photo .hero-inner{grid-template-columns:1fr;gap:32px;padding:56px 24px 40px}
+  .hero-photo .hero-inner{padding-top:0}
+  .hero-media{order:0;margin:0 -24px;width:auto;aspect-ratio:auto;height:min(110vw,520px);max-height:none}
   .hero h1{font-size:clamp(40px,9vw,72px)}
   .hero p{font-size:15px}
-  .hero-still{max-width:420px;margin:0 auto}
 
   /* Product grids */
   .grid-4{grid-template-columns:repeat(2,1fr)}
@@ -438,6 +443,8 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 @media (max-width: 640px) {
   /* Hero */
   .hero-inner{padding:40px 16px 32px}
+  .hero-photo .hero-inner{padding-top:0;gap:24px}
+  .hero-media{margin:0 -16px;height:min(110vw,440px)}
   .hero h1{font-size:clamp(32px,8vw,48px);margin-bottom:16px}
   .hero-kicker{margin-bottom:16px}
   .hero p{font-size:14px;margin-bottom:24px}
