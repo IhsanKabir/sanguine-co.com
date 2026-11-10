@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { colorLabel, sizeLabel } from "@/lib/option-labels";
 import { Link } from "@/i18n/routing";
 import DeliveryOptionsFields from "@/components/storefront/DeliveryOptionsFields";
 import { createProductPreorderRequest } from "@/lib/actions/preorders";
@@ -25,6 +26,7 @@ export default function ProductPreorderForm({
   sizes,
 }: Props) {
   const t = useTranslations();
+  const locale = useLocale() as "en" | "bn";
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
@@ -127,7 +129,7 @@ export default function ProductPreorderForm({
           <div className="field">
             <label>{t("common.colour")}</label>
             <select value={color} onChange={(e) => setColor(e.target.value)}>
-              {colors.map((c) => <option key={c} value={c}>{c}</option>)}
+              {colors.map((c) => <option key={c} value={c}>{colorLabel(c, locale)}</option>)}
             </select>
           </div>
         )}
@@ -135,7 +137,7 @@ export default function ProductPreorderForm({
           <div className="field">
             <label>{t("common.size")}</label>
             <select value={size} onChange={(e) => setSize(e.target.value)}>
-              {sizes.map((s) => <option key={s} value={s}>{s}</option>)}
+              {sizes.map((s) => <option key={s} value={s}>{sizeLabel(s, locale)}</option>)}
             </select>
           </div>
         )}
