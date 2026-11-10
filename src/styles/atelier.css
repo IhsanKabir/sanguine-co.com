@@ -978,9 +978,8 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .locale-switch button.is-active { background: var(--purple-900); color: white; cursor: default; }
 .locale-switch button:disabled { opacity: .6; }
 
-/* Use the same family vars for system/component fonts (Next.js fonts inject vars) */
+/* --font-sans / --font-serif come from next/font (app/fonts.ts) on <html>;
+ * redefining them here could override the self-hosted families. */
 :root {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-mono: var(--mono);
 }
