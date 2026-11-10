@@ -167,7 +167,7 @@
   background: radial-gradient(circle at 35% 30%, oklch(0.45 0.20 25), oklch(0.25 0.18 25));
   display: grid; place-items: center;
   color: var(--gold);
-  font-family: "Cormorant Garamond", serif;
+  font-family: var(--serif);
   font-style: italic; font-weight: 600; font-size: 22px;
   box-shadow: 0 6px 14px -2px oklch(0.2 0.2 25 / 0.5), inset 0 -2px 4px oklch(0 0 0 / 0.3), inset 0 2px 4px oklch(1 0 0 / 0.15);
 }
@@ -327,7 +327,7 @@
   display: flex; gap: 48px;
   animation: marquee 36s linear infinite;
   white-space: nowrap;
-  font-family: "Cormorant Garamond", serif;
+  font-family: var(--serif);
   font-style: italic;
   font-size: 16px;
   font-weight: 400;
