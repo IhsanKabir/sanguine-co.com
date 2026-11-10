@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/auth-utils";
 import { getProductImages } from "@/lib/queries";
 import { formatBdt } from "@/lib/utils";
 import ProductPreorderForm from "./ProductPreorderForm";
+import { localizeEstimate } from "@/lib/delivery";
 
 export const dynamic = "force-dynamic";
 
@@ -71,7 +72,7 @@ export default async function ProductPreorderPage({ params }: Props) {
             </div>
             {product.estimatedDelivery && (
               <div style={{ fontSize: 13, color: "var(--gold-deep)" }}>
-                {t("preorder.estimatedDelivery", { when: product.estimatedDelivery })}
+                {t("preorder.estimatedDelivery", { when: localizeEstimate(product.estimatedDelivery, locale as "en" | "bn") })}
               </div>
             )}
           </div>
