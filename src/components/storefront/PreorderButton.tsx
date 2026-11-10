@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { priceDisplayText, type PriceDisplay } from "@/lib/pricing";
+import { localizeEstimate } from "@/lib/delivery";
 
 type Props = {
   slug: string;
@@ -46,7 +47,7 @@ export default function PreorderButton({
         )}
         <div>{t("preorder.deposit", { pct: depositPct })}</div>
         {estimatedDelivery && (
-          <div>{t("preorder.estimatedDelivery", { when: estimatedDelivery })}</div>
+          <div>{t("preorder.estimatedDelivery", { when: localizeEstimate(estimatedDelivery, locale as "en" | "bn") })}</div>
         )}
       </div>
     </div>

@@ -62,3 +62,17 @@ export function isValidDeliveryDate(value: string, now: Date): boolean {
   const { min, max } = deliveryDateBounds(now);
   return value >= min && value <= max;
 }
+
+/**
+ * Admin's free-text preorder estimate ("1-3 DAYS", "2 days") read in the page
+ * language: "1 to 3 days" / "১ থেকে ৩ দিন". Text in any other shape is shown
+ * as typed. One admin field serves both languages.
+ */
+export function localizeEstimate(text: string, locale: "en" | "bn"): string {
+  const n = (v: string) => (locale === "bn" ? Number(v).toLocaleString("bn-BD", { useGrouping: false }) : v);
+  const range = text.trim().match(/^(\d+)\s*(?:-|–|to)\s*(\d+)\s*days?$/i);
+  if (range) return locale === "bn" ? `${n(range[1])} থেকে ${n(range[2])} দিন` : `${range[1]} to ${range[2]} days`;
+  const single = text.trim().match(/^(\d+)\s*(days?)$/i);
+  if (single) return locale === "bn" ? `${n(single[1])} দিন` : `${single[1]} ${Number(single[1]) === 1 ? "day" : "days"}`;
+  return text;
+}

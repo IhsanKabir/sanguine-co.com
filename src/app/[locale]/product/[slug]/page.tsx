@@ -26,6 +26,7 @@ import { and, eq } from "drizzle-orm";
 import { SITE_URL as BASE } from "@/lib/site-url";
 import { priceDisplay, priceDisplayText, schemaOrgOffer, effectiveDepositPct, effectiveReturnWindowDays } from "@/lib/pricing";
 import { getCommerceSettings } from "@/lib/commerce";
+import { localizeEstimate } from "@/lib/delivery";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -305,7 +306,7 @@ export default async function ProductPage({ params }: Props) {
             ) : p.preorderOnly || p.preorderEnabled ? (
               <li>
                 <Icon name="arrow" size={13} />
-                <span>{p.estimatedDelivery ? t("preorder.estimatedDelivery", { when: p.estimatedDelivery }) : t("pdp.preorderOnly")}</span>
+                <span>{p.estimatedDelivery ? t("preorder.estimatedDelivery", { when: localizeEstimate(p.estimatedDelivery, locale as "en" | "bn") }) : t("pdp.preorderOnly")}</span>
               </li>
             ) : null}
             <li><Icon name="check" size={13} /><span>{t("pdp.codTitle")}</span></li>
