@@ -27,7 +27,7 @@
   },
   "home": {
     "metaTitle": "Sanguine · Considered gifts, Dhaka",
-    "metaDescription": "{categories}, chosen in Dhaka and delivered across Bangladesh. Prices up front. Pay when it arrives.",
+    "metaDescription": "{categories}, chosen in Dhaka and delivered across Bangladesh. Made fresh to order, paid for on arrival.",
     "kicker": "Sanguine · Dhaka",
     "headlineLineOne": "Things worth",
     "headlineLineTwoStart": "",
@@ -50,7 +50,7 @@
     "stillCaption": "Chosen with care in Dhaka.",
     "stillCaptionSmall": "Considered gifts",
     "marquee": {
-      "atelierMade": "Prices up front",
+      "atelierMade": "Made fresh to order",
       "cod": "Cash on delivery",
       "gift": "Gift wrapping",
       "freeDelivery": "Free delivery over {threshold}",
@@ -67,12 +67,12 @@
     },
     "promise": {
       "kicker": "HOW IT WORKS",
-      "title": "Priced up front.<br></br>Paid for <em>on arrival</em>.",
-      "body": "You see the price before you order. We deliver to your door anywhere in Bangladesh, and you pay the courier when it arrives.",
-      "f1Title": "Clear prices",
-      "f1Sub": "Confirmed before you pay.",
+      "title": "Made fresh to order.<br></br>Paid for <em>on arrival</em>.",
+      "body": "Tell us what you'd like and we confirm the price before you pay. A small bKash deposit secures your order, and the rest is paid in cash when it arrives, anywhere in Bangladesh.",
+      "f1Title": "Price confirmed first",
+      "f1Sub": "On WhatsApp, before you pay.",
       "f2Title": "Cash on delivery",
-      "f2Sub": "Nothing to pay in advance.",
+      "f2Sub": "A small bKash deposit, the rest on arrival.",
       "f3Title": "Nationwide delivery",
       "f3Sub": "By Pathao and Steadfast.",
       "f4Title": "Gift wrapping",
@@ -82,7 +82,8 @@
       "kicker": "Newsletter",
       "title": "Hear from us, <em>rarely</em>.",
       "body": "New arrivals and the occasional note. Only when there's something worth saying."
-    }
+    },
+    "occasionsTitle": "What are you celebrating?"
   },
   "shop": {
     "sort": "Sort",
@@ -725,5 +726,12 @@
     "errType": "{name}: {type} files aren't accepted.",
     "errUpload": "Upload failed for {name}: {message}",
     "unknownType": "unknown"
+  },
+  "occasion": {
+    "kicker": "Shop by occasion",
+    "metaTitle": "{occasion}: flowers and gifts",
+    "metaDescription": "{occasion}: flowers and gifts from Sanguine, made fresh to order in Dhaka and paid for on arrival.",
+    "blurb": "{count, plural, =0 {Nothing here yet.} one {# piece chosen for this occasion.} other {# pieces chosen for this occasion.}}",
+    "empty": "Nothing is chosen for this occasion yet. Browse the shop instead."
   }
 }

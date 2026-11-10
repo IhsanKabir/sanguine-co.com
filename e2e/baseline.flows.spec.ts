@@ -112,3 +112,19 @@ test.describe("baseline · catalogue flows @db", () => {
     await expect(page).toHaveURL(/sign-in/);
   });
 });
+
+test.describe("shop by occasion", () => {
+  test("an unknown occasion is a 404, never an empty page", async ({ request }) => {
+    const res = await request.get("/en/occasion/not-an-occasion");
+    expect(res.status()).toBe(404);
+  });
+
+  test("a known occasion page renders in both languages @db", async ({ page }) => {
+    skipWithoutDb();
+    for (const [locale, heading] of [["en", "Birthday"], ["bn", "জন্মদিন"]] as const) {
+      const res = await page.goto(`/${locale}/occasion/birthday`);
+      expect(res?.status()).toBe(200);
+      await expect(page.locator("h1")).toHaveText(heading);
+    }
+  });
+});

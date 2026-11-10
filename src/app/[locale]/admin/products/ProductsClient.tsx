@@ -8,6 +8,7 @@ import Icon from "@/components/storefront/Icon";
 import { Link } from "@/i18n/routing";
 import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import ProductImagesEditor from "./ProductImagesEditor";
+import { OCCASIONS, type OccasionId } from "@/lib/occasions";
 
 type Props = { segments: Segment[]; products: Product[]; trackedIds: string[] };
 
@@ -148,6 +149,7 @@ type Editing = {
   care: string;
   careBn: string;
   lookProductIds: string[];
+  occasions: OccasionId[];
   priceMinBdt: string;
   priceMaxBdt: string;
   preorderDepositPct: string;
@@ -163,7 +165,7 @@ const empty = (segId: string): Editing => ({
   description: "", descriptionBn: "", colors: "", sizes: "",
   preorderEnabled: false, preorderOnly: false,
   estimatedDelivery: "", preorderPriceBdt: "",
-  modelNote: "", details: "", detailsBn: "", care: "", careBn: "", lookProductIds: [],
+  modelNote: "", details: "", detailsBn: "", care: "", careBn: "", lookProductIds: [], occasions: [],
   priceMinBdt: "", priceMaxBdt: "", preorderDepositPct: "", returnWindowDays: "",
 });
 
@@ -233,6 +235,7 @@ export default function ProductsClient({ segments, products, trackedIds }: Props
       care: editing.care.trim() || null,
       careBn: editing.careBn.trim() || null,
       lookProductIds: editing.lookProductIds,
+      occasions: editing.occasions,
       priceMinBdt: editing.priceMinBdt ? parseInt(editing.priceMinBdt) : null,
       priceMaxBdt: editing.priceMaxBdt ? parseInt(editing.priceMaxBdt) : null,
       preorderDepositPct: editing.preorderDepositPct ? parseInt(editing.preorderDepositPct) : null,
@@ -350,6 +353,7 @@ export default function ProductsClient({ segments, products, trackedIds }: Props
                       details: p.details ?? "", detailsBn: p.detailsBn ?? "",
                       care: p.care ?? "", careBn: p.careBn ?? "",
                       lookProductIds: (p.lookProductIds as string[] | null) ?? [],
+                      occasions: OCCASIONS.map((o) => o.id).filter((id) => ((p.occasions as string[] | null) ?? []).includes(id)),
                       priceMinBdt: p.priceMinBdt ? String(p.priceMinBdt) : "",
                       priceMaxBdt: p.priceMaxBdt ? String(p.priceMaxBdt) : "",
                       preorderDepositPct: p.preorderDepositPct ? String(p.preorderDepositPct) : "",
@@ -414,6 +418,26 @@ export default function ProductsClient({ segments, products, trackedIds }: Props
               <div className="field"><label>Colours (comma-separated)</label><input value={editing.colors} onChange={(e) => setEditing({ ...editing, colors: e.target.value })} placeholder="Aubergine, Obsidian, Rose"/></div>
               <div className="field"><label>Sizes (comma-separated)</label><input value={editing.sizes} onChange={(e) => setEditing({ ...editing, sizes: e.target.value })} placeholder="XS, S, M, L, XL"/></div>
             </div>
+            <fieldset className="field" style={{ marginTop: 8, border: 0, padding: 0 }}>
+              <legend style={{ fontSize: 11, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: 6 }}>Occasions (Shop by occasion)</legend>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px" }}>
+                {OCCASIONS.map((o) => (
+                  <label key={o.id} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, textTransform: "none", letterSpacing: 0 }}>
+                    <input
+                      type="checkbox"
+                      checked={editing.occasions.includes(o.id)}
+                      onChange={(e) => setEditing({
+                        ...editing,
+                        occasions: e.target.checked
+                          ? OCCASIONS.map((x) => x.id).filter((id) => id === o.id || editing.occasions.includes(id))
+                          : editing.occasions.filter((id) => id !== o.id),
+                      })}
+                    />
+                    {o.en} · {o.bn}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
 
             <div className="field" style={{ marginTop: 8 }}>
               <label>Model note (optional)</label>

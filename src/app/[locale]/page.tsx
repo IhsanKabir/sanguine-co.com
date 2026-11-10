@@ -3,7 +3,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import { categoryList } from "@/lib/category-list";
 import { Link } from "@/i18n/routing";
-import { getVisibleSegments, getLiveProducts, getHeroImagesFor } from "@/lib/queries";
+import { getVisibleSegments, getLiveProducts, getHeroImagesFor, getOccasionsInUse } from "@/lib/queries";
+import OccasionChips from "@/components/storefront/OccasionChips";
 import Composition from "@/components/storefront/Composition";
 import ProductCard from "@/components/storefront/ProductCard";
 import Icon from "@/components/storefront/Icon";
@@ -98,10 +99,11 @@ export default async function Home({ params }: Props) {
     ? MARQUEE_KEYS
     : MARQUEE_KEYS.filter((k) => k !== "freeDelivery");
 
-  const [segments, newArrivals, editors] = await Promise.all([
+  const [segments, newArrivals, editors, occasions] = await Promise.all([
     safeQuery(getVisibleSegments()),
     safeQuery(getLiveProducts({ tag: "new", limit: 4 })),
     safeQuery(getLiveProducts({ limit: 6 })),
+    safeQuery(getOccasionsInUse()),
   ]);
 
   const showSetupBanner = segments === null;
@@ -241,6 +243,20 @@ export default async function Home({ params }: Props) {
               </Link>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* ─── Shop by occasion: only occasions with live pieces ───── */}
+      {occasions && occasions.length > 0 && (
+        <section className="section" style={{ paddingTop: 12 }}>
+          <div className="section-hd">
+            <div>
+              <div className="kicker">{t("occasion.kicker")}</div>
+              <h2>{t("home.occasionsTitle")}</h2>
+              <div className="ornament-rule" />
+            </div>
+          </div>
+          <OccasionChips ids={occasions} locale={locale} />
         </section>
       )}
 

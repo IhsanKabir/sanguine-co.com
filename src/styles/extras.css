@@ -1032,3 +1032,22 @@
   letter-spacing: 0;
   line-height: 1;
 }
+
+/* Shop by occasion (components/storefront/OccasionChips.tsx) */
+.occasion-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.occasion-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  background: var(--cream);
+  color: var(--purple-900);
+  font-size: 13px;
+  letter-spacing: .04em;
+  text-decoration: none;
+  transition: border-color var(--duration-fast, 150ms) ease, background-color var(--duration-fast, 150ms) ease;
+}
+.occasion-chip:hover { border-color: var(--gold-deep); background: #fff; }
+.occasion-chip:focus-visible { outline: 2px solid var(--purple-900); outline-offset: 2px; }
+.occasion-chip.is-current { background: var(--purple-900); border-color: var(--purple-900); color: var(--cream); }
