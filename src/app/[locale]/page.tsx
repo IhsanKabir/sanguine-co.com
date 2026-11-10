@@ -11,7 +11,7 @@ import ProductCard from "@/components/storefront/ProductCard";
 import Icon from "@/components/storefront/Icon";
 import NewsletterForm from "@/components/storefront/NewsletterForm";
 import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
-import HeroTide from "@/components/storefront/HeroTide";
+import Image from "next/image";
 import Ornament from "@/components/storefront/Ornament";
 import JsonLd from "@/components/seo/JsonLd";
 import { SITE_URL as BASE } from "@/lib/site-url";
@@ -122,6 +122,10 @@ export default async function Home({ params }: Props) {
     ? await safeQuery(getHeroImagesFor(allProductIds)) ?? new Map()
     : new Map();
 
+  // Hero photo: the first featured piece that has one (falls back to text only).
+  const heroProduct = eds.find((p) => heroImages.has(p.id)) ?? null;
+  const heroPhoto = heroProduct ? heroImages.get(heroProduct.id) ?? null : null;
+
   // Bento takes the first 6 visible products
   const bento = (eds.length >= 6 ? eds : [...eds, ...news]).slice(0, 6);
 
@@ -164,11 +168,25 @@ export default async function Home({ params }: Props) {
         </div>
       )}
 
-      {/* ─── Hero ─────────────────────────────────────────────────── */}
-      <section className="hero" data-cursor="inkwell">
-        <HeroTide />
+      {/* ─── Hero (A+): a real bouquet photo leads ───────────────── */}
+      <section className={"hero" + (heroProduct ? " hero-photo" : "")}>
         <div className="hero-inner">
-          <div>
+          {heroProduct && heroPhoto && (
+            <Link href={`/product/${heroProduct.slug}`} className="hero-media" aria-label={(locale === "bn" && heroProduct.nameBn) || heroProduct.name}>
+              {/* The LCP element: the one photo fetched first, at high priority. */}
+              <Image
+                src={heroPhoto.url}
+                alt={heroPhoto.alt ?? heroProduct.name}
+                fill
+                priority
+                fetchPriority="high"
+                quality={60}
+                sizes="(max-width: 900px) 100vw, 46vw"
+                style={{ objectFit: "cover" }}
+              />
+            </Link>
+          )}
+          <div className="hero-copy">
             <div className="hero-kicker">{t("home.kicker")}</div>
             <h1>
               {t("home.headlineLineOne")}<br />
@@ -177,29 +195,18 @@ export default async function Home({ params }: Props) {
             <p>{t("home.lede", { categories: categoryList(segs, locale === "bn" ? "bn" : "en") })}</p>
             <div className="hero-btns">
               {segs.length === 1 && (
-                <Link href={`/shop/${segs[0].id}`} className="btn btn-gold" data-magnetic data-cursor-label={t("home.cursorEnter")}>
+                <Link href={`/shop/${segs[0].id}`} className="btn btn-gold">
                   {t("home.ctaShopOne", { name: locale === "bn" ? segs[0].nameBn || segs[0].name : segs[0].name.toLowerCase() })} <Icon name="arrow" size={14} />
                 </Link>
               )}
               {segs.length > 1 && (
-                <Link href="#departments" className="btn btn-gold" data-magnetic data-cursor-label={t("home.cursorEnter")}>
+                <Link href="#departments" className="btn btn-gold">
                   {t("home.ctaPrimary")} <Icon name="arrow" size={14} />
                 </Link>
               )}
-              <Link href="/atelier" className="btn btn-ghost" data-magnetic style={{ borderColor: "var(--mauve)", color: "var(--mauve)" }}>
+              <Link href="/atelier" className="btn btn-ghost">
                 {t("home.ctaSecondary")}
               </Link>
-            </div>
-          </div>
-          <div className="hero-still" aria-hidden="true">
-            <div className="hs-frame" />
-            <div className="hs-ring" />
-            <div className="hs-numeral">2026</div>
-            <div className="hs-rail">
-              <span>{t("brand.name")}</span><span>·</span><span>{t("home.stillRail")}</span>
-            </div>
-            <div className="hs-cap">
-              {t("home.stillCaption")}<small>{t("home.stillCaptionSmall")}</small>
             </div>
           </div>
         </div>
