@@ -5,6 +5,7 @@ import { categoryList } from "@/lib/category-list";
 import { Link } from "@/i18n/routing";
 import { getVisibleSegments, getLiveProducts, getHeroImagesFor, getOccasionsInUse } from "@/lib/queries";
 import OccasionChips from "@/components/storefront/OccasionChips";
+import NearViewport from "@/components/storefront/NearViewport";
 import Composition from "@/components/storefront/Composition";
 import ProductCard from "@/components/storefront/ProductCard";
 import Icon from "@/components/storefront/Icon";
@@ -310,7 +311,11 @@ export default async function Home({ params }: Props) {
                   className={cls}
                   data-cursor={CAT_CURSOR[p.segmentId || ""] || "magnify"}
                 >
-                  <Composition cat={p.segmentId || "clothing"} sku={p.sku} name={p.name} tag={p.tag} image={heroImages.get(p.id) ?? null} />
+                  {/* Photos load only when scrolled near: far below the hero they
+                      otherwise start at once and slow its first paint. */}
+                  <NearViewport fallback={<Composition cat={p.segmentId || "clothing"} sku={p.sku} name={p.name} tag={p.tag} />}>
+                    <Composition cat={p.segmentId || "clothing"} sku={p.sku} name={p.name} tag={p.tag} image={heroImages.get(p.id) ?? null} />
+                  </NearViewport>
                   <div className="b-overlay">
                     <div className="b-kicker">{segTag(seg)}</div>
                     <h3 className="b-name">{(locale === "bn" && p.nameBn) || p.name}</h3>
