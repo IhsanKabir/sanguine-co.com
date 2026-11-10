@@ -7,19 +7,17 @@ import { COPY_CACHE_TAG } from "@/lib/copy";
 import { COMMERCE_KEY, COMMERCE_CACHE_TAG, COMMERCE_DEFAULTS, commerceSchema, getCommerceSettings, type CommerceSettings } from "@/lib/commerce";
 import { SITE_URL } from "@/lib/site-url";
 
-// Bust the ISR cache for every locale-prefixed route.
-// revalidatePath("/", "layout") alone does not reach /en or /bn because
-// localePrefix:"always" in next-intl means the root "/" path never serves
-// storefront content: all pages live under /{locale}/...
+// Bust the ISR cache for every locale-prefixed route. Cached pages are tagged
+// by their ROUTE PATTERN (/[locale]/layout), not by the URL, so the pattern
+// must be passed: revalidatePath("/en", "layout") matched no cached page and
+// admin saves only showed up when the 300 s ISR timer ran out.
 //
 // Known limit: this does NOT purge the /api/og share-card CDN cache
 // (s-maxage=86400), so a product's social card can show an old price/name
 // for up to a day after an edit. Accepted trade-off: see the Cache-Control
 // note in src/app/api/og/route.tsx.
 function revalidateAllLocales() {
-  for (const locale of ["en", "bn"]) {
-    revalidatePath(`/${locale}`, "layout");
-  }
+  revalidatePath("/[locale]", "layout");
 }
 import { db, schema } from "@/lib/db";
 import { parseShippingAddress } from "@/lib/schema";

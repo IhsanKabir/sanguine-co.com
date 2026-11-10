@@ -421,6 +421,18 @@ export default function ProductsClient({ segments, products, trackedIds }: Props
             <fieldset className="field" style={{ marginTop: 8, border: 0, padding: 0 }}>
               <legend style={{ fontSize: 11, letterSpacing: ".15em", textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: 6 }}>Occasions (Shop by occasion)</legend>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px" }}>
+                {/* Flowers suit every occasion: one tick instead of eight. */}
+                <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, textTransform: "none", letterSpacing: 0 }}>
+                  <input
+                    type="checkbox"
+                    checked={editing.occasions.length === OCCASIONS.length}
+                    onChange={(e) => setEditing({
+                      ...editing,
+                      occasions: e.target.checked ? OCCASIONS.map((o) => o.id) : [],
+                    })}
+                  />
+                  All occasions · সব উপলক্ষ
+                </label>
                 {OCCASIONS.map((o) => (
                   <label key={o.id} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, textTransform: "none", letterSpacing: 0 }}>
                     <input

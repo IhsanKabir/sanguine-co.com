@@ -39,8 +39,6 @@ export async function updateAnnouncement(
   revalidateTag(ANNOUNCEMENT_CACHE_TAG);
   // SSG storefront pages bake the bar into their HTML: rebuild them so the
   // save is visible on the very next request (same idiom as the copy library).
-  for (const locale of ["en", "bn"]) {
-    revalidatePath(`/${locale}`, "layout");
-  }
+  revalidatePath("/[locale]", "layout");
   return { ok: true };
 }
