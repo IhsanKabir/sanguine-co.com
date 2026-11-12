@@ -9,6 +9,8 @@ import { Link } from "@/i18n/routing";
 import DeliveryOptionsFields from "@/components/storefront/DeliveryOptionsFields";
 import { createProductPreorderRequest } from "@/lib/actions/preorders";
 
+const DHAKA = "Dhaka";
+
 type Props = {
   productId: string;
   productName: string;
@@ -16,6 +18,8 @@ type Props = {
   userEmail: string;
   /** Saved details of a signed-in customer; empty strings for a guest. */
   prefill: CustomerPrefill;
+  /** Flowers: delivered in Dhaka only, so the city is fixed. */
+  dhakaOnly: boolean;
   signInHref: string;
   colors: string[];
   sizes: string[];
@@ -26,6 +30,7 @@ export default function ProductPreorderForm({
   productId,
   userEmail,
   prefill,
+  dhakaOnly,
   signInHref,
   colors,
   sizes,
@@ -47,7 +52,7 @@ export default function ProductPreorderForm({
   const [giftMessage, setGiftMessage] = useState("");
   const [line1, setLine1] = useState(prefill.line1);
   const [area, setArea] = useState(prefill.area);
-  const [city, setCity] = useState(prefill.city);
+  const [city, setCity] = useState(dhakaOnly ? DHAKA : prefill.city);
   const [postcode, setPostcode] = useState(prefill.postcode);
 
   // Details this browser used last time fill whatever is still empty. Read
@@ -60,8 +65,8 @@ export default function ProductPreorderForm({
     setLine1((v) => v || saved.line1 || "");
     setArea((v) => v || saved.area || "");
     setPostcode((v) => v || saved.postcode || "");
-    if (!prefill.line1 && saved.city) setCity(saved.city);
-  }, [prefill.line1]);
+    if (!dhakaOnly && !prefill.line1 && saved.city) setCity(saved.city);
+  }, [prefill.line1, dhakaOnly]);
 
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
@@ -189,6 +194,7 @@ export default function ProductPreorderForm({
 
       <div>
         <label style={{ fontSize: 11, letterSpacing: ".15em", color: "var(--ink-soft)", textTransform: "uppercase" }}>{t("preorderForm.addressOptionalConfirm")}</label>
+        {dhakaOnly && <div style={{ fontSize: 13, color: "var(--purple-900)", marginTop: 6 }}>{t("preorderForm.dhakaOnlyNote")}</div>}
         <div style={{ marginTop: 8, display: "grid", gap: 10 }}>
           <div className="field">
             <input name="address-line1" autoComplete="address-line1" value={line1} onChange={(e) => setLine1(e.target.value)} placeholder={t("preorderForm.line1Placeholder")} />
@@ -198,7 +204,7 @@ export default function ProductPreorderForm({
               <input name="address-level3" autoComplete="address-level3" value={area} onChange={(e) => setArea(e.target.value)} placeholder={t("preorderForm.areaPlaceholder")} />
             </div>
             <div className="field">
-              <input name="address-level2" autoComplete="address-level2" value={city} onChange={(e) => setCity(e.target.value)} placeholder={t("preorderForm.cityPlaceholder")} />
+              <input name="address-level2" autoComplete="address-level2" value={city} onChange={(e) => setCity(e.target.value)} placeholder={t("preorderForm.cityPlaceholder")} readOnly={dhakaOnly} aria-readonly={dhakaOnly} />
             </div>
             <div className="field">
               <input name="postal-code" autoComplete="postal-code" inputMode="numeric" value={postcode} onChange={(e) => setPostcode(e.target.value)} placeholder={t("preorderForm.postcodePlaceholder")} />

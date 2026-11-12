@@ -5,6 +5,7 @@ import { db, schema } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-utils";
 import { getCustomerPrefill } from "@/lib/customer-prefill";
+import { isDhakaOnlySegment } from "@/lib/delivery-scope";
 import { getProductImages } from "@/lib/queries";
 import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import ProductPreorderForm from "./ProductPreorderForm";
@@ -85,6 +86,7 @@ export default async function ProductPreorderPage({ params }: Props) {
           productName={name}
           userEmail={user?.email ?? ""}
           prefill={prefill}
+          dhakaOnly={isDhakaOnlySegment(product.segmentId)}
           signInHref={`/sign-in?next=/${locale}/preorder/product/${slug}`}
           colors={(product.colors as string[] | null) || []}
           sizes={(product.sizes as string[] | null) || []}

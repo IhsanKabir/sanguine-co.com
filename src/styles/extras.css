@@ -771,6 +771,55 @@
   text-underline-offset: 2px;
 }
 
+/* Contact and FAQ pages (they share the legal page column) */
+.legal-page .faq-q {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--purple-900);
+  margin: 22px 0 6px;
+}
+.legal-page .contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+  border-top: 1px solid var(--line);
+}
+.legal-page .contact-list li {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 2px 16px;
+  align-items: baseline;
+  padding: 16px 0;
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+}
+.legal-page .contact-label {
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.legal-page .contact-list a {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--purple-900);
+  overflow-wrap: anywhere;
+}
+.legal-page .contact-list a:hover,
+.legal-page .contact-list a:focus-visible {
+  color: var(--purple-700);
+}
+.legal-page .contact-note {
+  grid-column: 2;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+@media (max-width: 520px) {
+  .legal-page .contact-list li { grid-template-columns: minmax(0, 1fr); }
+  .legal-page .contact-note { grid-column: 1; }
+}
+
 /* Order tracking timeline */
 .track-timeline {
   display: flex;
