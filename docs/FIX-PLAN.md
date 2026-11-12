@@ -16,7 +16,8 @@ OWNER (only the owner can do it).
 | 1b | Preorder form fills in name, phone and address by itself | Claude | DONE (PR #69) |
 | H | Home hero: the wave background is back instead of one rose bouquet photo | Claude | DONE (PR #70). Left over: an empty black arch on desktop and a faint "About Sanguine" button |
 | 2 | Security updates (Next.js, Sentry and others) and a spam guard on the request form | Claude | DONE (PR #71, tested live). 29 advisories down to 9; what is left is listed under fix 2b |
-| 3 | Contact and FAQ pages; flower refund wording; flowers promised in Dhaka only | Claude | IN REVIEW |
+| 3 | Contact and FAQ pages; flower refund wording; flowers promised in Dhaka only | Claude | DONE (PR #72, live) |
+| 3b | Grey strip down the left edge of every page on phones (shadow of the closed menu); Contact and FAQ polish | Claude | IN REVIEW |
 | G | Board games launch: products in Admin, then posts and Reels | Owner adds the four games (C3) and their photos to the video drafts | OWNER |
 | V | Video maker: type the lines, pick photos, get a branded vertical video | Claude | DONE (12 Nov). Double-click `social-studio/Video maker.cmd`. Drafts for the four board games are saved, waiting for photos |
 | 4 | Mark test orders so reports show real revenue; leave the owner's own visits out of traffic | Claude | LATER |
@@ -102,7 +103,7 @@ Detail for the open fixes:
 - `next-intl` 3 to 4 (moderate). A breaking change in how translations are set up.
 - `postcss` inside Next.js, and `glob` and `minimatch` inside the Sentry build plugin (build tools only, they do not run on the live site). They clear when Next.js and Sentry ship updates.
 
-**Fix 3, Contact, FAQ and policy wording (in review).**
+**Fix 3, Contact, FAQ and policy wording (done, PR #72; the last three points below are fix 3b, in review).**
 - Done: `/contact` and `/faq` in both languages, linked in the footer and in the sitemap. The FAQ takes its figures from Admin, Settings and carries FAQ structured data for search engines. Contact details live in `src/lib/contact.ts`.
 - Done: the returns page has a flowers section (deposit refunded straight away, less the delivery charge only if needed); the terms page no longer says "no deposit" for made-to-order pieces.
 - Done: flowers are Dhaka only. `src/lib/delivery-scope.ts` lists the Dhaka-only categories (`flowers`). The home lede, meta description, top bar, moving strip and "How it works" pick their wording from the open categories: Dhaka wording while only flowers are open, "across Bangladesh, flowers in Dhaka only" once a courier category opens. The preorder form fixes the city to Dhaka for flowers and the server rejects other cities.
@@ -137,4 +138,5 @@ Detail for the open fixes:
 - 12 Nov 2026: fix H merged (PR #70): the home hero is the wave background again.
 - 12 Nov 2026: Video maker built and tested; drafts saved for the four board games.
 - 12 Nov 2026: fix 2 merged (PR #71); the owner's test request arrived on the new versions.
-- 12 Nov 2026: fix 3 opened: Contact and FAQ pages, flower refund wording, flowers in Dhaka only. Also removes the grey strip the closed phone menu left on every page.
+- 12 Nov 2026: fix 3 merged (PR #72): Contact and FAQ pages, flower refund wording, flowers in Dhaka only.
+- 12 Nov 2026: fix 3b opened: removes the grey strip the closed phone menu left on every page, Contact and FAQ polish, and an owner's edit in Admin, Editorial now covers the Dhaka wording too.
