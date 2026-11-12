@@ -110,6 +110,7 @@ Detail for the open fixes:
 - Open: reply hours are not stated anywhere because the owner has not confirmed them (T7). No street address and no licence number until the owner provides them.
 - To change the wording later: the strings are in `src/messages/en.json` and `bn.json` under keys ending in `Dhaka` and `Mixed`. An edit of the base string in Admin, Editorial (for example the announcement bar) also replaces its Dhaka and Mixed variants, unless a variant is edited itself (`expandVariantOverrides` in `src/lib/copy.ts`).
 - Done, found while checking the screenshots: the closed phone menu cast a grey shadow down the left edge of every page on phones. The shadow now shows only while the menu is open.
+- Done in fix 3b: Questions and Contact links in the phone menu, and the open menu now sits above the cookie bar and the chat buttons (the cookie bar used to cover the language switch for first-time visitors).
 - Seen, not changed: a full-screen canvas and a custom cursor layer are still mounted on phones, where they do nothing. Worth removing on touch devices in a later speed pass.
 
 **Fix G, board games launch.**
