@@ -2,6 +2,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { getVisibleSegments } from "@/lib/queries";
 import { getCommerceSettings } from "@/lib/commerce";
 import { formatBdt } from "@/lib/utils";
+import { deliveryScope, scopedKey } from "@/lib/delivery-scope";
 import {
   getAnnouncement,
   isWithinWindow,
@@ -51,7 +52,7 @@ export default async function TopNav() {
         />
       ) : (
         <div className="topbar">
-          {t("topbar.announcement", { threshold: formatBdt(commerce.freeShippingThresholdBdt, locale as "en" | "bn") })}
+          {t(scopedKey("topbar.announcement", deliveryScope(segments), ["dhaka"]), { threshold: formatBdt(commerce.freeShippingThresholdBdt, locale as "en" | "bn") })}
         </div>
       )}
       <nav className="nav" aria-label={t("nav.primary")}>

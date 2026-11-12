@@ -32,11 +32,11 @@ function EnglishSection({ days }: { days: number }) {
       <p>For bespoke pre-order requests, you submit a request and we return a quote. The quote is an offer from Sanguine; you accept it by reply, and only at that point is an order created.</p>
 
       <h2>Pricing and payment</h2>
-      <p>All prices are in Bangladeshi Taka (৳ / BDT). At present, all orders are paid for in cash on delivery: no deposit, no online payment, no card on file. The courier collects the full amount on arrival.</p>
+      <p>All prices are in Bangladeshi Taka (৳ / BDT). At present, in-stock orders are paid for in cash on delivery: no deposit, no online payment, no card on file. The courier collects the full amount on arrival. Made-to-order pieces, including bouquets, are confirmed with a small bKash deposit once you accept the price, and the rest is paid in cash on delivery.</p>
       <p>We do not yet collect VAT. When Sanguine&rsquo;s Trade Licence and VAT registration become active, we will say so plainly and adjust the displayed prices to be inclusive of any required VAT.</p>
 
       <h2>Delivery</h2>
-      <p>We ship nationwide via Pathao Courier and Steadfast Courier. Delivery is within 48 hours inside Dhaka and typically three to seven working days elsewhere in Bangladesh, but courier delays do happen and we cannot guarantee a specific date unless we have agreed it with you in writing.</p>
+      <p>Flowers are delivered in Dhaka only. Everything else ships nationwide via Pathao Courier and Steadfast Courier. Delivery is within 48 hours inside Dhaka and typically three to seven working days elsewhere in Bangladesh, but courier delays do happen and we cannot guarantee a specific date unless we have agreed it with you in writing.</p>
       <p>For bespoke pieces, the timeline begins when the quote is accepted and is stated in the quote itself.</p>
 
       <h2>Returns and refunds</h2>
@@ -81,11 +81,11 @@ function BangleSection({ days }: { days: number }) {
       <p>বেসপোক প্রি-অর্ডারের ক্ষেত্রে আপনি একটি অনুরোধ জমা দেন এবং আমরা একটি কোট ফেরত দিই। সেই কোটটি সাঙ্গুইনের প্রস্তাব; আপনি জবাবের মাধ্যমে গ্রহণ করলে কেবল তখনই অর্ডার তৈরি হয়।</p>
 
       <h2>মূল্য ও পরিশোধ</h2>
-      <p>সকল মূল্য বাংলাদেশি টাকায় (৳ / BDT)। বর্তমানে সকল অর্ডার ক্যাশ অন ডেলিভারিতে পরিশোধিত: কোনো জমা, কোনো অনলাইন পেমেন্ট, কোনো কার্ড সংরক্ষণ নয়। কুরিয়ার পৌঁছে গেলে সম্পূর্ণ অর্থ গ্রহণ করেন।</p>
+      <p>সকল মূল্য বাংলাদেশি টাকায় (৳ / BDT)। বর্তমানে স্টকের অর্ডার ক্যাশ অন ডেলিভারিতে পরিশোধিত: কোনো জমা, কোনো অনলাইন পেমেন্ট, কোনো কার্ড সংরক্ষণ নয়। কুরিয়ার পৌঁছে গেলে সম্পূর্ণ অর্থ গ্রহণ করেন। অর্ডারে তৈরি জিনিস, যেমন ফুলের তোড়া, দাম মেনে নেওয়ার পর বিকাশে অল্প অগ্রিম দিয়ে নিশ্চিত হয়, বাকিটা ডেলিভারির সময় নগদে।</p>
       <p>আমরা এখনো VAT সংগ্রহ করি না। সাঙ্গুইনের ট্রেড লাইসেন্স ও VAT রেজিস্ট্রেশন সক্রিয় হলে আমরা স্পষ্টভাবে জানাব এবং প্রদর্শিত মূল্যে প্রয়োজনীয় VAT অন্তর্ভুক্ত করে নেব।</p>
 
       <h2>ডেলিভারি</h2>
-      <p>আমরা সারা দেশে Pathao ও Steadfast কুরিয়ারের মাধ্যমে পাঠাই। ঢাকার ভেতরে ৪৮ ঘণ্টার মধ্যে এবং বাইরে সাধারণত তিন থেকে সাত কর্মদিবস। কুরিয়ারজনিত বিলম্ব ঘটে; লিখিতভাবে নির্দিষ্ট তারিখ সম্মত না হলে আমরা গ্যারান্টি দিতে পারি না।</p>
+      <p>ফুল শুধু ঢাকায় ডেলিভারি হয়। বাকি সবকিছু আমরা সারা দেশে Pathao ও Steadfast কুরিয়ারের মাধ্যমে পাঠাই। ঢাকার ভেতরে ৪৮ ঘণ্টার মধ্যে এবং বাইরে সাধারণত তিন থেকে সাত কর্মদিবস। কুরিয়ারজনিত বিলম্ব ঘটে; লিখিতভাবে নির্দিষ্ট তারিখ সম্মত না হলে আমরা গ্যারান্টি দিতে পারি না।</p>
       <p>বেসপোক পিসের ক্ষেত্রে কোট গৃহীত হওয়ার দিন থেকে সময় গণনা শুরু হয়, এবং তা কোটেই উল্লেখ থাকে।</p>
 
       <h2>ফেরত ও অর্থ ফেরত</h2>

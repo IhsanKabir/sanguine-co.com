@@ -6,7 +6,7 @@ import { SITE_URL as BASE } from "@/lib/site-url";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   title: { default: "Sanguine", template: "%s · Sanguine" },
-  description: "Considered gifts, chosen in Dhaka and delivered across Bangladesh. Prices up front. Pay when it arrives.",
+  description: "Considered gifts, chosen in Dhaka. Pay when it arrives.",
   applicationName: "Sanguine",
   // Both tokens stay: the first is the original May property, the second is
   // the owner's live Search Console property for sanguine-co.com (2026-07-14).

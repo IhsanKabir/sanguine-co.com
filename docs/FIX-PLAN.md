@@ -15,8 +15,8 @@ OWNER (only the owner can do it).
 | 1 | Alerts: emails were never sent; owner alert for every order and request; waiting-time badge in Admin | Claude, owner | DONE (PR #68, tested live). SMS is not connected, see A5 |
 | 1b | Preorder form fills in name, phone and address by itself | Claude | DONE (PR #69) |
 | H | Home hero: the wave background is back instead of one rose bouquet photo | Claude | DONE (PR #70). Left over: an empty black arch on desktop and a faint "About Sanguine" button |
-| 2 | Security updates (Next.js, Sentry and others) and a spam guard on the request form | Claude | IN REVIEW. 29 advisories down to 9; what is left is listed under fix 2b |
-| 3 | Contact and FAQ pages; flower refund wording; flowers promised in Dhaka only | Claude | NEXT (all answers in) |
+| 2 | Security updates (Next.js, Sentry and others) and a spam guard on the request form | Claude | DONE (PR #71, tested live). 29 advisories down to 9; what is left is listed under fix 2b |
+| 3 | Contact and FAQ pages; flower refund wording; flowers promised in Dhaka only | Claude | IN REVIEW |
 | G | Board games launch: products in Admin, then posts and Reels | Owner adds the four games (C3) and their photos to the video drafts | OWNER |
 | V | Video maker: type the lines, pick photos, get a branded vertical video | Claude | DONE (12 Nov). Double-click `social-studio/Video maker.cmd`. Drafts for the four board games are saved, waiting for photos |
 | 4 | Mark test orders so reports show real revenue; leave the owner's own visits out of traffic | Claude | LATER |
@@ -71,6 +71,7 @@ A1 to A4 are done (12 Nov): the alert email and the customer email arrive.
 - **T3.** ANSWERED: returns 3 days in general. Flowers: a refund on the spot if the customer does not like the bouquet.
 - **T4.** ANSWERED: flowers are delivered in Dhaka only for now.
 - **T5.** ANSWERED: on a flower refund, only the delivery charge is deducted, and only if needed.
+- **T7.** OPEN: reply hours to show on the Contact page (for example 10am to 8pm, every day).
 - **T6.** ANSWERED: four games, names and prices as in C3. Still needed from the owner: stock counts and photos.
 
 ### B. Backups
@@ -101,12 +102,12 @@ Detail for the open fixes:
 - `next-intl` 3 to 4 (moderate). A breaking change in how translations are set up.
 - `postcss` inside Next.js, and `glob` and `minimatch` inside the Sentry build plugin (build tools only, they do not run on the live site). They clear when Next.js and Sentry ship updates.
 
-**Fix 3, Contact, FAQ and policy wording.**
-- New pages `/contact` and `/faq` in both languages (`src/app/[locale]/contact`, `/faq`), linked in the footer, added to the sitemap.
-- Contact: phone 01777603364, WhatsApp, Messenger, concierge@sanguine-co.com, reply hours 10am to 8pm, "based in Dhaka". No street address and no licence number until the owner provides them.
-- FAQ: how a flower order works (request, price, deposit by bKash, made fresh, delivered within 48 hours in Dhaka), payment, delivery, returns.
-- Returns page (`src/app/[locale]/legal/returns/page.tsx`): add a flowers section: if the customer does not like the bouquet on delivery, the deposit is refunded on the spot, less the delivery charge only if needed.
-- Flowers in Dhaka only: the home lede, meta description and shipping page say "delivered across Bangladesh". Make the flower promise "delivered in Dhaka"; keep "across Bangladesh" for categories that ship by courier. The preorder form for a flower product should say Dhaka only and reject other cities with a clear message.
+**Fix 3, Contact, FAQ and policy wording (in review).**
+- Done: `/contact` and `/faq` in both languages, linked in the footer and in the sitemap. The FAQ takes its figures from Admin, Settings and carries FAQ structured data for search engines. Contact details live in `src/lib/contact.ts`.
+- Done: the returns page has a flowers section (deposit refunded straight away, less the delivery charge only if needed); the terms page no longer says "no deposit" for made-to-order pieces.
+- Done: flowers are Dhaka only. `src/lib/delivery-scope.ts` lists the Dhaka-only categories (`flowers`). The home lede, meta description, top bar, moving strip and "How it works" pick their wording from the open categories: Dhaka wording while only flowers are open, "across Bangladesh, flowers in Dhaka only" once a courier category opens. The preorder form fixes the city to Dhaka for flowers and the server rejects other cities.
+- Open: reply hours are not stated anywhere because the owner has not confirmed them (T7). No street address and no licence number until the owner provides them.
+- To change the wording later: the strings are in `src/messages/en.json` and `bn.json` under keys ending in `Dhaka` and `Mixed`.
 
 **Fix G, board games launch.**
 - After the owner adds the products (C3, T6): check each product page live, then write for each game one Facebook and Instagram caption in English and Bangla with a link carrying `?utm_source=facebook&utm_medium=social&utm_campaign=boardgames`, and one short Reel scene file in `social-studio/videos/`.
@@ -133,4 +134,5 @@ Detail for the open fixes:
 - 12 Nov 2026: fix 1b merged (PR #69). Owner answered T1 to T5.
 - 12 Nov 2026: fix H merged (PR #70): the home hero is the wave background again.
 - 12 Nov 2026: Video maker built and tested; drafts saved for the four board games.
-- 12 Nov 2026: fix 2 opened: Next.js and Sentry updated, global error screen, spam guard on the preorder form.
+- 12 Nov 2026: fix 2 merged (PR #71); the owner's test request arrived on the new versions.
+- 12 Nov 2026: fix 3 opened: Contact and FAQ pages, flower refund wording, flowers in Dhaka only.

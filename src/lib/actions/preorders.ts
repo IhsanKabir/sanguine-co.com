@@ -12,6 +12,7 @@ import { sendEmail } from "@/lib/email/brevo";
 import { runAfterResponse } from "@/lib/background";
 import { sendOwnerAlert, preorderAlertSms } from "@/lib/owner-alert";
 import { isFormRateLimited } from "@/lib/request-guard";
+import { isDhakaOnlySegment, isDhakaCity } from "@/lib/delivery-scope";
 import {
   preorderReceivedEmail,
   preorderQuoteEmail,
@@ -194,6 +195,10 @@ export async function createProductPreorderRequest(
   // the flag was left on.
   if (!product || !product.preorderEnabled || product.status !== "live") {
     return { ok: false as const, error: "This product is not available for preorder." };
+  }
+  // Bouquets cannot travel by courier: the form fixes the city, this is the backstop.
+  if (isDhakaOnlySegment(product.segmentId) && data.deliveryAddress && !isDhakaCity(data.deliveryAddress.city)) {
+    return { ok: false as const, error: "Flowers are delivered in Dhaka only. Please give a Dhaka address." };
   }
 
   // Snapshot what the customer was shown (estimate range + deposit %): the

@@ -17,6 +17,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { SITE_URL as BASE } from "@/lib/site-url";
 import { getCommerceSettings } from "@/lib/commerce";
 import { formatBdt } from "@/lib/utils";
+import { deliveryScope, scopedKey } from "@/lib/delivery-scope";
 
 // ISR: the homepage fires several catalogue queries per request and reads no
 // cookies/auth: cache the rendered page. Admin edits still appear instantly
@@ -44,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = `${BASE}/${locale}`;
   const title = t("home.metaTitle");
   const openSegments = await getVisibleSegments().catch(() => []);
-  const description = t("home.metaDescription", { categories: categoryList(openSegments, isBn ? "bn" : "en") });
+  const description = t(scopedKey("home.metaDescription", deliveryScope(openSegments), ["dhaka", "mixed"]), { categories: categoryList(openSegments, isBn ? "bn" : "en") });
   return {
     // The copy already carries the brand ("Sanguine · Considered gifts…"), so
     // skip the layout template that would append " · Sanguine" a second time.
@@ -74,6 +75,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const MARQUEE_KEYS = ["atelierMade", "cod", "gift", "freeDelivery", "returns", "certified"];
+// The third "How it works" point is the delivery promise.
+const DELIVERY_FEATURE = 3;
 
 const CAT_CURSOR: Record<string, string> = {
   clothing: "magnify",
@@ -109,6 +112,8 @@ export default async function Home({ params }: Props) {
 
   const showSetupBanner = segments === null;
   const segs = segments ?? [];
+  // Flowers are Dhaka only: the delivery wording follows what is open.
+  const scope = deliveryScope(segs);
   // Category label in the page language (the Bangla site was showing the English tag).
   const segTag = (seg?: { tag: string | null; tagBn: string | null }) =>
     (locale === "bn" && seg?.tagBn) || seg?.tag || undefined;
@@ -174,7 +179,7 @@ export default async function Home({ params }: Props) {
               {t("home.headlineLineOne")}<br />
               {t("home.headlineLineTwoStart")}<em>{t("home.headlineLineTwoEm")}</em>{t("home.headlineLineTwoEnd")}
             </h1>
-            <p>{t("home.lede", { categories: categoryList(segs, locale === "bn" ? "bn" : "en") })}</p>
+            <p>{t(scopedKey("home.lede", scope, ["dhaka", "mixed"]), { categories: categoryList(segs, locale === "bn" ? "bn" : "en") })}</p>
             <div className="hero-btns">
               {segs.length === 1 && (
                 <Link href={`/shop/${segs[0].id}`} className="btn btn-gold" data-magnetic data-cursor-label={t("home.cursorEnter")}>
@@ -210,7 +215,7 @@ export default async function Home({ params }: Props) {
         <div className="marquee-track">
           {/* Listed twice so the scrolling track loops seamlessly. */}
           {[...marqueeKeys, ...marqueeKeys].map((k, i) => (
-            <span key={k + i} aria-hidden={i >= marqueeKeys.length || undefined}>{t(`home.marquee.${k}`, { threshold: freeOver, days: returnDays })}</span>
+            <span key={k + i} aria-hidden={i >= marqueeKeys.length || undefined}>{t(scopedKey(`home.marquee.${k}`, scope, k === "certified" ? ["dhaka"] : []), { threshold: freeOver, days: returnDays })}</span>
           ))}
         </div>
       </div>
@@ -358,7 +363,7 @@ export default async function Home({ params }: Props) {
             {t.rich("home.promise.title", { em: (c) => <em style={{ color: "var(--gold)" }}>{c}</em>, br: () => <br /> })}
           </h2>
           <p style={{ color: "var(--purple-200)", fontSize: 16, maxWidth: 600, margin: "0 auto 24px", lineHeight: 1.7 }}>
-            {t("home.promise.body")}
+            {t(scopedKey("home.promise.body", scope, ["dhaka"]))}
           </p>
           <div className="promise-grid">
             {[
@@ -370,8 +375,8 @@ export default async function Home({ params }: Props) {
               <div key={x.n} style={{ display: "flex", gap: 14, alignItems: "start" }}>
                 <div style={{ color: "var(--gold)" }}><Icon name={x.i} size={26} /></div>
                 <div>
-                  <div style={{ fontWeight: 500, color: "var(--cream)", marginBottom: 4 }}>{t(`home.promise.f${x.n}Title`)}</div>
-                  <div style={{ fontSize: 12, color: "var(--purple-200)" }}>{t(`home.promise.f${x.n}Sub`)}</div>
+                  <div style={{ fontWeight: 500, color: "var(--cream)", marginBottom: 4 }}>{t(scopedKey(`home.promise.f${x.n}Title`, scope, x.n === DELIVERY_FEATURE ? ["dhaka"] : []))}</div>
+                  <div style={{ fontSize: 12, color: "var(--purple-200)" }}>{t(scopedKey(`home.promise.f${x.n}Sub`, scope, x.n === DELIVERY_FEATURE ? ["dhaka"] : []))}</div>
                 </div>
               </div>
             ))}

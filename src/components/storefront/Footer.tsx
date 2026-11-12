@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { getVisibleSegments } from "@/lib/queries";
 import { Link } from "@/i18n/routing";
+import { SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL } from "@/lib/contact";
 
 export default async function Footer() {
   const t = await getTranslations();
@@ -44,12 +45,17 @@ export default async function Footer() {
             <ul>
               <li><Link href="/legal/shipping">{t("footer.shipping")}</Link></li>
               <li><Link href="/legal/returns">{t("footer.returns")}</Link></li>
+              <li><Link href="/faq">{t("footer.faq")}</Link></li>
               <li>{t("footer.cod")}</li>
             </ul>
           </div>
           <div>
             <div className="col-title">{t("footer.contact")}</div>
-            <ul><li>concierge@sanguine-co.com</li></ul>
+            <ul>
+              <li><Link href="/contact">{t("footer.contactPage")}</Link></li>
+              <li><a href={`tel:${SUPPORT_PHONE_TEL}`}>{SUPPORT_PHONE_DISPLAY}</a></li>
+              <li><a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a></li>
+            </ul>
           </div>
         </div>
         <div className="footer-bottom">
