@@ -137,7 +137,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .hero-inner{max-width:1400px;margin:0 auto;padding:96px 32px;display:grid;grid-template-columns:1.618fr 1fr;gap:64px;align-items:center;position:relative;z-index:2}
 .hero h1{font-family:var(--serif);font-size:88px;line-height:.95;font-weight:400;margin:0 0 24px;letter-spacing:-.02em}
 .hero h1 em{color:var(--gold);font-style:italic}
-.hero p{font-size:17px;color:var(--purple-200);max-width:480px;margin:0 0 32px;line-height:1.6}
+.hero p{font-size:17px;color:var(--cream);text-shadow:0 1px 2px oklch(0.15 0.04 220 / .55),0 0 16px oklch(0.15 0.04 220 / .5);max-width:480px;margin:0 0 32px;line-height:1.6}
 .hero-kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;display:flex;align-items:center;gap:10px}
 .hero-kicker::before,.hero-kicker::after{content:"";height:1px;width:32px;background:var(--gold);opacity:.6}
 .hero-visual{aspect-ratio:4/5;background:repeating-linear-gradient(135deg,oklch(.35 .18 300) 0 10px,oklch(.42 .20 300) 10px 20px);display:grid;place-items:center;color:var(--gold);font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;border:1px solid var(--gold);position:relative}
@@ -400,7 +400,6 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
   .hero-inner{grid-template-columns:1fr;gap:32px;padding:56px 24px 40px}
   .hero h1{font-size:clamp(40px,9vw,72px)}
   .hero p{font-size:15px}
-  .hero-still{max-width:420px;margin:0 auto}
 
   /* Product grids */
   .grid-4{grid-template-columns:repeat(2,1fr)}

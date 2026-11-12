@@ -23,10 +23,42 @@
 /* ─── Hero mobile fixes ──────────────────────────────────────────────────── */
 .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
 
-@media (max-width: 900px) {
-  /* overflow:hidden clips the overlay text elements that bled on narrow screens */
-  .hero-still { overflow: hidden; }
+/* Secondary button on the hero. The purple outline disappeared against the
+   teal sea, so it is cream on a faint shade, and fills cream on hover. */
+.btn-on-dark {
+  border-color: oklch(0.955 0.014 78 / 0.8);
+  color: var(--cream);
+  background: oklch(0.2 0.05 220 / 0.35);
 }
+.btn-on-dark:hover,
+.btn-on-dark:focus-visible {
+  background: var(--cream);
+  border-color: var(--cream);
+  color: var(--purple-950);
+}
+
+/* Wide screens: the painted horizon is lightest exactly where the lede and
+   buttons sit, so a soft shade runs behind the copy and fades out before the
+   sun, and the thin cloud strokes fade out behind the headline instead of
+   running through it (HeroTide draws them twice). Phones keep the copy on
+   the dark upper sky and need neither. */
+.hero-tide .ht-clouds-faded { display: none; }
+@media (min-width: 901px) {
+  .hero-tide .ht-clouds { display: none; }
+  .hero-tide .ht-clouds-faded { display: inline; }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+      oklch(0.2 0.05 220 / 0.62) 0%,
+      oklch(0.2 0.05 220 / 0.45) 40%,
+      oklch(0.2 0.05 220 / 0) 70%);
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
 
 /* ─── Single-row nav responsive ─────────────────────────────────────────── */
 .nav-menu-btn { display: none; }

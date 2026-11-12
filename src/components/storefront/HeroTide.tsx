@@ -7,6 +7,19 @@
  * frame repainted the whole scene. On phones that kept the main thread busy
  * for seconds after load (Lighthouse total blocking time 3.2 s on /en).
  */
+// Drawn twice below: in full (phones) and faded on the left (wide screens),
+// switched by CSS (.ht-clouds in extras.css).
+const CLOUD_STROKES = (
+  <>
+    <path d="M -200 200 Q -50 195, 100 200 T 400 195 T 700 198 T 1000 195 T 1300 200 T 1600 198"
+          stroke="oklch(0.93 0.025 200)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+    <path d="M -200 260 Q 0 258, 200 262 T 600 260 T 1000 258 T 1400 262 T 1800 260"
+          stroke="oklch(0.93 0.025 200)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.7" />
+    <path d="M -200 165 Q 100 168, 400 162 T 1000 168 T 1700 162"
+          stroke="oklch(0.93 0.025 200)" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.5" />
+  </>
+);
+
 export default function HeroTide() {
   return (
     <svg
@@ -40,6 +53,15 @@ export default function HeroTide() {
           <stop offset="0%" stopColor="oklch(0.42 0.07 210)" />
           <stop offset="100%" stopColor="oklch(0.30 0.06 215)" />
         </linearGradient>
+        {/* Wide screens: hides the cloud strokes on the left, where the
+            headline sits, and shows them over the sun. */}
+        <linearGradient id="ht-cloud-fade-g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0">
+          <stop offset="0.3" stopColor="black" />
+          <stop offset="0.58" stopColor="white" />
+        </linearGradient>
+        <mask id="ht-cloud-fade">
+          <rect x="-400" y="0" width="2400" height="900" fill="url(#ht-cloud-fade-g)" />
+        </mask>
         {/* Sun: a soft warm circle */}
         <radialGradient id="ht-sun" cx="0.5" cy="0.5" r="0.5">
           <stop offset="0%" stopColor="oklch(0.92 0.10 80)" stopOpacity="0.85" />
@@ -55,15 +77,9 @@ export default function HeroTide() {
         <circle cx="980" cy="320" r="220" fill="url(#ht-sun)" />
       </g>
 
-      {/* Cloud strokes: drift across the sky */}
-      <g opacity="0.5">
-        <path d="M -200 200 Q -50 195, 100 200 T 400 195 T 700 198 T 1000 195 T 1300 200 T 1600 198"
-              stroke="oklch(0.93 0.025 200)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <path d="M -200 260 Q 0 258, 200 262 T 600 260 T 1000 258 T 1400 262 T 1800 260"
-              stroke="oklch(0.93 0.025 200)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.7" />
-        <path d="M -200 165 Q 100 168, 400 162 T 1000 168 T 1700 162"
-              stroke="oklch(0.93 0.025 200)" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.5" />
-      </g>
+      {/* Cloud strokes across the sky */}
+      <g className="ht-clouds" opacity="0.5">{CLOUD_STROKES}</g>
+      <g className="ht-clouds-faded" opacity="0.5" mask="url(#ht-cloud-fade)">{CLOUD_STROKES}</g>
 
       {/* Mid sea: band from 56% to 76% */}
       <g>
