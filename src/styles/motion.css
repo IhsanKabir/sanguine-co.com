@@ -310,9 +310,9 @@
   transform: perspective(1000px) rotateX(var(--tilt-x, 0)) rotateY(var(--tilt-y, 0)) translateZ(10px);
 }
 
-/* Hero emphasis: a plain colour (set in styles.css, plum on the A+ cream
-   hero). An infinite background-position shimmer on clipped text repainted
-   the largest text on the page every frame. */
+/* Hero emphasis: plain gold. An infinite background-position shimmer on
+   clipped text repainted the largest text on the page every frame. */
+.hero h1 em { color: var(--gold); }
 
 /* Marquee strip */
 .marquee {
