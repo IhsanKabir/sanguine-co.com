@@ -7,59 +7,13 @@ import { db, schema } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth-utils";
 import { slugify } from "@/lib/utils";
 import { variantsFor } from "@/lib/variant-stock";
-
-/**
- * Parse a single CSV line, respecting quoted fields and escaped quotes ("").
- * Returns the array of cell values for that line. RFC-4180-shaped.
- */
-function parseCsvLine(line: string): string[] {
-  const out: string[] = [];
-  let cur = "";
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (inQuotes) {
-      if (c === '"' && line[i + 1] === '"') { cur += '"'; i++; }
-      else if (c === '"') { inQuotes = false; }
-      else { cur += c; }
-    } else {
-      if (c === ',') { out.push(cur); cur = ""; }
-      else if (c === '"' && cur === "") { inQuotes = true; }
-      else { cur += c; }
-    }
-  }
-  out.push(cur);
-  return out;
-}
-
-/**
- * Tokenise the entire CSV body into rows, handling embedded newlines inside
- * quoted cells. Returns header + rows split.
- */
-function parseCsv(text: string): { headers: string[]; rows: string[][] } {
-  // Normalise line endings.
-  const body = text.replace(/^﻿/, "").replace(/\r\n/g, "\n");
-  const lines: string[] = [];
-  let buf = "";
-  let inQuotes = false;
-  for (const ch of body) {
-    if (ch === '"') inQuotes = !inQuotes;
-    if (ch === "\n" && !inQuotes) {
-      if (buf.trim().length > 0) lines.push(buf);
-      buf = "";
-      continue;
-    }
-    buf += ch;
-  }
-  if (buf.trim().length > 0) lines.push(buf);
-  if (lines.length === 0) return { headers: [], rows: [] };
-  const headers = parseCsvLine(lines[0]).map((h) => h.trim().toLowerCase());
-  const rows = lines.slice(1).map(parseCsvLine);
-  return { headers, rows };
-}
+import { parseCsv } from "@/lib/csv";
 
 const REQUIRED = ["sku", "name", "segment_id", "price_bdt", "stock"] as const;
-const OPTIONAL = ["name_bn", "was_bdt", "tag", "description", "description_bn", "colors", "sizes"] as const;
+const OPTIONAL = [
+  "name_bn", "was_bdt", "tag", "description", "description_bn",
+  "details", "details_bn", "care", "care_bn", "colors", "sizes",
+] as const;
 const ALL_COLUMNS = [...REQUIRED, ...OPTIONAL];
 
 type ParsedRow = {
@@ -74,6 +28,10 @@ type ParsedRow = {
   tag: string | null;
   description: string | null;
   descriptionBn: string | null;
+  details: string | null;
+  detailsBn: string | null;
+  care: string | null;
+  careBn: string | null;
   colors: string[];
   sizes: string[];
   errors: string[];
@@ -103,7 +61,8 @@ export type ImportPreview = {
  *   - First pass = dry run; returns a full preview + per-row errors.
  *   - Second pass with `commit: true` writes the rows.
  *   - Match logic: if `sku` already exists, the row is an UPDATE (only the
- *     columns supplied in the CSV are written). If `sku` is new, it's a CREATE.
+ *     columns supplied in the CSV are written, so a stock-only sheet keeps
+ *     the descriptions). If `sku` is new, it's a CREATE.
  *   - Bad rows are skipped (never block the good rows).
  */
 export async function importProductsCsv(input: z.infer<typeof importInputSchema>): Promise<ImportPreview> {
@@ -136,6 +95,9 @@ export async function importProductsCsv(input: z.infer<typeof importInputSchema>
   }
 
   const colIdx = (name: string) => headers.indexOf(name);
+  const has = (name: string) => colIdx(name) >= 0;
+  /** Optional text cell: null when the column is missing or the cell is empty. */
+  const optText = (row: string[], name: string) => (has(name) ? ((row[colIdx(name)] ?? "").trim() || null) : null);
 
   // Validate segment IDs once.
   const validSegments = new Set(
@@ -187,6 +149,10 @@ export async function importProductsCsv(input: z.infer<typeof importInputSchema>
       tag: colIdx("tag") >= 0 ? ((row[colIdx("tag")] ?? "").trim() || null) : null,
       description: colIdx("description") >= 0 ? ((row[colIdx("description")] ?? "").trim() || null) : null,
       descriptionBn: colIdx("description_bn") >= 0 ? ((row[colIdx("description_bn")] ?? "").trim() || null) : null,
+      details: optText(row, "details"),
+      detailsBn: optText(row, "details_bn"),
+      care: optText(row, "care"),
+      careBn: optText(row, "care_bn"),
       colors,
       sizes,
       errors: errs,
@@ -222,19 +188,28 @@ export async function importProductsCsv(input: z.infer<typeof importInputSchema>
     for (const p of valid) {
       const existingId = existingBySku.get(p.sku);
       if (existingId) {
+        // Only the optional columns present in this sheet are written: one
+        // without a description column must not wipe the descriptions.
+        const optional = {
+          ...(has("name_bn") ? { nameBn: p.nameBn } : {}),
+          ...(has("was_bdt") ? { wasBdt: p.wasBdt } : {}),
+          ...(has("tag") ? { tag: p.tag } : {}),
+          ...(has("description") ? { description: p.description } : {}),
+          ...(has("description_bn") ? { descriptionBn: p.descriptionBn } : {}),
+          ...(has("details") ? { details: p.details } : {}),
+          ...(has("details_bn") ? { detailsBn: p.detailsBn } : {}),
+          ...(has("care") ? { care: p.care } : {}),
+          ...(has("care_bn") ? { careBn: p.careBn } : {}),
+          ...(has("colors") ? { colors: p.colors } : {}),
+          ...(has("sizes") ? { sizes: p.sizes } : {}),
+        };
         await tx.update(schema.products).set({
           ...(tracked.has(existingId) ? {} : { stock: p.stock }),
           name: p.name,
-          nameBn: p.nameBn,
           slug: slugify(p.name),
           segmentId: p.segmentId,
           priceBdt: p.priceBdt,
-          wasBdt: p.wasBdt,
-          tag: p.tag,
-          description: p.description,
-          descriptionBn: p.descriptionBn,
-          colors: p.colors,
-          sizes: p.sizes,
+          ...optional,
         }).where(eq(schema.products.id, existingId));
       } else {
         const id = `p-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
@@ -251,6 +226,10 @@ export async function importProductsCsv(input: z.infer<typeof importInputSchema>
           tag: p.tag,
           description: p.description,
           descriptionBn: p.descriptionBn,
+          details: p.details,
+          detailsBn: p.detailsBn,
+          care: p.care,
+          careBn: p.careBn,
           colors: p.colors,
           sizes: p.sizes,
         });

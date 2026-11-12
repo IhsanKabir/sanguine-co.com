@@ -1,7 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { pageMetadata } from "@/lib/page-metadata";
-import { SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL, messengerUrl, whatsAppUrl } from "@/lib/contact";
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL, REPLY_HOURS, SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL, messengerUrl, whatsAppUrl } from "@/lib/contact";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -26,8 +26,8 @@ export default async function ContactPage({ params }: Props) {
       <h1>{isBn ? "আমাদের সঙ্গে কথা বলুন।" : "Talk to us."}</h1>
       <p className="page-intro">
         {isBn
-          ? "অর্ডার, তোড়া বা ডেলিভারি নিয়ে যেকোনো প্রশ্নে নিচের যেকোনো উপায়ে লিখুন বা ফোন করুন।"
-          : "For a question about an order, a bouquet or a delivery, use any of these."}
+          ? `অর্ডার, তোড়া বা ডেলিভারি নিয়ে যেকোনো প্রশ্নে নিচের যেকোনো উপায়ে লিখুন বা ফোন করুন। আমরা উত্তর দিই ${REPLY_HOURS.bn} মধ্যে।`
+          : `For a question about an order, a bouquet or a delivery, use any of these. We reply between ${REPLY_HOURS.en}.`}
       </p>
 
       <ul className="contact-list">
@@ -52,6 +52,10 @@ export default async function ContactPage({ params }: Props) {
             </a>
           </li>
         )}
+        <li>
+          <span className="contact-label">Instagram</span>
+          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">{INSTAGRAM_HANDLE}</a>
+        </li>
         <li>
           <span className="contact-label">{isBn ? "ইমেইল" : "Email"}</span>
           <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
