@@ -17,7 +17,8 @@ OWNER (only the owner can do it).
 | H | Home hero: the wave background is back instead of one rose bouquet photo | Claude | DONE (PR #70). Left over: an empty black arch on desktop and a faint "About Sanguine" button |
 | 2 | Security updates (Next.js, Sentry and others) and a spam guard on the request form | Claude | DONE (PR #71, tested live). 29 advisories down to 9; what is left is listed under fix 2b |
 | 3 | Contact and FAQ pages; flower refund wording; flowers promised in Dhaka only | Claude | DONE (PR #72, live) |
-| 3b | Grey strip down the left edge of every page on phones (shadow of the closed menu); Contact and FAQ polish | Claude | IN REVIEW |
+| 3b | Grey strip down the left edge of every page on phones (shadow of the closed menu); Contact and FAQ polish; Questions and Contact in the phone menu | Claude | DONE (PR #73, live) |
+| 3c | Open phone menu was covered at the bottom by the cookie bar (it hid the language switch for first-time visitors) | Claude | IN REVIEW |
 | G | Board games launch: products in Admin, then posts and Reels | Owner adds the four games (C3) and their photos to the video drafts | OWNER |
 | V | Video maker: type the lines, pick photos, get a branded vertical video | Claude | DONE (12 Nov). Double-click `social-studio/Video maker.cmd`. Drafts for the four board games are saved, waiting for photos |
 | 4 | Mark test orders so reports show real revenue; leave the owner's own visits out of traffic | Claude | LATER |
@@ -103,14 +104,15 @@ Detail for the open fixes:
 - `next-intl` 3 to 4 (moderate). A breaking change in how translations are set up.
 - `postcss` inside Next.js, and `glob` and `minimatch` inside the Sentry build plugin (build tools only, they do not run on the live site). They clear when Next.js and Sentry ship updates.
 
-**Fix 3, Contact, FAQ and policy wording (done, PR #72; the last three points below are fix 3b, in review).**
+**Fix 3, Contact, FAQ and policy wording (done: PR #72, then PR #73 for fix 3b; the menu stacking point is fix 3c, in review).**
 - Done: `/contact` and `/faq` in both languages, linked in the footer and in the sitemap. The FAQ takes its figures from Admin, Settings and carries FAQ structured data for search engines. Contact details live in `src/lib/contact.ts`.
 - Done: the returns page has a flowers section (deposit refunded straight away, less the delivery charge only if needed); the terms page no longer says "no deposit" for made-to-order pieces.
 - Done: flowers are Dhaka only. `src/lib/delivery-scope.ts` lists the Dhaka-only categories (`flowers`). The home lede, meta description, top bar, moving strip and "How it works" pick their wording from the open categories: Dhaka wording while only flowers are open, "across Bangladesh, flowers in Dhaka only" once a courier category opens. The preorder form fixes the city to Dhaka for flowers and the server rejects other cities.
 - Open: reply hours are not stated anywhere because the owner has not confirmed them (T7). No street address and no licence number until the owner provides them.
 - To change the wording later: the strings are in `src/messages/en.json` and `bn.json` under keys ending in `Dhaka` and `Mixed`. An edit of the base string in Admin, Editorial (for example the announcement bar) also replaces its Dhaka and Mixed variants, unless a variant is edited itself (`expandVariantOverrides` in `src/lib/copy.ts`).
 - Done, found while checking the screenshots: the closed phone menu cast a grey shadow down the left edge of every page on phones. The shadow now shows only while the menu is open.
-- Done in fix 3b: Questions and Contact links in the phone menu, and the open menu now sits above the cookie bar and the chat buttons (the cookie bar used to cover the language switch for first-time visitors).
+- Done in fix 3b: Questions and Contact links in the phone menu.
+- Fix 3c: the open menu now sits above the cookie bar and the chat buttons. The drawer is inside the sticky nav (z-index 40), so the nav itself rises while the menu is open (`.nav:has(.mobile-drawer.open)` in `src/styles/extras.css`).
 - Seen, not changed: a full-screen canvas and a custom cursor layer are still mounted on phones, where they do nothing. Worth removing on touch devices in a later speed pass.
 
 **Fix G, board games launch.**
@@ -140,4 +142,6 @@ Detail for the open fixes:
 - 12 Nov 2026: Video maker built and tested; drafts saved for the four board games.
 - 12 Nov 2026: fix 2 merged (PR #71); the owner's test request arrived on the new versions.
 - 12 Nov 2026: fix 3 merged (PR #72): Contact and FAQ pages, flower refund wording, flowers in Dhaka only.
-- 12 Nov 2026: fix 3b opened: removes the grey strip the closed phone menu left on every page, Contact and FAQ polish, and an owner's edit in Admin, Editorial now covers the Dhaka wording too.
+- 12 Nov 2026: fix 3b merged (PR #73): no more grey strip from the closed phone menu, Contact and FAQ polish, Questions and Contact in the phone menu, and an owner's edit in Admin, Editorial now covers the Dhaka wording too.
+- 12 Nov 2026: fix 3c opened: the open phone menu sits above the cookie bar.
+- Working note: the owner merges a PR as soon as its checks are green. Finish and verify the work on a pushed branch first (Vercel builds a preview for any branch), and open the PR only when nothing more will be added.
