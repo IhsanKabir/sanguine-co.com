@@ -4,6 +4,7 @@ import { Link } from "@/i18n/routing";
 import { db, schema } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-utils";
+import { getCustomerPrefill } from "@/lib/customer-prefill";
 import { getProductImages } from "@/lib/queries";
 import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import ProductPreorderForm from "./ProductPreorderForm";
@@ -27,6 +28,7 @@ export default async function ProductPreorderPage({ params }: Props) {
 
   // No sign-in wall: guests preorder with their email (0021).
   const user = await getCurrentUser();
+  const prefill = await getCustomerPrefill(user);
 
   const seg = product.segmentId
     ? await db.select().from(schema.segments).where(eq(schema.segments.id, product.segmentId)).limit(1).then((r) => r[0] ?? null)
@@ -82,6 +84,7 @@ export default async function ProductPreorderPage({ params }: Props) {
           productId={product.id}
           productName={name}
           userEmail={user?.email ?? ""}
+          prefill={prefill}
           signInHref={`/sign-in?next=/${locale}/preorder/product/${slug}`}
           colors={(product.colors as string[] | null) || []}
           sizes={(product.sizes as string[] | null) || []}

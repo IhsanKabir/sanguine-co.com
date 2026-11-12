@@ -11,7 +11,8 @@ OWNER (only the owner can do it).
 
 | # | Fix | Who | Status |
 |---|-----|-----|--------|
-| 1 | Alerts: emails were never sent; add owner alert for every order and request; waiting-time badge in Admin | Claude, then owner steps A1 to A4 | IN REVIEW |
+| 1 | Alerts: emails were never sent; add owner alert for every order and request; waiting-time badge in Admin | Claude, owner | DONE (PR #68, tested live 12 Nov: emails arrive). SMS is not connected, see A5 |
+| 1b | Preorder form fills in name, phone and address by itself | Claude | IN REVIEW |
 | 2 | Security updates (Next.js, Sentry and others) and a spam guard on the request form | Claude | NEXT |
 | 3 | Contact and FAQ pages; business registration number in the footer | Claude, needs owner answers T1 to T3 | NEXT |
 | 4 | Mark test orders so reports show real revenue; leave the owner's own visits out of traffic | Claude | LATER |
@@ -48,6 +49,11 @@ If any of the four did not arrive, tell Claude which one.
 
 **Reply-time habit.** Flower prices are hidden, so your reply is the sale. Aim to send the price within 2 hours between 10am and 8pm. The badge turns amber after 2 hours and red after 12.
 
+**A5. SMS alerts (optional, later).** No SMS arrived because the shop has no SMS account yet: the SSL Wireless keys are empty everywhere. Getting one usually needs business papers, so leave it until the trade licence exists. Until then, make the email alert loud on your phone:
+1. Install the Gmail app and sign in with the alert address.
+2. In Gmail on a computer, open one alert email, then the three dots, then "Filter messages like these". Choose "Never send to Spam", "Always mark as important" and apply the label "Sanguine alerts".
+3. In the Gmail app: Settings, your account, Notifications, set to "High priority only" or "All", and give the "Sanguine alerts" label its own sound under Manage labels.
+
 ### R. Reach (the biggest gap: almost nobody has seen the shop)
 
 **R1. Post by hand, 3 to 5 times a week.** Posts made through the API are visible only to you. Upload the Reels and photos yourself in Meta Business Suite (business.facebook.com). Claude can prepare the videos and captions.
@@ -74,10 +80,11 @@ If any of the four did not arrive, tell Claude which one.
 
 ### T. Answers Claude needs
 
-- **T1.** A phone number customers may call or message, to show on the Contact page.
-- **T2.** Your DBID or trade licence number, to show in the footer. If you do not have one yet, say so.
-- **T3.** The return window is set to 3 days. Keep 3, or use 7 for clothing?
-- **T4.** Where can you really deliver a fresh bouquet? Dhaka only, or other cities too?
+- **T1.** ANSWERED 12 Nov: 01777603364 for now.
+- **T2.** ANSWERED 12 Nov: no licence yet; the owner will apply once sales grow. Nothing is shown in the footer until then.
+- **T3.** ANSWERED 12 Nov: 3 days in general. Flowers: a refund on the spot if the customer does not like the bouquet.
+- **T4.** OPEN: where can you really deliver a fresh bouquet? Dhaka only, or other cities too?
+- **T5.** OPEN: for the flower refund, what exactly is refunded when a customer refuses a bouquet at the door: the full deposit, or the deposit minus delivery?
 
 ### B. Backups
 
@@ -86,3 +93,4 @@ If any of the four did not arrive, tell Claude which one.
 ## Change log
 
 - 12 Nov 2026: plan created. Fix 1 opened as a PR.
+- 12 Nov 2026: fix 1 merged (PR #68) and tested by the owner: alert and customer emails arrive, SMS does not (no SMS account). Owner answered T1 to T3. Fix 1b opened: the preorder form now fills in saved details.
