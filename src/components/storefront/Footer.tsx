@@ -1,7 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { getVisibleSegments } from "@/lib/queries";
 import { Link } from "@/i18n/routing";
-import { SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL } from "@/lib/contact";
+import { FACEBOOK_URL, INSTAGRAM_URL, SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL } from "@/lib/contact";
 
 export default async function Footer() {
   const t = await getTranslations();
@@ -55,6 +55,8 @@ export default async function Footer() {
               <li><Link href="/contact">{t("footer.contactPage")}</Link></li>
               <li><a href={`tel:${SUPPORT_PHONE_TEL}`}>{SUPPORT_PHONE_DISPLAY}</a></li>
               <li><a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a></li>
+              <li><a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Instagram</a></li>
+              <li><a href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer">Facebook</a></li>
             </ul>
           </div>
         </div>

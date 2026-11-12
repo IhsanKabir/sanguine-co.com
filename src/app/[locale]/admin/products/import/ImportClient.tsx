@@ -98,7 +98,10 @@ export default function ImportClient() {
             <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 8, lineHeight: 1.7 }}>
               <p style={{ margin: 0 }}><b>Required:</b> sku, name, segment_id, price_bdt, stock</p>
               <p style={{ margin: "4px 0" }}>
-                <b>Optional:</b> name_bn, was_bdt, tag (new / sale / limited / staff-pick), description, description_bn, colors (comma-separated), sizes (comma-separated)
+                <b>Optional:</b> name_bn, was_bdt, tag (new / sale / limited / staff-pick), description, description_bn, details, details_bn (the &ldquo;Details&rdquo; section: one fact per line), care, care_bn, colors (comma-separated), sizes (comma-separated)
+              </p>
+              <p style={{ margin: "4px 0" }}>
+                Columns you leave out are not changed on pieces that already exist.
               </p>
               <p style={{ margin: "4px 0" }}>
                 <b>SKU rule:</b> if a row&rsquo;s SKU already exists, the existing piece is <b>updated</b>. Otherwise a new piece is <b>created</b>.

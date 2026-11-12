@@ -2,7 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { getCommerceSettings, type CommerceSettings } from "@/lib/commerce";
 import { pageMetadata } from "@/lib/page-metadata";
-import { SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY } from "@/lib/contact";
+import { REPLY_HOURS, SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY } from "@/lib/contact";
 import { formatBdt } from "@/lib/utils";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -55,7 +55,7 @@ function faqGroups(locale: Locale, c: CommerceSettings): FaqGroup[] {
         items: [
           { q: "তোড়া পছন্দ না হলে?", a: "হাতে পাওয়ার সময়ই জানান, সম্ভব হলে ডেলিভারি দিতে আসা ব্যক্তি থাকতেই। আমরা সঙ্গে সঙ্গে আপনার অগ্রিম ফেরত দিই। প্রয়োজন হলে শুধু ডেলিভারি চার্জটুকু রাখি।" },
           { q: "অন্য জিনিস কি ফেরত দেওয়া যায়?", a: `ফুল ছাড়া অন্য জিনিস ডেলিভারির ${daysBn} দিনের মধ্যে ফেরত দেওয়া যায়, অব্যবহৃত ও প্যাকেটসহ। বিস্তারিত রিটার্ন পেজে।` },
-          { q: "যোগাযোগ করব কীভাবে?", a: `হোয়াটসঅ্যাপে সবচেয়ে দ্রুত উত্তর পাবেন। ফোন করতে পারেন ${SUPPORT_PHONE_DISPLAY} নম্বরে, অথবা লিখুন ${SUPPORT_EMAIL}-এ।` },
+          { q: "যোগাযোগ করব কীভাবে?", a: `হোয়াটসঅ্যাপে সবচেয়ে দ্রুত উত্তর পাবেন। আমরা উত্তর দিই ${REPLY_HOURS.bn} মধ্যে। ফোন করতে পারেন ${SUPPORT_PHONE_DISPLAY} নম্বরে, অথবা লিখুন ${SUPPORT_EMAIL}-এ।` },
         ],
       },
     ];
@@ -90,7 +90,7 @@ function faqGroups(locale: Locale, c: CommerceSettings): FaqGroup[] {
       items: [
         { q: "What if I do not like the bouquet?", a: "Tell us when it arrives, before the delivery person leaves if you can. We refund your deposit straight away. We only keep the delivery charge if we need to." },
         { q: "Can I return other items?", a: `Items other than flowers can be returned within ${days} ${days === 1 ? "day" : "days"} of delivery, unused and in their packaging. The returns page has the details.` },
-        { q: "How do I reach you?", a: `WhatsApp is the fastest. You can also call ${SUPPORT_PHONE_DISPLAY} or write to ${SUPPORT_EMAIL}.` },
+        { q: "How do I reach you?", a: `WhatsApp is the fastest. We reply between ${REPLY_HOURS.en}. You can also call ${SUPPORT_PHONE_DISPLAY} or write to ${SUPPORT_EMAIL}.` },
       ],
     },
   ];

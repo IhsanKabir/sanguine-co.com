@@ -1,4 +1,5 @@
 import { SITE_URL as BASE } from "@/lib/site-url";
+import { FACEBOOK_URL, INSTAGRAM_URL, SUPPORT_PHONE_TEL } from "@/lib/contact";
 
 // Canonical entity name is "Sanguine" everywhere: JSON-LD, OG,
 // manifest, brand copy. Inconsistent naming delays Google Knowledge Panel
@@ -11,16 +12,15 @@ export const organizationLd = {
   logo: `${BASE}/logo.png`,
   description: "Sanguine is a house of considered things, based in Dhaka, opening one category at a time.",
   email: "concierge@sanguine-co.com",
+  telephone: SUPPORT_PHONE_TEL,
   address: {
     "@type": "PostalAddress",
     addressLocality: "Dhaka",
     addressCountry: "BD",
   },
   // Only CLAIMED profiles: unclaimed handles muddy Knowledge Panel
-  // disambiguation. Add more (Instagram etc.) as the accounts are created.
-  sameAs: [
-    "https://www.facebook.com/TheSanguineCo",
-  ],
+  // disambiguation. Instagram added 13 Nov 2026; add others as they open.
+  sameAs: [FACEBOOK_URL, INSTAGRAM_URL],
 };
 
 // SearchAction removed 2026-05-03: the query-string URL template

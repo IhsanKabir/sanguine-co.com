@@ -18,14 +18,15 @@ OWNER (only the owner can do it).
 | 2 | Security updates (Next.js, Sentry and others) and a spam guard on the request form | Claude | DONE (PR #71, tested live). 29 advisories down to 9; what is left is listed under fix 2b |
 | 3 | Contact and FAQ pages; flower refund wording; flowers promised in Dhaka only | Claude | DONE (PR #72, live) |
 | 3b | Grey strip down the left edge of every page on phones (shadow of the closed menu); Contact and FAQ polish; Questions and Contact in the phone menu | Claude | DONE (PR #73, live) |
-| 3c | Open phone menu was covered at the bottom by the cookie bar (it hid the language switch for first-time visitors) | Claude | IN REVIEW |
-| G | Board games launch: products in Admin, then posts and Reels | Owner adds the four games (C3) and their photos to the video drafts | OWNER |
+| 3c | Open phone menu was covered at the bottom by the cookie bar (it hid the language switch for first-time visitors) | Claude | DONE (PR #74, live) |
+| 3d | Instagram on the site, reply hours (10am to 10pm), and the product import takes Details and Care columns | Claude | IN REVIEW |
+| G | Board games launch: listings, videos and captions are ready in `E:\Documents\Retail Platform\board-games` | Owner uploads the file and adds photos (C3) | OWNER |
 | V | Video maker: type the lines, pick photos, get a branded vertical video | Claude | DONE (12 Nov). Double-click `social-studio/Video maker.cmd`. Drafts for the four board games are saved, waiting for photos |
-| 4 | Mark test orders so reports show real revenue; leave the owner's own visits out of traffic | Claude | LATER |
+| 4 | Mark test orders so reports show real revenue; leave the owner's own visits out of traffic | Claude, then the owner runs one SQL | NEXT (owner confirmed 13 Nov: all 8 orders so far are tests) |
 | 5 | Meta Pixel behind the cookie consent | Claude, needs owner step R4 | LATER |
 | 6 | Tests for prices, deposits and stock | Claude | LATER |
 | 8 | Home page: campaign slot and category panels (mockups are on the design canvas) | Claude, needs owner approval | LATER |
-| R | Reach: Instagram, Google Business Profile, Search Console, posting by hand | Owner, steps R1 to R5 | OWNER (Instagram being opened 12 Nov) |
+| R | Reach: Instagram, Google Business Profile, Search Console, posting by hand | Owner, steps R1 to R5 | OWNER (Instagram open: instagram.com/thesanguineco) |
 | C | Catalogue: bouquet details, clothing and board game products, category wording | Owner, steps C1 to C4 | OWNER |
 | B | Backups: confirm the Supabase plan | Owner, step B1 | OWNER |
 
@@ -40,13 +41,13 @@ A1 to A4 are done (12 Nov): the alert email and the customer email arrive.
 2. In Gmail on a computer, open one alert email, then the three dots, then "Filter messages like these". Choose "Never send to Spam", "Always mark as important" and apply the label "Sanguine alerts".
 3. In the Gmail app: Settings, your account, Notifications, and give the "Sanguine alerts" label its own sound under Manage labels.
 
-**Reply-time habit.** Flower prices are hidden, so your reply is the sale. Aim to send the price within 2 hours between 10am and 8pm. The badge in Admin, Pre-orders turns amber after 2 hours and red after 12.
+**Reply-time habit.** Flower prices are hidden, so your reply is the sale. Aim to send the price within 2 hours between 10am and 10pm (the hours the Contact page promises). The badge in Admin, Pre-orders turns amber after 2 hours and red after 12.
 
 ### R. Reach (the biggest gap: almost nobody has seen the shop)
 
 **R1. Post by hand, 3 to 5 times a week.** Posts made through the API are visible only to you. Upload the Reels and photos yourself in Meta Business Suite (business.facebook.com). Claude prepares the videos and captions.
 
-**R2. Instagram.** Create the account. If the code does not arrive at concierge@sanguine-co.com, use your Gmail for now and switch later. Then link Instagram to the Facebook page in Meta Business Suite, Settings, Accounts, and give Claude the profile link so it goes on the site.
+**R2. Instagram.** DONE 13 Nov: https://www.instagram.com/thesanguineco/ is on the site (footer, Contact page, and the brand data Google reads). Still to do: link Instagram to the Facebook page in Meta Business Suite, Settings, Accounts, and put the shop link in the Instagram bio.
 
 **R3. Google Business Profile.** Go to business.google.com, add "Sanguine", category "Florist" (add "Gift shop" as a second), service area Dhaka, website sanguine-co.com, phone 01777603364. Google will verify by phone or video. This is what makes the shop appear on Google Maps and in "flower delivery Dhaka" searches.
 
@@ -62,7 +63,7 @@ A1 to A4 are done (12 Nov): the alert email and the customer email arrive.
 
 **C2. Clothing.** Add at least 8 pieces with real photos before unhiding the category. If that is not ready by 16 Nov, move the launch date instead of opening with 2 or 3 pieces.
 
-**C3. Board games (4 games in hand: Exploding Kittens ৳1,800, One Night Ultimate Werewolf ৳1,500, One Night Ultimate Werewolf Daybreak ৳1,500, Coup ৳1,400; prices from the Summer 2024 list, confirm them).** For each game: Admin, Products, New, category Boardgames, a real price, your own photos (box front, box back, the pieces laid out, a game in play), stock quantity, and in Details: players, age, play time, language, what is in the box. Unhide the category when 3 or more are in. Claude then checks the pages and prepares the posts.
+**C3. Board games (4 games in hand: Exploding Kittens ৳1,800, One Night Ultimate Werewolf ৳1,500, One Night Ultimate Werewolf Daybreak ৳1,500, Coup ৳1,400; prices from the Summer 2024 list, confirm them).** Everything is ready in `E:\Documents\Retail Platform\board-games`: follow its README. In short: merge the import PR (3d), upload `board-games.csv` in Admin, Products, Import, add your photos, set the category name and switch its preorder off, then unhide it. Stock is set to 1 of each; ages are only filled in for Exploding Kittens.
 
 **C4. Category wording.** Before unhiding any category, open Admin, Segments and replace the old tag and description. Boardgames: name "Board games", tag "Games", description "Games for long evenings". Turn preorder off for board games that are in stock. Clothing still says "Garments cut with patience" with tag "Atelier".
 
@@ -73,7 +74,8 @@ A1 to A4 are done (12 Nov): the alert email and the customer email arrive.
 - **T3.** ANSWERED: returns 3 days in general. Flowers: a refund on the spot if the customer does not like the bouquet.
 - **T4.** ANSWERED: flowers are delivered in Dhaka only for now.
 - **T5.** ANSWERED: on a flower refund, only the delivery charge is deducted, and only if needed.
-- **T7.** OPEN: reply hours to show on the Contact page (for example 10am to 8pm, every day).
+- **T7.** ANSWERED 13 Nov: replies between 10am and 10pm (days not stated, so the site does not name them).
+- **T8.** ANSWERED 13 Nov: all orders so far (the 7 delivered on 30 Apr to 3 May and the ৳160 refund of 14 Jul) were tests.
 - **T6.** ANSWERED: four games, names and prices as in C3. Still needed from the owner: stock counts and photos.
 
 ### B. Backups
@@ -108,24 +110,25 @@ Detail for the open fixes:
 - Done: `/contact` and `/faq` in both languages, linked in the footer and in the sitemap. The FAQ takes its figures from Admin, Settings and carries FAQ structured data for search engines. Contact details live in `src/lib/contact.ts`.
 - Done: the returns page has a flowers section (deposit refunded straight away, less the delivery charge only if needed); the terms page no longer says "no deposit" for made-to-order pieces.
 - Done: flowers are Dhaka only. `src/lib/delivery-scope.ts` lists the Dhaka-only categories (`flowers`). The home lede, meta description, top bar, moving strip and "How it works" pick their wording from the open categories: Dhaka wording while only flowers are open, "across Bangladesh, flowers in Dhaka only" once a courier category opens. The preorder form fixes the city to Dhaka for flowers and the server rejects other cities.
-- Open: reply hours are not stated anywhere because the owner has not confirmed them (T7). No street address and no licence number until the owner provides them.
+- Reply hours (T7) are on the Contact page and in the FAQ, from `REPLY_HOURS` in `src/lib/contact.ts` (fix 3d). No street address and no licence number until the owner provides them.
 - To change the wording later: the strings are in `src/messages/en.json` and `bn.json` under keys ending in `Dhaka` and `Mixed`. An edit of the base string in Admin, Editorial (for example the announcement bar) also replaces its Dhaka and Mixed variants, unless a variant is edited itself (`expandVariantOverrides` in `src/lib/copy.ts`).
 - Done, found while checking the screenshots: the closed phone menu cast a grey shadow down the left edge of every page on phones. The shadow now shows only while the menu is open.
 - Done in fix 3b: Questions and Contact links in the phone menu.
 - Fix 3c: the open menu now sits above the cookie bar and the chat buttons. The drawer is inside the sticky nav (z-index 40), so the nav itself rises while the menu is open (`.nav:has(.mobile-drawer.open)` in `src/styles/extras.css`).
 - Seen, not changed: a full-screen canvas and a custom cursor layer are still mounted on phones, where they do nothing. Worth removing on touch devices in a later speed pass.
 
-**Fix G, board games launch.**
-- After the owner adds the products (C3, T6): check each product page live, then write for each game one Facebook and Instagram caption in English and Bangla with a link carrying `?utm_source=facebook&utm_medium=social&utm_campaign=boardgames`, and one short Reel scene file in `social-studio/videos/`.
-- Render with `social-studio/render.mjs`. The owner uploads by hand (R1).
-- Descriptions come from the box and the owner, not from memory: wrong player counts or play times are a returns risk.
+**Fix G, board games launch (content ready, waiting for the owner).**
+- `E:\Documents\Retail Platform\board-games` (outside the repo): `board-games.csv` for Admin, Products, Import; `README.md`, the owner's steps; `make-board-games.cjs`, which writes the CSV, the video texts in `social-studio/videos/` and the captions in `social-studio/captions/` from one list of facts.
+- Facts were checked on 13 Nov against several shops' listings: players, playing time and contents agree everywhere. Ages differ between editions, so only Exploding Kittens (7+) carries one; the owner adds the others from the boxes. One Night Ultimate Werewolf Daybreak is 3 to 7 players on its own, up to 10 with the original.
+- The captions link to `/en/product/<slug>` (slugs: exploding-kittens-original-edition, one-night-ultimate-werewolf, one-night-ultimate-werewolf-daybreak, coup), which open once the category is unhidden.
+- Next for Claude: when the owner says the games are in, check the four product pages live, and help render the videos.
 
 **Fix V, Video maker (done).**
 - `social-studio/studio.mjs` (a local server on 127.0.0.1:4477, no dependencies) and `studio.html`, started with `Video maker.cmd`. Scenes are Words, Photo or Website recording; the page shows a live preview and runs `render.mjs`. How to use it: `social-studio/README.md`.
 - `social-studio` is not a git repository; it lives only on the owner's computer.
 - No generated footage of products. Generated footage for mood or backgrounds only, through a paid service, if the owner asks.
 
-**Fix 4, clean numbers.** The 7 delivered orders of 30 Apr to 3 May and the ৳160 refund look like tests: confirm with the owner, then exclude them from `src/lib/revenue.ts` reports (a flag, not a delete). Skip analytics events for signed-in admins.
+**Fix 4, clean numbers.** The owner confirmed (13 Nov) that all 8 orders so far are tests. Plan: an `is_test` column on orders (migration, the owner runs the SQL before merge), set for those 8; `countsAsRevenue` in `src/lib/revenue.ts` excludes test orders, so the dashboard, analytics and reports all drop them; a "Test" label and a mark/unmark button in Admin, Orders for future tests. Skip analytics events from the owner's own devices (a cookie set when Admin is opened).
 
 **Fix 5, Pixel.** Load the Meta Pixel only after cookie consent, with PageView, ViewContent and Lead (request sent). Re-measure speed.
 
@@ -143,5 +146,6 @@ Detail for the open fixes:
 - 12 Nov 2026: fix 2 merged (PR #71); the owner's test request arrived on the new versions.
 - 12 Nov 2026: fix 3 merged (PR #72): Contact and FAQ pages, flower refund wording, flowers in Dhaka only.
 - 12 Nov 2026: fix 3b merged (PR #73): no more grey strip from the closed phone menu, Contact and FAQ polish, Questions and Contact in the phone menu, and an owner's edit in Admin, Editorial now covers the Dhaka wording too.
-- 12 Nov 2026: fix 3c opened: the open phone menu sits above the cookie bar.
+- 12 Nov 2026: fix 3c merged (PR #74): the open phone menu sits above the cookie bar.
+- 13 Nov 2026: owner answered T7 (10am to 10pm) and T8 (all orders so far are tests), and opened Instagram. Board games content pack written. Fix 3d opened.
 - Working note: the owner merges a PR as soon as its checks are green. Finish and verify the work on a pushed branch first (Vercel builds a preview for any branch), and open the PR only when nothing more will be added.
