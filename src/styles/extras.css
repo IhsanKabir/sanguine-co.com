@@ -51,9 +51,9 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(90deg,
-      oklch(0.2 0.05 220 / 0.55) 0%,
-      oklch(0.2 0.05 220 / 0.35) 40%,
-      oklch(0.2 0.05 220 / 0) 68%);
+      oklch(0.2 0.05 220 / 0.62) 0%,
+      oklch(0.2 0.05 220 / 0.45) 40%,
+      oklch(0.2 0.05 220 / 0) 70%);
     pointer-events: none;
     z-index: 1;
   }
