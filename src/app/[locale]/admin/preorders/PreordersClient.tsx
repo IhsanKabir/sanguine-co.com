@@ -56,6 +56,24 @@ type Props = {
   products: Record<string, RequestProductInfo>;
 };
 
+// A request is waiting on the owner until a price has been sent.
+const AWAITING_OWNER = new Set(["new", "reviewing"]);
+const HOUR_MS = 60 * 60 * 1000;
+const WAIT_WARN_HOURS = 2;
+const WAIT_LATE_HOURS = 12;
+
+function WaitingBadge({ status, createdAt }: { status: string; createdAt: Date | string }) {
+  // Computed after mount: the server and the browser clocks differ.
+  const [hours, setHours] = useState<number | null>(null);
+  useEffect(() => {
+    setHours(Math.floor((Date.now() - new Date(createdAt).getTime()) / HOUR_MS));
+  }, [createdAt]);
+  if (!AWAITING_OWNER.has(status) || hours === null) return null;
+  const tone = hours >= WAIT_LATE_HOURS ? "pill-err" : hours >= WAIT_WARN_HOURS ? "pill-warn" : "pill-ok";
+  const label = hours < 1 ? "under 1 h" : hours < 48 ? `${hours} h` : `${Math.floor(hours / 24)} days`;
+  return <div><span className={`pill ${tone}`} style={{ marginTop: 4 }}>Waiting {label}</span></div>;
+}
+
 export default function PreordersClient({ requests, segments, linkedOrders, products }: Props) {
   const [filter, setFilter] = useState<string>("all");
   const [selected, setSelected] = useState<PreorderRequest | null>(null);
@@ -117,7 +135,10 @@ export default function PreordersClient({ requests, segments, linkedOrders, prod
               </td></tr>
             ) : visible.map((r) => (
               <tr key={r.id} style={{ cursor: "pointer" }} onClick={() => startTransition(() => setSelected(r))}>
-                <td style={{ fontSize: 12, color: "var(--ink-soft)" }}>{formatDate(new Date(r.createdAt))}</td>
+                <td style={{ fontSize: 12, color: "var(--ink-soft)" }}>
+                  {formatDate(new Date(r.createdAt))}
+                  <WaitingBadge status={r.status} createdAt={r.createdAt} />
+                </td>
                 <td>
                   <div style={{ fontWeight: 500 }}>{r.customerName || "-"}</div>
                   <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>{r.customerEmail}</div>

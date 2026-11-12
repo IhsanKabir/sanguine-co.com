@@ -6,6 +6,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { COPY_CACHE_TAG } from "@/lib/copy";
 import { COMMERCE_KEY, COMMERCE_CACHE_TAG, COMMERCE_DEFAULTS, commerceSchema, getCommerceSettings, type CommerceSettings } from "@/lib/commerce";
 import { SITE_URL } from "@/lib/site-url";
+import { runAfterResponse } from "@/lib/background";
 
 // Bust the ISR cache for every locale-prefixed route. Cached pages are tagged
 // by their ROUTE PATTERN (/[locale]/layout), not by the URL, so the pattern
@@ -533,22 +534,22 @@ export async function bookCourier(input: z.infer<typeof courierSchema>) {
       tracking: trackingCode,
       trackingUrl: `${siteUrl}/en/order/${order.number}/track?t=${order.trackingToken}`,
     });
-    sendEmail({ to: order.guestEmail, toName: addr.fullName, subject, html })
+    const to = order.guestEmail;
+    runAfterResponse(() => sendEmail({ to, toName: addr.fullName, subject, html })
       .then((r) => logOrderEvent({
         orderId: order.id,
         type: "email_sent",
-        payload: { subject, to: order.guestEmail, ok: r.ok, error: r.error ?? null },
-      }))
-      .catch(() => {});
+        payload: { subject, to, ok: r.ok, error: r.error ?? null },
+      })));
   }
   if (order.guestPhone) {
-    sendSms(order.guestPhone, `Sanguine: ${order.number} shipped via ${data.courier} (${trackingCode}).`)
+    const to = order.guestPhone;
+    runAfterResponse(() => sendSms(to, `Sanguine: ${order.number} shipped via ${data.courier} (${trackingCode}).`)
       .then((r) => logOrderEvent({
         orderId: order.id,
         type: "sms_sent",
-        payload: { to: order.guestPhone, ok: r.ok, error: r.error ?? null },
-      }))
-      .catch(() => {});
+        payload: { to, ok: r.ok, error: r.error ?? null },
+      })));
   }
 
   revalidatePath("/admin", "layout");

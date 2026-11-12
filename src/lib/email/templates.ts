@@ -184,6 +184,37 @@ export function preorderAdminNotifyEmail(d: PreorderEmailData & {
   return { subject, html: SHELL(body) };
 }
 
+/** Alert to the shop owner for every placed order (not sent to customers). */
+export function ownerOrderAlertEmail(d: {
+  number: string;
+  customerName: string;
+  customerPhone: string;
+  city: string;
+  lines: OrderEmailLine[];
+  totalBdt: number;
+  paidOnline: boolean;
+  adminUrl: string;
+}) {
+  const subject = `New order · ${d.number} · ${formatBdt(d.totalBdt)}`;
+  const rows = d.lines.map((l) => {
+    const options = [l.color, l.size].filter(Boolean).join(" · ");
+    return `<tr><td style="padding:10px 0;font-size:14px;">${escapeHtml(l.name)}${options ? ` <span style="color:#7a6a52;">(${escapeHtml(options)})</span>` : ""} × ${l.qty}</td><td style="padding:10px 0;font-size:14px;text-align:right;">${formatBdt(l.lineTotalBdt)}</td></tr>`;
+  }).join("");
+  const body = `
+    <p style="font-size:15px;margin:0 0 24px;">A new order has been placed: <b>${d.number}</b>.</p>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-top:1px solid #e8d8a8;">
+      <tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;width:140px;">From</td><td style="padding:10px 0;font-size:14px;">${escapeHtml(d.customerName || "(no name)")}${d.customerPhone ? " · " + escapeHtml(d.customerPhone) : ""}${d.city ? " · " + escapeHtml(d.city) : ""}</td></tr>
+      <tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;">Payment</td><td style="padding:10px 0;font-size:14px;">${d.paidOnline ? "Paid online" : "Cash on delivery"}</td></tr>
+    </table>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-top:1px solid #e8d8a8;margin-top:16px;">
+      ${rows}
+      <tr><td style="padding:10px 0;font-size:14px;border-top:1px solid #e8d8a8;"><b>Total</b></td><td style="padding:10px 0;font-size:14px;text-align:right;border-top:1px solid #e8d8a8;"><b>${formatBdt(d.totalBdt)}</b></td></tr>
+    </table>
+    <p style="margin:24px 0 0;"><a href="${d.adminUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Open orders in admin →</a></p>
+  `;
+  return { subject, html: SHELL(body) };
+}
+
 // ─── Newsletter welcome ───────────────────────────────────────────────
 export function newsletterWelcomeEmail(siteUrl: string) {
   const subject = "Welcome to the Sanguine newsletter";

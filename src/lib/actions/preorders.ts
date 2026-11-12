@@ -9,6 +9,8 @@ import { requireUser, getCurrentUser } from "@/lib/auth-utils";
 import { requirePermission } from "@/lib/auth-utils";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/brevo";
+import { runAfterResponse } from "@/lib/background";
+import { sendOwnerAlert, preorderAlertSms } from "@/lib/owner-alert";
 import {
   preorderReceivedEmail,
   preorderQuoteEmail,
@@ -80,7 +82,7 @@ export async function createPreorderRequest(
     attachments: data.attachments,
   }).returning();
 
-  // Customer + admin notification emails: fire-and-forget, never block.
+  // Customer + owner notifications: sent after the response, never block.
   const customerPayload = {
     customerName: data.customerName,
     segmentName: seg[0].name,
@@ -92,19 +94,19 @@ export async function createPreorderRequest(
   };
   if (user.email) {
     const { subject, html } = preorderReceivedEmail(customerPayload);
-    sendEmail({ to: user.email, toName: data.customerName, subject, html }).catch(() => {});
+    const to = user.email;
+    runAfterResponse(() => sendEmail({ to, toName: data.customerName, subject, html }));
   }
-  const adminEmail = process.env.PREORDER_ADMIN_EMAIL || process.env.BREVO_FROM_EMAIL;
-  if (adminEmail) {
-    const baseUrl = SITE_URL;
+  {
     const { subject, html } = preorderAdminNotifyEmail({
       ...customerPayload,
       requestId: row.id,
       customerEmail: user.email ?? "",
       customerPhone: data.customerPhone || null,
-      adminUrl: `${baseUrl}/en/admin/preorders?id=${row.id}`,
+      adminUrl: `${SITE_URL}/en/admin/preorders?id=${row.id}`,
     });
-    sendEmail({ to: adminEmail, subject, html }).catch(() => {});
+    const sms = preorderAlertSms(seg[0].name, data.customerName, data.customerPhone || null);
+    runAfterResponse(() => sendOwnerAlert({ kind: "preorder", subject, html, sms }));
   }
 
   revalidatePath("/[locale]/admin/preorders", "page");
@@ -229,11 +231,9 @@ export async function createProductPreorderRequest(
       targetDate: null,
       attachmentCount: 0,
     });
-    sendEmail({ to: email, toName: data.customerName, subject, html }).catch(() => {});
+    runAfterResponse(() => sendEmail({ to: email, toName: data.customerName, subject, html }));
   }
-  const adminEmail = process.env.PREORDER_ADMIN_EMAIL || process.env.BREVO_FROM_EMAIL;
-  if (adminEmail) {
-    const baseUrl = SITE_URL;
+  {
     const { subject, html } = preorderAdminNotifyEmail({
       customerName: data.customerName,
       segmentName: product.name,
@@ -245,9 +245,10 @@ export async function createProductPreorderRequest(
       requestId: row.id,
       customerEmail: email,
       customerPhone: data.customerPhone || null,
-      adminUrl: `${baseUrl}/en/admin/preorders?id=${row.id}`,
+      adminUrl: `${SITE_URL}/en/admin/preorders?id=${row.id}`,
     });
-    sendEmail({ to: adminEmail, subject, html }).catch(() => {});
+    const sms = preorderAlertSms(product.name, data.customerName, data.customerPhone || null);
+    runAfterResponse(() => sendOwnerAlert({ kind: "preorder", subject, html, sms }));
   }
 
   revalidatePath("/[locale]/admin/preorders", "page");
@@ -349,7 +350,8 @@ export async function quotePreorderRequest(input: z.infer<typeof quoteSchema>) {
       depositPct,
       adminNotes: data.adminNotes ?? null,
     });
-    sendEmail({ to: row.customerEmail, toName: row.customerName ?? undefined, subject, html }).catch(() => {});
+    const to = row.customerEmail;
+    runAfterResponse(() => sendEmail({ to, toName: row.customerName ?? undefined, subject, html }));
   }
 
   revalidatePath("/[locale]/admin/preorders", "page");
