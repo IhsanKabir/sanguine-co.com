@@ -24,7 +24,7 @@ export default async function ContactPage({ params }: Props) {
     <article className="legal-page">
       <div className="legal-kicker">{isBn ? "যোগাযোগ" : "CONTACT"}</div>
       <h1>{isBn ? "আমাদের সঙ্গে কথা বলুন।" : "Talk to us."}</h1>
-      <p className="legal-lede">
+      <p className="page-intro">
         {isBn
           ? "অর্ডার, তোড়া বা ডেলিভারি নিয়ে যেকোনো প্রশ্নে নিচের যেকোনো উপায়ে লিখুন বা ফোন করুন।"
           : "For a question about an order, a bouquet or a delivery, use any of these."}

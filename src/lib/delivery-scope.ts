@@ -14,6 +14,9 @@ export const DHAKA_ONLY_SEGMENT_IDS: readonly string[] = ["flowers"];
 
 export type DeliveryScope = "dhaka" | "mixed" | "nationwide";
 
+/** Suffixes of the per-scope message keys, e.g. `home.ledeDhaka`. */
+export const SCOPE_KEY_SUFFIXES: readonly string[] = ["Dhaka", "Mixed"];
+
 export function isDhakaOnlySegment(segmentId: string | null | undefined): boolean {
   return Boolean(segmentId) && DHAKA_ONLY_SEGMENT_IDS.includes(segmentId as string);
 }
