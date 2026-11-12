@@ -35,6 +35,8 @@ export default function ProductPreorderForm({
   const [name, setName] = useState(prefill.fullName);
   const [phone, setPhone] = useState(prefill.phone);
   const [guestEmail, setGuestEmail] = useState("");
+  // Honeypot: hidden from people, so only scripts ever fill it in.
+  const [company, setCompany] = useState("");
   const isGuest = !userEmail;
   const contactEmail = userEmail || guestEmail.trim();
   const [quantity, setQuantity] = useState(1);
@@ -79,6 +81,7 @@ export default function ProductPreorderForm({
           customerName: name.trim(),
           customerPhone: phone.trim(),
           customerEmail: isGuest ? guestEmail.trim() : null,
+          company,
           targetDate: deliveryDate || null,
           giftMessage: giftMessage.trim() || null,
           deliveryAddress: line1.trim()
@@ -109,6 +112,12 @@ export default function ProductPreorderForm({
 
   return (
     <form onSubmit={onSubmit} style={{ display: "grid", gap: 18 }}>
+      <div aria-hidden="true" style={{ position: "absolute", left: -9999, width: 1, height: 1, overflow: "hidden" }}>
+        <label>
+          Company
+          <input name="company" tabIndex={-1} autoComplete="off" value={company} onChange={(e) => setCompany(e.target.value)} />
+        </label>
+      </div>
       <div className="row">
         <div className="field">
           <label>{t("preorderForm.yourName")}</label>
