@@ -79,6 +79,12 @@ export default function MobileMenuButton({ segments }: { segments: Segment[] }) 
           <Link href="/wishlist" className="mobile-nav-link mobile-nav-secondary">
             <Icon name="heart" size={16} /> {t("nav.wishlist")}
           </Link>
+          <Link href="/faq" className="mobile-nav-link mobile-nav-secondary">
+            <Icon name="help" size={16} /> {t("footer.faq")}
+          </Link>
+          <Link href="/contact" className="mobile-nav-link mobile-nav-secondary">
+            <Icon name="chat" size={16} /> {t("footer.contactPage")}
+          </Link>
         </div>
 
         <div className="mobile-drawer-footer">

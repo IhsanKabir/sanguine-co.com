@@ -118,7 +118,7 @@ export default async function FaqPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className="legal-kicker">{isBn ? "সাধারণ প্রশ্ন" : "QUESTIONS"}</div>
       <h1>{isBn ? "যা সবাই জানতে চান।" : "What people ask us."}</h1>
-      <p className="legal-lede">
+      <p className="page-intro">
         {isBn ? "অর্ডার, ডেলিভারি আর পেমেন্ট নিয়ে ছোট ছোট উত্তর।" : "Short answers about ordering, delivery and payment."}
       </p>
 
