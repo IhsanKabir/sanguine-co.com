@@ -17,13 +17,13 @@
     "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
-    "@sentry/nextjs": "^10.51.0",
+    "@sentry/nextjs": "^10.78.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.4",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "drizzle-orm": "^0.45.2",
-    "next": "15.5",
+    "next": "^15.5.29",
     "next-intl": "^3.25.0",
     "postgres": "^3.4.5",
     "react": "^19.0.0",
