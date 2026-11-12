@@ -46,6 +46,7 @@ async function getCustomers(): Promise<CustomerRow[]> {
       max(${schema.orders.createdAt}) as last_order_at
     from ${schema.orders}
     where ${schema.orders.guestEmail} is not null
+      and not ${schema.orders.isTest}
     group by email, full_name, phone, city
     order by total_spent desc nulls last
     limit 200

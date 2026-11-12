@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth-utils";
 import { signOut } from "@/lib/actions/auth";
 import Icon from "@/components/storefront/Icon";
 import type { Permission } from "@/lib/permissions";
+import StaffMarker from "./StaffMarker";
 
 export const dynamic = "force-dynamic";
 
@@ -99,6 +100,7 @@ export default async function AdminLayout({ children, params }: Props) {
           <Link href="/" className="icon-btn" aria-label="Exit admin"><Icon name="x" size={16} /></Link>
         </div>
         <div className="admin-content">{children}</div>
+        <StaffMarker />
       </div>
     </div>
   );

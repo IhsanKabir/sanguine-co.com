@@ -3,6 +3,7 @@
 import { db, schema } from "@/lib/db";
 import { headers, cookies } from "next/headers";
 import { randomUUID } from "crypto";
+import { STAFF_COOKIE } from "@/lib/staff";
 
 export type EventType =
   | "session_start"
@@ -60,6 +61,8 @@ export async function trackEvent(input: TrackInput): Promise<void> {
   try {
     const h = await headers();
     const sessionId = await getSessionId();
+    // A browser that opened Admin is the shop's own (lib/staff.ts).
+    const isStaff = (await cookies()).get(STAFF_COOKIE)?.value === "1";
     await db.insert(schema.events).values({
       type: input.type,
       sessionId,
@@ -70,6 +73,7 @@ export async function trackEvent(input: TrackInput): Promise<void> {
       referrer: h.get("referer")?.slice(0, 400) ?? null,
       path: input.path ?? null,
       ip: (h.get("x-forwarded-for") || h.get("x-real-ip") || "").split(",")[0].trim() || null,
+      isStaff,
     });
   } catch (e) {
     console.warn("[events] failed:", e instanceof Error ? e.message : e);

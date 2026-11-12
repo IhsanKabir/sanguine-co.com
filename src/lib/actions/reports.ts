@@ -3,7 +3,7 @@
 import { db, schema } from "@/lib/db";
 import { sql, and, gte, lte, desc, eq } from "drizzle-orm";
 import { requirePermission } from "@/lib/auth-utils";
-import { countsAsRevenue, netOrderRevenue } from "@/lib/revenue";
+import { countsAsRevenue, netOrderRevenue, notTestOrder } from "@/lib/revenue";
 
 export type DateRange = { from: Date; to: Date };
 
@@ -17,6 +17,7 @@ export async function getSalesData(range: DateRange) {
   const cond = and(
     gte(schema.orders.createdAt, range.from),
     lte(schema.orders.createdAt, range.to),
+    notTestOrder,
   );
   // Money figures use only orders that count as revenue (lib/revenue.ts);
   // the by-status breakdown below still lists every order.
@@ -126,6 +127,7 @@ export async function getCodReconciliation(range: DateRange) {
     gte(schema.orders.createdAt, range.from),
     lte(schema.orders.createdAt, range.to),
     eq(schema.orders.paymentMethod, "cod"),
+    notTestOrder,
   );
 
   const summary = await db.execute<{
@@ -182,6 +184,7 @@ export async function exportSalesCsv(range: DateRange): Promise<string> {
     .where(and(
       gte(schema.orders.createdAt, range.from),
       lte(schema.orders.createdAt, range.to),
+      notTestOrder,
     ))
     .orderBy(desc(schema.orders.createdAt));
 

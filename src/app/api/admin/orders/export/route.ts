@@ -68,6 +68,7 @@ export async function GET() {
     "notes",
     "delivery_date",
     "gift_message",
+    "is_test",
   ];
 
   const rows: string[] = [headers.join(",")];
@@ -91,6 +92,7 @@ export async function GET() {
         o.notes ?? "",
         o.deliveryDate ?? "",
         o.giftMessage ?? "",
+        o.isTest ? "yes" : "",
       ].map(esc).join(","));
       continue;
     }
@@ -107,6 +109,7 @@ export async function GET() {
         o.notes ?? "",
         o.deliveryDate ?? "",
         o.giftMessage ?? "",
+        o.isTest ? "yes" : "",
       ].map(esc).join(","));
     }
   }

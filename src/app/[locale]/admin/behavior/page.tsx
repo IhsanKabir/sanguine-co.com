@@ -46,7 +46,8 @@ export default async function AdminBehaviorPage({
       count(*) filter (where type = 'checkout_start')::int  as checkouts,
       count(*) filter (where type = 'order_placed')::int    as orders
     from events
-    where created_at >= ${since}::timestamptz
+    where not is_staff
+      and created_at >= ${since}::timestamptz
   `).catch(logAndFallback("funnel", [{ sessions: 0, product_views: 0, adds: 0, checkouts: 0, orders: 0 }] as Array<{
     sessions: number; product_views: number; adds: number; checkouts: number; orders: number;
   }>));
@@ -62,7 +63,8 @@ export default async function AdminBehaviorPage({
       count(*)::int as count,
       sum(case when (payload->>'zero_result')::boolean then 1 else 0 end)::int as zero_results
     from events
-    where type = 'search'
+    where not is_staff
+      and type = 'search'
       and created_at >= ${since}::timestamptz
       and payload->>'query' is not null
     group by query
@@ -77,7 +79,8 @@ export default async function AdminBehaviorPage({
       count(*)::int as views,
       (select name from products where slug = coalesce(events.product_id, replace(events.path, '/product/', '')) limit 1) as name
     from events
-    where type = 'product_view'
+    where not is_staff
+      and type = 'product_view'
       and created_at >= ${since}::timestamptz
     group by product_id
     order by views desc
@@ -88,7 +91,8 @@ export default async function AdminBehaviorPage({
   const topPagesRaw = await db.execute<{ path: string; views: number }>(sql`
     select path, count(*)::int as views
     from events
-    where type = 'page_view'
+    where not is_staff
+      and type = 'page_view'
       and created_at >= ${since}::timestamptz
       and path is not null
     group by path
@@ -106,7 +110,8 @@ export default async function AdminBehaviorPage({
       nullif(payload->>'utm_campaign', '') as campaign,
       count(*)::int as visits
     from events
-    where type = 'session_start'
+    where not is_staff
+      and type = 'session_start'
       and created_at >= ${since}::timestamptz
     group by 1, 2
     order by visits desc
@@ -119,7 +124,8 @@ export default async function AdminBehaviorPage({
            count(*) filter (where type = 'session_start')::int as sessions,
            count(*) filter (where type = 'order_placed')::int as orders
     from events
-    where created_at >= ${since}::timestamptz
+    where not is_staff
+      and created_at >= ${since}::timestamptz
     group by day
     order by day asc
   `).catch(logAndFallback("dailyVolume", [] as Array<{ day: string; sessions: number; orders: number }>));

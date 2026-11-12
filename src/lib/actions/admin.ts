@@ -397,6 +397,32 @@ export async function updateOrderStatus(orderId: string, status: typeof validSta
   revalidatePath("/admin", "layout");
 }
 
+const orderTestSchema = z.object({
+  orderId: z.string().uuid(),
+  isTest: z.boolean(),
+});
+
+/**
+ * Mark an order as a test, or undo it. A test order stays in the list with a
+ * label and leaves every revenue figure and order count (lib/revenue.ts).
+ */
+export async function setOrderTest(input: z.infer<typeof orderTestSchema>) {
+  await requirePermission("orders");
+  const data = orderTestSchema.parse(input);
+  const [row] = await db.update(schema.orders)
+    .set({ isTest: data.isTest, updatedAt: new Date() })
+    .where(eq(schema.orders.id, data.orderId))
+    .returning({ id: schema.orders.id });
+  if (!row) return { ok: false as const, error: "Order not found." };
+  await logOrderEvent({
+    orderId: row.id,
+    type: "note_added",
+    payload: { note: data.isTest ? "Marked as a test order" : "No longer marked as a test order" },
+  });
+  revalidatePath("/[locale]/admin", "layout");
+  return { ok: true as const };
+}
+
 const bulkStatusSchema = z.object({
   orderIds: z.array(z.string().uuid()).min(1).max(200),
   status: z.enum(validStatuses),
