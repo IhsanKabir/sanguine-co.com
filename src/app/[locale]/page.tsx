@@ -191,20 +191,9 @@ export default async function Home({ params }: Props) {
                   {t("home.ctaPrimary")} <Icon name="arrow" size={14} />
                 </Link>
               )}
-              <Link href="/atelier" className="btn btn-ghost" data-magnetic style={{ borderColor: "var(--mauve)", color: "var(--mauve)" }}>
+              <Link href="/atelier" className="btn btn-on-dark" data-magnetic>
                 {t("home.ctaSecondary")}
               </Link>
-            </div>
-          </div>
-          <div className="hero-still" aria-hidden="true">
-            <div className="hs-frame" />
-            <div className="hs-ring" />
-            <div className="hs-numeral">2026</div>
-            <div className="hs-rail">
-              <span>{t("brand.name")}</span><span>·</span><span>{t("home.stillRail")}</span>
-            </div>
-            <div className="hs-cap">
-              {t("home.stillCaption")}<small>{t("home.stillCaptionSmall")}</small>
             </div>
           </div>
         </div>
