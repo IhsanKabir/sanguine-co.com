@@ -1,6 +1,7 @@
 import { getRequestConfig } from "next-intl/server";
 import { routing } from "./routing";
-import { applyCopyOverrides, getCopyOverrides } from "@/lib/copy";
+import { applyCopyOverrides, expandVariantOverrides, getCopyOverrides } from "@/lib/copy";
+import { SCOPE_KEY_SUFFIXES } from "@/lib/delivery-scope";
 
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale;
@@ -12,6 +13,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
   // admin writes to site_settings.copy; see lib/copy.ts.
   const overrides = await getCopyOverrides();
   const localeOverrides = locale === "bn" ? overrides.bn : overrides.en;
-  const messages = applyCopyOverrides(baseMessages, localeOverrides);
+  // An edit of a base string also covers its delivery-scope variants.
+  const messages = applyCopyOverrides(baseMessages, expandVariantOverrides(baseMessages, localeOverrides, SCOPE_KEY_SUFFIXES));
   return { locale, messages };
 });

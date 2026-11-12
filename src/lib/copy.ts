@@ -100,6 +100,39 @@ export function applyCopyOverrides<T extends Record<string, unknown>>(
   return merged as T;
 }
 
+function hasMessage(messages: Record<string, unknown>, path: string): boolean {
+  let cur: unknown = messages;
+  for (const segment of path.split(".")) {
+    if (typeof cur !== "object" || cur === null) return false;
+    cur = (cur as Record<string, unknown>)[segment];
+  }
+  return typeof cur === "string";
+}
+
+/**
+ * Some strings have variants picked at render time (the delivery wording:
+ * `home.lede`, `home.ledeDhaka`, `home.ledeMixed`). The Editorial admin
+ * edits the base string, so the owner's text must show whichever variant is
+ * live: an override of the base key is copied onto every variant that exists
+ * and has not been edited itself. Returns a new map; the input is untouched.
+ */
+export function expandVariantOverrides(
+  messages: Record<string, unknown>,
+  overrides: Record<string, string>,
+  suffixes: readonly string[],
+): Record<string, string> {
+  const expanded: Record<string, string> = { ...overrides };
+  for (const [path, value] of Object.entries(overrides)) {
+    if (typeof value !== "string" || value.length === 0) continue;
+    for (const suffix of suffixes) {
+      const variant = path + suffix;
+      if (overrides[variant]) continue;
+      if (hasMessage(messages, variant)) expanded[variant] = value;
+    }
+  }
+  return expanded;
+}
+
 /**
  * Walk a nested messages object and return a flat dotted-path keyed map of
  * every string leaf. ICU placeholders inside the strings are preserved as-is:

@@ -107,7 +107,9 @@ Detail for the open fixes:
 - Done: the returns page has a flowers section (deposit refunded straight away, less the delivery charge only if needed); the terms page no longer says "no deposit" for made-to-order pieces.
 - Done: flowers are Dhaka only. `src/lib/delivery-scope.ts` lists the Dhaka-only categories (`flowers`). The home lede, meta description, top bar, moving strip and "How it works" pick their wording from the open categories: Dhaka wording while only flowers are open, "across Bangladesh, flowers in Dhaka only" once a courier category opens. The preorder form fixes the city to Dhaka for flowers and the server rejects other cities.
 - Open: reply hours are not stated anywhere because the owner has not confirmed them (T7). No street address and no licence number until the owner provides them.
-- To change the wording later: the strings are in `src/messages/en.json` and `bn.json` under keys ending in `Dhaka` and `Mixed`.
+- To change the wording later: the strings are in `src/messages/en.json` and `bn.json` under keys ending in `Dhaka` and `Mixed`. An edit of the base string in Admin, Editorial (for example the announcement bar) also replaces its Dhaka and Mixed variants, unless a variant is edited itself (`expandVariantOverrides` in `src/lib/copy.ts`).
+- Done, found while checking the screenshots: the closed phone menu cast a grey shadow down the left edge of every page on phones. The shadow now shows only while the menu is open.
+- Seen, not changed: a full-screen canvas and a custom cursor layer are still mounted on phones, where they do nothing. Worth removing on touch devices in a later speed pass.
 
 **Fix G, board games launch.**
 - After the owner adds the products (C3, T6): check each product page live, then write for each game one Facebook and Instagram caption in English and Bangla with a link carrying `?utm_source=facebook&utm_medium=social&utm_campaign=boardgames`, and one short Reel scene file in `social-studio/videos/`.
@@ -135,4 +137,4 @@ Detail for the open fixes:
 - 12 Nov 2026: fix H merged (PR #70): the home hero is the wave background again.
 - 12 Nov 2026: Video maker built and tested; drafts saved for the four board games.
 - 12 Nov 2026: fix 2 merged (PR #71); the owner's test request arrived on the new versions.
-- 12 Nov 2026: fix 3 opened: Contact and FAQ pages, flower refund wording, flowers in Dhaka only.
+- 12 Nov 2026: fix 3 opened: Contact and FAQ pages, flower refund wording, flowers in Dhaka only. Also removes the grey strip the closed phone menu left on every page.
