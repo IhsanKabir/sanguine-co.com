@@ -9,6 +9,7 @@ import { requirePermission } from "@/lib/auth-utils";
 import { logOrderEvent } from "@/lib/order-events";
 import { checkOptionStock, takeStock } from "@/lib/variant-stock";
 import { sendEmail } from "@/lib/email/brevo";
+import { runAfterResponse } from "@/lib/background";
 import { orderPlacedEmail, type OrderEmailLine } from "@/lib/email/templates";
 
 import { SITE_URL } from "@/lib/site-url";
@@ -157,13 +158,13 @@ export async function createManualOrder(input: z.infer<typeof manualSchema>) {
       paymentMethod: "cod",
       trackingUrl: `${SITE_URL}/en/order/${number}/track?t=${trackingToken}`,
     });
-    sendEmail({ to: data.customer.email, toName: data.customer.fullName, subject, html })
+    const to = data.customer.email;
+    runAfterResponse(() => sendEmail({ to, toName: data.customer.fullName, subject, html })
       .then((r) => logOrderEvent({
         orderId: order.id,
         type: "email_sent",
-        payload: { subject, to: data.customer.email, ok: r.ok, error: r.error ?? null },
-      }))
-      .catch(() => {});
+        payload: { subject, to, ok: r.ok, error: r.error ?? null },
+      })));
   }
 
   revalidatePath("/[locale]/admin/orders", "page");

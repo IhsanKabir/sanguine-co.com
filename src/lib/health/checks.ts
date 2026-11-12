@@ -11,11 +11,12 @@
  * component imports the RESULT types (via `import type`) and re-runs through
  * the `getHealthReport` server action: never this module directly.
  */
-import { sql, count, eq, lte, gt } from "drizzle-orm";
+import { sql, count, eq, lte, gt, desc } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/site-url";
 import { searchProducts } from "@/lib/queries";
+import { OWNER_ALERT_EVENT, ownerAlertEmail, ownerAlertPhone } from "@/lib/owner-alert";
 
 export type HealthStatus = "ok" | "warn" | "fail";
 export type HealthCategory = "Core" | "Integrations" | "Data" | "Features" | "Config";
@@ -408,6 +409,40 @@ const CHECKS: CheckDef[] = [
           ? { status: "warn", detail: `Could not reach ${SITE_URL} (no local server running?).` }
           : { status: "fail", detail: `Fetch of ${SITE_URL}/sitemap.xml failed: ${e instanceof Error ? e.message : "network error"}` };
       }
+    },
+  },
+  {
+    id: "owner-alerts",
+    label: "Owner alerts (new orders and requests)",
+    category: "Features",
+    critical: true,
+    usesDb: true,
+    run: async () => {
+      const email = ownerAlertEmail();
+      const phone = ownerAlertPhone();
+      if (!email && !phone) {
+        return { status: "fail", detail: "No alert address: set OWNER_ALERT_EMAIL (and OWNER_ALERT_PHONE) in Vercel." };
+      }
+      const channels = [email ? "email" : null, phone ? "SMS" : "no SMS (OWNER_ALERT_PHONE not set)"].filter(Boolean).join(" + ");
+      const recent = await db.select({ payload: schema.events.payload, createdAt: schema.events.createdAt })
+        .from(schema.events)
+        .where(eq(schema.events.type, OWNER_ALERT_EVENT))
+        .orderBy(desc(schema.events.createdAt))
+        .limit(10);
+      if (recent.length === 0) {
+        return { status: "warn", detail: `No alert sent yet (${channels}). Place a test request to confirm it arrives.` };
+      }
+      const failed = recent.filter((r) => (r.payload as { ok?: boolean } | null)?.ok === false);
+      const last = recent[0];
+      const when = last.createdAt.toISOString().slice(0, 16).replace("T", " ");
+      if ((last.payload as { ok?: boolean } | null)?.ok === false) {
+        const err = (last.payload as { error?: string | null } | null)?.error ?? "unknown error";
+        return { status: "fail", detail: `Latest alert FAILED (${when} UTC): ${err}` };
+      }
+      if (failed.length > 0) {
+        return { status: "warn", detail: `${failed.length} of the last ${recent.length} alerts failed; latest sent ${when} UTC (${channels}).` };
+      }
+      return { status: "ok", detail: `Last ${recent.length} alert(s) sent; latest ${when} UTC (${channels}).` };
     },
   },
   {
