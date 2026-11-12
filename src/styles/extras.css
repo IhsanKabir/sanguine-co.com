@@ -39,8 +39,13 @@
 
 /* Wide screens: the painted horizon is lightest exactly where the lede and
    buttons sit, so a soft shade runs behind the copy and fades out before the
-   sun. Phones keep the copy on the dark upper sky and need none. */
+   sun, and the thin cloud strokes fade out behind the headline instead of
+   running through it (HeroTide draws them twice). Phones keep the copy on
+   the dark upper sky and need neither. */
+.hero-tide .ht-clouds-faded { display: none; }
 @media (min-width: 901px) {
+  .hero-tide .ht-clouds { display: none; }
+  .hero-tide .ht-clouds-faded { display: inline; }
   .hero::after {
     content: "";
     position: absolute;
