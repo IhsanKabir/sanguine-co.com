@@ -71,6 +71,11 @@
   transform: translateX(0);
   box-shadow: 4px 0 28px oklch(0.1 0.08 300 / 0.2);
 }
+/* The drawer lives inside the sticky nav (z-index 40), so its own z-index
+   cannot lift it above the cookie bar (95) or the chat buttons (90): they
+   covered the language switch at the bottom of the open menu. While the menu
+   is open, the whole nav rises above them. */
+.nav:has(.mobile-drawer.open) { z-index: 210; }
 
 .mobile-drawer-hd {
   display: flex;
