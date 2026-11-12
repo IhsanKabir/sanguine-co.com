@@ -140,7 +140,7 @@ const productPreorderSchema = z.object({
     postcode: z.string().max(20).optional().nullable(),
   }).optional().nullable(),
   /** Honeypot: a field people never see. Only scripts fill it in. */
-  company: z.string().max(200).optional().nullable(),
+  trap: z.string().max(200).optional().nullable(),
 });
 
 /** Same burst guard as checkout: three requests per email per 10 minutes. */
@@ -160,7 +160,7 @@ export async function createProductPreorderRequest(
   const data = parsed.data;
   // A filled honeypot gets the same answer as a real request, and nothing is
   // stored or emailed, so a script cannot tell it was caught.
-  if (data.company?.trim()) return { ok: true as const, id: "received" };
+  if (data.trap?.trim()) return { ok: true as const, id: "received" };
   if (data.targetDate && !isValidDeliveryDate(data.targetDate, new Date())) {
     return { ok: false as const, error: "Please choose a delivery date from tomorrow onwards." };
   }
