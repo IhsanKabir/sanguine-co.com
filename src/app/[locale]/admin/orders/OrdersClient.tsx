@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition, useMemo } from "react";
 import type { Order, OrderEvent, OrderLine } from "@/lib/schema";
 import { parseShippingAddress } from "@/lib/schema";
-import { updateOrderStatus, bookCourier, getOrderTimeline, bulkUpdateOrderStatus } from "@/lib/actions/admin";
+import { updateOrderStatus, bookCourier, getOrderTimeline, bulkUpdateOrderStatus, setOrderTest } from "@/lib/actions/admin";
 import { formatBdt, formatDate } from "@/lib/utils";
 import { Link } from "@/i18n/routing";
 import Icon from "@/components/storefront/Icon";
@@ -104,7 +104,9 @@ export default function OrdersClient({ orders, lines }: Props) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", marginBottom: 16 }}>
         <div>
           <h1 className="admin-h1">Orders</h1>
-          <p className="admin-sub">{orders.length} total · {orders.filter((o) => o.status === "cod_pending").length} awaiting fulfilment.</p>
+          <p className="admin-sub">
+            {orders.length} total{orders.some((o) => o.isTest) ? ` (${orders.filter((o) => o.isTest).length} marked test)` : ""} · {orders.filter((o) => o.status === "cod_pending" && !o.isTest).length} awaiting fulfilment.
+          </p>
         </div>
         <div style={{ display: "flex", gap: 8, position: "relative" }}>
           <CourierSyncButton />
@@ -217,7 +219,10 @@ export default function OrdersClient({ orders, lines }: Props) {
                       aria-label={`Select order ${o.number}`}
                     />
                   </td>
-                  <td style={{ fontFamily: "var(--mono)", color: "var(--purple-900)", fontWeight: 500 }}>{o.number}</td>
+                  <td style={{ fontFamily: "var(--mono)", color: "var(--purple-900)", fontWeight: 500 }}>
+                    {o.number}
+                    {o.isTest && <span className="pill pill-warn" style={{ marginLeft: 6, fontFamily: "var(--sans)" }}>Test</span>}
+                  </td>
                   <td>
                     <div style={{ fontWeight: 500 }}>{addr.fullName ?? "-"}</div>
                     <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>{o.guestEmail}</div>
@@ -321,6 +326,28 @@ export default function OrdersClient({ orders, lines }: Props) {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div className="panel" style={{ padding: 16, marginBottom: 14 }}>
+                <div className="pdp-label">Test order</div>
+                <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: "0 0 10px", lineHeight: 1.6 }}>
+                  {selected.isTest
+                    ? "Left out of revenue, reports and order counts."
+                    : "Placed it yourself to try the shop? Mark it so it stays out of revenue and reports."}
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => startTransition(async () => {
+                    const next = !selected.isTest;
+                    const r = await setOrderTest({ orderId: selected.id, isTest: next });
+                    if (!r.ok) return;
+                    setSelected({ ...selected, isTest: next });
+                    getOrderTimeline(selected.id).then(setTimeline).catch(() => {});
+                  })}
+                >
+                  {selected.isTest ? "Not a test order" : "Mark as test order"}
+                </button>
               </div>
 
               <RefundPanel

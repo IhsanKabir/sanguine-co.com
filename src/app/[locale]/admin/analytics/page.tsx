@@ -2,7 +2,7 @@ import { db, schema } from "@/lib/db";
 import { sql, desc } from "drizzle-orm";
 import { formatBdt } from "@/lib/utils";
 import { requirePermission } from "@/lib/auth-utils";
-import { countsAsRevenue, netOrderRevenue } from "@/lib/revenue";
+import { countsAsRevenue, netOrderRevenue, notTestOrder } from "@/lib/revenue";
 
 export default async function AdminAnalyticsPage() {
   const ctx = await requirePermission("analytics");
@@ -12,9 +12,9 @@ export default async function AdminAnalyticsPage() {
     total_orders: number; total_revenue: number; aov: number; units_sold: number;
   }>(sql`
     select
-      count(*)::int as total_orders,
+      count(*) filter (where ${notTestOrder})::int as total_orders,
       -- Revenue and AOV over orders that count as revenue, net of refunds
-      -- (lib/revenue.ts); total_orders still counts every order placed.
+      -- (lib/revenue.ts); total_orders counts every real order placed.
       coalesce(sum(${netOrderRevenue}) filter (where ${countsAsRevenue}), 0)::int as total_revenue,
       coalesce(round(avg(${netOrderRevenue}) filter (where ${countsAsRevenue}))::int, 0) as aov,
       coalesce((select sum(${schema.orderLines.qty})::int from ${schema.orderLines}
@@ -25,6 +25,7 @@ export default async function AdminAnalyticsPage() {
   const statusBreakdown = await db.execute<{ status: string; count: number; total: number }>(sql`
     select ${schema.orders.status} as status, count(*)::int as count, coalesce(sum(${schema.orders.totalBdt} + ${schema.orders.depositPaidBdt}), 0)::int as total
     from ${schema.orders}
+    where ${notTestOrder}
     group by ${schema.orders.status}
   `).catch(() => []);
 
@@ -42,7 +43,7 @@ export default async function AdminAnalyticsPage() {
     limit 10
   `).catch(() => []);
 
-  const recentOrders = await db.select().from(schema.orders).orderBy(desc(schema.orders.createdAt)).limit(30).catch(() => []);
+  const recentOrders = await db.select().from(schema.orders).where(notTestOrder).orderBy(desc(schema.orders.createdAt)).limit(30).catch(() => []);
 
   return (
     <>

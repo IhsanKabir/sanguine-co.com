@@ -168,6 +168,9 @@ export const orders = pgTable("orders", {
   notes: text("notes"),
   deliveryDate: date("delivery_date"),            // customer-chosen day, null = earliest (0022)
   giftMessage: text("gift_message"),              // card message (0022)
+  // Placed to test the shop (0024): stays listed in Admin with a label, and
+  // every revenue figure and order count leaves it out (lib/revenue.ts).
+  isTest: boolean("is_test").default(false).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
@@ -296,6 +299,8 @@ export const events = pgTable("events", {
   referrer: text("referrer"),
   path: text("path"),
   ip: text("ip"),
+  // From a browser that opened Admin (0024, lib/staff.ts): left out of traffic.
+  isStaff: boolean("is_staff").default(false).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 

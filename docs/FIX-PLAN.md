@@ -14,15 +14,15 @@ OWNER (only the owner can do it).
 |---|-----|-----|--------|
 | 1 | Alerts: emails were never sent; owner alert for every order and request; waiting-time badge in Admin | Claude, owner | DONE (PR #68, tested live). SMS is not connected, see A5 |
 | 1b | Preorder form fills in name, phone and address by itself | Claude | DONE (PR #69) |
-| H | Home hero: the wave background is back instead of one rose bouquet photo | Claude | DONE (PR #70). Left over: an empty black arch on desktop and a faint "About Sanguine" button |
+| H | Home hero: the wave background is back instead of one rose bouquet photo | Claude | DONE (PR #70; the empty desktop arch and faint text fixed in PR #76) |
 | 2 | Security updates (Next.js, Sentry and others) and a spam guard on the request form | Claude | DONE (PR #71, tested live). 29 advisories down to 9; what is left is listed under fix 2b |
 | 3 | Contact and FAQ pages; flower refund wording; flowers promised in Dhaka only | Claude | DONE (PR #72, live) |
 | 3b | Grey strip down the left edge of every page on phones (shadow of the closed menu); Contact and FAQ polish; Questions and Contact in the phone menu | Claude | DONE (PR #73, live) |
 | 3c | Open phone menu was covered at the bottom by the cookie bar (it hid the language switch for first-time visitors) | Claude | DONE (PR #74, live) |
-| 3d | Instagram on the site, reply hours (10am to 10pm), and the product import takes Details and Care columns | Claude | IN REVIEW |
+| 3d | Instagram on the site, reply hours (10am to 10pm), and the product import takes Details and Care columns | Claude | DONE (PR #75) |
 | G | Board games launch: listings, videos and captions are ready in `E:\Documents\Retail Platform\board-games` | Owner uploads the file and adds photos (C3) | OWNER |
 | V | Video maker: type the lines, pick photos, get a branded vertical video | Claude | DONE (12 Nov). Double-click `social-studio/Video maker.cmd`. Drafts for the four board games are saved, waiting for photos |
-| 4 | Mark test orders so reports show real revenue; leave the owner's own visits out of traffic | Claude, then the owner runs one SQL | NEXT (owner confirmed 13 Nov: all 8 orders so far are tests) |
+| 4 | Mark test orders so reports show real revenue; leave the owner's own visits out of traffic | Claude, then the owner runs one SQL | WAITING FOR THE OWNER'S SQL (migration 0024), then PR from `fix/test-orders-staff-visits` |
 | 5 | Meta Pixel behind the cookie consent | Claude, needs owner step R4 | LATER |
 | 6 | Tests for prices, deposits and stock | Claude | LATER |
 | 8 | Home page: campaign slot and category panels (mockups are on the design canvas) | Claude, needs owner approval | LATER |
@@ -128,7 +128,11 @@ Detail for the open fixes:
 - `social-studio` is not a git repository; it lives only on the owner's computer.
 - No generated footage of products. Generated footage for mood or backgrounds only, through a paid service, if the owner asks.
 
-**Fix 4, clean numbers.** The owner confirmed (13 Nov) that all 8 orders so far are tests. Plan: an `is_test` column on orders (migration, the owner runs the SQL before merge), set for those 8; `countsAsRevenue` in `src/lib/revenue.ts` excludes test orders, so the dashboard, analytics and reports all drop them; a "Test" label and a mark/unmark button in Admin, Orders for future tests. Skip analytics events from the owner's own devices (a cookie set when Admin is opened).
+**Fix 4, clean numbers (branch `fix/test-orders-staff-visits`, waiting for the SQL).**
+- Migration `supabase/migrations/0024_test_orders_staff_visits.sql`: `orders.is_test` (the 8 orders the owner confirmed as tests are set) and `events.is_staff` (past events from any browser that opened Admin are set: 1,382 of 1,862 events on 13 Nov; over the last 30 days page views go from 438 to 130).
+- `notTestOrder` and `countsAsRevenue` in `src/lib/revenue.ts` leave test orders out of the dashboard, analytics, reports, the sales export and the customers list. Test orders stay in Admin, Orders with a "Test" label, and the order drawer has a "Mark as test order" button for future tests. The orders CSV export gets an `is_test` column.
+- The shop's own visits: Admin sets a cookie (`ssg_staff`, `src/lib/staff.ts`, `StaffMarker` in the Admin layout); `trackEvent` writes `is_staff` from it; Admin, Behaviour leaves those events out.
+- Order of steps: the owner runs the SQL in Supabase, Claude checks the two columns with a read-only query, then opens the PR. Merging first would break every order query (Drizzle selects `is_test` by name).
 
 **Fix 5, Pixel.** Load the Meta Pixel only after cookie consent, with PageView, ViewContent and Lead (request sent). Re-measure speed.
 
@@ -148,4 +152,6 @@ Detail for the open fixes:
 - 12 Nov 2026: fix 3b merged (PR #73): no more grey strip from the closed phone menu, Contact and FAQ polish, Questions and Contact in the phone menu, and an owner's edit in Admin, Editorial now covers the Dhaka wording too.
 - 12 Nov 2026: fix 3c merged (PR #74): the open phone menu sits above the cookie bar.
 - 13 Nov 2026: owner answered T7 (10am to 10pm) and T8 (all orders so far are tests), and opened Instagram. Board games content pack written. Fix 3d opened.
+- 13 Nov 2026: fix 3d merged (PR #75) and the desktop hero fixed (PR #76: no empty arch, readable text). Fix 4 written; waiting for the owner to run migration 0024.
+- 13 Nov 2026: no photos or videos of the board games exist yet. The video drafts and the shop listings need the owner's own photos (see C3 and the README in the board-games folder).
 - Working note: the owner merges a PR as soon as its checks are green. Finish and verify the work on a pushed branch first (Vercel builds a preview for any branch), and open the PR only when nothing more will be added.
