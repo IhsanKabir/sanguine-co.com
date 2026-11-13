@@ -20,11 +20,11 @@ OWNER (only the owner can do it).
 | 3b | Grey strip down the left edge of every page on phones (shadow of the closed menu); Contact and FAQ polish; Questions and Contact in the phone menu | Claude | DONE (PR #73, live) |
 | 3c | Open phone menu was covered at the bottom by the cookie bar (it hid the language switch for first-time visitors) | Claude | DONE (PR #74, live) |
 | 3d | Instagram on the site, reply hours (10am to 10pm), and the product import takes Details and Care columns | Claude | DONE (PR #75) |
-| G | Board games launch: listings, videos and captions are ready in `E:\Documents\Retail Platform\board-games` | Owner uploads the file and adds photos (C3) | OWNER |
+| G | Board games launch: listings imported, photos prepared, four videos made (`E:\Documents\Retail Platform\board-games`) | Owner: re-upload the CSV (ages), stock, photos, category settings, unhide, post | OWNER (steps in that folder's README) |
 | V | Video maker: type the lines, pick photos, get a branded vertical video | Claude | DONE (12 Nov). Double-click `social-studio/Video maker.cmd`. Drafts for the four board games are saved, waiting for photos |
-| 4 | Mark test orders so reports show real revenue; leave the owner's own visits out of traffic | Claude, then the owner runs one SQL | WAITING FOR THE OWNER'S SQL (migration 0024), then PR from `fix/test-orders-staff-visits` |
+| 4 | Mark test orders so reports show real revenue; leave the owner's own visits out of traffic | Claude, owner ran the SQL | DONE (PR #77; migration 0024 run and checked 13 Nov). Owner: open Admin once on each device |
 | 5 | Meta Pixel behind the cookie consent | Claude, needs owner step R4 | LATER |
-| 6 | Tests for prices, deposits and stock | Claude | LATER |
+| 6 | Tests for prices, deposits and stock | Claude | NEXT |
 | 8 | Home page: campaign slot and category panels (mockups are on the design canvas) | Claude, needs owner approval | LATER |
 | R | Reach: Instagram, Google Business Profile, Search Console, posting by hand | Owner, steps R1 to R5 | OWNER (Instagram open: instagram.com/thesanguineco) |
 | C | Catalogue: bouquet details, clothing and board game products, category wording | Owner, steps C1 to C4 | OWNER |
@@ -117,22 +117,25 @@ Detail for the open fixes:
 - Fix 3c: the open menu now sits above the cookie bar and the chat buttons. The drawer is inside the sticky nav (z-index 40), so the nav itself rises while the menu is open (`.nav:has(.mobile-drawer.open)` in `src/styles/extras.css`).
 - Seen, not changed: a full-screen canvas and a custom cursor layer are still mounted on phones, where they do nothing. Worth removing on touch devices in a later speed pass.
 
-**Fix G, board games launch (content ready, waiting for the owner).**
+**Fix G, board games launch (waiting for the owner's last steps).**
 - `E:\Documents\Retail Platform\board-games` (outside the repo): `board-games.csv` for Admin, Products, Import; `README.md`, the owner's steps; `make-board-games.cjs`, which writes the CSV, the video texts in `social-studio/videos/` and the captions in `social-studio/captions/` from one list of facts.
-- Facts were checked on 13 Nov against several shops' listings: players, playing time and contents agree everywhere. Ages differ between editions, so only Exploding Kittens (7+) carries one; the owner adds the others from the boxes. One Night Ultimate Werewolf Daybreak is 3 to 7 players on its own, up to 10 with the original.
+- Facts were checked on 13 Nov against several shops' listings: players, playing time and contents agree everywhere. One Night Ultimate Werewolf Daybreak is 3 to 7 players on its own, up to 10 with the original. Ages come from the owner's boxes and graphics: Exploding Kittens 7+, One Night Ultimate Werewolf 8+, Daybreak 8+, Coup 14+ (its box back; the spines say 13+).
+- The owner imported the CSV on 13 Nov (four products, hidden category, stock 1 each). The regenerated CSV adds the ages; re-uploading it is safe while prices and stock in the shop still match the file.
+- Photos: the owner's originals are in `board-games/photos/<game>/`; `prepare-photos.sh` makes portrait 4:5 versions in `photos/ready/` (upright, blurred fill for wide shots). Four files are designed graphics with a "TableTop" logo and are not used. Daybreak has no photo of its own yet; its images are cut from the group shot.
+- Videos: rendered to `social-studio/out/<game>.mp4` with those photos; `social-studio/stage.html` now balances lines and keeps a "·" separator at the end of a line.
 - The captions link to `/en/product/<slug>` (slugs: exploding-kittens-original-edition, one-night-ultimate-werewolf, one-night-ultimate-werewolf-daybreak, coup), which open once the category is unhidden.
-- Next for Claude: when the owner says the games are in, check the four product pages live, and help render the videos.
+- Next for Claude: when the owner says the category is open, check the four product pages live (photos, details, price, add to bag).
 
 **Fix V, Video maker (done).**
 - `social-studio/studio.mjs` (a local server on 127.0.0.1:4477, no dependencies) and `studio.html`, started with `Video maker.cmd`. Scenes are Words, Photo or Website recording; the page shows a live preview and runs `render.mjs`. How to use it: `social-studio/README.md`.
 - `social-studio` is not a git repository; it lives only on the owner's computer.
 - No generated footage of products. Generated footage for mood or backgrounds only, through a paid service, if the owner asks.
 
-**Fix 4, clean numbers (branch `fix/test-orders-staff-visits`, waiting for the SQL).**
+**Fix 4, clean numbers (done, PR #77).**
 - Migration `supabase/migrations/0024_test_orders_staff_visits.sql`: `orders.is_test` (the 8 orders the owner confirmed as tests are set) and `events.is_staff` (past events from any browser that opened Admin are set: 1,382 of 1,862 events on 13 Nov; over the last 30 days page views go from 438 to 130).
 - `notTestOrder` and `countsAsRevenue` in `src/lib/revenue.ts` leave test orders out of the dashboard, analytics, reports, the sales export and the customers list. Test orders stay in Admin, Orders with a "Test" label, and the order drawer has a "Mark as test order" button for future tests. The orders CSV export gets an `is_test` column.
 - The shop's own visits: Admin sets a cookie (`ssg_staff`, `src/lib/staff.ts`, `StaffMarker` in the Admin layout); `trackEvent` writes `is_staff` from it; Admin, Behaviour leaves those events out.
-- Order of steps: the owner runs the SQL in Supabase, Claude checks the two columns with a read-only query, then opens the PR. Merging first would break every order query (Drizzle selects `is_test` by name).
+- The owner ran the SQL first (13 Nov); a read-only check found both columns, 8 test orders and 1,382 flagged events; a test visit carrying the cookie on the preview was recorded with `is_staff = true`. A device only counts as the owner's after Admin is opened on it once.
 
 **Fix 5, Pixel.** Load the Meta Pixel only after cookie consent, with PageView, ViewContent and Lead (request sent). Re-measure speed.
 
@@ -153,5 +156,6 @@ Detail for the open fixes:
 - 12 Nov 2026: fix 3c merged (PR #74): the open phone menu sits above the cookie bar.
 - 13 Nov 2026: owner answered T7 (10am to 10pm) and T8 (all orders so far are tests), and opened Instagram. Board games content pack written. Fix 3d opened.
 - 13 Nov 2026: fix 3d merged (PR #75) and the desktop hero fixed (PR #76: no empty arch, readable text). Fix 4 written; waiting for the owner to run migration 0024.
-- 13 Nov 2026: no photos or videos of the board games exist yet. The video drafts and the shop listings need the owner's own photos (see C3 and the README in the board-games folder).
+- 13 Nov 2026: fix 4 merged (PR #77) after the owner ran migration 0024.
+- 13 Nov 2026: owner imported the board games and added photos. Ages added to the CSV, photos prepared for the shop, four videos rendered.
 - Working note: the owner merges a PR as soon as its checks are green. Finish and verify the work on a pushed branch first (Vercel builds a preview for any branch), and open the PR only when nothing more will be added.
