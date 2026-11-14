@@ -67,11 +67,10 @@
 @media (max-width: 900px) {
   .nav-cats    { display: none; }
   .nav-inner   { padding: 12px 20px; gap: 12px; }
-  .nav-brand   { font-size: 26px; }
   .nav-menu-btn { display: grid; }
 }
 @media (max-width: 640px) {
-  .nav-brand   { font-size: 22px; flex: 1; text-align: center; }
+  .nav-brand   { flex: 1; justify-content: center; }
   .nav-right   { gap: 4px; }
   .nav-hide-sm { display: none; }
 }
@@ -117,13 +116,8 @@
   border-bottom: 1px solid var(--line);
   flex-shrink: 0;
 }
-.mobile-drawer-brand {
-  font-family: var(--serif);
-  font-size: 22px;
-  font-style: italic;
-  color: var(--purple-900);
-  letter-spacing: .06em;
-}
+.mobile-drawer-brand { line-height: 0; }
+.mobile-drawer-brand img { display: block; }
 
 .mobile-drawer-nav {
   flex: 1;

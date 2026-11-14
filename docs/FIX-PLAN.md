@@ -24,6 +24,7 @@ OWNER (only the owner can do it).
 | Q | Quality check after every video and for shop pictures, with a written standard | Claude | DONE (13 Nov; 3D boxes added 14 Nov). `social-studio/qc.mjs`; the standard and the owner's photo guide are in `social-studio/quality-standard.md` |
 | V | Video maker: type the lines, pick photos, get a branded vertical video | Claude | DONE (12 Nov). Double-click `social-studio/Video maker.cmd`. Videos for three board games are made and checked, each with the game's own box in 3D; Daybreak waits for a photo |
 | 4 | Mark test orders so reports show real revenue; leave the owner's own visits out of traffic | Claude, owner ran the SQL | DONE (PR #77; migration 0024 run and checked 13 Nov). Owner: open Admin once on each device |
+| L | New logo, "One line": সাঙ্গুইন hangs from a gold line and SANGUINE stands on it. In the header, footer, phone menu, browser icons, link previews, emails and the invoice. Also: link previews of made-to-order flowers said "BDT 0", and the invoice and the emails now escape the customer's own text | Claude; owner changes the profile picture and cover (step L1) | IN REVIEW (PR #81) |
 | 5 | Meta Pixel behind the cookie consent | Claude, needs owner step R4 | LATER |
 | 6 | Tests for prices, deposits and stock | Claude | NEXT |
 | 8 | Home page: campaign slot and category panels (mockups are on the design canvas) | Claude, needs owner approval | LATER |
@@ -57,6 +58,15 @@ A1 to A4 are done (12 Nov): the alert email and the customer email arrive.
 - Pixel: in Meta Events Manager, create a Pixel for sanguine-co.com and give Claude the Pixel ID (a number, it is not a secret).
 
 **R5. First reviews.** Offer the first 5 to 10 bouquets to people you know at cost. Ask each for an honest review on the site and a photo you may post.
+
+### L. The new logo
+
+**L1. Profile picture and cover (after PR #81 is merged).** Both files are in `E:\Documents\Retail Platform\social-assets`:
+
+- Facebook profile picture and Instagram profile picture: `sanguine-profile-picture.png` (S over স across the gold line; both apps crop it round).
+- Facebook cover: `sanguine-facebook-cover.png`.
+
+The old ones are kept in `social-assets\old-logo`.
 
 ### C. Catalogue
 
@@ -143,6 +153,8 @@ Detail for the open fixes:
 
 **Fix 6, tests.** Unit tests for `src/lib/pricing.ts`, `src/lib/variant-stock.ts`, deposit math in `preorders.ts`, and `quote-message.ts`. Add a CI step that fails when a migration file exists that production has not applied.
 
+**Fix L, logo.** Made in `E:\Documents\Retail Platform\brand` (see its README): the type is outlined with HarfBuzz, so the logo never depends on a font. `node build.mjs` there writes every file: `public/brand/*.svg` and the email PNG, the icons, `src/lib/brand-files.generated.ts` (file sizes, for `BrandMark`), `src/lib/brand-art.generated.ts` (outlines, for the link preview and the invoice), the social pictures and the Reel template's copy. Never edit the generated files by hand. The header uses files, not inline SVG, so the 12 KB of outlines is not sent twice on every page. Phones show one language's half (`<picture>`, max-width 640px).
+
 **Fix 8, home redesign.** Mockups: design canvas, row "Home: the brand on top, the categories under it". A campaign slot in Admin (image, headline, button) that falls back to the wave background, and one photo panel per open category with the photo set in Admin, Segments (needs a migration for the cover image). Needs the owner's approval of the mockups first.
 
 ## Change log
@@ -162,4 +174,5 @@ Detail for the open fixes:
 - 13 Nov 2026: owner imported the board games and added photos. Ages added to the CSV, photos prepared for the shop, four videos rendered.
 - 13 Nov 2026: owner asked for a quality check after generation and a comparison with the global brands. The first pictures and videos did not pass: wrong shape for the shop, blurred bars, text under the apps' buttons. Check built, pictures and three videos remade to pass it, Daybreak held back until its box is photographed.
 - 14 Nov 2026: owner still not satisfied with the pictures and videos. Boxes rebuilt in 3D from the owner's own photos of their faces, for the shop pictures and the videos; all pass the check.
+- 15 Nov 2026: owner asked for a more creative logo before the flower Reels. Two routes shown (`brand/concepts/index.html`); the owner went with the recommended one, "One line". Fix L written; the link previews of flowers no longer say "BDT 0".
 - Working note: the owner merges a PR as soon as its checks are green. Finish and verify the work on a pushed branch first (Vercel builds a preview for any branch), and open the PR only when nothing more will be added.

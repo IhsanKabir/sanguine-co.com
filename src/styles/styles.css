@@ -58,8 +58,9 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:20px;padding:14px 32px}
 .nav-cats{display:flex;align-items:center;flex:1;justify-content:center}
 .nav-right{display:flex;align-items:center;gap:8px}
-.nav-brand{font-family:var(--serif);font-size:34px;font-weight:500;letter-spacing:.06em;color:var(--purple-900);text-align:center;font-style:italic}
-.nav-brand sup{font-size:9px;letter-spacing:.3em;font-style:normal;color:var(--gold-text);vertical-align:super;margin-left:4px}
+/* The logo is a picture (BrandMark): its size comes from its width/height attributes. */
+.nav-brand{display:flex;align-items:center;flex:none;line-height:0}
+.nav-brand img{display:block}
 .nav-link{font-size:13px;color:var(--ink-soft);padding:12px 4px;position:relative}
 .nav-link:hover,.nav-link.active{color:var(--purple-800)}
 .nav-link.active::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--gold)}

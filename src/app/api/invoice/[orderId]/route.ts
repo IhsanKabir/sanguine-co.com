@@ -2,12 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/lib/db";
 import { parseShippingAddress } from "@/lib/schema";
 import { getCurrentUser } from "@/lib/auth-utils";
+import { escapeHtml } from "@/lib/html";
+import { BRAND_COLOURS, BRAND_LOCKUP } from "@/lib/brand-art.generated";
 import { eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
 function fmt(n: number) {
   return "৳" + new Intl.NumberFormat("en-IN").format(n);
+}
+
+/** Text from the order (names, addresses, codes), escaped: a guest order can carry anyone's email. */
+const e = (v: string | number | null | undefined) => escapeHtml(String(v ?? ""));
+
+/** The logo (brand/), drawn from outlines so it prints without any font. */
+function logoSvg(letterPx: number): string {
+  const { designSize, width, height, letters, line } = BRAND_LOCKUP;
+  const k = letterPx / designSize;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${Math.round(width * k)}" height="${Math.round(height * k)}" role="img" aria-label="Sanguine">` +
+    `<path d="${letters}" fill="${BRAND_COLOURS.plum}"/>` +
+    `<rect x="${line.x}" y="${line.y}" width="${line.width}" height="${line.height}" fill="${BRAND_COLOURS.goldOnLight}"/></svg>`;
 }
 
 export async function GET(
@@ -52,8 +66,8 @@ export async function GET(
       (l) => `
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid #e8e4de;font-size:13px">
-        ${l.nameSnapshot}
-        ${l.color || l.size ? `<span style="color:#888;margin-left:8px">· ${[l.color, l.size].filter(Boolean).join(" · ")}</span>` : ""}
+        ${e(l.nameSnapshot)}
+        ${l.color || l.size ? `<span style="color:#888;margin-left:8px">· ${e([l.color, l.size].filter(Boolean).join(" · "))}</span>` : ""}
       </td>
       <td style="padding:10px 0;border-bottom:1px solid #e8e4de;font-size:13px;text-align:center;color:#666">${l.qty}</td>
       <td style="padding:10px 0;border-bottom:1px solid #e8e4de;font-size:13px;text-align:right">${fmt(l.unitPriceBdt)}</td>
@@ -64,7 +78,7 @@ export async function GET(
 
   const discountRow =
     order.couponDiscountBdt && order.couponDiscountBdt > 0
-      ? `<tr><td colspan="3" style="text-align:right;padding:6px 0;font-size:13px;color:#666">Discount${order.couponCode ? ` · ${order.couponCode}` : ""}</td><td style="text-align:right;padding:6px 0;font-size:13px;color:#2d7d46">− ${fmt(order.couponDiscountBdt)}</td></tr>`
+      ? `<tr><td colspan="3" style="text-align:right;padding:6px 0;font-size:13px;color:#666">Discount${order.couponCode ? ` · ${e(order.couponCode)}` : ""}</td><td style="text-align:right;padding:6px 0;font-size:13px;color:#2d7d46">− ${fmt(order.couponDiscountBdt)}</td></tr>`
       : "";
 
   // Prepaid preorder deposit: a payment already received, shown between
@@ -79,13 +93,12 @@ export async function GET(
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Invoice · ${order.number}</title>
+<title>Invoice · ${e(order.number)}</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:system-ui,sans-serif;background:#faf9f6;color:#1a1520;padding:48px 40px;max-width:760px;margin:0 auto}
-  .logo{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;color:#2d1b4e;letter-spacing:.04em}
-  .logo sup{font-size:11px;letter-spacing:.2em;vertical-align:super;font-weight:400;color:#8b7bb0}
+  .logo{line-height:0}
   .mono{font-family:'JetBrains Mono',monospace}
   .divider{border:none;border-top:1px solid #e0dbd6;margin:24px 0}
   table{width:100%;border-collapse:collapse}
@@ -99,11 +112,11 @@ export async function GET(
 
 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px">
   <div>
-    <div class="logo">Sanguine <sup>SSG</sup></div>
-    <div class="mono" style="font-size:10px;letter-spacing:.2em;color:#8b7bb0;margin-top:6px;text-transform:uppercase">Invoice</div>
+    <div class="logo">${logoSvg(22)}</div>
+    <div class="mono" style="font-size:10px;letter-spacing:.2em;color:#8b7bb0;margin-top:10px;text-transform:uppercase">Invoice</div>
   </div>
   <div style="text-align:right">
-    <div class="mono" style="font-size:18px;color:#2d1b4e;font-weight:500;letter-spacing:.12em">${order.number}</div>
+    <div class="mono" style="font-size:18px;color:#2d1b4e;font-weight:500;letter-spacing:.12em">${e(order.number)}</div>
     <div style="font-size:12px;color:#888;margin-top:4px">${placed}</div>
   </div>
 </div>
@@ -114,19 +127,19 @@ export async function GET(
   <div>
     <div class="mono" style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8b7bb0;margin-bottom:8px">Billed to</div>
     <div style="font-size:14px;line-height:1.6;color:#2d1b4e">
-      ${addr.fullName ?? "-"}<br/>
-      ${addr.line1 ?? ""}${addr.line2 ? ", " + addr.line2 : ""}<br/>
-      ${addr.area ? addr.area + ", " : ""}${addr.city ?? ""}${addr.postcode ? " " + addr.postcode : ""}<br/>
-      ${addr.phone ?? ""}
+      ${e(addr.fullName ?? "-")}<br/>
+      ${e(addr.line1)}${addr.line2 ? ", " + e(addr.line2) : ""}<br/>
+      ${addr.area ? e(addr.area) + ", " : ""}${e(addr.city)}${addr.postcode ? " " + e(addr.postcode) : ""}<br/>
+      ${e(addr.phone)}
     </div>
   </div>
   <div>
     <div class="mono" style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8b7bb0;margin-bottom:8px">Order details</div>
     <div style="font-size:13px;line-height:1.8;color:#555">
-      <span style="color:#2d1b4e;font-weight:500">Status:</span> ${order.status.replace("_", " ")}<br/>
-      <span style="color:#2d1b4e;font-weight:500">Payment:</span> ${order.paymentMethod === "cod" ? "Cash on Delivery" : order.paymentMethod}<br/>
-      ${order.shippingCourier ? `<span style="color:#2d1b4e;font-weight:500">Courier:</span> ${order.shippingCourier}<br/>` : ""}
-      ${order.shippingTracking ? `<span style="color:#2d1b4e;font-weight:500">Tracking:</span> <span class="mono">${order.shippingTracking}</span>` : ""}
+      <span style="color:#2d1b4e;font-weight:500">Status:</span> ${e(order.status.replace("_", " "))}<br/>
+      <span style="color:#2d1b4e;font-weight:500">Payment:</span> ${order.paymentMethod === "cod" ? "Cash on Delivery" : e(order.paymentMethod)}<br/>
+      ${order.shippingCourier ? `<span style="color:#2d1b4e;font-weight:500">Courier:</span> ${e(order.shippingCourier)}<br/>` : ""}
+      ${order.shippingTracking ? `<span style="color:#2d1b4e;font-weight:500">Tracking:</span> <span class="mono">${e(order.shippingTracking)}</span>` : ""}
     </div>
   </div>
 </div>

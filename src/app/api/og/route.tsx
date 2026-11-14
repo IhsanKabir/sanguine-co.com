@@ -3,6 +3,9 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getProductBySlug, getProductImages, getSegmentBySlug } from "@/lib/queries";
 import { captureError } from "@/lib/monitoring";
+import { priceDisplay, type PriceDisplay } from "@/lib/pricing";
+import { BRAND_LOCKUP } from "@/lib/brand-art.generated";
+import { formatAmount, priceLine } from "./price-line";
 
 /**
  * Dynamic Open Graph card: EXECUTION-PLAN Phase 2.3.
@@ -119,34 +122,19 @@ function TideWaves() {
   );
 }
 
-/** Italic-serif wordmark with the small gold DHAKA sup: mirrors `.nav-brand`. */
-function Wordmark({ size = 40 }: { size?: number }) {
+/**
+ * The logo, as in the site header (BrandMark): সাঙ্গুইন hangs from the gold
+ * line and SANGUINE stands on it. Drawn from outlines, so it needs no Bangla
+ * font here. `letterPx` is the size of the English capitals.
+ */
+function Lockup({ letterPx }: { letterPx: number }) {
+  const { designSize, width, height, letters, line } = BRAND_LOCKUP;
+  const k = letterPx / designSize;
   return (
-    <div style={{ display: "flex", alignItems: "baseline" }}>
-      <span
-        style={{
-          fontFamily: "Cormorant Garamond",
-          fontStyle: "italic",
-          fontWeight: 500,
-          fontSize: size,
-          color: CREAM,
-          letterSpacing: 1,
-        }}
-      >
-        Sanguine
-      </span>
-      <span
-        style={{
-          fontFamily: "Inter",
-          fontSize: Math.round(size * 0.28),
-          letterSpacing: 4,
-          color: GOLD,
-          marginLeft: 12,
-        }}
-      >
-        DHAKA
-      </span>
-    </div>
+    <svg width={Math.round(width * k)} height={Math.round(height * k)} viewBox={`0 0 ${width} ${height}`}>
+      <path d={letters} fill={CREAM} />
+      <rect x={line.x} y={line.y} width={line.width} height={line.height} fill={GOLD} />
+    </svg>
   );
 }
 
@@ -161,7 +149,7 @@ const rootStyle = {
 
 // ── Cards ────────────────────────────────────────────────────────────────
 
-/** Generic maison card: wordmark + tagline. Used for `/api/og` and unknown slugs. */
+/** Generic maison card: the logo + tagline. Used for `/api/og` and unknown slugs. */
 function MaisonCard() {
   return (
     <div style={{ ...rootStyle, alignItems: "center", justifyContent: "center" }}>
@@ -174,25 +162,13 @@ function MaisonCard() {
           marginTop: -36,
         }}
       >
-        <span style={{ fontSize: 22, letterSpacing: 8, color: GOLD }}>DHAKA</span>
-        <span
-          style={{
-            fontFamily: "Cormorant Garamond",
-            fontStyle: "italic",
-            fontWeight: 500,
-            fontSize: 124,
-            color: CREAM,
-            marginTop: 8,
-          }}
-        >
-          Sanguine
-        </span>
-        <div style={{ width: 72, height: 2, background: GOLD, marginTop: 22 }} />
+        <span style={{ fontSize: 22, letterSpacing: 8, color: GOLD, marginBottom: 34 }}>DHAKA</span>
+        <Lockup letterPx={72} />
         <span
           style={{
             fontSize: 26,
             color: PLUM_200,
-            marginTop: 26,
+            marginTop: 34,
             maxWidth: 720,
             textAlign: "center",
             lineHeight: 1.4,
@@ -208,16 +184,13 @@ function MaisonCard() {
 type ProductCardData = {
   name: string;
   segmentName: string | null;
-  priceBdt: number;
+  price: PriceDisplay;
+  preorderOnly: boolean;
   wasBdt: number | null;
   tag: string | null;
   photoUrl: string | null;
 };
 
-/** Format whole-BDT amounts with the same en-IN lakh grouping as formatBdt. */
-function formatAmount(n: number): string {
-  return new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n);
-}
 
 // Admin uploads are capped at 8 MB; anything larger is not ours to render.
 const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
@@ -329,9 +302,9 @@ function ProductCard({ p }: { p: ProductCardData }) {
           <div style={{ width: 64, height: 2, background: GOLD, marginTop: 24 }} />
           <div style={{ display: "flex", alignItems: "center", marginTop: 22 }}>
             <span style={{ fontSize: 28, color: PLUM_200 }}>
-              {`BDT ${formatAmount(p.priceBdt)}`}
+              {priceLine(p.price, p.preorderOnly)}
             </span>
-            {p.wasBdt != null && p.wasBdt > p.priceBdt && (
+            {p.price.kind === "fixed" && p.wasBdt != null && p.wasBdt > p.price.amountBdt && (
               <span
                 style={{
                   fontSize: 22,
@@ -361,7 +334,7 @@ function ProductCard({ p }: { p: ProductCardData }) {
           </div>
         </div>
 
-        <Wordmark />
+        <Lockup letterPx={30} />
       </div>
     </div>
   );
@@ -424,7 +397,8 @@ export async function GET(request: Request) {
               p={{
                 name: p.name,
                 segmentName: segment?.name ?? null,
-                priceBdt: p.priceBdt,
+                price: priceDisplay(p),
+                preorderOnly: p.preorderOnly,
                 wasBdt: p.wasBdt,
                 tag: p.tag,
                 photoUrl,

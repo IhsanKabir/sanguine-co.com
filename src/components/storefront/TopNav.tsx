@@ -16,6 +16,7 @@ import SearchDropdown from "./SearchDropdown";
 import CatStrip from "./CatStrip";
 import MobileMenuButton from "./MobileMenuButton";
 import AnnouncementBar from "./AnnouncementBar";
+import BrandMark from "./BrandMark";
 
 export default async function TopNav() {
   const t = await getTranslations();
@@ -59,7 +60,7 @@ export default async function TopNav() {
         <div className="nav-inner">
           <MobileMenuButton segments={segmentData} />
           <Link href="/" className="nav-brand">
-            {t("brand.name")}
+            <BrandMark locale={locale === "bn" ? "bn" : "en"} alt={t("brand.name")} letterPx={26} narrowLetterPx={26} />
           </Link>
           <CatStrip segments={segmentData} inline />
           <div className="nav-right">
