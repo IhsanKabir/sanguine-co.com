@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { usePathname } from "next/navigation";
 import Icon from "./Icon";
 import LocaleSwitcher from "./LocaleSwitcher";
+import { brandHalf } from "./BrandMark";
 
 type Segment = { id: string; name: string };
 
 export default function MobileMenuButton({ segments }: { segments: Segment[] }) {
   const t = useTranslations();
+  const brand = brandHalf(useLocale() === "bn" ? "bn" : "en", 22);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -49,7 +51,10 @@ export default function MobileMenuButton({ segments }: { segments: Segment[] }) 
         aria-label={t("nav.siteNavigation")}
       >
         <div className="mobile-drawer-hd">
-          <span className="mobile-drawer-brand">{t("brand.name")}</span>
+          <span className="mobile-drawer-brand">
+            {/* eslint-disable-next-line @next/next/no-img-element -- an SVG logo; lazy, as the closed drawer is off screen */}
+            <img src={brand.src} width={brand.width} height={brand.height} alt={t("brand.name")} loading="lazy" decoding="async" />
+          </span>
           <button
             className="icon-btn"
             onClick={() => setOpen(false)}

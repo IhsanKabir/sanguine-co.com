@@ -1,8 +1,16 @@
 /**
  * Email templates as inline HTML strings. No template engine to keep things simple.
  * Templates use Sanguine's serif typography, deep purple brand color, and gold rule.
+ * The logo at the top is a PNG on the site (email apps do not show SVG); with
+ * pictures blocked, its alt text and styling show "Sanguine" in Georgia.
  */
 import { formatBdt } from "@/lib/utils";
+import { escapeHtml } from "@/lib/html";
+import { SITE_URL } from "@/lib/site-url";
+import { BRAND_EMAIL_LOGO } from "@/lib/brand-files.generated";
+
+/** Every value put into the HTML is escaped: names and addresses are typed by customers. */
+const e = (v: string | number | null | undefined) => escapeHtml(String(v ?? ""));
 
 const SHELL = (body: string) => `<!doctype html>
 <html><head><meta charset="utf-8"/><title>Sanguine</title></head>
@@ -11,8 +19,7 @@ const SHELL = (body: string) => `<!doctype html>
     <tr><td align="center">
       <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" style="background:white;max-width:560px;width:100%;">
         <tr><td style="padding:40px 40px 20px;border-bottom:1px solid #e8e0d2;text-align:center;">
-          <div style="font-family:Georgia,serif;font-style:italic;font-size:32px;color:#2a1854;letter-spacing:.02em;">Sanguine</div>
-          <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.4em;color:#a07e2c;margin-top:6px;">DHAKA</div>
+          <img src="${SITE_URL}${BRAND_EMAIL_LOGO.src}" width="${BRAND_EMAIL_LOGO.width}" height="${BRAND_EMAIL_LOGO.height}" alt="Sanguine" style="display:block;margin:0 auto;border:0;outline:none;text-decoration:none;font-family:Georgia,serif;font-size:26px;color:#2a1854;">
         </td></tr>
         <tr><td style="padding:32px 40px;font-family:Georgia,serif;color:#2a1854;line-height:1.7;">
           ${body}
@@ -49,7 +56,7 @@ export function orderPlacedEmail(d: OrderEmailData) {
   const linesHtml = d.lines.map(l => `
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid #f0e8d8;font-family:Georgia,serif;font-size:14px;">
-        ${l.name}${l.color ? ` · <span style="color:#7a6a52;font-size:12px;">${l.color}</span>` : ""}${l.size ? ` · <span style="color:#7a6a52;font-size:12px;">${l.size}</span>` : ""}
+        ${e(l.name)}${l.color ? ` · <span style="color:#7a6a52;font-size:12px;">${e(l.color)}</span>` : ""}${l.size ? ` · <span style="color:#7a6a52;font-size:12px;">${e(l.size)}</span>` : ""}
         <div style="font-family:'Courier New',monospace;font-size:11px;color:#7a6a52;">Qty ${l.qty}</div>
       </td>
       <td style="padding:10px 0;border-bottom:1px solid #f0e8d8;text-align:right;font-family:Georgia,serif;font-size:14px;">${formatBdt(l.lineTotalBdt)}</td>
@@ -68,10 +75,10 @@ export function orderPlacedEmail(d: OrderEmailData) {
 
   const subject = `Your Sanguine order ${d.number}`;
   const body = `
-    <p style="font-size:15px;margin:0 0 4px;">Dear ${d.customerName.split(" ")[0]},</p>
+    <p style="font-size:15px;margin:0 0 4px;">Dear ${e(d.customerName.split(" ")[0])},</p>
     <p style="font-size:15px;margin:0 0 24px;">Thank you for your order. We've started preparing it.</p>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-top:1px solid #e8d8a8;">
-      <tr><td style="padding:14px 0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;">ORDER · ${d.number}</td></tr>
+      <tr><td style="padding:14px 0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;">ORDER · ${e(d.number)}</td></tr>
     </table>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">${linesHtml}</table>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:14px;">
@@ -83,10 +90,10 @@ export function orderPlacedEmail(d: OrderEmailData) {
     ${codNote}
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:32px 0 8px;">DELIVERING TO</p>
     <p style="font-size:14px;line-height:1.6;margin:0;">
-      ${d.customerName}<br/>${d.shippingAddress.line1}<br/>${d.shippingAddress.area ? d.shippingAddress.area + ", " : ""}${d.shippingAddress.city}${d.shippingAddress.postcode ? " " + d.shippingAddress.postcode : ""}<br/>
-      ${d.customerPhone}
+      ${e(d.customerName)}<br/>${e(d.shippingAddress.line1)}<br/>${d.shippingAddress.area ? e(d.shippingAddress.area) + ", " : ""}${e(d.shippingAddress.city)}${d.shippingAddress.postcode ? " " + e(d.shippingAddress.postcode) : ""}<br/>
+      ${e(d.customerPhone)}
     </p>
-    ${d.trackingUrl ? `<p style="margin:24px 0 0;"><a href="${d.trackingUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Track your order →</a></p>` : ""}
+    ${d.trackingUrl ? `<p style="margin:24px 0 0;"><a href="${e(d.trackingUrl)}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Track your order →</a></p>` : ""}
     <p style="font-size:13px;color:#7a6a52;margin:32px 0 0;line-height:1.7;">We'll write again when the courier collects your parcel. If anything looks wrong, reply to this email.</p>
     <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">Sanguine</p>
   `;
@@ -96,10 +103,10 @@ export function orderPlacedEmail(d: OrderEmailData) {
 export function orderShippedEmail(d: OrderEmailData & { courier: string; tracking?: string }) {
   const subject = `On its way · ${d.number}`;
   const body = `
-    <p style="font-size:15px;margin:0 0 24px;">Dear ${d.customerName.split(" ")[0]},</p>
-    <p style="font-size:15px;margin:0 0 24px;">Your order is in the hands of <b>${d.courier}</b>${d.tracking ? `, tracking <code style="font-family:'Courier New',monospace;background:#f4ecd8;padding:2px 6px;">${d.tracking}</code>` : ""}.</p>
+    <p style="font-size:15px;margin:0 0 24px;">Dear ${e(d.customerName.split(" ")[0])},</p>
+    <p style="font-size:15px;margin:0 0 24px;">Your order is in the hands of <b>${e(d.courier)}</b>${d.tracking ? `, tracking <code style="font-family:'Courier New',monospace;background:#f4ecd8;padding:2px 6px;">${e(d.tracking)}</code>` : ""}.</p>
     ${d.paymentMethod === "cod" ? `<p style="background:#fdf6e8;border:1px solid #e8d8a8;padding:14px 16px;font-size:13px;">Please have <b>${formatBdt(d.totalBdt)}</b> ready in cash for the courier.</p>` : ""}
-    ${d.trackingUrl ? `<p style="margin:18px 0 0;"><a href="${d.trackingUrl}" style="color:#2a1854;font-weight:500;">Track your order →</a></p>` : ""}
+    ${d.trackingUrl ? `<p style="margin:18px 0 0;"><a href="${e(d.trackingUrl)}" style="color:#2a1854;font-weight:500;">Track your order →</a></p>` : ""}
     <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">Sanguine</p>
   `;
   return { subject, html: SHELL(body) };
@@ -119,13 +126,13 @@ export type PreorderEmailData = {
 export function preorderReceivedEmail(d: PreorderEmailData) {
   const subject = `Request received · ${d.segmentName}`;
   const body = `
-    <p style="font-size:15px;margin:0 0 6px;">Dear ${d.customerName.split(" ")[0] || "friend"},</p>
-    <p style="font-size:15px;margin:0 0 24px;">We have your request for a piece in <em>${d.segmentName}</em>. We'll reply within a day or two with a price and a date.</p>
+    <p style="font-size:15px;margin:0 0 6px;">Dear ${e(d.customerName.split(" ")[0] || "friend")},</p>
+    <p style="font-size:15px;margin:0 0 24px;">We have your request for a piece in <em>${e(d.segmentName)}</em>. We'll reply within a day or two with a price and a date.</p>
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:0 0 8px;">YOUR REQUEST</p>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-top:1px solid #e8d8a8;">
       <tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;width:120px;">Quantity</td><td style="padding:10px 0;font-size:14px;">${d.quantity}</td></tr>
       ${d.budgetHintBdt ? `<tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;">Budget hint</td><td style="padding:10px 0;font-size:14px;">${formatBdt(d.budgetHintBdt)}</td></tr>` : ""}
-      ${d.targetDate ? `<tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;">Hoped-for date</td><td style="padding:10px 0;font-size:14px;">${d.targetDate}</td></tr>` : ""}
+      ${d.targetDate ? `<tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;">Hoped-for date</td><td style="padding:10px 0;font-size:14px;">${e(d.targetDate)}</td></tr>` : ""}
       ${d.attachmentCount > 0 ? `<tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;">References</td><td style="padding:10px 0;font-size:14px;">${d.attachmentCount} file${d.attachmentCount === 1 ? "" : "s"}</td></tr>` : ""}
     </table>
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:24px 0 8px;">YOU WROTE</p>
@@ -152,7 +159,7 @@ export function preorderQuoteEmail(
     ? `${formatBdt(d.quotedPriceBdt)} <span style="font-size:16px;color:#7a6a52;">each</span> × ${d.quantity} = ${formatBdt(total)}`
     : formatBdt(total);
   const body = `
-    <p style="font-size:15px;margin:0 0 6px;">Dear ${d.customerName.split(" ")[0] || "friend"},</p>
+    <p style="font-size:15px;margin:0 0 6px;">Dear ${e(d.customerName.split(" ")[0] || "friend")},</p>
     <p style="font-size:15px;margin:0 0 24px;">Thank you for your request. We can make this for you. The price, including delivery, is:</p>
     <p style="text-align:center;font-family:Georgia,serif;font-size:32px;color:#2a1854;font-weight:400;margin:0 0 24px;">${priceLine}</p>
     ${d.adminNotes ? `<p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:0 0 8px;">A NOTE FROM US</p><p style="font-size:14px;color:#3a2a64;line-height:1.7;background:#f9f4ec;padding:14px 16px;border-left:2px solid #a07e2c;white-space:pre-wrap;margin:0 0 24px;">${escapeHtml(d.adminNotes)}</p>` : ""}
@@ -170,16 +177,16 @@ export function preorderAdminNotifyEmail(d: PreorderEmailData & {
 }) {
   const subject = `New pre-order request · ${d.segmentName} · ${d.customerName || d.customerEmail}`;
   const body = `
-    <p style="font-size:15px;margin:0 0 24px;">A new bespoke request has arrived in <em>${d.segmentName}</em>.</p>
+    <p style="font-size:15px;margin:0 0 24px;">A new bespoke request has arrived in <em>${e(d.segmentName)}</em>.</p>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-top:1px solid #e8d8a8;">
-      <tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;width:140px;">From</td><td style="padding:10px 0;font-size:14px;">${d.customerName || "(no name)"} · ${d.customerEmail}${d.customerPhone ? " · " + d.customerPhone : ""}</td></tr>
+      <tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;width:140px;">From</td><td style="padding:10px 0;font-size:14px;">${e(d.customerName || "(no name)")} · ${e(d.customerEmail)}${d.customerPhone ? " · " + e(d.customerPhone) : ""}</td></tr>
       <tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;">Quantity</td><td style="padding:10px 0;font-size:14px;">${d.quantity}</td></tr>
       ${d.budgetHintBdt ? `<tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;">Budget hint</td><td style="padding:10px 0;font-size:14px;">${formatBdt(d.budgetHintBdt)}</td></tr>` : ""}
-      ${d.targetDate ? `<tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;">Wants by</td><td style="padding:10px 0;font-size:14px;">${d.targetDate}</td></tr>` : ""}
+      ${d.targetDate ? `<tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;">Wants by</td><td style="padding:10px 0;font-size:14px;">${e(d.targetDate)}</td></tr>` : ""}
       <tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;">References</td><td style="padding:10px 0;font-size:14px;">${d.attachmentCount} file${d.attachmentCount === 1 ? "" : "s"}</td></tr>
     </table>
     <p style="font-size:14px;color:#3a2a64;line-height:1.7;background:#f9f4ec;padding:14px 16px;border-left:2px solid #a07e2c;white-space:pre-wrap;margin:24px 0;">${escapeHtml(d.description)}</p>
-    <p style="margin:24px 0 0;"><a href="${d.adminUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Open in admin →</a></p>
+    <p style="margin:24px 0 0;"><a href="${e(d.adminUrl)}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Open in admin →</a></p>
   `;
   return { subject, html: SHELL(body) };
 }
@@ -201,7 +208,7 @@ export function ownerOrderAlertEmail(d: {
     return `<tr><td style="padding:10px 0;font-size:14px;">${escapeHtml(l.name)}${options ? ` <span style="color:#7a6a52;">(${escapeHtml(options)})</span>` : ""} × ${l.qty}</td><td style="padding:10px 0;font-size:14px;text-align:right;">${formatBdt(l.lineTotalBdt)}</td></tr>`;
   }).join("");
   const body = `
-    <p style="font-size:15px;margin:0 0 24px;">A new order has been placed: <b>${d.number}</b>.</p>
+    <p style="font-size:15px;margin:0 0 24px;">A new order has been placed: <b>${e(d.number)}</b>.</p>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-top:1px solid #e8d8a8;">
       <tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;width:140px;">From</td><td style="padding:10px 0;font-size:14px;">${escapeHtml(d.customerName || "(no name)")}${d.customerPhone ? " · " + escapeHtml(d.customerPhone) : ""}${d.city ? " · " + escapeHtml(d.city) : ""}</td></tr>
       <tr><td style="padding:10px 0;font-size:14px;color:#7a6a52;">Payment</td><td style="padding:10px 0;font-size:14px;">${d.paidOnline ? "Paid online" : "Cash on delivery"}</td></tr>
@@ -210,7 +217,7 @@ export function ownerOrderAlertEmail(d: {
       ${rows}
       <tr><td style="padding:10px 0;font-size:14px;border-top:1px solid #e8d8a8;"><b>Total</b></td><td style="padding:10px 0;font-size:14px;text-align:right;border-top:1px solid #e8d8a8;"><b>${formatBdt(d.totalBdt)}</b></td></tr>
     </table>
-    <p style="margin:24px 0 0;"><a href="${d.adminUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Open orders in admin →</a></p>
+    <p style="margin:24px 0 0;"><a href="${e(d.adminUrl)}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Open orders in admin →</a></p>
   `;
   return { subject, html: SHELL(body) };
 }
@@ -222,7 +229,7 @@ export function newsletterWelcomeEmail(siteUrl: string) {
     <p style="font-size:15px;margin:0 0 24px;">Thank you for subscribing.</p>
     <p style="font-size:15px;margin:0 0 20px;">We write rarely: new arrivals, the occasional note, and nothing else.</p>
     <p style="font-size:15px;margin:0 0 32px;">The next email will arrive when there's something worth saying.</p>
-    <p style="margin:0 0 32px;"><a href="${siteUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Shop Sanguine &rarr;</a></p>
+    <p style="margin:0 0 32px;"><a href="${e(siteUrl)}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Shop Sanguine &rarr;</a></p>
     <p style="font-style:italic;font-size:14px;color:#2a1854;margin:0;">Sanguine</p>
   `;
   return { subject, html: SHELL(body) };
@@ -232,10 +239,10 @@ export function newsletterWelcomeEmail(siteUrl: string) {
 export function reviewRequestEmail(firstName: string, orderNumber: string, trackingUrl: string) {
   const subject = `Your order has arrived · ${orderNumber}`;
   const body = `
-    <p style="font-size:15px;margin:0 0 6px;">Dear ${firstName},</p>
+    <p style="font-size:15px;margin:0 0 6px;">Dear ${e(firstName)},</p>
     <p style="font-size:15px;margin:0 0 24px;">Your order has been delivered. We hope it arrived exactly as you expected.</p>
     <p style="font-size:15px;margin:0 0 24px;">If you have a minute, a short review helps other customers and tells us what to keep doing. No obligation.</p>
-    <p style="margin:0 0 32px;"><a href="${trackingUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Write a review &rarr;</a></p>
+    <p style="margin:0 0 32px;"><a href="${e(trackingUrl)}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">Write a review &rarr;</a></p>
     <p style="font-style:italic;font-size:14px;color:#2a1854;margin:0;">Sanguine</p>
   `;
   return { subject, html: SHELL(body) };
@@ -246,18 +253,9 @@ export function backInStockEmail(productName: string, productUrl: string) {
   const subject = `Back in stock · ${productName}`;
   const body = `
     <p style="font-size:11px;letter-spacing:.4em;color:#a07e2c;margin:0 0 14px;font-family:'Courier New',monospace;">BACK IN STOCK</p>
-    <h2 style="font-size:24px;font-weight:400;color:#2a1854;margin:0 0 14px;font-family:Georgia,serif;">${productName}</h2>
+    <h2 style="font-size:24px;font-weight:400;color:#2a1854;margin:0 0 14px;font-family:Georgia,serif;">${e(productName)}</h2>
     <p style="font-size:15px;margin:0 0 28px;">The piece you asked about is back. Quantities are limited. This is the only email we'll send about it.</p>
-    <p style="margin:0 0 6px;"><a href="${productUrl}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">View it &rarr;</a></p>
+    <p style="margin:0 0 6px;"><a href="${e(productUrl)}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;letter-spacing:.05em;">View it &rarr;</a></p>
   `;
   return { subject, html: SHELL(body) };
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
 }

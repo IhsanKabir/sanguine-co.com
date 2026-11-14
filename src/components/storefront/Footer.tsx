@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { getVisibleSegments } from "@/lib/queries";
 import { Link } from "@/i18n/routing";
 import { FACEBOOK_URL, INSTAGRAM_URL, SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL } from "@/lib/contact";
+import BrandMark from "./BrandMark";
 
 export default async function Footer() {
   const t = await getTranslations();
@@ -18,7 +19,9 @@ export default async function Footer() {
       <div className="footer-inner">
         <div className="footer-grid">
           <div>
-            <p style={{ fontStyle: "italic", fontFamily: "var(--serif)", fontSize: 18, margin: "0 0 8px", color: "var(--cream)" }}>{t("brand.name")}</p>
+            <p style={{ margin: "0 0 14px", lineHeight: 0 }}>
+              <BrandMark locale={locale === "bn" ? "bn" : "en"} alt={t("brand.name")} letterPx={18} tone="dark" />
+            </p>
             <p style={{ fontSize: 13, color: "var(--purple-200)", maxWidth: 300, lineHeight: 1.7 }}>
               {t("brand.tagline")}
             </p>
