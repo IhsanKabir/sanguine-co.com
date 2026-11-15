@@ -32,7 +32,8 @@ const BUILT_IN: Readonly<Record<string, Cutout>> = {
   "multicolor-lily-bouquet": cut("multicolor-lily-bouquet", 753, 900),
   "the-100-lychee-bouquet": cut("the-100-lychee-bouquet", 900, 860),
   "pink-rose-bouquet": cut("pink-rose-bouquet", 572, 900),
-  // The sunflower basket's photo has a cupcake and a candle in front: no cut-out until a clean photo.
+  // From the owner's own photo (sunflowers and white lilies, 16 Nov 2026), dark centres filled back in.
+  "sunflower-bouquet": cut("sunflower-bouquet", 811, 900),
 };
 
 /** A product's cut-out: the uploaded one (by product id) if any, else the built-in one (by address). */
