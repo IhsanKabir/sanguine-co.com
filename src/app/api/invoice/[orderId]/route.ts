@@ -3,7 +3,7 @@ import { db, schema } from "@/lib/db";
 import { parseShippingAddress } from "@/lib/schema";
 import { getCurrentUser } from "@/lib/auth-utils";
 import { escapeHtml } from "@/lib/html";
-import { BRAND_COLOURS, BRAND_LOCKUP } from "@/lib/brand-art.generated";
+import { BRAND_LOCKUP } from "@/lib/brand-art.generated";
 import { eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
@@ -17,11 +17,9 @@ const e = (v: string | number | null | undefined) => escapeHtml(String(v ?? ""))
 
 /** The logo (brand/), drawn from outlines so it prints without any font. */
 function logoSvg(letterPx: number): string {
-  const { designSize, width, height, letters, line } = BRAND_LOCKUP;
+  const { designSize, width, height, light } = BRAND_LOCKUP;
   const k = letterPx / designSize;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${Math.round(width * k)}" height="${Math.round(height * k)}" role="img" aria-label="Sanguine">` +
-    `<path d="${letters}" fill="${BRAND_COLOURS.plum}"/>` +
-    `<rect x="${line.x}" y="${line.y}" width="${line.width}" height="${line.height}" fill="${BRAND_COLOURS.goldOnLight}"/></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${Math.round(width * k)}" height="${Math.round(height * k)}" role="img" aria-label="Sanguine">${light}</svg>`;
 }
 
 export async function GET(

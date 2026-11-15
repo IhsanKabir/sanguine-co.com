@@ -60,7 +60,7 @@ export default async function TopNav() {
         <div className="nav-inner">
           <MobileMenuButton segments={segmentData} />
           <Link href="/" className="nav-brand">
-            <BrandMark locale={locale === "bn" ? "bn" : "en"} alt={t("brand.name")} letterPx={26} narrowLetterPx={26} />
+            <BrandMark locale={locale === "bn" ? "bn" : "en"} alt={t("brand.name")} letterPx={26} narrowLetterPx={17} />
           </Link>
           <CatStrip segments={segmentData} inline />
           <div className="nav-right">
