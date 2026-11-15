@@ -10,6 +10,9 @@ import HeroRail, { type RailItem } from "@/components/storefront/HeroRail";
 import Shelf, { type ShelfItem } from "@/components/storefront/Shelf";
 import SameDayLine from "@/components/storefront/SameDayLine";
 import { cutoutFor } from "@/lib/cutouts";
+import { getUploadedCutouts } from "@/lib/cutout-store";
+import { getMoments, momentsLive, splitEm } from "@/lib/moments";
+import { displayName } from "@/lib/product-name";
 import { expressCutoffLabel } from "@/lib/delivery";
 import { whatsAppUrl } from "@/lib/contact";
 import NewsletterForm from "@/components/storefront/NewsletterForm";
@@ -17,8 +20,6 @@ import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
 import Ornament from "@/components/storefront/Ornament";
 import JsonLd from "@/components/seo/JsonLd";
 import { SITE_URL as BASE } from "@/lib/site-url";
-import { getCommerceSettings } from "@/lib/commerce";
-import { formatBdt } from "@/lib/utils";
 import { deliveryScope, scopedKey } from "@/lib/delivery-scope";
 
 // ISR: the homepage fires several catalogue queries per request and reads no
@@ -76,7 +77,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const MARQUEE_KEYS = ["atelierMade", "cod", "gift", "freeDelivery", "returns", "certified"];
 // The third "How it works" point is the delivery promise.
 const DELIVERY_FEATURE = 3;
 
@@ -87,19 +87,13 @@ export default async function Home({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations();
-  const commerce = await getCommerceSettings();
-  const freeOver = formatBdt(commerce.freeShippingThresholdBdt, locale as "en" | "bn");
-  // The bn message formats {days, number}, so this stays a number.
-  const returnDays = commerce.returnWindowDays;
-  // A threshold of 0 switches free shipping off: drop that marquee point.
-  const marqueeKeys = commerce.freeShippingThresholdBdt > 0
-    ? MARQUEE_KEYS
-    : MARQUEE_KEYS.filter((k) => k !== "freeDelivery");
 
-  const [segments, live, occasions] = await Promise.all([
+  const [segments, live, occasions, uploaded, moments] = await Promise.all([
     safeQuery(getVisibleSegments()),
     safeQuery(getLiveProducts({ limit: SHELF_LIMIT })),
     safeQuery(getOccasionsInUse()),
+    getUploadedCutouts(),
+    getMoments(),
   ]);
 
   const showSetupBanner = segments === null;
@@ -111,21 +105,26 @@ export default async function Home({ params }: Props) {
   const heroImages = products.length > 0
     ? await safeQuery(getHeroImagesFor(products.map((p) => p.id))) ?? new Map()
     : new Map();
-  const nameOf = (p: { name: string; nameBn: string | null }) => (locale === "bn" && p.nameBn) || p.name;
+  const nameOf = (p: { name: string; nameBn: string | null }) => (locale === "bn" && p.nameBn) || displayName(p.name);
   const priceOf = (p: Parameters<typeof priceDisplay>[0]) => {
     const display = priceDisplay(p);
     return display.kind === "quote" ? t("pdp.priceOnQuote") : priceDisplayText(display, locale as "en" | "bn");
   };
   // The rail: products with a cut-out (lib/cutouts.ts). The shelf: every live product.
   const rail: RailItem[] = products.flatMap((p) => {
-    const cutout = cutoutFor(p.slug);
+    const cutout = cutoutFor(p, uploaded);
     return cutout ? [{ slug: p.slug, name: nameOf(p), meta: `${t("pdp.preorderOnly")} · ${priceOf(p)}`, cutout }] : [];
   });
   const shelf: ShelfItem[] = products.map((p) => ({
-    slug: p.slug, name: nameOf(p), price: priceOf(p), cutout: cutoutFor(p.slug), photo: heroImages.get(p.id)?.url ?? null,
+    slug: p.slug, name: nameOf(p), price: priceOf(p), cutout: cutoutFor(p, uploaded), photo: heroImages.get(p.id)?.url ?? null,
   }));
   // Campaigns lean on same-day express, which is for flowers in Dhaka.
-  const showMoments = scope !== "nationwide" && rail.length > 0;
+  // The band follows Admin, Editorial; the page is rebuilt at least every few minutes, so its dates hold.
+  // Campaigns lean on same-day express, which is for flowers in Dhaka.
+  const showMoments = scope !== "nationwide" && momentsLive(moments, new Date());
+  const bn = locale === "bn";
+  const cutoffLabel = expressCutoffLabel(bn ? "bn" : "en");
+  const momentTitle = splitEm(bn ? moments.titleBn || moments.titleEn : moments.titleEn);
   const wa = whatsAppUrl();
   const shopHref = segs.length === 1 ? `/shop/${segs[0].id}` : "#shelf";
 
@@ -194,16 +193,6 @@ export default async function Home({ params }: Props) {
         )}
       </section>
 
-      {/* ─── Marquee: concise trust points ──────────────────────── */}
-      <div className="marquee" data-cursor="default">
-        <div className="marquee-track">
-          {/* Listed twice so the scrolling track loops seamlessly. */}
-          {[...marqueeKeys, ...marqueeKeys].map((k, i) => (
-            <span key={k + i} aria-hidden={i >= marqueeKeys.length || undefined}>{t(scopedKey(`home.marquee.${k}`, scope, k === "certified" ? ["dhaka"] : []), { threshold: freeOver, days: returnDays })}</span>
-          ))}
-        </div>
-      </div>
-
       {/* ─── The shelf: every bouquet in a row ───────────────────── */}
       {shelf.length > 0 && (
         <section id="shelf" className="shelf-sec" aria-labelledby="shelf-title">
@@ -232,18 +221,18 @@ export default async function Home({ params }: Props) {
         </section>
       )}
 
-      {/* ─── Moments: one campaign at a time ─────────────────────── */}
+      {/* ─── Moments: one campaign at a time (Admin, Editorial) ─────── */}
       {showMoments && (
         <section className="moment" aria-labelledby="moment-title">
           <div className="moment-poster">
-            {/* eslint-disable-next-line @next/next/no-img-element -- a small poster frame from the Reel */}
-            <img src="/moments/cats-anniversary.webp" width={540} height={960} alt={t("home.moments.alt")} loading="lazy" decoding="async" />
+            {/* eslint-disable-next-line @next/next/no-img-element -- a small campaign poster */}
+            <img src={moments.image} width={540} height={960} alt={bn ? moments.imageAltBn || moments.imageAltEn : moments.imageAltEn} loading="lazy" decoding="async" />
           </div>
           <div>
             <div className="lh-kicker">{t("home.moments.kicker")}</div>
-            <h2 id="moment-title">{t.rich("home.moments.title", { em: (c) => <em>{c}</em> })}</h2>
-            <p>{t("home.moments.body", { cutoff: expressCutoffLabel(locale === "bn" ? "bn" : "en") })}</p>
-            <Link href="#shelf" className="btn">{t("home.moments.cta")}</Link>
+            <h2 id="moment-title">{momentTitle.before}{momentTitle.em && <em>{momentTitle.em}</em>}{momentTitle.after}</h2>
+            <p>{(bn ? moments.bodyBn || moments.bodyEn : moments.bodyEn).replaceAll("{cutoff}", cutoffLabel)}</p>
+            <Link href={moments.href} className="btn">{bn ? moments.ctaBn || moments.ctaEn : moments.ctaEn}</Link>
           </div>
         </section>
       )}

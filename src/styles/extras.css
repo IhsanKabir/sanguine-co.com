@@ -680,9 +680,12 @@
 }
 .fc-btn:hover .fc-tooltip { opacity: 1; }
 @media (max-width: 640px) {
-  .floating-chat { right: 16px; bottom: 66px; }
-  .fc-btn { width: 48px; height: 48px; }
+  .floating-chat { right: 12px; bottom: 66px; }
+  .fc-btn { width: 44px; height: 44px; }
   .fc-tooltip { display: none; }
+  /* One button on phones: WhatsApp is the shop's main channel, and two stacked buttons
+     covered the text beside them. Messenger stays on wide screens. */
+  .fc-messenger { display: none; }
 }
 
 /* Cookie consent banner */

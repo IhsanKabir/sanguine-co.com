@@ -4,7 +4,8 @@
 
 .lh {
   display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: "copy rail";
-  gap: clamp(16px, 4vw, 56px); align-items: center; overflow: hidden;
+  gap: clamp(16px, 4vw, 56px); align-items: center;
+  overflow: clip;   /* not "hidden": a hidden box can still be scrolled, and focusing an arrow shifted the whole section sideways */
   padding: clamp(28px, 5vw, 56px) clamp(16px, 4vw, 48px) clamp(28px, 3vw, 44px);
   background: var(--purple-50);
 }
@@ -34,7 +35,8 @@ html[lang="bn"] .lh h1 { line-height: 1.25; letter-spacing: 0; font-size: clamp(
 
 /* the rail */
 .rail { position: relative; height: clamp(380px, 40vw, 540px); outline-offset: 6px; touch-action: pan-y; user-select: none; }
-.rail-slot { position: absolute; left: 50%; bottom: 76px; width: 58%; aspect-ratio: 4 / 5; transform: translateX(-50%);
+.rail-slot { position: absolute; left: 50%; bottom: 76px; height: calc(100% - 96px); width: auto; max-width: 64%; aspect-ratio: 4 / 5; transform: translateX(-50%);
+  cursor: pointer;   /* a side bouquet comes forward when tapped; the one in front opens its page */
   transition: transform .8s cubic-bezier(.22, .8, .2, 1), opacity .8s cubic-bezier(.22, .8, .2, 1); }
 .rail-slot::before { content: ""; position: absolute; inset: 6% 0 0; border-radius: 50%; z-index: -1;
   background: radial-gradient(closest-side, #ffffff 30%, rgb(255 255 255 / 0)); }   /* a soft light that hides rough cut-out edges */
@@ -101,7 +103,7 @@ html[lang="bn"] .rail-meta { letter-spacing: 0; text-transform: none; }
   .lh-top { grid-area: title; } .lh-rest { grid-area: rest; }
   .lh h1 { margin-bottom: 6px; }
   .rail { height: 330px; }
-  .rail-slot { width: 62%; bottom: 66px; aspect-ratio: 1 / 1; }   /* square on phones: round bouquets left a gap above */
+  .rail-slot { height: calc(100% - 86px); max-width: 74%; bottom: 66px; aspect-ratio: 1 / 1; }   /* square on phones: round bouquets left a gap above */
   .rail-slot[data-pos="-1"] { transform: translateX(-128%) scale(.5); }
   .rail-slot[data-pos="1"] { transform: translateX(28%) scale(.5); }
   .shelf { grid-auto-columns: 46%; }
