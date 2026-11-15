@@ -1,15 +1,17 @@
 :root{
   /* Luxury plum palette: deep violet darks, warm ivory ground, amber gold accents.
    * Token names retain `--purple-*` for backward-compat with all surface CSS. */
-  --purple-950:oklch(0.17 0.13 308);--purple-900:oklch(0.28 0.14 305);--purple-800:oklch(0.40 0.13 302);
-  --purple-700:oklch(0.52 0.11 300);--purple-600:oklch(0.62 0.10 298);--purple-400:oklch(0.74 0.08 295);
-  --purple-200:oklch(0.86 0.05 295);--purple-100:oklch(0.92 0.03 295);--purple-50:oklch(0.96 0.015 295);
+  /* The brand scale: sanguine red (owner, 15 Nov 2026). The names say purple because the
+     site began plum; every component uses them, so the values changed and the names stayed. */
+  --purple-950:oklch(0.20 0.06 30);--purple-900:oklch(0.40 0.12 32);--purple-800:oklch(0.47 0.13 33);
+  --purple-700:oklch(0.53 0.12 35);--purple-600:oklch(0.65 0.10 40);--purple-400:oklch(0.76 0.07 45);
+  --purple-200:oklch(0.87 0.04 50);--purple-100:oklch(0.93 0.025 55);--purple-50:oklch(0.965 0.012 65);
   --gold:oklch(0.71 0.12 78);--gold-deep:oklch(0.50 0.12 68);--gold-text:oklch(0.42 0.10 68);
-  --mauve:oklch(0.62 0.12 300);--mauve-deep:oklch(0.50 0.13 305);
-  --cream:oklch(0.955 0.014 78);--ink:oklch(0.14 0.01 285);--ink-soft:oklch(0.38 0.03 300);--line:oklch(0.88 0.015 75);
+  --mauve:oklch(0.58 0.12 35);--mauve-deep:oklch(0.47 0.13 33);
+  --cream:oklch(0.955 0.014 78);--ink:oklch(0.16 0.012 40);--ink-soft:oklch(0.40 0.03 40);--line:oklch(0.88 0.015 75);
   --ok:oklch(0.58 0.14 150);--warn:oklch(0.60 0.15 60);--err:oklch(0.41 0.20 25);
   --rose-dust:oklch(0.78 0.07 30);
-  --violet-hour:oklch(0.30 0.10 305);
+  --violet-hour:oklch(0.30 0.09 31);
   --serif:var(--font-serif),var(--font-bn-serif,"Noto Serif Bengali"),Georgia,serif;--sans:var(--font-sans),var(--font-bn-sans,"Noto Sans Bengali"),system-ui,sans-serif;--mono:var(--font-sans),var(--font-bn-sans,"Noto Sans Bengali"),system-ui,sans-serif;
   --shadow-md:0 8px 24px rgba(15,10,30,.08);--shadow-lg:0 20px 60px rgba(15,10,30,.14);
 }
@@ -100,10 +102,10 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .btn-primary{background:var(--purple-900);color:var(--cream)}.btn-primary:hover{background:var(--purple-950)}
 .btn-ghost{border-color:var(--purple-900);color:var(--purple-900)}.btn-ghost:hover{background:var(--purple-900);color:var(--cream)}
 /* mauve-deep, not mauve: cream on --mauve was 3.3:1, under WCAG AA 4.5:1 */
-.btn-gold{background:var(--mauve-deep);color:var(--cream)}.btn-gold:hover{background:oklch(0.42 0.13 305);color:var(--cream)}
+.btn-gold{background:var(--mauve-deep);color:var(--cream)}.btn-gold:hover{background:oklch(0.42 0.13 32);color:var(--cream)}
 .btn-sm{padding:8px 16px;font-size:11px;min-height:40px}.btn-block{width:100%}
 
-.ph{position:relative;overflow:hidden;background:repeating-linear-gradient(135deg,oklch(.92 .04 300) 0 8px,oklch(.88 .05 300) 8px 16px);display:grid;place-items:center;color:var(--purple-800);font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase}
+.ph{position:relative;overflow:hidden;background:repeating-linear-gradient(135deg,oklch(.92 0.04 32) 0 8px,oklch(.88 0.05 32) 8px 16px);display:grid;place-items:center;color:var(--purple-800);font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase}
 .ph.dark{background:repeating-linear-gradient(135deg,var(--purple-900) 0 8px,var(--purple-800) 8px 16px);color:var(--gold)}
 .ph.gold{background:repeating-linear-gradient(135deg,oklch(.90 .07 85) 0 8px,oklch(.84 .09 85) 8px 16px);color:var(--purple-900)}
 .ph-label{background:rgba(255,255,255,.85);padding:4px 10px;border-radius:2px}
@@ -138,10 +140,10 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .hero-inner{max-width:1400px;margin:0 auto;padding:96px 32px;display:grid;grid-template-columns:1.618fr 1fr;gap:64px;align-items:center;position:relative;z-index:2}
 .hero h1{font-family:var(--serif);font-size:88px;line-height:.95;font-weight:400;margin:0 0 24px;letter-spacing:-.02em}
 .hero h1 em{color:var(--gold);font-style:italic}
-.hero p{font-size:17px;color:var(--cream);text-shadow:0 1px 2px oklch(0.15 0.04 220 / .55),0 0 16px oklch(0.15 0.04 220 / .5);max-width:480px;margin:0 0 32px;line-height:1.6}
+.hero p{font-size:17px;color:var(--cream);text-shadow:0 1px 2px oklch(0.15 0.04 32 / .55),0 0 16px oklch(0.15 0.04 32 / .5);max-width:480px;margin:0 0 32px;line-height:1.6}
 .hero-kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;display:flex;align-items:center;gap:10px}
 .hero-kicker::before,.hero-kicker::after{content:"";height:1px;width:32px;background:var(--gold);opacity:.6}
-.hero-visual{aspect-ratio:4/5;background:repeating-linear-gradient(135deg,oklch(.35 .18 300) 0 10px,oklch(.42 .20 300) 10px 20px);display:grid;place-items:center;color:var(--gold);font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;border:1px solid var(--gold);position:relative}
+.hero-visual{aspect-ratio:4/5;background:repeating-linear-gradient(135deg,oklch(.35 0.14 32) 0 10px,oklch(.42 0.14 32) 10px 20px);display:grid;place-items:center;color:var(--gold);font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;border:1px solid var(--gold);position:relative}
 .hero-visual::after{content:"";position:absolute;inset:12px;border:1px solid var(--gold);opacity:.3}
 
 .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
@@ -174,7 +176,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .pdp-thumb{aspect-ratio:1;border:1px solid var(--line);cursor:pointer;overflow:hidden;transition:border-color .12s,box-shadow .12s}
 /* Selection must read instantly: the 1px border change was invisible while
  * the (slow) full-size photo loaded, so clicks felt like they did nothing. */
-.pdp-thumb.active{border:2px solid var(--purple-800);box-shadow:0 0 0 2px oklch(0.45 0.18 300 / 0.25)}
+.pdp-thumb.active{border:2px solid var(--purple-800);box-shadow:0 0 0 2px oklch(0.45 0.14 32 / 0.25)}
 /* overflow:hidden + object-fit (set on the img) clip uploads of ANY aspect
  * ratio to the 3:4 frame: a portrait photo taller than 3:4 previously
  * overflowed the grid row and spilled across the info column. */
@@ -304,8 +306,8 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
  * and the full-viewport backdrop-blur forced expensive re-blurs every frame
  * of the drawer slide on integrated GPUs: a slightly deeper veil reads the
  * same without the per-frame cost. */
-.overlay{position:fixed;inset:0;background:oklch(0.22 0.06 220 / 0.5);z-index:100;animation:ssg-overlay-in .18s cubic-bezier(.16,.84,.32,1)}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:420px;background:#fff;z-index:101;display:flex;flex-direction:column;animation:ssg-drawer-in .28s cubic-bezier(.16,.84,.32,1);box-shadow:-30px 0 80px oklch(0.22 0.06 220 / 0.18)}
+.overlay{position:fixed;inset:0;background:oklch(0.22 0.06 32 / 0.5);z-index:100;animation:ssg-overlay-in .18s cubic-bezier(.16,.84,.32,1)}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:420px;background:#fff;z-index:101;display:flex;flex-direction:column;animation:ssg-drawer-in .28s cubic-bezier(.16,.84,.32,1);box-shadow:-30px 0 80px oklch(0.22 0.06 32 / 0.18)}
 @keyframes ssg-overlay-in{from{opacity:0}to{opacity:1}}
 @keyframes ssg-drawer-in{from{transform:translateX(100%);opacity:.6}to{transform:translateX(0);opacity:1}}
 @media (prefers-reduced-motion: reduce){

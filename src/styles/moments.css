@@ -8,7 +8,7 @@
 #ssg-cursor[data-mode="loupe"] .cur-loupe::before {
   content: ""; position: absolute; inset: 8px;
   border-radius: 50%;
-  box-shadow: inset 0 0 20px oklch(0.4 0.18 300 / 0.15);
+  box-shadow: inset 0 0 20px oklch(0.4 0.14 32 / 0.15);
 }
 
 /* Wax seal imprint on click (cursor.js) */

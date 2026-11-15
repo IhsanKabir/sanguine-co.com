@@ -16,7 +16,7 @@ export default function SignOutButton() {
         onMouseLeave={() => setHover(false)}
         style={{
           background: "transparent",
-          border: "1px solid oklch(0.65 0.08 300 / 0.6)",
+          border: "1px solid oklch(0.65 0.08 32 / 0.6)",
           color: "var(--cream)",
           fontSize: 11, letterSpacing: ".1em",
           textTransform: "uppercase", padding: "9px 20px",

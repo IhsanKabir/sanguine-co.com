@@ -24,11 +24,11 @@
 .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* Secondary button on the hero. The purple outline disappeared against the
-   teal sea, so it is cream on a faint shade, and fills cream on hover. */
+   dark dusk, so it is cream on a faint shade, and fills cream on hover. */
 .btn-on-dark {
   border-color: oklch(0.955 0.014 78 / 0.8);
   color: var(--cream);
-  background: oklch(0.2 0.05 220 / 0.35);
+  background: oklch(0.2 0.05 32 / 0.35);
 }
 .btn-on-dark:hover,
 .btn-on-dark:focus-visible {
@@ -51,9 +51,9 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(90deg,
-      oklch(0.2 0.05 220 / 0.62) 0%,
-      oklch(0.2 0.05 220 / 0.45) 40%,
-      oklch(0.2 0.05 220 / 0) 70%);
+      oklch(0.2 0.05 32 / 0.62) 0%,
+      oklch(0.2 0.05 32 / 0.45) 40%,
+      oklch(0.2 0.05 32 / 0) 70%);
     pointer-events: none;
     z-index: 1;
   }
@@ -79,7 +79,7 @@
 .mobile-overlay {
   position: fixed;
   inset: 0;
-  background: oklch(0.1 0.08 300 / 0.55);
+  background: oklch(0.1 0.08 32 / 0.55);
   z-index: 200;
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
@@ -100,7 +100,7 @@
    into the page as a grey strip down the left edge. */
 .mobile-drawer.open {
   transform: translateX(0);
-  box-shadow: 4px 0 28px oklch(0.1 0.08 300 / 0.2);
+  box-shadow: 4px 0 28px oklch(0.1 0.08 32 / 0.2);
 }
 /* The drawer lives inside the sticky nav (z-index 40), so its own z-index
    cannot lift it above the cookie bar (95) or the chat buttons (90): they
@@ -141,7 +141,7 @@
   transition: background .12s, color .12s;
 }
 .mobile-nav-link:last-child { border-bottom: none; }
-.mobile-nav-link:active { background: oklch(0.95 0.02 300); color: var(--purple-800); }
+.mobile-nav-link:active { background: oklch(0.95 0.02 32); color: var(--purple-800); }
 
 .mobile-drawer-links {
   border-top: 1px solid var(--line);
@@ -915,7 +915,7 @@
   background: var(--purple-900);
   color: var(--gold);
   border-color: var(--purple-900);
-  box-shadow: 0 0 0 6px oklch(0.42 0.18 300 / .15);
+  box-shadow: 0 0 0 6px oklch(0.42 0.14 32 / .15);
 }
 .track-label {
   font-family: var(--serif);

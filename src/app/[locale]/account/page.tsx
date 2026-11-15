@@ -157,7 +157,7 @@ export default async function AccountPage({ params }: Props) {
             )}
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
               <span style={{
-                background: "oklch(0.62 0.12 300 / 0.2)", border: `1px solid ${tier.color}`,
+                background: "oklch(0.62 0.12 32 / 0.2)", border: `1px solid ${tier.color}`,
                 color: tier.color, fontSize: 9, fontFamily: "var(--mono)",
                 letterSpacing: ".2em", textTransform: "uppercase", padding: "3px 10px", borderRadius: 2,
               }}>

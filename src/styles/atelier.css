@@ -14,7 +14,7 @@
   display: grid;
   place-items: center;
   border-radius: 2px;
-  background: oklch(0.92 0.04 300);
+  background: oklch(0.92 0.04 32);
   --cmp-h: 0;
   --cmp-i: "S";
   --cmp-fg: oklch(0.95 0.05 85 / 0.55);
@@ -80,16 +80,16 @@
 .cmp-clothing {
   background:
     linear-gradient(135deg,
-      oklch(0.32 0.14 calc(320 + var(--cmp-h) * 1)) 0%,
-      oklch(0.18 0.10 calc(310 + var(--cmp-h) * 1)) 100%);
+      oklch(0.32 0.14 calc(30 + var(--cmp-h) * 1)) 0%,
+      oklch(0.18 0.1 calc(29 + var(--cmp-h) * 1)) 100%);
 }
 .cmp-clothing::before {
   background:
     repeating-linear-gradient(110deg,
       transparent 0 18px,
-      oklch(0.55 0.18 calc(320 + var(--cmp-h) * 1) / 0.10) 18px 20px),
+      oklch(0.55 0.15 calc(30 + var(--cmp-h) * 1) / 0.10) 18px 20px),
     radial-gradient(ellipse 70% 100% at 30% 110%,
-      oklch(0.50 0.18 calc(330 + var(--cmp-h) * 1) / 0.55), transparent 60%);
+      oklch(0.50 0.15 calc(31 + var(--cmp-h) * 1) / 0.55), transparent 60%);
 }
 
 /* ---------- Books: bound spines ---------- */
@@ -126,7 +126,7 @@
   background: radial-gradient(circle at 50% 50%,
     oklch(0.40 0.10 calc(260 + var(--cmp-h) * 1)) 0%,
     oklch(0.18 0.08 calc(260 + var(--cmp-h) * 1)) 60%,
-    oklch(0.10 0.04 260) 100%);
+    oklch(0.10 0.04 32) 100%);
 }
 .cmp-watches::before {
   background:
@@ -171,39 +171,39 @@
   background: linear-gradient(180deg,
     oklch(0.92 0.04 calc(280 + var(--cmp-h) * 1)),
     oklch(0.78 0.10 calc(290 + var(--cmp-h) * 1)) 50%,
-    oklch(0.45 0.15 calc(300 + var(--cmp-h) * 1)));
+    oklch(0.45 0.15 calc(30 + var(--cmp-h) * 1)));
 }
 .cmp-perfume::before {
   background:
     radial-gradient(ellipse 50% 40% at 50% 35%, oklch(0.95 0.05 85 / 0.4), transparent 70%),
-    radial-gradient(circle at 50% 65%, oklch(0.40 0.18 calc(310 + var(--cmp-h) * 1) / 0.45), transparent 55%);
+    radial-gradient(circle at 50% 65%, oklch(0.40 0.15 calc(29 + var(--cmp-h) * 1) / 0.45), transparent 55%);
 }
 /* Bottle silhouette */
 .cmp-perfume::after {
   background:
     linear-gradient(180deg,
       transparent 0 30%,
-      oklch(0.20 0.12 calc(300 + var(--cmp-h) * 1) / 0.5) 30% 32%,
+      oklch(0.20 0.12 calc(30 + var(--cmp-h) * 1) / 0.5) 30% 32%,
       transparent 32% 36%,
-      oklch(0.20 0.12 calc(300 + var(--cmp-h) * 1) / 0.45) 36% 90%,
-      oklch(0.10 0.08 calc(300 + var(--cmp-h) * 1) / 0.6) 90% 92%,
+      oklch(0.20 0.12 calc(30 + var(--cmp-h) * 1) / 0.45) 36% 90%,
+      oklch(0.10 0.08 calc(30 + var(--cmp-h) * 1) / 0.6) 90% 92%,
       transparent 92%);
   -webkit-mask: linear-gradient(90deg, transparent 0 36%, #000 38% 62%, transparent 64%);
           mask: linear-gradient(90deg, transparent 0 36%, #000 38% 62%, transparent 64%);
 }
-.cmp-perfume .cmp-mark { color: oklch(0.30 0.15 300 / 0.55); }
+.cmp-perfume .cmp-mark { color: oklch(0.30 0.14 32 / 0.55); }
 
 /* ---------- Flowers: soft blossoms ---------- */
 .cmp-flowers {
   background: linear-gradient(160deg,
-    oklch(0.86 0.08 calc(340 + var(--cmp-h) * 1)),
-    oklch(0.55 0.18 calc(330 + var(--cmp-h) * 1)) 70%,
-    oklch(0.32 0.14 calc(310 + var(--cmp-h) * 1)));
+    oklch(0.86 0.07 calc(50 + var(--cmp-h) * 1)),
+    oklch(0.55 0.15 calc(28 + var(--cmp-h) * 1)) 70%,
+    oklch(0.30 0.10 calc(30 + var(--cmp-h) * 1)));
 }
 .cmp-flowers::before {
   background:
     radial-gradient(ellipse 35% 45% at 30% 30%, oklch(0.85 0.14 calc(0 + var(--cmp-h) * 1) / 0.65), transparent 70%),
-    radial-gradient(ellipse 30% 35% at 75% 60%, oklch(0.78 0.16 calc(330 + var(--cmp-h) * 1) / 0.7), transparent 70%),
+    radial-gradient(ellipse 30% 35% at 75% 60%, oklch(0.78 0.13 calc(15 + var(--cmp-h) * 1) / 0.7), transparent 70%),
     radial-gradient(ellipse 25% 28% at 55% 80%, oklch(0.65 0.14 calc(20 + var(--cmp-h) * 1) / 0.55), transparent 70%),
     radial-gradient(ellipse 20% 22% at 20% 75%, oklch(0.92 0.08 calc(85 + var(--cmp-h) * 1) / 0.5), transparent 70%);
 }
@@ -213,7 +213,7 @@
     radial-gradient(circle at 75% 60%, oklch(0.95 0.10 85 / 0.4) 0 1.5%, transparent 1.5%),
     radial-gradient(circle at 55% 80%, oklch(0.95 0.10 85 / 0.3) 0 1.2%, transparent 1.2%);
 }
-.cmp-flowers .cmp-mark { color: oklch(0.20 0.10 300 / 0.55); }
+.cmp-flowers .cmp-mark { color: oklch(0.20 0.1 32 / 0.55); }
 
 /* ---------- Jewelry: faceted gold ---------- */
 .cmp-jewelry {
@@ -235,14 +235,14 @@
 }
 .cmp-jewelry::after {
   background:
-    radial-gradient(circle at 50% 50%, transparent 0 28%, oklch(0.20 0.10 300 / 0.85) 28% 32%, transparent 32%);
+    radial-gradient(circle at 50% 50%, transparent 0 28%, oklch(0.20 0.1 32 / 0.85) 28% 32%, transparent 32%);
 }
 .cmp-jewelry .cmp-mark { color: oklch(0.95 0.10 85 / 0.95); }
 
 /* ---------- Anime: high-contrast halftone ---------- */
 .cmp-anime {
   background: linear-gradient(135deg,
-    oklch(0.45 0.22 calc(340 + var(--cmp-h) * 1)),
+    oklch(0.45 0.15 calc(32 + var(--cmp-h) * 1)),
     oklch(0.18 0.12 calc(290 + var(--cmp-h) * 1)));
 }
 .cmp-anime::before {
@@ -311,7 +311,7 @@
 .cmp-boardgames::after {
   background:
     radial-gradient(circle at 30% 35%, oklch(0.30 0.18 25 / 0.7) 0 2%, transparent 3%),
-    radial-gradient(circle at 70% 60%, oklch(0.20 0.12 270 / 0.7) 0 2%, transparent 3%),
+    radial-gradient(circle at 70% 60%, oklch(0.20 0.12 32 / 0.7) 0 2%, transparent 3%),
     radial-gradient(circle at 55% 25%, oklch(0.30 0.10 150 / 0.6) 0 1.6%, transparent 2.5%),
     linear-gradient(45deg, transparent 0 49%, oklch(0.30 0.10 30 / 0.5) 49% 50%, transparent 50% 100%);
 }
@@ -344,7 +344,7 @@
 }
 .swatch-vis .dot {
   width: 30px; height: 30px; border-radius: 50%;
-  border: 1px solid oklch(0.88 0.015 300);
+  border: 1px solid oklch(0.88 0.015 32);
   position: relative;
   transition: transform .15s ease;
 }
@@ -388,7 +388,7 @@
 .ship-bar .top b { color: var(--purple-900); font-weight: 500; }
 .ship-bar .track {
   margin-top: 8px; height: 2px;
-  background: oklch(0.88 0.015 300);
+  background: oklch(0.88 0.015 32);
   overflow: hidden;
 }
 .ship-bar .fill {
@@ -553,7 +553,7 @@
   position: absolute; inset: 0; z-index: 5;
   display: flex; flex-direction: column; justify-content: flex-end;
   padding: 18px;
-  background: linear-gradient(0deg, oklch(0.10 0.08 290 / 0.7) 0%, transparent 60%);
+  background: linear-gradient(0deg, oklch(0.10 0.08 32 / 0.7) 0%, transparent 60%);
   color: var(--cream);
 }
 .bento .b-kicker {
@@ -707,7 +707,7 @@
    =========================================================== */
 .letters {
   background:
-    radial-gradient(ellipse 60% 80% at 50% 0%, oklch(0.30 0.16 320 / 0.5), transparent 60%),
+    radial-gradient(ellipse 60% 80% at 50% 0%, oklch(0.30 0.14 32 / 0.5), transparent 60%),
     var(--purple-950);
   color: var(--cream);
   padding: 80px 32px;
@@ -720,7 +720,7 @@
   position: absolute; inset: 0;
   background:
     radial-gradient(circle at 20% 80%, oklch(0.85 0.13 85 / 0.08), transparent 40%),
-    radial-gradient(circle at 80% 20%, oklch(0.55 0.18 320 / 0.15), transparent 50%);
+    radial-gradient(circle at 80% 20%, oklch(0.55 0.14 32 / 0.15), transparent 50%);
   pointer-events: none;
 }
 .letters-inner {
@@ -756,7 +756,7 @@
   display: flex; gap: 8px;
   max-width: 480px; margin: 0 auto;
   border: 1px solid oklch(0.85 0.13 85 / 0.4);
-  background: oklch(0.10 0.08 290 / 0.5);
+  background: oklch(0.10 0.08 32 / 0.5);
   padding: 4px;
 }
 .letters-form input {
@@ -897,6 +897,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .locale-switch button:hover:not(:disabled) { background: var(--purple-50); color: var(--purple-900); }
 .locale-switch button.is-active { background: var(--purple-900); color: white; cursor: default; }
 .locale-switch button:disabled { opacity: .6; }
+.locale-switch button.is-active:disabled { opacity: 1; }   /* the current language: shown solid, not faded */
 
 /* --font-sans / --font-serif come from next/font (app/fonts.ts) on <html>;
  * redefining them here could override the self-hosted families. */

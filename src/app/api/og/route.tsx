@@ -31,13 +31,13 @@ export const runtime = "nodejs";
 // Hex equivalents of the OKLCH tokens in styles.css:1-15 (satori, the SVG
 // renderer behind ImageResponse, does not parse oklch()). If the palette
 // shifts, re-derive these from :root rather than eyeballing.
-const PLUM_950 = "#1f0039";
-const PLUM_900 = "#3a045e";
-const VIOLET_HOUR = "#3a1c55";
-const PLUM_200 = "#d3cbef";
-const PLUM_400 = "#aea1d9";
-const PLUM_700 = "#73599e";
-const MAUVE = "#9274c3";
+const PLUM_950 = "#2c0805";
+const PLUM_900 = "#7b2719";
+const VIOLET_HOUR = "#52170e";
+const PLUM_200 = "#ebcdbd";
+const PLUM_400 = "#d8a48c";
+const PLUM_700 = "#af5840";
+const MAUVE = "#b65d47";
 const GOLD = "#ca9740";
 const CREAM = "#f5efe6";
 
@@ -263,7 +263,7 @@ function ProductCard({ p }: { p: ProductCardData }) {
             left: columnWidth,
             width: PHOTO_WIDTH,
             height: HEIGHT,
-            background: `linear-gradient(90deg, ${PLUM_950} 0%, rgba(31,0,57,0.42) 18%, rgba(31,0,57,0.14) 45%, rgba(31,0,57,0.14) 100%)`,
+            background: `linear-gradient(90deg, ${PLUM_950} 0%, rgba(44,8,5,0.42) 18%, rgba(44,8,5,0.14) 45%, rgba(44,8,5,0.14) 100%)`,
           }}
         />
       )}

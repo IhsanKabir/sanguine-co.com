@@ -6,6 +6,8 @@ import { localizeEstimate } from "@/lib/delivery";
 type Props = {
   slug: string;
   estimatedDelivery?: string | null;
+  /** Flowers (Dhaka only): the estimate reads "…, usually the same day". */
+  sameDayUsual?: boolean;
   /** Quotation-model price state: fixed / estimate range / quote-only. */
   display: PriceDisplay;
   /** Effective deposit % (product override ?? global setting). */
@@ -17,6 +19,7 @@ type Props = {
 export default function PreorderButton({
   slug,
   estimatedDelivery,
+  sameDayUsual = false,
   display,
   depositPct,
   locale,
@@ -47,7 +50,9 @@ export default function PreorderButton({
         )}
         <div>{t("preorder.deposit", { pct: depositPct })}</div>
         {estimatedDelivery && (
-          <div>{t("preorder.estimatedDelivery", { when: localizeEstimate(estimatedDelivery, locale as "en" | "bn") })}</div>
+          <div>{t("preorder.estimatedDelivery", { when: sameDayUsual
+            ? t("pdp.usuallySameDay", { when: localizeEstimate(estimatedDelivery, locale as "en" | "bn") })
+            : localizeEstimate(estimatedDelivery, locale as "en" | "bn") })}</div>
         )}
       </div>
     </div>
