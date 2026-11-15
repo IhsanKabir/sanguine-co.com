@@ -26,7 +26,7 @@ export default function OceanicBand({ kicker, name, blurb, trailing }: Props) {
         position: "relative",
         padding: "44px 32px 32px",
         marginBottom: 24,
-        background: "linear-gradient(180deg, oklch(0.97 0.015 200) 0%, var(--cream) 100%)",
+        background: "linear-gradient(180deg, oklch(0.97 0.015 300) 0%, var(--cream) 100%)",
         borderBottom: "1px solid var(--line)",
       }}
     >

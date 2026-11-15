@@ -93,7 +93,7 @@ export async function GET(
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Invoice · ${e(order.number)}</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:system-ui,sans-serif;background:#faf9f6;color:#1a1520;padding:48px 40px;max-width:760px;margin:0 auto}
   .logo{line-height:0}

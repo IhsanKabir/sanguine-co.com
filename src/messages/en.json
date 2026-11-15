@@ -52,6 +52,37 @@
     "editors": "Selected by Sanguine",
     "cursorEnter": "View",
     "stillRail": "Dhaka",
+    "rail": {
+      "region": "Bouquets",
+      "prev": "Previous bouquet",
+      "next": "Next bouquet",
+      "pause": "Pause",
+      "play": "Play"
+    },
+    "sameDay": {
+      "open": "Same-day express: order in the next {h} h {m} m",
+      "closed": "Today's express has closed. Order now for tomorrow."
+    },
+    "trust": {
+      "price": "Price confirmed before you pay",
+      "cod": "Cash on delivery",
+      "fresh": "Made fresh to order"
+    },
+    "shelf": {
+      "kicker": "The shelf",
+      "title": "Every bouquet, made when you order.",
+      "seeAll": "See all",
+      "prev": "Scroll left",
+      "next": "Scroll right"
+    },
+    "moments": {
+      "kicker": "Moments",
+      "title": "Forgot your anniversary? <em>It's not too late.</em>",
+      "body": "Order by {cutoff} and choose same-day express: the bouquet arrives today.",
+      "cta": "Choose a bouquet",
+      "alt": "Two cartoon cats: she is cross, he forgot their anniversary"
+    },
+    "whatsapp": "Ask on WhatsApp",
     "marquee": {
       "atelierMade": "Made fresh to order",
       "cod": "Cash on delivery",

@@ -77,8 +77,8 @@ function loadFonts(): Promise<FontSet> {
   // mis-traced font files) would pin a rejected promise and 500 every
   // subsequent request on that instance instead of retrying the disk read.
   fontsPromise ??= Promise.all([
-    readFile(path.join(FONT_DIR, "CormorantGaramond-SemiBold.ttf")),
-    readFile(path.join(FONT_DIR, "CormorantGaramond-MediumItalic.ttf")),
+    readFile(path.join(FONT_DIR, "InstrumentSerif-Regular.ttf")),
+    readFile(path.join(FONT_DIR, "InstrumentSerif-Italic.ttf")),
     readFile(path.join(FONT_DIR, "Inter-Regular.ttf")),
   ])
     .then(([serif, serifItalic, sans]) => ({ serif, serifItalic, sans }))
@@ -287,7 +287,7 @@ function ProductCard({ p }: { p: ProductCardData }) {
         <div style={{ display: "flex", flexDirection: "column", maxWidth: hasPhoto ? 600 : 900 }}>
           <span
             style={{
-              fontFamily: "Cormorant Garamond",
+              fontFamily: "Instrument Serif",
               fontWeight: 600,
               fontSize: nameFontSize(name),
               color: CREAM,
@@ -364,8 +364,8 @@ export async function GET(request: Request) {
       width: WIDTH,
       height: HEIGHT,
       fonts: [
-        { name: "Cormorant Garamond", data: fonts.serif, weight: 600 as const, style: "normal" as const },
-        { name: "Cormorant Garamond", data: fonts.serifItalic, weight: 500 as const, style: "italic" as const },
+        { name: "Instrument Serif", data: fonts.serif, weight: 400 as const, style: "normal" as const },
+        { name: "Instrument Serif", data: fonts.serifItalic, weight: 400 as const, style: "italic" as const },
         { name: "Inter", data: fonts.sans, weight: 400 as const, style: "normal" as const },
       ],
       headers: { "Cache-Control": CACHE_CONTROL },

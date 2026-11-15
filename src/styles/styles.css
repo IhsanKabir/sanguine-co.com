@@ -1,12 +1,16 @@
+html{font-synthesis-weight:none}
 :root{
   /* Luxury plum palette: deep violet darks, warm ivory ground, amber gold accents.
    * Token names retain `--purple-*` for backward-compat with all surface CSS. */
-  --purple-950:oklch(0.17 0.13 308);--purple-900:oklch(0.28 0.14 305);--purple-800:oklch(0.40 0.13 302);
-  --purple-700:oklch(0.52 0.11 300);--purple-600:oklch(0.62 0.10 298);--purple-400:oklch(0.74 0.08 295);
-  --purple-200:oklch(0.86 0.05 295);--purple-100:oklch(0.92 0.03 295);--purple-50:oklch(0.96 0.015 295);
-  --gold:oklch(0.71 0.12 78);--gold-deep:oklch(0.50 0.12 68);--gold-text:oklch(0.42 0.10 68);
+  /* FINAL brand colours (owner, 15 Nov 2026): violet, white, black and the lightest yellow
+     (--purple-50 and --purple-100 hold the yellows for panels and highlights; --line is warm). The --gold names now hold
+     soft violets (gold left the palette); --cream is white. Names kept so no component changes. */
+  --purple-950:oklch(0.17 0.02 300);--purple-900:oklch(0.30 0.12 303);--purple-800:oklch(0.40 0.14 303);
+  --purple-700:oklch(0.50 0.13 300);--purple-600:oklch(0.60 0.11 298);--purple-400:oklch(0.74 0.08 295);
+  --purple-200:oklch(0.86 0.05 295);--purple-100:oklch(0.967 0.065 98);--purple-50:oklch(0.988 0.025 97);
+  --gold:oklch(0.76 0.09 300);--gold-deep:oklch(0.45 0.13 303);--gold-text:oklch(0.40 0.14 303);
   --mauve:oklch(0.62 0.12 300);--mauve-deep:oklch(0.50 0.13 305);
-  --cream:oklch(0.955 0.014 78);--ink:oklch(0.14 0.01 285);--ink-soft:oklch(0.38 0.03 300);--line:oklch(0.88 0.015 75);
+  --cream:oklch(1 0 0);--ink:oklch(0.17 0.005 300);--ink-soft:oklch(0.42 0.02 300);--line:oklch(0.92 0.03 92);
   --ok:oklch(0.58 0.14 150);--warn:oklch(0.60 0.15 60);--err:oklch(0.41 0.20 25);
   --rose-dust:oklch(0.78 0.07 30);
   --violet-hour:oklch(0.30 0.10 305);
@@ -138,7 +142,7 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
 .hero-inner{max-width:1400px;margin:0 auto;padding:96px 32px;display:grid;grid-template-columns:1.618fr 1fr;gap:64px;align-items:center;position:relative;z-index:2}
 .hero h1{font-family:var(--serif);font-size:88px;line-height:.95;font-weight:400;margin:0 0 24px;letter-spacing:-.02em}
 .hero h1 em{color:var(--gold);font-style:italic}
-.hero p{font-size:17px;color:var(--cream);text-shadow:0 1px 2px oklch(0.15 0.04 220 / .55),0 0 16px oklch(0.15 0.04 220 / .5);max-width:480px;margin:0 0 32px;line-height:1.6}
+.hero p{font-size:17px;color:var(--cream);text-shadow:0 1px 2px oklch(0.15 0.04 300 / .55),0 0 16px oklch(0.15 0.04 300 / .5);max-width:480px;margin:0 0 32px;line-height:1.6}
 .hero-kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;display:flex;align-items:center;gap:10px}
 .hero-kicker::before,.hero-kicker::after{content:"";height:1px;width:32px;background:var(--gold);opacity:.6}
 .hero-visual{aspect-ratio:4/5;background:repeating-linear-gradient(135deg,oklch(.35 .18 300) 0 10px,oklch(.42 .20 300) 10px 20px);display:grid;place-items:center;color:var(--gold);font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;border:1px solid var(--gold);position:relative}
@@ -304,8 +308,8 @@ input,select,textarea{font-family:inherit;font-size:inherit}img{max-width:100%;d
  * and the full-viewport backdrop-blur forced expensive re-blurs every frame
  * of the drawer slide on integrated GPUs: a slightly deeper veil reads the
  * same without the per-frame cost. */
-.overlay{position:fixed;inset:0;background:oklch(0.22 0.06 220 / 0.5);z-index:100;animation:ssg-overlay-in .18s cubic-bezier(.16,.84,.32,1)}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:420px;background:#fff;z-index:101;display:flex;flex-direction:column;animation:ssg-drawer-in .28s cubic-bezier(.16,.84,.32,1);box-shadow:-30px 0 80px oklch(0.22 0.06 220 / 0.18)}
+.overlay{position:fixed;inset:0;background:oklch(0.22 0.06 300 / 0.5);z-index:100;animation:ssg-overlay-in .18s cubic-bezier(.16,.84,.32,1)}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:420px;background:#fff;z-index:101;display:flex;flex-direction:column;animation:ssg-drawer-in .28s cubic-bezier(.16,.84,.32,1);box-shadow:-30px 0 80px oklch(0.22 0.06 300 / 0.18)}
 @keyframes ssg-overlay-in{from{opacity:0}to{opacity:1}}
 @keyframes ssg-drawer-in{from{transform:translateX(100%);opacity:.6}to{transform:translateX(0);opacity:1}}
 @media (prefers-reduced-motion: reduce){

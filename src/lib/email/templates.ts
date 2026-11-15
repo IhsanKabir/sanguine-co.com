@@ -14,7 +14,7 @@ const e = (v: string | number | null | undefined) => escapeHtml(String(v ?? ""))
 
 const SHELL = (body: string) => `<!doctype html>
 <html><head><meta charset="utf-8"/><title>Sanguine</title></head>
-<body style="margin:0;padding:0;background:#fdfbf7;font-family:Georgia,'Cormorant Garamond',serif;color:#2a1854;">
+<body style="margin:0;padding:0;background:#fdfbf7;font-family:Georgia,'Instrument Serif',serif;color:#2a1854;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fdfbf7;padding:40px 20px;">
     <tr><td align="center">
       <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" style="background:white;max-width:560px;width:100%;">
