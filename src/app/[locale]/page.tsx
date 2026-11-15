@@ -5,13 +5,15 @@ import { categoryList } from "@/lib/category-list";
 import { Link } from "@/i18n/routing";
 import { getVisibleSegments, getLiveProducts, getHeroImagesFor, getOccasionsInUse } from "@/lib/queries";
 import OccasionChips from "@/components/storefront/OccasionChips";
-import NearViewport from "@/components/storefront/NearViewport";
-import Composition from "@/components/storefront/Composition";
-import ProductCard from "@/components/storefront/ProductCard";
 import Icon from "@/components/storefront/Icon";
+import HeroRail, { type RailItem } from "@/components/storefront/HeroRail";
+import Shelf, { type ShelfItem } from "@/components/storefront/Shelf";
+import SameDayLine from "@/components/storefront/SameDayLine";
+import { cutoutFor } from "@/lib/cutouts";
+import { expressCutoffLabel } from "@/lib/delivery";
+import { whatsAppUrl } from "@/lib/contact";
 import NewsletterForm from "@/components/storefront/NewsletterForm";
 import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
-import HeroTide from "@/components/storefront/HeroTide";
 import Ornament from "@/components/storefront/Ornament";
 import JsonLd from "@/components/seo/JsonLd";
 import { SITE_URL as BASE } from "@/lib/site-url";
@@ -78,17 +80,8 @@ const MARQUEE_KEYS = ["atelierMade", "cod", "gift", "freeDelivery", "returns", "
 // The third "How it works" point is the delivery promise.
 const DELIVERY_FEATURE = 3;
 
-const CAT_CURSOR: Record<string, string> = {
-  clothing: "magnify",
-  accessories: "magnify",
-  perfume: "perfume",
-  jewelry: "jewelry",
-  flowers: "flowers",
-  watches: "watches",
-  books: "inkwell",
-  anime: "anime",
-  boardgames: "magnify",
-};
+// The shelf holds up to this many products; "See all" leads to the rest.
+const SHELF_LIMIT = 24;
 
 export default async function Home({ params }: Props) {
   const { locale } = await params;
@@ -103,10 +96,9 @@ export default async function Home({ params }: Props) {
     ? MARQUEE_KEYS
     : MARQUEE_KEYS.filter((k) => k !== "freeDelivery");
 
-  const [segments, newArrivals, editors, occasions] = await Promise.all([
+  const [segments, live, occasions] = await Promise.all([
     safeQuery(getVisibleSegments()),
-    safeQuery(getLiveProducts({ tag: "new", limit: 4 })),
-    safeQuery(getLiveProducts({ limit: 6 })),
+    safeQuery(getLiveProducts({ limit: SHELF_LIMIT })),
     safeQuery(getOccasionsInUse()),
   ]);
 
@@ -114,44 +106,39 @@ export default async function Home({ params }: Props) {
   const segs = segments ?? [];
   // Flowers are Dhaka only: the delivery wording follows what is open.
   const scope = deliveryScope(segs);
-  // Category label in the page language (the Bangla site was showing the English tag).
-  const segTag = (seg?: { tag: string | null; tagBn: string | null }) =>
-    (locale === "bn" && seg?.tagBn) || seg?.tag || undefined;
-  const segName = (seg: { name: string; nameBn: string | null }) =>
-    (locale === "bn" && seg.nameBn) || seg.name;
-  const news = newArrivals ?? [];
-  const eds = editors ?? [];
-  // Single batched fetch of hero images for every product on the page.
-  const allProductIds = Array.from(new Set([...news, ...eds].map((p) => p.id)));
-  const heroImages = allProductIds.length > 0
-    ? await safeQuery(getHeroImagesFor(allProductIds)) ?? new Map()
+  const products = live ?? [];
+  // One batched fetch of first photos, for shelf items without a cut-out.
+  const heroImages = products.length > 0
+    ? await safeQuery(getHeroImagesFor(products.map((p) => p.id))) ?? new Map()
     : new Map();
-
-  // Bento takes the first 6 visible products
-  const bento = (eds.length >= 6 ? eds : [...eds, ...news]).slice(0, 6);
+  const nameOf = (p: { name: string; nameBn: string | null }) => (locale === "bn" && p.nameBn) || p.name;
+  const priceOf = (p: Parameters<typeof priceDisplay>[0]) => {
+    const display = priceDisplay(p);
+    return display.kind === "quote" ? t("pdp.priceOnQuote") : priceDisplayText(display, locale as "en" | "bn");
+  };
+  // The rail: products with a cut-out (lib/cutouts.ts). The shelf: every live product.
+  const rail: RailItem[] = products.flatMap((p) => {
+    const cutout = cutoutFor(p.slug);
+    return cutout ? [{ slug: p.slug, name: nameOf(p), meta: `${t("pdp.preorderOnly")} · ${priceOf(p)}`, cutout }] : [];
+  });
+  const shelf: ShelfItem[] = products.map((p) => ({
+    slug: p.slug, name: nameOf(p), price: priceOf(p), cutout: cutoutFor(p.slug), photo: heroImages.get(p.id)?.url ?? null,
+  }));
+  // Campaigns lean on same-day express, which is for flowers in Dhaka.
+  const showMoments = scope !== "nationwide" && rail.length > 0;
+  const wa = whatsAppUrl();
+  const shopHref = segs.length === 1 ? `/shop/${segs[0].id}` : "#shelf";
 
   // Editorial product groupings exposed as ItemList structured data so
   // Google can surface featured products in image / shopping results.
   // Bergdorf Goodman / Mr Porter both ship this on their homepage.
   const homeListsLd = [
-    news.length > 0 && {
+    products.length > 0 && {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      name: t("home.newThisWeek"),
-      numberOfItems: news.length,
-      itemListElement: news.map((p, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        url: `${BASE}/${locale}/product/${p.slug}`,
-        name: (locale === "bn" && p.nameBn) || p.name,
-      })),
-    },
-    eds.length > 0 && {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      name: t("home.editors"),
-      numberOfItems: eds.length,
-      itemListElement: eds.map((p, i) => ({
+      name: t("home.shelf.title"),
+      numberOfItems: products.length,
+      itemListElement: products.map((p, i) => ({
         "@type": "ListItem",
         position: i + 1,
         url: `${BASE}/${locale}/product/${p.slug}`,
@@ -169,34 +156,42 @@ export default async function Home({ params }: Props) {
         </div>
       )}
 
-      {/* ─── Hero ─────────────────────────────────────────────────── */}
-      <section className="hero" data-cursor="inkwell">
-        <HeroTide />
-        <div className="hero-inner">
-          <div>
-            <div className="hero-kicker">{t("home.kicker")}</div>
-            <h1>
+      {/* ─── Opening: the product is the hero (brand/landing-mockup) ─── */}
+      <section className="lh" aria-labelledby="home-title">
+        <div className="lh-copy">
+          <div className="lh-top">
+            <div className="lh-kicker">{t("home.kicker")}</div>
+            <h1 id="home-title">
               {t("home.headlineLineOne")}<br />
               {t("home.headlineLineTwoStart")}<em>{t("home.headlineLineTwoEm")}</em>{t("home.headlineLineTwoEnd")}
             </h1>
-            <p>{t(scopedKey("home.lede", scope, ["dhaka", "mixed"]), { categories: categoryList(segs, locale === "bn" ? "bn" : "en") })}</p>
-            <div className="hero-btns">
-              {segs.length === 1 && (
-                <Link href={`/shop/${segs[0].id}`} className="btn btn-gold" data-magnetic data-cursor-label={t("home.cursorEnter")}>
-                  {t("home.ctaShopOne", { name: locale === "bn" ? segs[0].nameBn || segs[0].name : segs[0].name.toLowerCase() })} <Icon name="arrow" size={14} />
-                </Link>
-              )}
-              {segs.length > 1 && (
-                <Link href="#departments" className="btn btn-gold" data-magnetic data-cursor-label={t("home.cursorEnter")}>
-                  {t("home.ctaPrimary")} <Icon name="arrow" size={14} />
-                </Link>
-              )}
-              <Link href="/atelier" className="btn btn-on-dark" data-magnetic>
-                {t("home.ctaSecondary")}
+          </div>
+          <div className="lh-rest">
+            <p className="lh-lede">{t(scopedKey("home.lede", scope, ["dhaka", "mixed"]), { categories: categoryList(segs, locale === "bn" ? "bn" : "en") })}</p>
+            {scope !== "nationwide" && <SameDayLine />}
+            <div className="lh-btns">
+              <Link href={shopHref} className="btn btn-gold" data-magnetic data-cursor-label={t("home.cursorEnter")}>
+                {segs.length === 1
+                  ? t("home.ctaShopOne", { name: locale === "bn" ? segs[0].nameBn || segs[0].name : segs[0].name.toLowerCase() })
+                  : t("home.ctaPrimary")} <Icon name="arrow" size={14} />
               </Link>
+              <a href={wa} className="btn btn-ghost" target="_blank" rel="noopener noreferrer">{t("home.whatsapp")}</a>
             </div>
+            <ul className="lh-trust">
+              <li>{t("home.trust.price")}</li>
+              <li>{t("home.trust.cod")}</li>
+              <li>{t("home.trust.fresh")}</li>
+            </ul>
           </div>
         </div>
+        {rail.length > 0 && (
+          <div className="lh-rail">
+            <HeroRail
+              items={rail}
+              labels={{ region: t("home.rail.region"), prev: t("home.rail.prev"), next: t("home.rail.next"), pause: t("home.rail.pause"), play: t("home.rail.play") }}
+            />
+          </div>
+        )}
       </section>
 
       {/* ─── Marquee: concise trust points ──────────────────────── */}
@@ -209,35 +204,17 @@ export default async function Home({ params }: Props) {
         </div>
       </div>
 
-      {/* ─── Departments / Wander the House ──────────────────────── */}
-      {segs.length > 0 && (
-        <section id="departments" className="section" data-cursor="magnify">
-          <div className="section-hd" data-reveal>
+      {/* ─── The shelf: every bouquet in a row ───────────────────── */}
+      {shelf.length > 0 && (
+        <section id="shelf" className="shelf-sec" aria-labelledby="shelf-title">
+          <div className="shelf-hd">
             <div>
-              <div className="kicker">{t("home.departments")}</div>
-              <h2>{t("home.wanderTheHouse")}</h2>
-              <div className="ornament-rule" />
+              <div className="lh-kicker">{t("home.shelf.kicker")}</div>
+              <h2 id="shelf-title">{t("home.shelf.title")}</h2>
             </div>
+            {segs[0] && <Link href={`/shop/${segs[0].id}`} className="link">{t("home.shelf.seeAll")} →</Link>}
           </div>
-          <div className="cat-grid">
-            {segs.slice(0, 6).map((c, i) => (
-              <Link
-                key={c.id}
-                href={`/shop/${c.id}`}
-                className="cat-tile"
-                data-reveal
-                data-reveal-delay={(i % 3) + 1}
-                data-cursor={CAT_CURSOR[c.id] || "magnify"}
-                data-cursor-label={segName(c)}
-              >
-                <Composition cat={c.id} sku={c.id} name={segName(c)} style={{ position: "absolute", inset: 0 }} />
-                <div className="cat-tile-lbl">
-                  <div className="kicker">{segTag(c)}</div>
-                  <div className="name">{segName(c)}</div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <Shelf items={shelf} labels={{ prev: t("home.shelf.prev"), next: t("home.shelf.next") }} />
         </section>
       )}
 
@@ -255,71 +232,18 @@ export default async function Home({ params }: Props) {
         </section>
       )}
 
-      {/* ─── New This Week ────────────────────────────────────────── */}
-      {news.length > 0 && (
-        <section className="section" style={{ paddingTop: 20 }} data-cursor="crosshair">
-          <div className="section-hd" data-reveal>
-            <div>
-              <div className="kicker">{t("home.justArrived")}</div>
-              <h2>{t("home.newThisWeek")}</h2>
-              <div className="ornament-rule" />
-            </div>
-            {segs[0] && (
-              <Link href={`/shop/${segs[0].id}`} className="link">{t("home.viewAll")} →</Link>
-            )}
+      {/* ─── Moments: one campaign at a time ─────────────────────── */}
+      {showMoments && (
+        <section className="moment" aria-labelledby="moment-title">
+          <div className="moment-poster">
+            {/* eslint-disable-next-line @next/next/no-img-element -- a small poster frame from the Reel */}
+            <img src="/moments/cats-anniversary.webp" width={540} height={960} alt={t("home.moments.alt")} loading="lazy" decoding="async" />
           </div>
-          <div className="grid grid-4">
-            {news.map((p, i) => {
-              const seg = segs.find((s) => s.id === p.segmentId);
-              return (
-                <div key={p.id} data-reveal data-reveal-delay={i + 1}>
-                  <ProductCard product={p} segmentTag={segTag(seg)} heroImage={heroImages.get(p.id) ?? null} />
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* ─── Bento · A small cabinet of curiosities ─────────────── */}
-      {bento.length > 0 && (
-        <section className="section" data-cursor="crosshair">
-          <div className="section-hd" data-reveal>
-            <div>
-              <div className="kicker">{t("home.atelier")}</div>
-              <h2>{t("home.cabinet")}</h2>
-              <div className="ornament-rule" />
-            </div>
-          </div>
-          <div className="bento" data-reveal>
-            {bento.map((p, i) => {
-              const cls = ["b-1", "b-2", "b-3", "b-4", "b-3", "b-5"][i] || "b-3";
-              const seg = segs.find((s) => s.id === p.segmentId);
-              // Pricing rules, not raw priceBdt: quotation/preorder pieces
-              // showed ৳0 here (and the hardcoded en-IN ignored bn).
-              const display = priceDisplay(p);
-              return (
-                <Link
-                  key={p.id}
-                  href={`/product/${p.slug}`}
-                  className={cls}
-                  data-cursor={CAT_CURSOR[p.segmentId || ""] || "magnify"}
-                >
-                  {/* Photos load only when scrolled near: far below the hero they
-                      otherwise start at once and slow its first paint. */}
-                  <NearViewport fallback={<Composition cat={p.segmentId || "clothing"} sku={p.sku} name={p.name} tag={p.tag} />}>
-                    <Composition cat={p.segmentId || "clothing"} sku={p.sku} name={p.name} tag={p.tag} image={heroImages.get(p.id) ?? null} />
-                  </NearViewport>
-                  <div className="b-overlay">
-                    <div className="b-kicker">{segTag(seg)}</div>
-                    <h3 className="b-name">{(locale === "bn" && p.nameBn) || p.name}</h3>
-                    <div className="b-price">
-                      {display.kind === "quote" ? t("pdp.priceOnQuote") : priceDisplayText(display, locale as "en" | "bn")}
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+          <div>
+            <div className="lh-kicker">{t("home.moments.kicker")}</div>
+            <h2 id="moment-title">{t.rich("home.moments.title", { em: (c) => <em>{c}</em> })}</h2>
+            <p>{t("home.moments.body", { cutoff: expressCutoffLabel(locale === "bn" ? "bn" : "en") })}</p>
+            <Link href="#shelf" className="btn">{t("home.moments.cta")}</Link>
           </div>
         </section>
       )}
