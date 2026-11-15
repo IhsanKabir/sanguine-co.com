@@ -12,7 +12,7 @@ type Segment = { id: string; name: string };
 
 export default function MobileMenuButton({ segments }: { segments: Segment[] }) {
   const t = useTranslations();
-  const brand = brandHalf(useLocale() === "bn" ? "bn" : "en", 22);
+  const brand = brandHalf(useLocale() === "bn" ? "bn" : "en", 17);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 

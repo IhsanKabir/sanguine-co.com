@@ -123,19 +123,16 @@ function TideWaves() {
 }
 
 /**
- * The logo, as in the site header (BrandMark): সাঙ্গুইন hangs from the gold
- * line and SANGUINE stands on it. Drawn from outlines, so it needs no Bangla
- * font here. `letterPx` is the size of the English capitals.
+ * The logo, as in the site header (BrandMark): the smiling mask beside SANGUINE,
+ * the version for dark grounds. Drawn from outlines (brand/), so it needs no font
+ * here. `letterPx` is the height of the capitals.
  */
 function Lockup({ letterPx }: { letterPx: number }) {
-  const { designSize, width, height, letters, line } = BRAND_LOCKUP;
-  const k = letterPx / designSize;
-  return (
-    <svg width={Math.round(width * k)} height={Math.round(height * k)} viewBox={`0 0 ${width} ${height}`}>
-      <path d={letters} fill={CREAM} />
-      <rect x={line.x} y={line.y} width={line.width} height={line.height} fill={GOLD} />
-    </svg>
-  );
+  const { designSize, width, height, dark } = BRAND_LOCKUP;
+  const k = letterPx / designSize, w = Math.round(width * k), h = Math.round(height * k);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${w}" height="${h}">${dark}</svg>`;
+  // eslint-disable-next-line @next/next/no-img-element -- an image inside the generated card, not a page
+  return <img src={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`} width={w} height={h} alt="Sanguine" />;
 }
 
 const rootStyle = {

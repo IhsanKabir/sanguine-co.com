@@ -6,11 +6,11 @@ interface BrandMarkProps {
   locale: Locale;
   /** The accessible name: the brand name in the page's language. */
   alt: string;
-  /** Size of the English capitals in px (the logo's design size). */
+  /** Height of the capitals in px (the mask is twice as tall). */
   letterPx: number;
-  /** On screens up to 640px wide, show only this page's language at this size. */
+  /** On screens up to 640px wide, show the logo at this smaller size. */
   narrowLetterPx?: number;
-  /** "light" puts plum letters on a light ground, "dark" cream letters on a dark one. */
+  /** "light" puts the red name on a light ground, "dark" the paper name on a dark one. */
   tone?: "light" | "dark";
   className?: string;
 }
@@ -20,16 +20,16 @@ const scaled = (file: { width: number; height: number }, letterPx: number) => ({
   height: Math.round((file.height * letterPx) / BRAND_DESIGN_SIZE),
 });
 
-/** The file for one language's half of the logo (narrow screens, the mobile menu). */
+/** The logo file for narrow screens and the mobile menu (the same lockup in both languages). */
 export function brandHalf(locale: Locale, letterPx: number) {
   const file = locale === "bn" ? BRAND_FILES.bn : BRAND_FILES.en;
   return { src: file.src, ...scaled(file, letterPx) };
 }
 
 /**
- * The Sanguine logo: সাঙ্গুইন hangs from a gold line and SANGUINE stands on
- * it (made in brand/, see brand/README.md). Wide screens show both scripts;
- * with `narrowLetterPx`, narrow screens show the half in the page's language.
+ * The Sanguine logo: a smiling mask, cut out like a sticker, beside SANGUINE
+ * (made in brand/, see brand/README.md). With `narrowLetterPx`, narrow screens
+ * show it smaller.
  *
  * Files, not inline SVG: the outlines are 12 KB, and inline they would be
  * sent twice on every page (in the HTML and again in the React payload),
