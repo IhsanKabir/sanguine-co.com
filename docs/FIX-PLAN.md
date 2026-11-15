@@ -51,7 +51,7 @@ A1 to A4 are done (12 Nov): the alert email and the customer email arrive.
 
 **R2. Instagram.** DONE 13 Nov: https://www.instagram.com/thesanguineco/ is on the site (footer, Contact page, and the brand data Google reads). Still to do: link Instagram to the Facebook page in Meta Business Suite, Settings, Accounts, and put the shop link in the Instagram bio.
 
-**R3. Google Business Profile.** Go to business.google.com, add "Sanguine", category "Florist" (add "Gift shop" as a second), service area Dhaka, website sanguine-co.com, phone 01777603364. Google will verify by phone or video. This is what makes the shop appear on Google Maps and in "flower delivery Dhaka" searches.
+**R3. Google Business Profile.** Go to business.google.com, add "Sanguine", category "Florist" (add "Gift shop" as a second), service area Dhaka, website sanguine-co.com, phone 01575363214 (WhatsApp Business). Google will verify by phone or video. This is what makes the shop appear on Google Maps and in "flower delivery Dhaka" searches.
 
 **R4. Google Search Console and Meta Pixel.**
 - Search Console: go to search.google.com/search-console, add `sanguine-co.com` as a Domain property. It gives you a TXT record. Add it in Cloudflare, DNS, then press Verify. Then open Sitemaps and submit `https://sanguine-co.com/sitemap.xml`.
@@ -80,7 +80,7 @@ The old ones are kept in `social-assets\old-logo`.
 
 ### T. Answers Claude needs
 
-- **T1.** ANSWERED: phone 01777603364 for now.
+- **T1.** ANSWERED: phone 01777603364 at first; from 15 Nov 2026 01575363214, which is also WhatsApp Business.
 - **T2.** ANSWERED: no licence yet; the owner will apply once sales grow. Nothing is shown in the footer until then.
 - **T3.** ANSWERED: returns 3 days in general. Flowers: a refund on the spot if the customer does not like the bouquet.
 - **T4.** ANSWERED: flowers are delivered in Dhaka only for now.
