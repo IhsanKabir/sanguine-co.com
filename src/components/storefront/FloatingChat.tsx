@@ -1,15 +1,14 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { normalizeBdWhatsApp } from "@/lib/utils";
+import { WHATSAPP_NUMBER } from "@/lib/contact";
 
 /**
  * Floating WhatsApp + Messenger buttons (BD-essential per research).
- * Configure via env: NEXT_PUBLIC_WHATSAPP_NUMBER, NEXT_PUBLIC_MESSENGER_PAGE.
- * Hidden if both are unset. Local-format numbers (01XXXXXXXXX) are normalized
- * to international for wa.me: a local-format link points at nothing.
+ * WhatsApp is the shop's WhatsApp Business number (lib/contact.ts);
+ * Messenger comes from NEXT_PUBLIC_MESSENGER_PAGE.
  */
-const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;   // e.g. 8801XXXXXXXXX
+const WHATSAPP = WHATSAPP_NUMBER;
 const MESSENGER = process.env.NEXT_PUBLIC_MESSENGER_PAGE;   // e.g. sanguine
 
 export default function FloatingChat() {
@@ -21,7 +20,7 @@ export default function FloatingChat() {
     <div className="floating-chat" aria-label={t("chat.label")}>
       {WHATSAPP && (
         <a
-          href={`https://wa.me/${normalizeBdWhatsApp(WHATSAPP)}?text=${greeting}`}
+          href={`https://wa.me/${WHATSAPP}?text=${greeting}`}
           target="_blank"
           rel="noopener noreferrer"
           className="fc-btn fc-whatsapp"
