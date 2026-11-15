@@ -12,11 +12,11 @@
 const CLOUD_STROKES = (
   <>
     <path d="M -200 200 Q -50 195, 100 200 T 400 195 T 700 198 T 1000 195 T 1300 200 T 1600 198"
-          stroke="oklch(0.93 0.025 200)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          stroke="oklch(0.96 0.015 300)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
     <path d="M -200 260 Q 0 258, 200 262 T 600 260 T 1000 258 T 1400 262 T 1800 260"
-          stroke="oklch(0.93 0.025 200)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.7" />
+          stroke="oklch(0.96 0.015 300)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.7" />
     <path d="M -200 165 Q 100 168, 400 162 T 1000 168 T 1700 162"
-          stroke="oklch(0.93 0.025 200)" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.5" />
+          stroke="oklch(0.96 0.015 300)" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.5" />
   </>
 );
 
@@ -39,19 +39,19 @@ export default function HeroTide() {
       <defs>
         {/* Sky: deep tide-deep at top, fading to mist at the horizon */}
         <linearGradient id="ht-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="oklch(0.22 0.06 220)" />
-          <stop offset="55%" stopColor="oklch(0.46 0.07 215)" />
-          <stop offset="100%" stopColor="oklch(0.78 0.05 200)" />
+          <stop offset="0%" stopColor="oklch(0.20 0.07 300)" />
+          <stop offset="55%" stopColor="oklch(0.42 0.11 302)" />
+          <stop offset="100%" stopColor="oklch(0.86 0.04 300)" />
         </linearGradient>
         {/* Sea: pale aqua band */}
         <linearGradient id="ht-sea" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="oklch(0.78 0.06 200)" />
-          <stop offset="100%" stopColor="oklch(0.62 0.06 205)" />
+          <stop offset="0%" stopColor="oklch(0.85 0.04 300)" />
+          <stop offset="100%" stopColor="oklch(0.68 0.07 300)" />
         </linearGradient>
-        {/* Foreground tide: deeper teal */}
+        {/* Foreground tide: deeper violet */}
         <linearGradient id="ht-tide" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="oklch(0.42 0.07 210)" />
-          <stop offset="100%" stopColor="oklch(0.30 0.06 215)" />
+          <stop offset="0%" stopColor="oklch(0.40 0.10 302)" />
+          <stop offset="100%" stopColor="oklch(0.27 0.08 303)" />
         </linearGradient>
         {/* Wide screens: hides the cloud strokes on the left, where the
             headline sits, and shows them over the sun. */}
@@ -86,7 +86,7 @@ export default function HeroTide() {
         <path d="M 0 540 Q 360 532, 720 540 T 1440 540 L 1440 700 L 0 700 Z" fill="url(#ht-sea)" />
         {/* Horizon ripple */}
         <path d="M 0 545 Q 240 543, 480 547 T 960 545 T 1440 547"
-              stroke="oklch(0.93 0.025 200)" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.6" />
+              stroke="oklch(0.96 0.015 300)" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.6" />
       </g>
 
       {/* Foreground tide: bottom 28%, with two soft wavelets */}
@@ -95,9 +95,9 @@ export default function HeroTide() {
               fill="url(#ht-tide)" />
         {/* Foam highlight */}
         <path d="M 0 665 Q 240 660, 480 668 T 960 663 T 1440 666"
-              stroke="oklch(0.88 0.04 200)" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.4" />
+              stroke="oklch(0.92 0.03 300)" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.4" />
         <path d="M 0 700 Q 240 698, 480 703 T 960 700 T 1440 702"
-              stroke="oklch(0.88 0.04 200)" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.25" />
+              stroke="oklch(0.92 0.03 300)" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.25" />
       </g>
     </svg>
   );

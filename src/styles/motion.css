@@ -313,6 +313,9 @@
 /* Hero emphasis: plain gold. An infinite background-position shimmer on
    clipped text repainted the largest text on the page every frame. */
 .hero h1 em { color: var(--gold); }
+/* The accent word in Great Vibes (owner, 15 Nov 2026): one word, big headlines only. */
+html[lang="en"] .hero h1 em { font-family: var(--font-script), "Instrument Serif", cursive; font-style: normal; font-weight: 400;
+  font-size: 1.28em; line-height: .9; letter-spacing: 0; display: inline-block; padding-right: .06em; transform: translateY(.05em) rotate(-3deg); }
 
 /* Marquee strip */
 .marquee {
@@ -320,8 +323,8 @@
   color: var(--gold);
   padding: 10px 0;
   overflow: hidden;
-  border-top: 1px solid oklch(0.4 0.06 220 / 0.5);
-  border-bottom: 1px solid oklch(0.4 0.06 220 / 0.5);
+  border-top: 1px solid oklch(0.4 0.06 300 / 0.5);
+  border-bottom: 1px solid oklch(0.4 0.06 300 / 0.5);
 }
 .marquee-track {
   display: flex; gap: 48px;

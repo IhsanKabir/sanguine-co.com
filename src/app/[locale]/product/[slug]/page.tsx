@@ -332,6 +332,7 @@ export default async function ProductPage({ params }: Props) {
             <PreorderButton
               slug={p.slug}
               estimatedDelivery={p.estimatedDelivery}
+              sameDayUsual={isDhakaOnlySegment(p.segmentId)}
               display={display}
               depositPct={depositPct}
               locale={locale}
@@ -355,6 +356,8 @@ export default async function ProductPage({ params }: Props) {
                 <PreorderButton
                   slug={p.slug}
                   estimatedDelivery={p.estimatedDelivery}
+
+                  sameDayUsual={isDhakaOnlySegment(p.segmentId)}
                   display={display}
                   depositPct={depositPct}
                   locale={locale}
@@ -366,6 +369,8 @@ export default async function ProductPage({ params }: Props) {
             <PreorderButton
               slug={p.slug}
               estimatedDelivery={p.estimatedDelivery}
+
+              sameDayUsual={isDhakaOnlySegment(p.segmentId)}
               display={display}
               depositPct={depositPct}
               locale={locale}

@@ -897,6 +897,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .locale-switch button:hover:not(:disabled) { background: var(--purple-50); color: var(--purple-900); }
 .locale-switch button.is-active { background: var(--purple-900); color: white; cursor: default; }
 .locale-switch button:disabled { opacity: .6; }
+.locale-switch button.is-active:disabled { opacity: 1; }   /* the current language: shown solid, not faded */
 
 /* --font-sans / --font-serif come from next/font (app/fonts.ts) on <html>;
  * redefining them here could override the self-hosted families. */
