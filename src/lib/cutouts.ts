@@ -1,12 +1,14 @@
 /**
- * Cut-out pictures of products: the shop's own photos with the background removed
- * (social-studio/photos/*-cut.png), edges hardened (the faint haze the cutting tool leaves
- * is dropped), as transparent WebP in two sizes in /public/cutouts.
- * The home page's rail and shelf stand them on the page. A product without one shows
- * its normal photo on the shelf and is left out of the rail.
+ * Cut-out pictures of products: the bouquet with its background removed, as transparent WebP
+ * in two sizes. The home page's rail and shelf stand them on the page. A product without one
+ * shows its normal photo on the shelf and is left out of the rail.
  *
- * To add one: export the cut-out at 900 and 450 px tall as "<slug>-900.webp" and
- * "<slug>-450.webp" into /public/cutouts, then add a line below with the 900 size.
+ * Two sources, the uploaded one winning:
+ *  - uploaded in the admin (Products, edit, "Cut-out for the home page"), stored per product
+ *    id in site_settings.cutouts (lib/cutout-store.ts);
+ *  - built in: the first cut-outs, made from the shop's photos (social-studio/photos/*-cut.png,
+ *    edges hardened), in /public/cutouts, listed below by product address.
+ * Pure module: safe in server and client components.
  */
 export interface Cutout {
   /** About 900 px tall: wide screens. */
@@ -25,7 +27,7 @@ const cut = (slug: string, width: number, height: number): Cutout => ({
   height,
 });
 
-const CUTOUTS: Readonly<Record<string, Cutout>> = {
+const BUILT_IN: Readonly<Record<string, Cutout>> = {
   "the-100-rose-special": cut("the-100-rose-special", 900, 874),
   "multicolor-lily-bouquet": cut("multicolor-lily-bouquet", 753, 900),
   "the-100-lychee-bouquet": cut("the-100-lychee-bouquet", 900, 860),
@@ -33,6 +35,7 @@ const CUTOUTS: Readonly<Record<string, Cutout>> = {
   // The sunflower basket's photo has a cupcake and a candle in front: no cut-out until a clean photo.
 };
 
-export function cutoutFor(slug: string): Cutout | null {
-  return CUTOUTS[slug] ?? null;
+/** A product's cut-out: the uploaded one (by product id) if any, else the built-in one (by address). */
+export function cutoutFor(product: { id: string; slug: string }, uploaded: Readonly<Record<string, Cutout>> = {}): Cutout | null {
+  return uploaded[product.id] ?? BUILT_IN[product.slug] ?? null;
 }

@@ -76,11 +76,7 @@
       "next": "Scroll right"
     },
     "moments": {
-      "kicker": "Moments",
-      "title": "Forgot your anniversary? <em>It's not too late.</em>",
-      "body": "Order by {cutoff} and choose same-day express: the bouquet arrives today.",
-      "cta": "Choose a bouquet",
-      "alt": "Two cartoon cats: she is cross, he forgot their anniversary"
+      "kicker": "Moments"
     },
     "whatsapp": "Ask on WhatsApp",
     "marquee": {

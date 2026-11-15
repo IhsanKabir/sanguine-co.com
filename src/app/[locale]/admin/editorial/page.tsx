@@ -3,6 +3,8 @@ import { getCopyOverridesUncached, flattenMessages } from "@/lib/copy";
 import { getAnnouncementUncached } from "@/lib/announcement";
 import EditorialClient from "./EditorialClient";
 import AnnouncementEditor from "./AnnouncementEditor";
+import MomentsEditor from "./MomentsEditor";
+import { getMomentsUncached } from "@/lib/moments";
 import { requirePermission } from "@/lib/auth-utils";
 import enMessages from "@/messages/en.json";
 import bnMessages from "@/messages/bn.json";
@@ -17,10 +19,11 @@ export default async function AdminEditorialPage() {
   const defaultsEn = flattenMessages(enMessages as Record<string, unknown>);
   const defaultsBn = flattenMessages(bnMessages as Record<string, unknown>);
 
-  const [overrides, brand, announcement] = await Promise.all([
+  const [overrides, brand, announcement, moments] = await Promise.all([
     getCopyOverridesUncached(),
     getBrand(),
     getAnnouncementUncached(),
+    getMomentsUncached(),
   ]);
 
   return (
@@ -33,6 +36,7 @@ export default async function AdminEditorialPage() {
         overridesBn={overrides.bn}
       />
       <AnnouncementEditor initial={announcement} />
+      <MomentsEditor initial={moments} />
     </>
   );
 }

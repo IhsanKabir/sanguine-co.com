@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import type { Cutout } from "@/lib/cutouts";
 
 export interface RailItem {
@@ -47,6 +47,8 @@ export default function HeroRail({ items, labels }: Props) {
   const [paused, setPaused] = useState(false);
   const [held, setHeld] = useState(false);   // pointed at or focused
   const x0 = useRef<number | null>(null);
+  const swiped = useRef(false);   // a swipe ends in a click too: that click must not also open a page
+  const router = useRouter();
   // Pictures load only when a bouquet is in front or next to it, then stay: hidden ones
   // are stacked in view (just transparent), so lazy loading alone would fetch them all.
   const [seen, setSeen] = useState<ReadonlySet<number>>(() => new Set([n - 1, 0, 1].map((i) => (i + n) % n)));
@@ -84,15 +86,25 @@ export default function HeroRail({ items, labels }: Props) {
       onMouseLeave={() => setHeld(false)}
       onFocus={() => setHeld(true)}
       onBlur={() => setHeld(false)}
-      onPointerDown={(e) => { x0.current = e.clientX; }}
+      onPointerDown={(e) => { x0.current = e.clientX; swiped.current = false; }}
       onPointerUp={(e) => {
         const start = x0.current;
         x0.current = null;
-        if (start !== null && Math.abs(e.clientX - start) > SWIPE_PX) go(e.clientX < start ? 1 : -1);
+        if (start !== null && Math.abs(e.clientX - start) > SWIPE_PX) { swiped.current = true; go(e.clientX < start ? 1 : -1); }
       }}
     >
       {items.map((it, i) => (
-        <div key={it.slug} className="rail-slot" data-pos={position(i, at, n)} aria-hidden={i !== at}>
+        <div
+          key={it.slug}
+          className="rail-slot"
+          data-pos={position(i, at, n)}
+          aria-hidden={i !== at}
+          onClick={() => {
+            if (swiped.current) { swiped.current = false; return; }
+            if (i === at) router.push(`/product/${it.slug}`);   // the one in front: open it
+            else setAt(i);                                        // a side one: bring it forward
+          }}
+        >
           {seen.has(i) && (
           // eslint-disable-next-line @next/next/no-img-element -- transparent WebP in two sizes, chosen by srcSet
           <img

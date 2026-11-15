@@ -8,6 +8,7 @@ import Icon from "@/components/storefront/Icon";
 import { Link } from "@/i18n/routing";
 import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import ProductImagesEditor from "./ProductImagesEditor";
+import CutoutEditor from "./CutoutEditor";
 import { OCCASIONS, type OccasionId } from "@/lib/occasions";
 
 type Props = { segments: Segment[]; products: Product[]; trackedIds: string[] };
@@ -520,7 +521,10 @@ export default function ProductsClient({ segments, products, trackedIds }: Props
             </div>
 
             {editing.id ? (
-              <ProductImagesEditor productId={editing.id} productSku={editing.sku} />
+              <>
+                <ProductImagesEditor productId={editing.id} productSku={editing.sku} />
+                <CutoutEditor productId={editing.id} />
+              </>
             ) : (
               <p style={{ marginTop: 14, fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.6 }}>
                 <i>Save the product first, then re-open this dialog to add photographs.</i>
