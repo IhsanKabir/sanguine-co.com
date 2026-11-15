@@ -10,6 +10,7 @@ import HeroRail, { type RailItem } from "@/components/storefront/HeroRail";
 import Shelf, { type ShelfItem } from "@/components/storefront/Shelf";
 import SameDayLine from "@/components/storefront/SameDayLine";
 import { cutoutFor } from "@/lib/cutouts";
+import { displayName } from "@/lib/product-name";
 import { expressCutoffLabel } from "@/lib/delivery";
 import { whatsAppUrl } from "@/lib/contact";
 import NewsletterForm from "@/components/storefront/NewsletterForm";
@@ -17,8 +18,6 @@ import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
 import Ornament from "@/components/storefront/Ornament";
 import JsonLd from "@/components/seo/JsonLd";
 import { SITE_URL as BASE } from "@/lib/site-url";
-import { getCommerceSettings } from "@/lib/commerce";
-import { formatBdt } from "@/lib/utils";
 import { deliveryScope, scopedKey } from "@/lib/delivery-scope";
 
 // ISR: the homepage fires several catalogue queries per request and reads no
@@ -76,7 +75,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const MARQUEE_KEYS = ["atelierMade", "cod", "gift", "freeDelivery", "returns", "certified"];
 // The third "How it works" point is the delivery promise.
 const DELIVERY_FEATURE = 3;
 
@@ -87,14 +85,6 @@ export default async function Home({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations();
-  const commerce = await getCommerceSettings();
-  const freeOver = formatBdt(commerce.freeShippingThresholdBdt, locale as "en" | "bn");
-  // The bn message formats {days, number}, so this stays a number.
-  const returnDays = commerce.returnWindowDays;
-  // A threshold of 0 switches free shipping off: drop that marquee point.
-  const marqueeKeys = commerce.freeShippingThresholdBdt > 0
-    ? MARQUEE_KEYS
-    : MARQUEE_KEYS.filter((k) => k !== "freeDelivery");
 
   const [segments, live, occasions] = await Promise.all([
     safeQuery(getVisibleSegments()),
@@ -111,7 +101,7 @@ export default async function Home({ params }: Props) {
   const heroImages = products.length > 0
     ? await safeQuery(getHeroImagesFor(products.map((p) => p.id))) ?? new Map()
     : new Map();
-  const nameOf = (p: { name: string; nameBn: string | null }) => (locale === "bn" && p.nameBn) || p.name;
+  const nameOf = (p: { name: string; nameBn: string | null }) => (locale === "bn" && p.nameBn) || displayName(p.name);
   const priceOf = (p: Parameters<typeof priceDisplay>[0]) => {
     const display = priceDisplay(p);
     return display.kind === "quote" ? t("pdp.priceOnQuote") : priceDisplayText(display, locale as "en" | "bn");
@@ -193,16 +183,6 @@ export default async function Home({ params }: Props) {
           </div>
         )}
       </section>
-
-      {/* ─── Marquee: concise trust points ──────────────────────── */}
-      <div className="marquee" data-cursor="default">
-        <div className="marquee-track">
-          {/* Listed twice so the scrolling track loops seamlessly. */}
-          {[...marqueeKeys, ...marqueeKeys].map((k, i) => (
-            <span key={k + i} aria-hidden={i >= marqueeKeys.length || undefined}>{t(scopedKey(`home.marquee.${k}`, scope, k === "certified" ? ["dhaka"] : []), { threshold: freeOver, days: returnDays })}</span>
-          ))}
-        </div>
-      </div>
 
       {/* ─── The shelf: every bouquet in a row ───────────────────── */}
       {shelf.length > 0 && (
