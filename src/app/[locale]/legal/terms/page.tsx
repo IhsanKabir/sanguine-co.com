@@ -36,7 +36,7 @@ function EnglishSection({ days }: { days: number }) {
       <p>We do not yet collect VAT. When Sanguine&rsquo;s Trade Licence and VAT registration become active, we will say so plainly and adjust the displayed prices to be inclusive of any required VAT.</p>
 
       <h2>Delivery</h2>
-      <p>Flowers are delivered in Dhaka only. Everything else ships nationwide via Pathao Courier and Steadfast Courier. Delivery is within 48 hours inside Dhaka and typically three to seven working days elsewhere in Bangladesh, but courier delays do happen and we cannot guarantee a specific date unless we have agreed it with you in writing.</p>
+      <p>Flowers are delivered in Dhaka only. Everything else ships nationwide via Pathao Courier and Steadfast Courier. Flowers arrive within 3 days, usually the same day. With paid same-day express, ordered before the cutoff, they arrive that day. Other orders arrive within 48 hours inside Dhaka and typically three to seven working days elsewhere in Bangladesh, but courier delays do happen and we cannot guarantee a specific date unless we have agreed it with you in writing.</p>
       <p>For bespoke pieces, the timeline begins when the quote is accepted and is stated in the quote itself.</p>
 
       <h2>Returns and refunds</h2>
@@ -85,7 +85,7 @@ function BangleSection({ days }: { days: number }) {
       <p>আমরা এখনো VAT সংগ্রহ করি না। সাঙ্গুইনের ট্রেড লাইসেন্স ও VAT রেজিস্ট্রেশন সক্রিয় হলে আমরা স্পষ্টভাবে জানাব এবং প্রদর্শিত মূল্যে প্রয়োজনীয় VAT অন্তর্ভুক্ত করে নেব।</p>
 
       <h2>ডেলিভারি</h2>
-      <p>ফুল শুধু ঢাকায় ডেলিভারি হয়। বাকি সবকিছু আমরা সারা দেশে Pathao ও Steadfast কুরিয়ারের মাধ্যমে পাঠাই। ঢাকার ভেতরে ৪৮ ঘণ্টার মধ্যে এবং বাইরে সাধারণত তিন থেকে সাত কর্মদিবস। কুরিয়ারজনিত বিলম্ব ঘটে; লিখিতভাবে নির্দিষ্ট তারিখ সম্মত না হলে আমরা গ্যারান্টি দিতে পারি না।</p>
+      <p>ফুল শুধু ঢাকায় ডেলিভারি হয়। বাকি সবকিছু আমরা সারা দেশে Pathao ও Steadfast কুরিয়ারের মাধ্যমে পাঠাই। ফুল ৩ দিনের মধ্যে পৌঁছায়, সাধারণত একই দিনে; সময়সীমার আগে একই দিনের এক্সপ্রেস (ফি সহ) বেছে নিলে সেদিনই। অন্য অর্ডার ঢাকার ভেতরে ৪৮ ঘণ্টার মধ্যে এবং বাইরে সাধারণত তিন থেকে সাত কর্মদিবস। কুরিয়ারজনিত বিলম্ব ঘটে; লিখিতভাবে নির্দিষ্ট তারিখ সম্মত না হলে আমরা গ্যারান্টি দিতে পারি না।</p>
       <p>বেসপোক পিসের ক্ষেত্রে কোট গৃহীত হওয়ার দিন থেকে সময় গণনা শুরু হয়, এবং তা কোটেই উল্লেখ থাকে।</p>
 
       <h2>ফেরত ও অর্থ ফেরত</h2>

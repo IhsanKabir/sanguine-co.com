@@ -148,22 +148,27 @@ export function preorderQuoteEmail(
     quotedPriceBdt: number;          // PER-UNIT price (owner decision 2026-07-13)
     depositBdt: number;              // prepayment that confirms the piece
     depositPct: number;
+    /** Same-day express fee, paid in advance with the deposit (0025). */
+    expressFeeBdt?: number | null;
     adminNotes?: string | null;
   },
 ) {
   const subject = `Your price · ${d.segmentName}`;
-  const total = d.quotedPriceBdt * d.quantity;
+  const express = d.expressFeeBdt ?? 0;
+  const total = d.quotedPriceBdt * d.quantity + express;
   // The math the customer agrees to must be the same math the conversion
   // charges: unit × quantity = total, deposit up front, remainder on delivery.
   const priceLine = d.quantity > 1
-    ? `${formatBdt(d.quotedPriceBdt)} <span style="font-size:16px;color:#7a6a52;">each</span> × ${d.quantity} = ${formatBdt(total)}`
-    : formatBdt(total);
+    ? `${formatBdt(d.quotedPriceBdt)} <span style="font-size:16px;color:#7a6a52;">each</span> × ${d.quantity}${express ? ` + ${formatBdt(express)} <span style="font-size:16px;color:#7a6a52;">same-day</span>` : ""} = ${formatBdt(total)}`
+    : express
+      ? `${formatBdt(d.quotedPriceBdt)} + ${formatBdt(express)} <span style="font-size:16px;color:#7a6a52;">same-day</span> = ${formatBdt(total)}`
+      : formatBdt(total);
   const body = `
     <p style="font-size:15px;margin:0 0 6px;">Dear ${e(d.customerName.split(" ")[0] || "friend")},</p>
     <p style="font-size:15px;margin:0 0 24px;">Thank you for your request. We can make this for you. The price, including delivery, is:</p>
     <p style="text-align:center;font-family:Georgia,serif;font-size:32px;color:#2a1854;font-weight:400;margin:0 0 24px;">${priceLine}</p>
     ${d.adminNotes ? `<p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:0 0 8px;">A NOTE FROM US</p><p style="font-size:14px;color:#3a2a64;line-height:1.7;background:#f9f4ec;padding:14px 16px;border-left:2px solid #a07e2c;white-space:pre-wrap;margin:0 0 24px;">${escapeHtml(d.adminNotes)}</p>` : ""}
-    <p style="font-size:13px;color:#7a6a52;margin:0 0 24px;line-height:1.7;">Reply to this email to accept. A deposit of <b style="color:#2a1854;">${formatBdt(d.depositBdt)}</b> (${d.depositPct}%) confirms the order, and we'll send you a bKash request for it. The remainder, ${formatBdt(Math.max(0, total - d.depositBdt))}, is paid in cash when the courier arrives.</p>
+    <p style="font-size:13px;color:#7a6a52;margin:0 0 24px;line-height:1.7;">Reply to this email to accept. A deposit of <b style="color:#2a1854;">${formatBdt(d.depositBdt)}</b> (${d.depositPct}%${express ? ` plus the ${formatBdt(express)} same-day fee` : ""}) confirms the order, and we'll send you a bKash request for it. The remainder, ${formatBdt(Math.max(0, total - d.depositBdt))}, is paid in cash when the courier arrives.</p>
     <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">Sanguine</p>
   `;
   return { subject, html: SHELL(body) };

@@ -4,6 +4,7 @@ import { getCommerceSettings, type CommerceSettings } from "@/lib/commerce";
 import { pageMetadata } from "@/lib/page-metadata";
 import { REPLY_HOURS, SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY } from "@/lib/contact";
 import { formatBdt } from "@/lib/utils";
+import { EXPRESS_FEE_BDT, expressCutoffLabel } from "@/lib/delivery";
 
 type Props = { params: Promise<{ locale: string }> };
 type Locale = "en" | "bn";
@@ -21,6 +22,7 @@ export async function generateMetadata({ params }: Props) {
 // disagree with what checkout charges or the returns page says.
 function faqGroups(locale: Locale, c: CommerceSettings): FaqGroup[] {
   const delivery = formatBdt(c.shippingDhakaBdt, locale);
+  const express = formatBdt(EXPRESS_FEE_BDT, locale), cutoff = expressCutoffLabel(locale);
   const freeOver = c.freeShippingThresholdBdt > 0 ? formatBdt(c.freeShippingThresholdBdt, locale) : null;
   const days = c.returnWindowDays;
 
@@ -40,7 +42,8 @@ function faqGroups(locale: Locale, c: CommerceSettings): FaqGroup[] {
         heading: "ডেলিভারি",
         items: [
           { q: "ফুল কোথায় ডেলিভারি হয়?", a: "আপাতত শুধু ঢাকায়। তোড়া তাজা ফুলে তৈরি, কুরিয়ারে দূরে পাঠালে ভালো থাকে না।" },
-          { q: "কত সময় লাগে?", a: "অর্ডার নিশ্চিত হওয়ার ৪৮ ঘণ্টার মধ্যে। চাইলে ফর্মে পরের কোনো দিনও বেছে নিতে পারেন।" },
+          { q: "কত সময় লাগে?", a: "অর্ডার নিশ্চিত হওয়ার ৩ দিনের মধ্যে, সাধারণত একই দিনে। চাইলে ফর্মে পরের কোনো দিনও বেছে নিতে পারেন।" },
+          { q: "আজই পাওয়া যাবে?", a: `যাবে। ${cutoff}-এর মধ্যে অর্ডার করে ফর্মে একই দিনের এক্সপ্রেস বেছে নিন। ফি ${express}, অগ্রিমের সঙ্গে আগেই দিতে হয়।` },
           { q: "ডেলিভারি চার্জ কত?", a: `ঢাকায় ${delivery}।${freeOver ? ` ${freeOver}-এর বেশি অর্ডারে ফ্রি।` : ""}` },
         ],
       },
@@ -75,7 +78,8 @@ function faqGroups(locale: Locale, c: CommerceSettings): FaqGroup[] {
       heading: "Delivery",
       items: [
         { q: "Where do you deliver flowers?", a: "In Dhaka only, for now. Bouquets are made fresh and do not travel well by courier." },
-        { q: "How long does it take?", a: "Within 48 hours of your order being confirmed. You can also choose a later day in the request form." },
+        { q: "How long does it take?", a: "Within 3 days of your order being confirmed, usually the same day. You can also choose a later day in the request form." },
+        { q: "Can I get it today?", a: `Yes. Order by ${cutoff} and choose same-day express in the request form. The fee is ${express}, paid in advance with the deposit.` },
         { q: "How much is delivery?", a: `${delivery} in Dhaka.${freeOver ? ` Free on orders over ${freeOver}.` : ""}` },
       ],
     },

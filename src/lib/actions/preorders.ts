@@ -22,7 +22,8 @@ import { SITE_URL } from "@/lib/site-url";
 import { normalizeBdWhatsApp } from "@/lib/utils";
 import { priceDisplay, effectiveDepositPct, depositForQuote } from "@/lib/pricing";
 import { getCommerceSettings } from "@/lib/commerce";
-import { isValidDeliveryDate, GIFT_MESSAGE_MAX } from "@/lib/delivery";
+import { isValidDeliveryDate, GIFT_MESSAGE_MAX, dhakaToday } from "@/lib/delivery";
+import { expressCheck, EXPRESS_ORDER_NOTE, PREORDER_ORDER_PREFIX } from "@/lib/express";
 
 const attachmentSchema = z.object({
   url: z.string().url(),
@@ -132,6 +133,8 @@ const productPreorderSchema = z.object({
   /** Optional "deliver on" day and card message (0022). */
   targetDate: z.string().optional().nullable(),
   giftMessage: z.string().trim().max(GIFT_MESSAGE_MAX).optional().nullable(),
+  /** Same-day express (flowers in Dhaka): delivered today for EXPRESS_FEE_BDT. */
+  express: z.boolean().optional().nullable(),
   /** Guests only: where the quote goes. Signed-in customers use their account email. */
   customerEmail: z.string().trim().email().max(200).optional().nullable(),
   deliveryAddress: z.object({
@@ -200,6 +203,9 @@ export async function createProductPreorderRequest(
   if (isDhakaOnlySegment(product.segmentId) && data.deliveryAddress && !isDhakaCity(data.deliveryAddress.city)) {
     return { ok: false as const, error: "Flowers are delivered in Dhaka only. Please give a Dhaka address." };
   }
+  const express = expressCheck(Boolean(data.express), product.segmentId, Boolean(data.deliveryAddress), new Date());
+  if (!express.ok) return express;
+  const targetDate = express.feeBdt ? dhakaToday(new Date()) : data.targetDate || null;
 
   // Snapshot what the customer was shown (estimate range + deposit %): the
   // quote may differ after research, but the advertised numbers must be on
@@ -216,6 +222,7 @@ export async function createProductPreorderRequest(
     `Preorder · ${product.name}`,
     data.color ? `Colour: ${data.color}` : null,
     data.size ? `Size: ${data.size}` : null,
+    express.feeBdt ? `${EXPRESS_ORDER_NOTE} (+${express.feeBdt} BDT): deliver today, ${targetDate}` : null,
     data.notes ? `Notes: ${data.notes}` : null,
   ].filter(Boolean).join(" · ");
 
@@ -231,8 +238,9 @@ export async function createProductPreorderRequest(
     color: data.color || null,
     size: data.size || null,
     deliveryAddress: data.deliveryAddress ?? null,
-    targetDate: data.targetDate || null,
+    targetDate,
     giftMessage: data.giftMessage || null,
+    expressFeeBdt: express.feeBdt,
     attachments: [],
     advertisedMinBdt,
     advertisedMaxBdt,
@@ -336,7 +344,8 @@ export async function quotePreorderRequest(input: z.infer<typeof quoteSchema>) {
   // Deposit secures the whole commission: pct × (per-unit quote × quantity).
   // Computing it per-unit made the quote email read "deposit ৳2,000 (20%)"
   // under a ৳30,000 three-piece total: 6.7% in reality.
-  const depositBdt = depositForQuote(data.quotedPriceBdt * existing.quantity, depositPct);
+  // A same-day express fee is paid in advance, with the deposit.
+  const depositBdt = depositForQuote(data.quotedPriceBdt * existing.quantity, depositPct) + (existing.expressFeeBdt ?? 0);
 
   const [row] = await db.update(schema.preorderRequests)
     .set({
@@ -366,6 +375,7 @@ export async function quotePreorderRequest(input: z.infer<typeof quoteSchema>) {
       quotedPriceBdt: data.quotedPriceBdt,
       depositBdt,
       depositPct,
+      expressFeeBdt: row.expressFeeBdt ?? null,
       adminNotes: data.adminNotes ?? null,
     });
     const to = row.customerEmail;
@@ -441,7 +451,7 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
     ? await db.select().from(schema.products).where(eq(schema.products.id, req.productId)).limit(1)
     : [];
 
-  const number = `SSG-PO-${Date.now().toString(36).toUpperCase()}`;
+  const number = `${PREORDER_ORDER_PREFIX}${Date.now().toString(36).toUpperCase()}`;
   const subtotal = req.quotedPriceBdt * req.quantity;   // per-unit quote × qty
   // The deposit is deducted from the COD total ONLY when it was actually
   // received (status 'confirmed', set by markPreorderDepositReceived). A
@@ -449,7 +459,8 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
   // never arrived would silently gift the deposit amount. Recorded in its
   // own depositPaidBdt column: it is a PAYMENT, not a discount (refund cap
   // and revenue both count it; the courier collects totalBdt).
-  const depositPaid = req.status === "confirmed" ? Math.min(req.depositBdt ?? 0, subtotal) : 0;
+  const expressFee = req.expressFeeBdt ?? 0;
+  const depositPaid = req.status === "confirmed" ? Math.min(req.depositBdt ?? 0, subtotal + expressFee) : 0;
   const trackingToken = randomBytes(16).toString("hex");
 
   const newOrderId = await db.transaction(async (tx) => {
@@ -461,15 +472,20 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
       status: "cod_pending",
       paymentMethod: "cod",
       subtotalBdt: subtotal,
-      shippingBdt: 0,
+      shippingBdt: expressFee,
       codFeeBdt: 0,
       depositPaidBdt: depositPaid,
-      totalBdt: subtotal - depositPaid,
+      totalBdt: subtotal + expressFee - depositPaid,
       shippingAddress: { fullName: req.customerName, phone: req.customerPhone, ...(req.deliveryAddress as object) },
       trackingToken,
-      notes: depositPaid > 0
-        ? `Bespoke pre-order · request ${req.id} · deposit ${depositPaid} BDT prepaid`
-        : `Bespoke pre-order · request ${req.id}`,
+      // The day and card the customer asked for travel with the order (0022).
+      deliveryDate: req.targetDate ?? null,
+      giftMessage: req.giftMessage ?? null,
+      notes: [
+        `Bespoke pre-order · request ${req.id}`,
+        depositPaid > 0 ? `deposit ${depositPaid} BDT prepaid` : null,
+        expressFee > 0 ? `${EXPRESS_ORDER_NOTE} (${expressFee} BDT)` : null,
+      ].filter(Boolean).join(" · "),
     }).returning({ id: schema.orders.id });
 
     await tx.insert(schema.orderLines).values({

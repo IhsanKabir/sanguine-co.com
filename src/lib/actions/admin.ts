@@ -28,6 +28,7 @@ import { requireAdmin, requirePermission } from "@/lib/auth-utils";
 import { PERMISSIONS, type Permission, type AdminRole } from "@/lib/permissions";
 import { slugify } from "@/lib/utils";
 import { createPathaoOrder } from "@/lib/shipping/pathao";
+import { isExpressOrder } from "@/lib/express";
 import { createSteadfastOrder } from "@/lib/shipping/steadfast";
 import { sendEmail } from "@/lib/email/brevo";
 import { orderShippedEmail, type OrderEmailLine } from "@/lib/email/templates";
@@ -501,6 +502,7 @@ export async function bookCourier(input: z.infer<typeof courierSchema>) {
         itemWeight: 0.5,
         amountToCollect: order.paymentMethod === "cod" ? order.totalBdt : 0,
         itemDescription: lines.map((l) => l.nameSnapshot).join(", ").slice(0, 200),
+        sameDay: isExpressOrder(order),
       });
       trackingCode = r.trackingCode;
     } else {

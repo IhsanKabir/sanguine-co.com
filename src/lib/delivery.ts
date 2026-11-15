@@ -39,6 +39,36 @@ export function formatArrival(d: Date, locale: "en" | "bn"): string {
   });
 }
 
+/**
+ * Same-day express for flowers in Dhaka (owner, 2026-11-15). Bouquets usually
+ * go out the same day anyway; express makes it a promise for a fixed fee,
+ * collected in advance with the deposit.
+ */
+export const EXPRESS_FEE_BDT = 200;
+/** Express requests close at this hour, Dhaka time (24-hour clock). */
+export const EXPRESS_CUTOFF_HOUR = 14;
+
+function dhakaHour(d: Date): number {
+  return Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Dhaka", hour: "2-digit", hourCycle: "h23" }).format(d));
+}
+
+/** True while a same-day express request can still be placed today. */
+export function isExpressOpen(now: Date): boolean {
+  return dhakaHour(now) < EXPRESS_CUTOFF_HOUR;
+}
+
+/** The cutoff in the page language: "2 PM" / "দুপুর ২টা". */
+export function expressCutoffLabel(locale: "en" | "bn"): string {
+  const h = EXPRESS_CUTOFF_HOUR % 12 || 12;
+  if (locale === "bn") return `দুপুর ${h.toLocaleString("bn-BD")}টা`;
+  return `${h} ${EXPRESS_CUTOFF_HOUR < 12 ? "AM" : "PM"}`;
+}
+
+/** Today's date in Dhaka, "YYYY-MM-DD". */
+export function dhakaToday(now: Date): string {
+  return dhakaDay(now);
+}
+
 /** Furthest ahead a customer can schedule a delivery. */
 export const MAX_SCHEDULE_DAYS = 60;
 export const GIFT_MESSAGE_MAX = 200;

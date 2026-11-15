@@ -268,6 +268,9 @@ export default async function AccountPage({ params }: Props) {
                       <div style={{ fontSize: 15, fontWeight: 600, color: "var(--purple-900)" }}>
                         {formatBdt(r.quotedPriceBdt, loc)}{r.quantity > 1 ? ` × ${r.quantity} = ${formatBdt(r.quotedPriceBdt * r.quantity, loc)}` : ""}
                       </div>
+                      {r.expressFeeBdt ? (
+                        <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>{t("accountPage.plusExpress", { amount: formatBdt(r.expressFeeBdt, loc) })}</div>
+                      ) : null}
                       {r.depositBdt ? (
                         <div style={{ fontSize: 11, color: "var(--gold-deep)" }}>
                           {t("accountPage.depositToConfirm", { amount: formatBdt(r.depositBdt, loc) })}
