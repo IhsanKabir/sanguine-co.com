@@ -16,6 +16,8 @@ export type QuoteMessageInput = {
   depositBdt: number | null;
   /** YYYY-MM-DD, as stored on the request. */
   targetDate: string | null;
+  /** Same-day express fee: part of the total, paid with the deposit (0025). */
+  expressFeeBdt?: number | null;
 };
 
 function formatDay(isoDate: string, locale: "en" | "bn"): string {
@@ -27,7 +29,8 @@ function formatDay(isoDate: string, locale: "en" | "bn"): string {
 }
 
 export function quoteWhatsAppText(q: QuoteMessageInput): string {
-  const total = q.quotedPriceBdt * q.quantity;
+  const express = q.expressFeeBdt ?? 0;
+  const total = q.quotedPriceBdt * q.quantity + express;
   const deposit = q.depositBdt && q.depositBdt > 0 ? Math.min(q.depositBdt, total) : 0;
   const rest = total - deposit;
   const name = q.customerName?.trim() || "";
@@ -37,7 +40,7 @@ export function quoteWhatsAppText(q: QuoteMessageInput): string {
   const en = [
     `Hello${name ? ` ${name}` : ""},`,
     `Thank you for your Sanguine preorder: ${q.productName} × ${q.quantity}.`,
-    `Price: ${formatBdt(total, "en")}.`,
+    express ? `Price: ${formatBdt(total, "en")}, including ${formatBdt(express, "en")} for same-day express.` : `Price: ${formatBdt(total, "en")}.`,
     deposit > 0
       ? `To confirm, please send a ${formatBdt(deposit, "en")} deposit by bKash. The remaining ${formatBdt(rest, "en")} is paid in cash on delivery.`
       : "Payment is cash on delivery.",
@@ -47,7 +50,7 @@ export function quoteWhatsAppText(q: QuoteMessageInput): string {
   const bn = [
     `প্রিয় ${name || "গ্রাহক"},`,
     `Sanguine-এ প্রি-অর্ডারের জন্য ধন্যবাদ: ${nameBn} × ${qtyBn}।`,
-    `দাম: ${formatBdt(total, "bn")}।`,
+    express ? `দাম: ${formatBdt(total, "bn")}, একই দিনের এক্সপ্রেসের ${formatBdt(express, "bn")} সহ।` : `দাম: ${formatBdt(total, "bn")}।`,
     deposit > 0
       ? `নিশ্চিত করতে বিকাশে ${formatBdt(deposit, "bn")} অগ্রিম পাঠান। বাকি ${formatBdt(rest, "bn")} ডেলিভারির সময় নগদে দেবেন।`
       : "মূল্য ডেলিভারির সময় নগদে পরিশোধ করবেন।",

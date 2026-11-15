@@ -50,6 +50,8 @@ export type PathaoOrderInput = {
   itemWeight: number;             // kg, min 0.5
   amountToCollect: number;        // 0 for prepaid; >0 for COD
   itemDescription?: string;
+  /** Same-day express: Pathao's on-demand delivery instead of the 48-hour service. */
+  sameDay?: boolean;
 };
 
 export async function createPathaoOrder(input: PathaoOrderInput): Promise<{ consignmentId: string; trackingCode: string }> {
@@ -72,7 +74,7 @@ export async function createPathaoOrder(input: PathaoOrderInput): Promise<{ cons
       recipient_city: input.recipientCity,
       recipient_zone: input.recipientZone,
       recipient_area: input.recipientArea,
-      delivery_type: 48,             // 48 hours (normal)
+      delivery_type: input.sameDay ? 12 : 48,   // 12: on demand, 48: normal
       item_type: 2,                  // 1: Document, 2: Parcel
       special_instruction: "Handle with care · Sanguine",
       item_quantity: input.itemQty,

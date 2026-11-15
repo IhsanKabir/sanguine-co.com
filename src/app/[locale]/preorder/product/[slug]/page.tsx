@@ -71,7 +71,9 @@ export default async function ProductPreorderPage({ params }: Props) {
             </div>
             {product.estimatedDelivery && (
               <div style={{ fontSize: 13, color: "var(--gold-deep)" }}>
-                {t("preorder.estimatedDelivery", { when: localizeEstimate(product.estimatedDelivery, locale as "en" | "bn") })}
+                {t("preorder.estimatedDelivery", { when: isDhakaOnlySegment(product.segmentId)
+                  ? t("pdp.usuallySameDay", { when: localizeEstimate(product.estimatedDelivery, locale as "en" | "bn") })
+                  : localizeEstimate(product.estimatedDelivery, locale as "en" | "bn") })}
               </div>
             )}
           </div>

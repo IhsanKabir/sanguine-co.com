@@ -8,6 +8,8 @@ import { colorLabel, sizeLabel } from "@/lib/option-labels";
 import { Link } from "@/i18n/routing";
 import DeliveryOptionsFields from "@/components/storefront/DeliveryOptionsFields";
 import { createProductPreorderRequest } from "@/lib/actions/preorders";
+import { EXPRESS_FEE_BDT, expressCutoffLabel, isExpressOpen } from "@/lib/delivery";
+import { formatBdt } from "@/lib/utils";
 
 const DHAKA = "Dhaka";
 
@@ -50,6 +52,11 @@ export default function ProductPreorderForm({
   const [notes, setNotes] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [giftMessage, setGiftMessage] = useState("");
+  // Same-day express (flowers): offered only before the cutoff. Worked out
+  // after mount, from the visitor's clock, because the page is cached.
+  const [express, setExpress] = useState(false);
+  const [expressOpen, setExpressOpen] = useState<boolean | null>(null);
+  useEffect(() => { if (dhakaOnly) setExpressOpen(isExpressOpen(new Date())); }, [dhakaOnly]);
   const [line1, setLine1] = useState(prefill.line1);
   const [area, setArea] = useState(prefill.area);
   const [city, setCity] = useState(dhakaOnly ? DHAKA : prefill.city);
@@ -87,7 +94,8 @@ export default function ProductPreorderForm({
           customerPhone: phone.trim(),
           customerEmail: isGuest ? guestEmail.trim() : null,
           trap,
-          targetDate: deliveryDate || null,
+          targetDate: express ? null : deliveryDate || null,
+          express,
           giftMessage: giftMessage.trim() || null,
           deliveryAddress: line1.trim()
             ? { line1: line1.trim(), area: area.trim() || null, city: city.trim(), postcode: postcode.trim() || null }
@@ -178,7 +186,25 @@ export default function ProductPreorderForm({
         )}
       </div>
 
-      <DeliveryOptionsFields date={deliveryDate} onDate={setDeliveryDate} gift={giftMessage} onGift={setGiftMessage} />
+      <DeliveryOptionsFields date={express ? "" : deliveryDate} onDate={(v) => { setDeliveryDate(v); if (v) setExpress(false); }} gift={giftMessage} onGift={setGiftMessage} />
+
+      {dhakaOnly && expressOpen !== null && (
+        <div style={{ padding: "14px 16px", border: `1px solid ${express ? "var(--gold-deep)" : "var(--line)"}`, background: express ? "#f9f4ec" : "white" }}>
+          {expressOpen ? (
+            <>
+              <label style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 15, color: "var(--purple-900)", cursor: "pointer" }}>
+                <input type="checkbox" checked={express} onChange={(e) => { setExpress(e.target.checked); if (e.target.checked) setDeliveryDate(""); }} />
+                {t("preorderForm.expressLabel", { fee: formatBdt(EXPRESS_FEE_BDT, locale) })}
+              </label>
+              <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 6, lineHeight: 1.6 }}>
+                {t("preorderForm.expressHint", { cutoff: expressCutoffLabel(locale) })}
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.6 }}>{t("preorderForm.expressClosed", { cutoff: expressCutoffLabel(locale) })}</div>
+          )}
+        </div>
+      )}
 
       <div className="field">
         <label>{t("preorderForm.notes")}</label>
@@ -197,7 +223,7 @@ export default function ProductPreorderForm({
         {dhakaOnly && <div style={{ fontSize: 13, color: "var(--purple-900)", marginTop: 6 }}>{t("preorderForm.dhakaOnlyNote")}</div>}
         <div style={{ marginTop: 8, display: "grid", gap: 10 }}>
           <div className="field">
-            <input name="address-line1" autoComplete="address-line1" value={line1} onChange={(e) => setLine1(e.target.value)} placeholder={t("preorderForm.line1Placeholder")} />
+            <input name="address-line1" autoComplete="address-line1" value={line1} onChange={(e) => setLine1(e.target.value)} placeholder={t("preorderForm.line1Placeholder")} required={express} />
           </div>
           <div className="row">
             <div className="field">

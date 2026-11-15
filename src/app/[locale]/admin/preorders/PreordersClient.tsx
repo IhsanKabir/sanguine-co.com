@@ -204,6 +204,7 @@ function DetailDrawer({
           quotedPriceBdt,
           depositBdt,
           targetDate: request.targetDate,
+          expressFeeBdt: request.expressFeeBdt,
         })
       : null;
   const [adminNotes, setAdminNotes] = useState(request.adminNotes ?? "");
@@ -317,6 +318,12 @@ function DetailDrawer({
             {request.giftMessage && (
               <div className="field"><label>Card message</label><div style={{ fontSize: 14, whiteSpace: "pre-wrap" }}>{request.giftMessage}</div></div>
             )}
+            {request.expressFeeBdt ? (
+              <div className="field">
+                <label>Same-day express</label>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#b3261e" }}>Deliver {request.targetDate} · fee {formatBdt(request.expressFeeBdt)} (in the deposit)</div>
+              </div>
+            ) : null}
             {request.targetDate && (
               <div className="field"><label>Wanted by</label><div style={{ fontSize: 14 }}>{request.targetDate}</div></div>
             )}
@@ -408,8 +415,8 @@ function DetailDrawer({
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "#a07e2c", marginBottom: 8 }}>DEPOSIT · {formatBdt(request.depositBdt)}</div>
               <p style={{ fontSize: 13, color: "#6b5a2a", margin: "0 0 12px", lineHeight: 1.6 }}>
                 Once the customer&apos;s bKash prepayment of {formatBdt(request.depositBdt)} arrives, mark it received:
-                the converted order will then collect {formatBdt(request.quotedPriceBdt * request.quantity - request.depositBdt)} on delivery.
-                Converting <b>without</b> marking it charges the full {formatBdt(request.quotedPriceBdt * request.quantity)} COD.
+                the converted order will then collect {formatBdt(request.quotedPriceBdt * request.quantity + (request.expressFeeBdt ?? 0) - request.depositBdt)} on delivery.
+                Converting <b>without</b> marking it charges the full {formatBdt(request.quotedPriceBdt * request.quantity + (request.expressFeeBdt ?? 0))} COD.
               </p>
               <button
                 type="button"
@@ -450,8 +457,8 @@ function DetailDrawer({
                 <button type="button" className="btn btn-primary btn-sm" onClick={onConvert} disabled={pending}>
                   Convert to COD order (
                   {request.status === "confirmed"
-                    ? `collect ${formatBdt(Math.max(0, request.quotedPriceBdt * request.quantity - (request.depositBdt ?? 0)))}`
-                    : formatBdt(request.quotedPriceBdt * request.quantity)}
+                    ? `collect ${formatBdt(Math.max(0, request.quotedPriceBdt * request.quantity + (request.expressFeeBdt ?? 0) - (request.depositBdt ?? 0)))}`
+                    : formatBdt(request.quotedPriceBdt * request.quantity + (request.expressFeeBdt ?? 0))}
                   )
                 </button>
               )}

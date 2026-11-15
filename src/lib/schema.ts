@@ -378,6 +378,7 @@ export const preorderRequests = pgTable("preorder_requests", {
   budgetHintBdt: integer("budget_hint_bdt"),
   targetDate: text("target_date"),                 // YYYY-MM-DD as text for simplicity
   giftMessage: text("gift_message"),               // card message (0022)
+  expressFeeBdt: integer("express_fee_bdt"),       // same-day express fee; null = standard delivery (0025)
   color: text("color"),
   size: text("size"),
 
