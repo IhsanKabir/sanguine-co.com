@@ -8,6 +8,7 @@ import { reviewRequestEmail } from "@/lib/email/templates";
 import { logOrderEvent } from "@/lib/order-events";
 import { returnStock } from "@/lib/variant-stock";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
+import { onOrderStatusForReferrals } from "@/lib/referral-server";
 
 /**
  * The one place an order changes status, with its side effects:
@@ -98,6 +99,12 @@ export async function applyOrderStatus(
 
   if (status === "delivered") {
     fireReviewRequest(orderId).catch(() => {});
+  }
+  // Referral credits follow the order: earned on delivery, back or void if it fails (0026).
+  try {
+    await onOrderStatusForReferrals(orderId, status);
+  } catch (err) {
+    console.error("[referrals] status update failed", orderId, status, err);
   }
 
   return { changed: true, from: before.status };

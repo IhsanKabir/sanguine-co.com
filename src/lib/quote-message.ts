@@ -1,4 +1,5 @@
 import { formatBdt, normalizeBdWhatsApp } from "./utils";
+import { preorderMoney } from "./referral";
 
 /**
  * The WhatsApp quote: one bilingual message the owner sends from their own
@@ -18,6 +19,8 @@ export type QuoteMessageInput = {
   targetDate: string | null;
   /** Same-day express fee: part of the total, paid with the deposit (0025). */
   expressFeeBdt?: number | null;
+  /** Referral discount taken off the quote (0026). */
+  referralDiscountBdt?: number | null;
 };
 
 function formatDay(isoDate: string, locale: "en" | "bn"): string {
@@ -29,10 +32,7 @@ function formatDay(isoDate: string, locale: "en" | "bn"): string {
 }
 
 export function quoteWhatsAppText(q: QuoteMessageInput): string {
-  const express = q.expressFeeBdt ?? 0;
-  const total = q.quotedPriceBdt * q.quantity + express;
-  const deposit = q.depositBdt && q.depositBdt > 0 ? Math.min(q.depositBdt, total) : 0;
-  const rest = total - deposit;
+  const { express, discount, total, deposit, rest } = preorderMoney(q);
   const name = q.customerName?.trim() || "";
   const nameBn = q.productNameBn?.trim() || q.productName;
   const qtyBn = q.quantity.toLocaleString("bn-BD");
@@ -41,6 +41,7 @@ export function quoteWhatsAppText(q: QuoteMessageInput): string {
     `Hello${name ? ` ${name}` : ""},`,
     `Thank you for your Sanguine preorder: ${q.productName} × ${q.quantity}.`,
     express ? `Price: ${formatBdt(total, "en")}, including ${formatBdt(express, "en")} for same-day express.` : `Price: ${formatBdt(total, "en")}.`,
+    discount > 0 ? `Your referral discount of ${formatBdt(discount, "en")} is already taken off.` : null,
     deposit > 0
       ? `To confirm, please send a ${formatBdt(deposit, "en")} deposit by bKash. The remaining ${formatBdt(rest, "en")} is paid in cash on delivery.`
       : "Payment is cash on delivery.",
@@ -51,6 +52,7 @@ export function quoteWhatsAppText(q: QuoteMessageInput): string {
     `প্রিয় ${name || "গ্রাহক"},`,
     `Sanguine-এ প্রি-অর্ডারের জন্য ধন্যবাদ: ${nameBn} × ${qtyBn}।`,
     express ? `দাম: ${formatBdt(total, "bn")}, একই দিনের এক্সপ্রেসের ${formatBdt(express, "bn")} সহ।` : `দাম: ${formatBdt(total, "bn")}।`,
+    discount > 0 ? `আপনার রেফারেল ছাড় ${formatBdt(discount, "bn")} এর মধ্যেই বাদ দেওয়া হয়েছে।` : null,
     deposit > 0
       ? `নিশ্চিত করতে বিকাশে ${formatBdt(deposit, "bn")} অগ্রিম পাঠান। বাকি ${formatBdt(rest, "bn")} ডেলিভারির সময় নগদে দেবেন।`
       : "মূল্য ডেলিভারির সময় নগদে পরিশোধ করবেন।",

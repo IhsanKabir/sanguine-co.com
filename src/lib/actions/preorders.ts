@@ -24,6 +24,8 @@ import { priceDisplay, effectiveDepositPct, depositForQuote } from "@/lib/pricin
 import { getCommerceSettings } from "@/lib/commerce";
 import { isValidDeliveryDate, GIFT_MESSAGE_MAX, dhakaToday } from "@/lib/delivery";
 import { expressCheck, EXPRESS_ORDER_NOTE, PREORDER_ORDER_PREFIX } from "@/lib/express";
+import { preorderMoney } from "@/lib/referral";
+import { checkReferralCode, referralDiscountForQuote, settleReferralAtConversion } from "@/lib/referral-server";
 
 const attachmentSchema = z.object({
   url: z.string().url(),
@@ -143,6 +145,8 @@ const productPreorderSchema = z.object({
     city: z.string().min(1).max(80),
     postcode: z.string().max(20).optional().nullable(),
   }).optional().nullable(),
+  /** A friend's referral code (lib/referral.ts): optional, first orders only. */
+  referralCode: z.string().trim().max(40).optional().nullable(),
   /** Honeypot: a field people never see. Only scripts fill it in. */
   trap: z.string().max(200).optional().nullable(),
 });
@@ -205,6 +209,8 @@ export async function createProductPreorderRequest(
   }
   const express = expressCheck(Boolean(data.express), product.segmentId, Boolean(data.deliveryAddress), new Date());
   if (!express.ok) return express;
+  const referral = await checkReferralCode(data.referralCode, { email, customerId: user?.id ?? null, phone: data.customerPhone });
+  if (!referral.ok) return referral;
   const targetDate = express.feeBdt ? dhakaToday(new Date()) : data.targetDate || null;
 
   // Snapshot what the customer was shown (estimate range + deposit %): the
@@ -223,6 +229,7 @@ export async function createProductPreorderRequest(
     data.color ? `Colour: ${data.color}` : null,
     data.size ? `Size: ${data.size}` : null,
     express.feeBdt ? `${EXPRESS_ORDER_NOTE} (+${express.feeBdt} BDT): deliver today, ${targetDate}` : null,
+    referral.code ? `Referral code: ${referral.code}` : null,
     data.notes ? `Notes: ${data.notes}` : null,
   ].filter(Boolean).join(" · ");
 
@@ -241,6 +248,7 @@ export async function createProductPreorderRequest(
     targetDate,
     giftMessage: data.giftMessage || null,
     expressFeeBdt: express.feeBdt,
+    referralCode: referral.code,
     attachments: [],
     advertisedMinBdt,
     advertisedMaxBdt,
@@ -345,17 +353,33 @@ export async function quotePreorderRequest(input: z.infer<typeof quoteSchema>) {
   // Computing it per-unit made the quote email read "deposit ৳2,000 (20%)"
   // under a ৳30,000 three-piece total: 6.7% in reality.
   // A same-day express fee is paid in advance, with the deposit.
-  const depositBdt = depositForQuote(data.quotedPriceBdt * existing.quantity, depositPct) + (existing.expressFeeBdt ?? 0);
+  // A referral discount (a friend's code, or the customer's own earned credit) comes off the
+  // bouquet before the deposit is worked out (lib/referral.ts).
+  const goods = data.quotedPriceBdt * existing.quantity;
+  const referral = await referralDiscountForQuote(existing, goods);
+  const depositBdt = depositForQuote(goods - referral.discountBdt, depositPct) + (existing.expressFeeBdt ?? 0);
 
-  const [row] = await db.update(schema.preorderRequests)
+  let row: typeof schema.preorderRequests.$inferSelect | undefined;
+  try {
+  [row] = await db.update(schema.preorderRequests)
     .set({
       status: "quoted",
       quotedPriceBdt: data.quotedPriceBdt,
       depositBdt,
+      referralDiscountBdt: referral.discountBdt || null,
+      referralCreditId: referral.creditId,
       adminNotes: data.adminNotes ?? null,
     })
     .where(eq(schema.preorderRequests.id, data.id))
     .returning();
+  } catch (err) {
+    // 0026's unique indexes: another quote took this discount a moment ago.
+    const e = err as { code?: string; cause?: { code?: string } };
+    if (e.code === "23505" || e.cause?.code === "23505") {
+      return { ok: false as const, error: "Another quote just took this customer's referral discount. Press send again: the quote will be worked out afresh." };
+    }
+    throw err;
+  }
 
   if (!row) return { ok: false as const, error: "Request not found" };
 
@@ -376,6 +400,7 @@ export async function quotePreorderRequest(input: z.infer<typeof quoteSchema>) {
       depositBdt,
       depositPct,
       expressFeeBdt: row.expressFeeBdt ?? null,
+      referralDiscountBdt: row.referralDiscountBdt ?? null,
       adminNotes: data.adminNotes ?? null,
     });
     const to = row.customerEmail;
@@ -384,7 +409,7 @@ export async function quotePreorderRequest(input: z.infer<typeof quoteSchema>) {
 
   revalidatePath("/[locale]/admin/preorders", "page");
   // Returned so the admin can send the same quote on WhatsApp straight away.
-  return { ok: true as const, quotedPriceBdt: data.quotedPriceBdt, depositBdt };
+  return { ok: true as const, quotedPriceBdt: data.quotedPriceBdt, depositBdt, referralDiscountBdt: referral.discountBdt };
 }
 
 const rejectSchema = z.object({
@@ -452,18 +477,21 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
     : [];
 
   const number = `${PREORDER_ORDER_PREFIX}${Date.now().toString(36).toUpperCase()}`;
-  const subtotal = req.quotedPriceBdt * req.quantity;   // per-unit quote × qty
+  const money = preorderMoney({ ...req, quotedPriceBdt: req.quotedPriceBdt, depositBdt: req.status === "confirmed" ? req.depositBdt : 0 });
+  const subtotal = money.goods;   // per-unit quote × qty
   // The deposit is deducted from the COD total ONLY when it was actually
   // received (status 'confirmed', set by markPreorderDepositReceived). A
   // 'quoted' request converts at the full subtotal: assuming payment that
   // never arrived would silently gift the deposit amount. Recorded in its
   // own depositPaidBdt column: it is a PAYMENT, not a discount (refund cap
   // and revenue both count it; the courier collects totalBdt).
-  const expressFee = req.expressFeeBdt ?? 0;
-  const depositPaid = req.status === "confirmed" ? Math.min(req.depositBdt ?? 0, subtotal + expressFee) : 0;
+  const expressFee = money.express;
+  const depositPaid = money.deposit;
   const trackingToken = randomBytes(16).toString("hex");
 
-  const newOrderId = await db.transaction(async (tx) => {
+  let newOrderId: string;
+  try {
+  newOrderId = await db.transaction(async (tx) => {
     const [order] = await tx.insert(schema.orders).values({
       number,
       customerId: req.customerId,
@@ -475,7 +503,10 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
       shippingBdt: expressFee,
       codFeeBdt: 0,
       depositPaidBdt: depositPaid,
-      totalBdt: subtotal + expressFee - depositPaid,
+      totalBdt: money.rest,
+      // The referral discount is recorded like a coupon (refunds and revenue already read these).
+      couponCode: money.discount > 0 ? (req.referralCode ?? "REFERRAL-CREDIT") : null,
+      couponDiscountBdt: money.discount,
       shippingAddress: { fullName: req.customerName, phone: req.customerPhone, ...(req.deliveryAddress as object) },
       trackingToken,
       // The day and card the customer asked for travel with the order (0022).
@@ -485,6 +516,7 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
         `Bespoke pre-order · request ${req.id}`,
         depositPaid > 0 ? `deposit ${depositPaid} BDT prepaid` : null,
         expressFee > 0 ? `${EXPRESS_ORDER_NOTE} (${expressFee} BDT)` : null,
+        money.discount > 0 ? `referral -${money.discount} BDT` : null,
       ].filter(Boolean).join(" · "),
     }).returning({ id: schema.orders.id });
 
@@ -504,8 +536,15 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
       .set({ status: "converted", convertedOrderId: order.id })
       .where(eq(schema.preorderRequests.id, req.id));
 
+    await settleReferralAtConversion(tx, req, order.id);
     return order.id;
   });
+  } catch (err) {
+    if (err instanceof Error && (err.message === "REFERRAL_CREDIT_GONE" || err.message === "REFERRAL_CODE_USED")) {
+      return { ok: false as const, error: "This quote's referral discount was already used on another order. Re-quote this request, then convert." };
+    }
+    throw err;
+  }
 
   revalidatePath("/[locale]/admin/preorders", "page");
   revalidatePath("/[locale]/admin/orders", "page");

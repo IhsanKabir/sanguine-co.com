@@ -601,7 +601,9 @@
   "referral": {
     "kicker": "Refer a friend",
     "title": "Share Sanguine",
-    "body": "Give a friend ৳500 off their first order. When they order with your code, you get ৳500 off your next one.",
+    "body": "Give a friend ৳200 off their first bouquet. When their order is delivered, you get ৳200 off your next one. For orders of ৳1,500 or more.",
+    "balance": "You have {amount} to use: sign in when you order, and it comes off your price.",
+    "pending": "{count, plural, one {# friend's order is} other {# friends' orders are}} on the way: your ৳200 arrives when it is delivered.",
     "codeLabel": "Your referral code",
     "copied": "✓ Copied",
     "copy": "Copy code",
@@ -686,6 +688,7 @@
     "qty": "Qty {qty}",
     "depositToConfirm": "Deposit to confirm · {amount}",
     "plusExpress": "+ {amount} same-day express",
+    "minusReferral": "− {amount} referral discount",
     "awaitingQuote": "Awaiting price",
     "yourBrowsing": "Your browsing",
     "recentlyViewed": "Recently viewed"
@@ -724,6 +727,8 @@
     "expressLabel": "Same-day express (+{fee}): delivered today",
     "expressHint": "Order by {cutoff}, Dhaka time. The fee is paid in advance with the deposit. Please add the delivery address below.",
     "expressClosed": "Same-day express closes at {cutoff}. Choose a day above, or order before {cutoff} tomorrow.",
+    "referralLabel": "Referral code (optional)",
+    "referralHint": "A friend's code takes {amount} off your first order of {min} or more.",
     "addressOptionalCall": "Delivery address (optional, we can take it on the call)",
     "line1Placeholder": "House, road, building",
     "areaPlaceholder": "Area (e.g. Gulshan)",
