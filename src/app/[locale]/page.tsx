@@ -12,6 +12,7 @@ import SameDayLine from "@/components/storefront/SameDayLine";
 import { cutoutFor } from "@/lib/cutouts";
 import { getUploadedCutouts } from "@/lib/cutout-store";
 import { getMoments, momentsLive, splitEm } from "@/lib/moments";
+import MomentsFilm from "@/components/storefront/MomentsFilm";
 import { displayName } from "@/lib/product-name";
 import { expressCutoffLabel } from "@/lib/delivery";
 import { whatsAppUrl } from "@/lib/contact";
@@ -225,8 +226,12 @@ export default async function Home({ params }: Props) {
       {showMoments && (
         <section className="moment" aria-labelledby="moment-title">
           <div className="moment-poster">
-            {/* eslint-disable-next-line @next/next/no-img-element -- a small campaign poster */}
-            <img src={moments.image} width={540} height={960} alt={bn ? moments.imageAltBn || moments.imageAltEn : moments.imageAltEn} loading="lazy" decoding="async" />
+            {moments.video ? (
+              <MomentsFilm video={moments.video} poster={moments.image} alt={bn ? moments.imageAltBn || moments.imageAltEn : moments.imageAltEn} />
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element -- a small campaign poster */
+              <img src={moments.image} width={540} height={960} alt={bn ? moments.imageAltBn || moments.imageAltEn : moments.imageAltEn} loading="lazy" decoding="async" />
+            )}
           </div>
           <div>
             <div className="lh-kicker">{t("home.moments.kicker")}</div>

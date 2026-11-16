@@ -25,9 +25,14 @@ const imageUrl = z.string().max(500).refine(
   "The picture must be one of ours.",
 );
 
+/** A short film bundled with the site (public/moments/*.mp4); the image is its poster. */
+const videoUrl = z.string().max(200).regex(/^\/moments\/[\w-]+\.mp4$/,"The film must be one of ours.");
+
 export const momentsSchema = z.object({
   enabled: z.boolean(),
   image: imageUrl,
+  /** Optional: plays in place of the picture (muted, with a sound button). Older rows have none. */
+  video: videoUrl.nullable().optional(),
   imageAltEn: z.string().max(200),
   imageAltBn: z.string().max(200),
   titleEn: z.string().max(160),
@@ -45,6 +50,7 @@ export type Moments = z.infer<typeof momentsSchema>;
 export const MOMENTS_DEFAULT: Moments = {
   enabled: true,
   image: "/moments/cats-anniversary.webp",
+  video: "/moments/cats-anniversary.mp4",
   imageAltEn: "Two cartoon cats: she is cross, he forgot their anniversary",
   imageAltBn: "কার্টুনের দুটি বিড়াল: সে রাগ করেছে, আর সে বিবাহবার্ষিকী ভুলে গেছে",
   titleEn: "Forgot your anniversary? <em>It's not too late.</em>",
@@ -66,7 +72,10 @@ async function readMoments(): Promise<Moments> {
   const rows = await db.select().from(schema.siteSettings).where(eq(schema.siteSettings.key, MOMENTS_KEY)).limit(1);
   if (!rows[0]) return MOMENTS_DEFAULT;
   const parsed = momentsSchema.safeParse(rows[0].value);
-  return parsed.success ? parsed.data : MOMENTS_OFF;
+  if (!parsed.success) return MOMENTS_OFF;
+  // Saved before films existed, still the cat poster: the cat film plays with it.
+  if (parsed.data.video === undefined && parsed.data.image === MOMENTS_DEFAULT.image) return { ...parsed.data, video: MOMENTS_DEFAULT.video };
+  return parsed.data;
 }
 
 /** For the admin form: never throws. */
