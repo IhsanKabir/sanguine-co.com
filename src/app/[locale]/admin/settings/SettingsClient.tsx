@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { EXPRESS_CUTOFF_EARLIEST_MIN, EXPRESS_CUTOFF_LATEST_MIN, EXPRESS_CUTOFF_STEP_MIN, expressCutoffLabel } from "@/lib/delivery";
 import { Link } from "@/i18n/routing";
 import { updateCommerceSettings } from "@/lib/actions/admin";
 import type { CommerceSettings } from "@/lib/commerce";
@@ -74,6 +75,25 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
     });
   };
 
+  // Same-day express cutoff (lib/delivery.ts): same commerce row, minutes after midnight in Dhaka.
+  const toTime = (min: number) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
+  const [cutoff, setCutoff] = useState(toTime(initialCommerce.expressCutoffMin));
+  const [cutoffMsg, setCutoffMsg] = useState<string | null>(null);
+  const [cutoffPending, startCutoff] = useTransition();
+  const saveCutoff = () => {
+    const [h, m] = cutoff.split(":").map(Number);
+    const min = h * 60 + m;
+    if (!Number.isInteger(min) || min < EXPRESS_CUTOFF_EARLIEST_MIN || min > EXPRESS_CUTOFF_LATEST_MIN || min % EXPRESS_CUTOFF_STEP_MIN !== 0) {
+      setCutoffMsg(`Choose a time between ${toTime(EXPRESS_CUTOFF_EARLIEST_MIN)} and ${toTime(EXPRESS_CUTOFF_LATEST_MIN)}, on the quarter hour.`);
+      return;
+    }
+    setCutoffMsg(null);
+    startCutoff(async () => {
+      const res = await updateCommerceSettings({ expressCutoffMin: min });
+      setCutoffMsg(res.ok ? `Saved: the site now says "order by ${expressCutoffLabel("en", min)}".` : "Save failed.");
+    });
+  };
+
   return (
     <>
       <h1 className="admin-h1">Settings</h1>
@@ -123,6 +143,27 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
               {commercePending ? "Saving…" : "Save"}
             </button>
             {commerceMsg && <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{commerceMsg}</span>}
+          </div>
+        </div>
+
+        {/* Same-day express: the last order time */}
+        <div className="panel">
+          <h3>Same-day express</h3>
+          <div className="row">
+            <div className="field">
+              <label htmlFor="express-cutoff">Last order time (Dhaka)</label>
+              <input id="express-cutoff" type="time" step={EXPRESS_CUTOFF_STEP_MIN * 60} min={toTime(EXPRESS_CUTOFF_EARLIEST_MIN)} max={toTime(EXPRESS_CUTOFF_LATEST_MIN)} value={cutoff} onChange={(e) => setCutoff(e.target.value)} />
+            </div>
+          </div>
+          <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 10, lineHeight: 1.6 }}>
+            Same-day orders close at this time. The home page countdown, the order form, product pages,
+            the FAQ and the delivery page all follow it. Videos and captions already posted still say the old time.
+          </p>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 8 }}>
+            <button className="btn btn-primary btn-sm" onClick={saveCutoff} disabled={cutoffPending}>
+              {cutoffPending ? "Saving…" : "Save"}
+            </button>
+            {cutoffMsg && <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{cutoffMsg}</span>}
           </div>
         </div>
 

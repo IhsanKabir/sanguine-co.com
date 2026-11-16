@@ -9,7 +9,7 @@ import { db, schema } from "./db";
  * dates show it only in a window, so the next campaign can be set up ahead.
  *
  * Titles may mark one phrase with <em>...</em> (shown in the accent colour); nothing else is
- * read as markup. "{cutoff}" in the text becomes the same-day cutoff ("2 PM").
+ * read as markup. "{cutoff}" in the text becomes the same-day cutoff (Admin, Settings).
  * Without a saved row, the band shows the first campaign: the cat film.
  */
 export const MOMENTS_KEY = "moments";

@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db, schema } from "./db";
+import { DEFAULT_EXPRESS_CUTOFF_MIN, EXPRESS_CUTOFF_EARLIEST_MIN, EXPRESS_CUTOFF_LATEST_MIN, EXPRESS_CUTOFF_STEP_MIN } from "./delivery";
 import {
   DEFAULT_PREORDER_DEPOSIT_PCT,
   DEFAULT_RETURN_WINDOW_DAYS,
@@ -41,6 +42,9 @@ export const commerceSchema = z.object({
   // every COD order by default; a minimum limits it to larger orders.
   codPhoneCheck: z.boolean().default(true),
   codPhoneCheckMinBdt: z.number().int().min(0).max(1_000_000).default(0),
+  // Same-day express: last order time, minutes after midnight in Dhaka (lib/delivery.ts).
+  expressCutoffMin: z.number().int().min(EXPRESS_CUTOFF_EARLIEST_MIN).max(EXPRESS_CUTOFF_LATEST_MIN)
+    .refine((m) => m % EXPRESS_CUTOFF_STEP_MIN === 0, "Use a time on the quarter hour.").default(DEFAULT_EXPRESS_CUTOFF_MIN),
 });
 
 export type CommerceSettings = z.infer<typeof commerceSchema>;
@@ -51,6 +55,7 @@ export const COMMERCE_DEFAULTS: CommerceSettings = {
   ...DEFAULT_SHIPPING_RULES,
   codPhoneCheck: true,
   codPhoneCheckMinBdt: 0,
+  expressCutoffMin: DEFAULT_EXPRESS_CUTOFF_MIN,
 };
 
 export function shippingRulesOf(c: CommerceSettings): ShippingRules {

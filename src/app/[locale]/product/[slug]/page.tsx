@@ -319,7 +319,7 @@ export default async function ProductPage({ params }: Props) {
             {isDhakaOnlySegment(p.segmentId) && (p.preorderOnly || p.preorderEnabled) && (
               <li>
                 <Icon name="arrow" size={13} />
-                <span>{t("pdp.expressLine", { fee: formatBdt(EXPRESS_FEE_BDT, locale as "en" | "bn"), cutoff: expressCutoffLabel(locale as "en" | "bn") })}</span>
+                <span>{t("pdp.expressLine", { fee: formatBdt(EXPRESS_FEE_BDT, locale as "en" | "bn"), cutoff: expressCutoffLabel(locale as "en" | "bn", commerce.expressCutoffMin) })}</span>
               </li>
             )}
             <li><Icon name="check" size={13} /><span>{t("pdp.codTitle")}</span></li>

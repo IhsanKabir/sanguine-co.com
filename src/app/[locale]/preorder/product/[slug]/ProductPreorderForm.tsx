@@ -25,6 +25,8 @@ type Props = {
   prefill: CustomerPrefill;
   /** Flowers: delivered in Dhaka only, so the city is fixed. */
   dhakaOnly: boolean;
+  /** Same-day express: last order time, minutes after midnight in Dhaka (Admin, Settings). */
+  expressCutoffMin: number;
   signInHref: string;
   colors: string[];
   sizes: string[];
@@ -36,6 +38,7 @@ export default function ProductPreorderForm({
   userEmail,
   prefill,
   dhakaOnly,
+  expressCutoffMin,
   signInHref,
   colors,
   sizes,
@@ -59,7 +62,7 @@ export default function ProductPreorderForm({
   // after mount, from the visitor's clock, because the page is cached.
   const [express, setExpress] = useState(false);
   const [expressOpen, setExpressOpen] = useState<boolean | null>(null);
-  useEffect(() => { if (dhakaOnly) setExpressOpen(isExpressOpen(new Date())); }, [dhakaOnly]);
+  useEffect(() => { if (dhakaOnly) setExpressOpen(isExpressOpen(new Date(), expressCutoffMin)); }, [dhakaOnly, expressCutoffMin]);
   const [line1, setLine1] = useState(prefill.line1);
   const [area, setArea] = useState(prefill.area);
   const [city, setCity] = useState(dhakaOnly ? DHAKA : prefill.city);
@@ -214,11 +217,11 @@ export default function ProductPreorderForm({
                 {t("preorderForm.expressLabel", { fee: formatBdt(EXPRESS_FEE_BDT, locale) })}
               </label>
               <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 6, lineHeight: 1.6 }}>
-                {t("preorderForm.expressHint", { cutoff: expressCutoffLabel(locale) })}
+                {t("preorderForm.expressHint", { cutoff: expressCutoffLabel(locale, expressCutoffMin) })}
               </div>
             </>
           ) : (
-            <div style={{ fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.6 }}>{t("preorderForm.expressClosed", { cutoff: expressCutoffLabel(locale) })}</div>
+            <div style={{ fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.6 }}>{t("preorderForm.expressClosed", { cutoff: expressCutoffLabel(locale, expressCutoffMin) })}</div>
           )}
         </div>
       )}

@@ -46,22 +46,50 @@ export function formatArrival(d: Date, locale: "en" | "bn"): string {
  */
 export const EXPRESS_FEE_BDT = 200;
 /** Express requests close at this hour, Dhaka time (24-hour clock). */
-export const EXPRESS_CUTOFF_HOUR = 14;
+/**
+ * The same-day cutoff, in minutes after midnight in Dhaka. Set in Admin, Settings
+ * (commerce.expressCutoffMin, 16 Nov 2026); this is the default and the fallback.
+ */
+export const DEFAULT_EXPRESS_CUTOFF_MIN = 14 * 60;
+export const EXPRESS_CUTOFF_EARLIEST_MIN = 8 * 60;
+export const EXPRESS_CUTOFF_LATEST_MIN = 22 * 60;
+export const EXPRESS_CUTOFF_STEP_MIN = 15;
 
-function dhakaHour(d: Date): number {
-  return Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Dhaka", hour: "2-digit", hourCycle: "h23" }).format(d));
+/** Minutes after midnight, now, in Dhaka. */
+export function dhakaMinutes(d: Date): number {
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Dhaka", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(d);
+  const h = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
+  const m = Number(parts.find((p) => p.type === "minute")?.value ?? 0);
+  return h * 60 + m;
 }
 
 /** True while a same-day express request can still be placed today. */
-export function isExpressOpen(now: Date): boolean {
-  return dhakaHour(now) < EXPRESS_CUTOFF_HOUR;
+export function isExpressOpen(now: Date, cutoffMin: number): boolean {
+  return dhakaMinutes(now) < cutoffMin;
 }
 
-/** The cutoff in the page language: "2 PM" / "দুপুর ২টা". */
-export function expressCutoffLabel(locale: "en" | "bn"): string {
-  const h = EXPRESS_CUTOFF_HOUR % 12 || 12;
-  if (locale === "bn") return `দুপুর ${h.toLocaleString("bn-BD")}টা`;
-  return `${h} ${EXPRESS_CUTOFF_HOUR < 12 ? "AM" : "PM"}`;
+/** Minutes left today before the cutoff; 0 once it has passed. */
+export function minutesToCutoff(now: Date, cutoffMin: number): number {
+  return Math.max(0, cutoffMin - dhakaMinutes(now));
+}
+
+/** The part of the day a Bangla time is said with: সকাল ১০টা, দুপুর ২টা, বিকেল ৪টা. */
+function bnDayPart(h: number): string {
+  if (h < 12) return "সকাল";
+  if (h < 15) return "দুপুর";
+  if (h < 18) return "বিকেল";
+  if (h < 20) return "সন্ধ্যা";
+  return "রাত";
+}
+
+/** The cutoff in the page language: "2 PM", "2:30 PM" / "দুপুর ২টা", "দুপুর ২টা ৩০ মিনিট". */
+export function expressCutoffLabel(locale: "en" | "bn", cutoffMin: number): string {
+  const h24 = Math.floor(cutoffMin / 60), m = cutoffMin % 60, h = h24 % 12 || 12;
+  if (locale === "bn") {
+    const bn = (n: number) => n.toLocaleString("bn-BD");
+    return `${bnDayPart(h24)} ${bn(h)}টা${m ? ` ${bn(m)} মিনিট` : ""}`;
+  }
+  return `${h}${m ? `:${String(m).padStart(2, "0")}` : ""} ${h24 < 12 ? "AM" : "PM"}`;
 }
 
 /** Today's date in Dhaka, "YYYY-MM-DD". */

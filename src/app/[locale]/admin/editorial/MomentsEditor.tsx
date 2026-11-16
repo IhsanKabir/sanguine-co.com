@@ -83,7 +83,7 @@ export default function MomentsEditor({ initial }: Props) {
       <h3>Moments (home page campaign)</h3>
       <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: -4, marginBottom: 14 }}>
         One campaign at a time, under the shelf on the home page. Mark one phrase of the title with &lt;em&gt;…&lt;/em&gt; for the accent colour.
-        &quot;{"{cutoff}"}&quot; becomes the same-day cutoff (2 PM). Links stay inside the site, like /occasion/anniversary or #shelf.
+        &quot;{"{cutoff}"}&quot; becomes the same-day cutoff set in Settings. Links stay inside the site, like /occasion/anniversary or #shelf.
       </p>
       <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginBottom: 14 }}>
         <input type="checkbox" checked={m.enabled} onChange={(e) => set("enabled", e.target.checked)} /> Show the band
