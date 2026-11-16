@@ -6,6 +6,7 @@ import { eq, desc, or, count, sql } from "drizzle-orm";
 import { formatBdt } from "@/lib/utils";
 import { listMyAddresses } from "@/lib/actions/addresses";
 import { ensureReferralCode } from "@/lib/actions/profile";
+import { referralBalance } from "@/lib/referral-server";
 import AddressBook from "./AddressBook";
 import ProfileEditor from "./ProfileEditor";
 import AccountOrders from "./AccountOrders";
@@ -125,6 +126,7 @@ export default async function AccountPage({ params }: Props) {
   try {
     referralCode = await ensureReferralCode();
   } catch (e) { console.error("[account] ensureReferralCode failed:", e); }
+  const referral = await referralBalance(user.id);
 
   return (
     <div className="acct-wrap">
@@ -268,6 +270,9 @@ export default async function AccountPage({ params }: Props) {
                       <div style={{ fontSize: 15, fontWeight: 600, color: "var(--purple-900)" }}>
                         {formatBdt(r.quotedPriceBdt, loc)}{r.quantity > 1 ? ` × ${r.quantity} = ${formatBdt(r.quotedPriceBdt * r.quantity, loc)}` : ""}
                       </div>
+                      {r.referralDiscountBdt ? (
+                        <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>{t("accountPage.minusReferral", { amount: formatBdt(r.referralDiscountBdt, loc) })}</div>
+                      ) : null}
                       {r.expressFeeBdt ? (
                         <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>{t("accountPage.plusExpress", { amount: formatBdt(r.expressFeeBdt, loc) })}</div>
                       ) : null}
@@ -316,7 +321,7 @@ export default async function AccountPage({ params }: Props) {
 
       {/* ─── Referral ───────────────────────────────────────────────────── */}
       {referralCode && (
-        <ReferralCard code={referralCode} locale={loc} />
+        <ReferralCard code={referralCode} locale={loc} earnedBdt={referral.earnedBdt} pending={referral.pending} />
       )}
 
       {/* ─── Address book ───────────────────────────────────────────────── */}

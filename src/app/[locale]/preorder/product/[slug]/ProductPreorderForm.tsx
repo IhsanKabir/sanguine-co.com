@@ -10,6 +10,7 @@ import DeliveryOptionsFields from "@/components/storefront/DeliveryOptionsFields
 import { createProductPreorderRequest } from "@/lib/actions/preorders";
 import { EXPRESS_FEE_BDT, expressCutoffLabel, isExpressOpen } from "@/lib/delivery";
 import { formatBdt } from "@/lib/utils";
+import { REFERRAL_BDT, REFERRAL_MIN_ORDER_BDT, normalizeReferralCode } from "@/lib/referral";
 
 const DHAKA = "Dhaka";
 
@@ -61,6 +62,12 @@ export default function ProductPreorderForm({
   const [area, setArea] = useState(prefill.area);
   const [city, setCity] = useState(dhakaOnly ? DHAKA : prefill.city);
   const [postcode, setPostcode] = useState(prefill.postcode);
+  // A friend's referral code; a shared link (?ref=SSG-ABC234) fills it in.
+  const [referralCode, setReferralCode] = useState("");
+  useEffect(() => {
+    const fromLink = normalizeReferralCode(new URLSearchParams(window.location.search).get("ref"));
+    if (fromLink) setReferralCode(fromLink);
+  }, []);
 
   // Details this browser used last time fill whatever is still empty. Read
   // after mount: the server cannot see them, and saved details win.
@@ -97,6 +104,7 @@ export default function ProductPreorderForm({
           targetDate: express ? null : deliveryDate || null,
           express,
           giftMessage: giftMessage.trim() || null,
+          referralCode: referralCode.trim() || null,
           deliveryAddress: line1.trim()
             ? { line1: line1.trim(), area: area.trim() || null, city: city.trim(), postcode: postcode.trim() || null }
             : null,
@@ -236,6 +244,24 @@ export default function ProductPreorderForm({
               <input name="postal-code" autoComplete="postal-code" inputMode="numeric" value={postcode} onChange={(e) => setPostcode(e.target.value)} placeholder={t("preorderForm.postcodePlaceholder")} />
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="field">
+        <label htmlFor="referral-code">{t("preorderForm.referralLabel")}</label>
+        <input
+          id="referral-code"
+          name="referral-code"
+          autoComplete="off"
+          autoCapitalize="characters"
+          spellCheck={false}
+          maxLength={20}
+          value={referralCode}
+          onChange={(e) => setReferralCode(e.target.value)}
+          placeholder="SSG-ABC234"
+        />
+        <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 6, lineHeight: 1.5 }}>
+          {t("preorderForm.referralHint", { amount: formatBdt(REFERRAL_BDT, locale), min: formatBdt(REFERRAL_MIN_ORDER_BDT, locale) })}
         </div>
       </div>
 

@@ -379,6 +379,9 @@ export const preorderRequests = pgTable("preorder_requests", {
   targetDate: text("target_date"),                 // YYYY-MM-DD as text for simplicity
   giftMessage: text("gift_message"),               // card message (0022)
   expressFeeBdt: integer("express_fee_bdt"),       // same-day express fee; null = standard delivery (0025)
+  referralCode: text("referral_code"),             // a friend's code, typed on the form (0026)
+  referralDiscountBdt: integer("referral_discount_bdt"), // taken off at quote time (0026)
+  referralCreditId: uuid("referral_credit_id"),    // the customer's own earned credit, used on this quote (0026)
   color: text("color"),
   size: text("size"),
 
@@ -398,6 +401,21 @@ export const preorderRequests = pgTable("preorder_requests", {
   rejectionReason: text("rejection_reason"),
   convertedOrderId: uuid("converted_order_id"),
 
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// ─── Referral credits (0026) ────────────────────────────────────────────
+// One row per referred customer: the reward of the customer who shared the code.
+export const referralCredits = pgTable("referral_credits", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  referrerId: uuid("referrer_id").notNull(),
+  referredEmail: text("referred_email").notNull(),
+  preorderId: uuid("preorder_id").notNull(),
+  orderId: uuid("order_id"),
+  amountBdt: integer("amount_bdt").notNull(),
+  status: text("status").default("pending").notNull(),   // pending | earned | used | void
+  usedOrderId: uuid("used_order_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

@@ -2,13 +2,17 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { formatBdt } from "@/lib/utils";
 
 type Props = {
   code: string;
   locale: "en" | "bn";
+  /** Credit ready to use, and friends' orders not yet delivered (lib/referral-server.ts). */
+  earnedBdt?: number;
+  pending?: number;
 };
 
-export default function ReferralCard({ code }: Props) {
+export default function ReferralCard({ code, locale, earnedBdt = 0, pending = 0 }: Props) {
   const t = useTranslations();
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +75,14 @@ export default function ReferralCard({ code }: Props) {
         >
           {bodyText}
         </p>
+        {earnedBdt > 0 && (
+          <p style={{ fontSize: 14, color: "var(--purple-900)", margin: 0, fontWeight: 500 }}>
+            {t("referral.balance", { amount: formatBdt(earnedBdt, locale) })}
+          </p>
+        )}
+        {pending > 0 && (
+          <p style={{ fontSize: 13, color: "var(--ink-soft)", margin: 0 }}>{t("referral.pending", { count: pending })}</p>
+        )}
 
         <div
           style={{

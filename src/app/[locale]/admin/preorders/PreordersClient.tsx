@@ -10,6 +10,7 @@ import {
   getPreorderAttachmentUrls,
 } from "@/lib/actions/preorders";
 import type { PreorderRequest, Segment } from "@/lib/schema";
+import { preorderMoney } from "@/lib/referral";
 import { formatBdt, formatDate } from "@/lib/utils";
 import { Link } from "@/i18n/routing";
 import Icon from "@/components/storefront/Icon";
@@ -192,9 +193,9 @@ function DetailDrawer({
   const usualPrice = request.quotedPriceBdt ? null : product?.usualPriceBdt ?? null;
   const [quotePrice, setQuotePrice] = useState((request.quotedPriceBdt ?? usualPrice)?.toString() ?? "");
   // Set once a quote is saved: the drawer stays open on the WhatsApp step.
-  const [sentQuote, setSentQuote] = useState<{ quotedPriceBdt: number; depositBdt: number } | null>(null);
+  const [sentQuote, setSentQuote] = useState<{ quotedPriceBdt: number; depositBdt: number; referralDiscountBdt: number } | null>(null);
 
-  const whatsAppUrl = (quotedPriceBdt: number, depositBdt: number | null) =>
+  const whatsAppUrl = (quotedPriceBdt: number, depositBdt: number | null, referralDiscountBdt: number | null) =>
     request.customerPhone
       ? quoteWhatsAppUrl(request.customerPhone, {
           customerName: request.customerName,
@@ -205,8 +206,11 @@ function DetailDrawer({
           depositBdt,
           targetDate: request.targetDate,
           expressFeeBdt: request.expressFeeBdt,
+          referralDiscountBdt,
         })
       : null;
+  // What the order will charge: the same formula as the quote and the conversion.
+  const money = request.quotedPriceBdt ? preorderMoney({ ...request, quotedPriceBdt: request.quotedPriceBdt }) : null;
   const [adminNotes, setAdminNotes] = useState(request.adminNotes ?? "");
 
   // Reject input
@@ -243,7 +247,7 @@ function DetailDrawer({
         quotedPriceBdt: price,
         adminNotes: adminNotes.trim() || null,
       });
-      if (r.ok) setSentQuote({ quotedPriceBdt: r.quotedPriceBdt, depositBdt: r.depositBdt });
+      if (r.ok) setSentQuote({ quotedPriceBdt: r.quotedPriceBdt, depositBdt: r.depositBdt, referralDiscountBdt: r.referralDiscountBdt });
       else setError(r.error);
     });
   };
@@ -365,7 +369,7 @@ function DetailDrawer({
           {sentQuote && (
             <QuoteSentPanel
               email={request.customerEmail}
-              whatsAppUrl={whatsAppUrl(sentQuote.quotedPriceBdt, sentQuote.depositBdt)}
+              whatsAppUrl={whatsAppUrl(sentQuote.quotedPriceBdt, sentQuote.depositBdt, sentQuote.referralDiscountBdt)}
               onDone={onClose}
             />
           )}
@@ -399,7 +403,7 @@ function DetailDrawer({
                   <button type="button" className="btn btn-ghost btn-sm" onClick={onMarkReviewing} disabled={pending}>Mark as reviewing</button>
                 )}
                 {(request.status === "quoted" || request.status === "confirmed") && request.quotedPriceBdt && (() => {
-                  const url = whatsAppUrl(request.quotedPriceBdt, request.depositBdt);
+                  const url = whatsAppUrl(request.quotedPriceBdt, request.depositBdt, request.referralDiscountBdt);
                   return url ? (
                     <a className="btn btn-ghost btn-sm" href={url} target="_blank" rel="noopener noreferrer">Resend on WhatsApp</a>
                   ) : null;
@@ -410,13 +414,19 @@ function DetailDrawer({
 
           {/* Deposit gate: a quoted request converts at FULL price until the
               bKash deposit is marked received; 'confirmed' deducts it. */}
-          {request.status === "quoted" && request.quotedPriceBdt && request.depositBdt ? (
+          {money && money.discount > 0 && (request.status === "quoted" || request.status === "confirmed") && (
+            <p style={{ marginTop: 16, fontSize: 13, color: "var(--ink-soft)" }}>
+              Referral discount: {formatBdt(money.discount)} off ({request.referralCode ? `friend's code ${request.referralCode}` : "the customer's own earned credit"}).
+            </p>
+          )}
+
+          {request.status === "quoted" && money && request.depositBdt ? (
             <div style={{ marginTop: 16, padding: 18, background: "#fdf6e8", border: "1px solid #e8d8a8" }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "#a07e2c", marginBottom: 8 }}>DEPOSIT · {formatBdt(request.depositBdt)}</div>
               <p style={{ fontSize: 13, color: "#6b5a2a", margin: "0 0 12px", lineHeight: 1.6 }}>
                 Once the customer&apos;s bKash prepayment of {formatBdt(request.depositBdt)} arrives, mark it received:
-                the converted order will then collect {formatBdt(request.quotedPriceBdt * request.quantity + (request.expressFeeBdt ?? 0) - request.depositBdt)} on delivery.
-                Converting <b>without</b> marking it charges the full {formatBdt(request.quotedPriceBdt * request.quantity + (request.expressFeeBdt ?? 0))} COD.
+                the converted order will then collect {formatBdt(money.rest)} on delivery.
+                Converting <b>without</b> marking it charges the full {formatBdt(money.total)} COD.
               </p>
               <button
                 type="button"
@@ -437,7 +447,7 @@ function DetailDrawer({
           ) : null}
 
           {/* Convert action: quoted (full COD) or confirmed (deposit deducted) */}
-          {(request.status === "quoted" || request.status === "confirmed") && request.quotedPriceBdt && (
+          {(request.status === "quoted" || request.status === "confirmed") && money && (
             <div style={{ marginTop: 16, padding: 18, background: "#eef7ee", border: "1px solid #4caf50" }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "#2e7d32", marginBottom: 8 }}>
                 {request.status === "confirmed" ? "DEPOSIT RECEIVED: READY TO CONVERT" : "CUSTOMER ACCEPTED?"}
@@ -457,8 +467,8 @@ function DetailDrawer({
                 <button type="button" className="btn btn-primary btn-sm" onClick={onConvert} disabled={pending}>
                   Convert to COD order (
                   {request.status === "confirmed"
-                    ? `collect ${formatBdt(Math.max(0, request.quotedPriceBdt * request.quantity + (request.expressFeeBdt ?? 0) - (request.depositBdt ?? 0)))}`
-                    : formatBdt(request.quotedPriceBdt * request.quantity + (request.expressFeeBdt ?? 0))}
+                    ? `collect ${formatBdt(money.rest)}`
+                    : formatBdt(money.total)}
                   )
                 </button>
               )}
