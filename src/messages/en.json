@@ -76,7 +76,11 @@
       "next": "Scroll right"
     },
     "moments": {
-      "kicker": "Moments"
+      "kicker": "Moments",
+      "play": "Play",
+      "pause": "Pause",
+      "soundOn": "Sound on",
+      "soundOff": "Sound off"
     },
     "whatsapp": "Ask on WhatsApp",
     "marquee": {

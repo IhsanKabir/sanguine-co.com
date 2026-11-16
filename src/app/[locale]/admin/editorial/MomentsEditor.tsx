@@ -54,7 +54,8 @@ export default function MomentsEditor({ initial }: Props) {
       const path = `moments/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await sb.storage.from("product-images").upload(path, file, { contentType: file.type, upsert: false });
       if (upErr) throw new Error(upErr.message);
-      set("image", sb.storage.from("product-images").getPublicUrl(path).data.publicUrl);
+      // A new picture is a new campaign: the previous campaign's film no longer belongs with it.
+      setM((prev) => ({ ...prev, image: sb.storage.from("product-images").getPublicUrl(path).data.publicUrl, video: null }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "The upload failed.");
     } finally {
