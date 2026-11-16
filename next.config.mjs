@@ -27,7 +27,12 @@ const nextConfig = {
   // policy keeps them from leaking to external destinations a customer might
   // click through to (couriers, WhatsApp web, etc.).
   async headers() {
+    // Cut-outs and the Moments film change rarely: a week in the browser, then refreshed
+    // in the background (PageSpeed "efficient cache lifetimes", 16 Nov).
+    const media = { key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" };
     return [
+      { source: "/cutouts/:path*", headers: [media] },
+      { source: "/moments/:path*", headers: [media] },
       {
         source: "/:path*",
         headers: [
