@@ -39,6 +39,13 @@ create table if not exists referral_credits (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+-- The first draft of this file (run on production once, 16 Nov) made the table with
+-- referrer_id instead; nothing had used it. These lines bring that table up to date and
+-- do nothing on a fresh database.
+alter table referral_credits add column if not exists referrer_email text;
+alter table referral_credits drop column if exists referrer_id;
+alter table referral_credits alter column referrer_email set not null;
+
 -- A customer can be referred once.
 create unique index if not exists referral_credits_referred_email_key on referral_credits (lower(referred_email));
 create index if not exists referral_credits_referrer_idx on referral_credits (lower(referrer_email), status);
