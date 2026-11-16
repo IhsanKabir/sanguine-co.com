@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef } from "react";
 import { Link } from "@/i18n/routing";
 import type { Cutout } from "@/lib/cutouts";
@@ -44,11 +45,10 @@ export default function Shelf({ items, labels }: Props) {
         {items.map((it) => (
           <Link key={it.slug} href={`/product/${it.slug}`} className="shelf-item">
             {it.cutout ? (
-              // eslint-disable-next-line @next/next/no-img-element -- transparent WebP, small size only
-              <img src={it.cutout.small} width={Math.round(it.cutout.width / 2)} height={Math.round(it.cutout.height / 2)} alt="" loading="lazy" decoding="async" />
+              <Image src={it.cutout.small} width={Math.round(it.cutout.width / 2)} height={Math.round(it.cutout.height / 2)} sizes="(max-width: 760px) 130px, 200px" alt="" loading="lazy" />
             ) : it.photo ? (
-              // eslint-disable-next-line @next/next/no-img-element -- a product photo without a cut-out, shown round
-              <img src={it.photo} alt="" className="shelf-photo" loading="lazy" decoding="async" />
+              // Resized by next/image: the original upload is about 1300 px, shown at 130 to 200 (PageSpeed, 16 Nov).
+              <Image src={it.photo} alt="" width={200} height={200} sizes="(max-width: 760px) 130px, 200px" className="shelf-photo" loading="lazy" />
             ) : (
               <span className="shelf-photo shelf-empty" />
             )}

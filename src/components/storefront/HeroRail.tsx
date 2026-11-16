@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { Link, useRouter } from "@/i18n/routing";
 import type { Cutout } from "@/lib/cutouts";
 
@@ -106,17 +107,15 @@ export default function HeroRail({ items, labels }: Props) {
           }}
         >
           {seen.has(i) && (
-          // eslint-disable-next-line @next/next/no-img-element -- transparent WebP in two sizes, chosen by srcSet
-          <img
-            src={it.cutout.small}
-            srcSet={`${it.cutout.small} 450w, ${it.cutout.large} 900w`}
+          // next/image makes the exact size each screen needs, in AVIF or WebP with the transparency kept.
+          <Image
+            src={it.cutout.large}
             sizes="(max-width: 760px) 50vw, 34vw"
             width={it.cutout.width}
             height={it.cutout.height}
             alt={it.name}
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "auto"}
-            decoding="async"
+            priority={i === 0}
+            loading={i === 0 ? undefined : "lazy"}
             draggable={false}
           />
           )}
