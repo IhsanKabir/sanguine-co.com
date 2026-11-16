@@ -10,62 +10,21 @@
  */
 import { config } from "dotenv";
 import postgres from "postgres";
+import { crawlSite } from "../src/lib/health/site-crawl";
 
 // The shop's own .env wins over a DATABASE_URL left in the terminal by another project.
 config({ path: ".env", override: true });
 
 const SITE = process.env.CHECK_SITE ?? "https://sanguine-co.com";
 // What Next.js prints when a page breaks (not words like "Something went wrong", which every page carries in its translations).
-const ERROR_MARKS = ["Application error: a server-side exception", "Application error: a client-side exception", "id=\"__next_error__\"", "<h2>Internal Server Error"];
 const problems: string[] = [];
 let passed = 0;
 
-async function page(path: string, expect: "ok" | "redirect" | "noerror" = "ok") {
-  const url = path.startsWith("http") ? path : SITE + path;
-  try {
-    const res = await fetch(url, { redirect: "manual", headers: { "user-agent": "sanguine-check-live" } });
-    const status = res.status;
-    if (expect === "redirect") {
-      if (status >= 300 && status < 400) { passed++; return; }
-      problems.push(`${status} ${path} (expected a redirect)`);
-      return;
-    }
-    if (status >= 300 && status < 400 && expect === "noerror") { passed++; return; }
-    if (status !== 200) { problems.push(`${status} ${path}`); return; }
-    const type = res.headers.get("content-type") ?? "";
-    if (type.includes("text/html")) {
-      const html = await res.text();
-      const mark = ERROR_MARKS.find((m) => html.includes(m));
-      if (mark) { problems.push(`"${mark}" on ${path}`); return; }
-    }
-    passed++;
-  } catch (err) {
-    problems.push(`no answer from ${path}: ${(err as Error).message}`);
-  }
-}
-
 async function pages() {
-  const xml = await (await fetch(`${SITE}/sitemap.xml`)).text();
-  const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-  if (urls.length === 0) problems.push("sitemap.xml lists no pages");
-  const slugs = [...new Set(urls.map((u) => u.match(/\/en\/product\/([^/?#]+)$/)?.[1]).filter(Boolean))] as string[];
-  const extra: [string, "ok" | "redirect" | "noerror"][] = [
-    ["/en?ref=SSG-ABCDEF", "ok"],
-    ["/en/search?q=rose", "ok"],
-    ["/en/sign-in", "ok"],
-    ["/en/wishlist", "noerror"],
-    ["/en/account", "redirect"],
-    ["/en/admin", "redirect"],
-    ["/robots.txt", "ok"],
-    ["/moments/cats-anniversary.mp4", "ok"],
-    ["/moments/cats-anniversary.webp", "ok"],
-    ["/cutouts/sunflower-bouquet-450.webp", "ok"],
-    ["/api/og?title=Sanguine", "noerror"],
-    ...slugs.map((s) => [`/en/preorder/product/${s}`, "noerror"] as [string, "noerror"]),
-  ];
-  const all: [string, "ok" | "redirect" | "noerror"][] = [...urls.map((u) => [u, "ok"] as [string, "ok"]), ...extra];
-  for (let i = 0; i < all.length; i += 6) await Promise.all(all.slice(i, i + 6).map(([p, e]) => page(p, e)));
-  console.log(`pages: ${all.length} checked`);
+  const { checked, problems: found } = await crawlSite(SITE);
+  passed += checked - found.length;
+  problems.push(...found);
+  console.log(`pages: ${checked} checked`);
 }
 
 async function database() {

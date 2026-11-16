@@ -17,6 +17,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/site-url";
 import { searchProducts } from "@/lib/queries";
 import { OWNER_ALERT_EVENT, ownerAlertEmail, ownerAlertPhone } from "@/lib/owner-alert";
+import { LIVE_CHECKS } from "./live-checks";
 
 export type HealthStatus = "ok" | "warn" | "fail";
 export type HealthCategory = "Core" | "Integrations" | "Data" | "Features" | "Config";
@@ -41,7 +42,7 @@ export type HealthReport = {
 
 type Probe = { status: HealthStatus; detail: string };
 
-type CheckDef = {
+export type CheckDef = {
   id: string;
   label: string;
   category: HealthCategory;
@@ -503,7 +504,7 @@ async function runOne(def: CheckDef, dbGate: DbGate): Promise<HealthCheck> {
 export async function runHealthChecks(): Promise<HealthReport> {
   const started = Date.now();
   const dbGate = makeGate(4);   // fresh per run: see note on makeGate
-  const checks = await Promise.all(CHECKS.map((def) => runOne(def, dbGate)));
+  const checks = await Promise.all([...CHECKS, ...LIVE_CHECKS].map((def) => runOne(def, dbGate)));
   const counts = {
     ok: checks.filter((c) => c.status === "ok").length,
     warn: checks.filter((c) => c.status === "warn").length,
