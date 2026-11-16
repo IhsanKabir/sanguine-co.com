@@ -11,6 +11,7 @@ import { createProductPreorderRequest } from "@/lib/actions/preorders";
 import { EXPRESS_FEE_BDT, expressCutoffLabel, isExpressOpen } from "@/lib/delivery";
 import { formatBdt } from "@/lib/utils";
 import { REFERRAL_BDT, REFERRAL_MIN_ORDER_BDT, normalizeReferralCode } from "@/lib/referral";
+import { REF_STORAGE_KEY } from "@/components/storefront/RefCapture";
 
 const DHAKA = "Dhaka";
 
@@ -65,7 +66,9 @@ export default function ProductPreorderForm({
   // A friend's referral code; a shared link (?ref=SSG-ABC234) fills it in.
   const [referralCode, setReferralCode] = useState("");
   useEffect(() => {
-    const fromLink = normalizeReferralCode(new URLSearchParams(window.location.search).get("ref"));
+    let saved: string | null = null;
+    try { saved = window.localStorage.getItem(REF_STORAGE_KEY); } catch { /* storage blocked */ }
+    const fromLink = normalizeReferralCode(new URLSearchParams(window.location.search).get("ref")) ?? normalizeReferralCode(saved);
     if (fromLink) setReferralCode(fromLink);
   }, []);
 

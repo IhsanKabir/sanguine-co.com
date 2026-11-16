@@ -8,6 +8,7 @@ import {
   convertPreorderToOrder,
   markPreorderDepositReceived,
   getPreorderAttachmentUrls,
+  getConfirmationWhatsAppUrl,
 } from "@/lib/actions/preorders";
 import type { PreorderRequest, Segment } from "@/lib/schema";
 import { preorderMoney } from "@/lib/referral";
@@ -220,6 +221,16 @@ function DetailDrawer({
   // Convert confirmation
   const [showConvertConfirm, setShowConvertConfirm] = useState(false);
 
+  // The order-confirmed WhatsApp message (with the customer's referral code): offered right
+  // after "Deposit received", and whenever a confirmed request is opened.
+  const [confirmUrl, setConfirmUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (request.status !== "confirmed") return;
+    let live = true;
+    getConfirmationWhatsAppUrl(request.id).then((u) => { if (live) setConfirmUrl(u); }).catch(() => {});
+    return () => { live = false; };
+  }, [request.id, request.status]);
+
   useEffect(() => {
     if ((request.attachments ?? []).length === 0) return;
     setLoadingUrls(true);
@@ -420,7 +431,17 @@ function DetailDrawer({
             </p>
           )}
 
-          {request.status === "quoted" && money && request.depositBdt ? (
+          {confirmUrl && (
+            <div style={{ marginTop: 16, padding: 18, background: "#eef7ee", border: "1px solid #4caf50" }}>
+              <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "#2e7d32", marginBottom: 8 }}>ORDER CONFIRMED</div>
+              <p style={{ fontSize: 13, color: "#2e4f33", margin: "0 0 12px", lineHeight: 1.6 }}>
+                The confirmation email has gone out with the customer&apos;s referral code. Send the same on WhatsApp:
+              </p>
+              <a className="btn btn-primary btn-sm" href={confirmUrl} target="_blank" rel="noopener noreferrer">Send confirmation on WhatsApp</a>
+            </div>
+          )}
+
+          {request.status === "quoted" && !confirmUrl && money && request.depositBdt ? (
             <div style={{ marginTop: 16, padding: 18, background: "#fdf6e8", border: "1px solid #e8d8a8" }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "#a07e2c", marginBottom: 8 }}>DEPOSIT · {formatBdt(request.depositBdt)}</div>
               <p style={{ fontSize: 13, color: "#6b5a2a", margin: "0 0 12px", lineHeight: 1.6 }}>
@@ -435,6 +456,8 @@ function DetailDrawer({
                 onClick={() => startTransition(async () => {
                   const res = await markPreorderDepositReceived(request.id);
                   if (res && "error" in res && res.error) { alert(res.error); return; }
+                  // Stay open on the WhatsApp step when there is a message to send.
+                  if (res.ok && res.whatsAppUrl) { setConfirmUrl(res.whatsAppUrl); return; }
                   // House pattern (quote/convert/reject do the same): close on
                   // success: the revalidated list shows the CONFIRMED pill.
                   // Leaving the dialog open rendered stale quoted-state UI.
@@ -447,7 +470,7 @@ function DetailDrawer({
           ) : null}
 
           {/* Convert action: quoted (full COD) or confirmed (deposit deducted) */}
-          {(request.status === "quoted" || request.status === "confirmed") && money && (
+          {(request.status === "quoted" || request.status === "confirmed") && money && !(confirmUrl && request.status === "quoted") && (
             <div style={{ marginTop: 16, padding: 18, background: "#eef7ee", border: "1px solid #4caf50" }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: ".2em", color: "#2e7d32", marginBottom: 8 }}>
                 {request.status === "confirmed" ? "DEPOSIT RECEIVED: READY TO CONVERT" : "CUSTOMER ACCEPTED?"}

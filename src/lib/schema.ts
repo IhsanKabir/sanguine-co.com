@@ -405,11 +405,18 @@ export const preorderRequests = pgTable("preorder_requests", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// ─── Referral codes (0026): one per email, so guests have one too ───────
+export const referralCodes = pgTable("referral_codes", {
+  code: text("code").primaryKey(),
+  email: text("email").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // ─── Referral credits (0026) ────────────────────────────────────────────
 // One row per referred customer: the reward of the customer who shared the code.
 export const referralCredits = pgTable("referral_credits", {
   id: uuid("id").primaryKey().defaultRandom(),
-  referrerId: uuid("referrer_id").notNull(),
+  referrerEmail: text("referrer_email").notNull(),
   referredEmail: text("referred_email").notNull(),
   preorderId: uuid("preorder_id").notNull(),
   orderId: uuid("order_id"),

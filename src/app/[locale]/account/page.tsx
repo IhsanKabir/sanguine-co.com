@@ -126,7 +126,7 @@ export default async function AccountPage({ params }: Props) {
   try {
     referralCode = await ensureReferralCode();
   } catch (e) { console.error("[account] ensureReferralCode failed:", e); }
-  const referral = await referralBalance(user.id);
+  const referral = user.email ? await referralBalance(user.email) : { earnedBdt: 0, pending: 0 };
 
   return (
     <div className="acct-wrap">
