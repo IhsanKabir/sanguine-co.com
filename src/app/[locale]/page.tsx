@@ -15,6 +15,7 @@ import { getMoments, momentsLive, splitEm } from "@/lib/moments";
 import MomentsFilm from "@/components/storefront/MomentsFilm";
 import { displayName } from "@/lib/product-name";
 import { expressCutoffLabel } from "@/lib/delivery";
+import { getCommerceSettings } from "@/lib/commerce";
 import { whatsAppUrl } from "@/lib/contact";
 import NewsletterForm from "@/components/storefront/NewsletterForm";
 import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
@@ -89,12 +90,13 @@ export default async function Home({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations();
 
-  const [segments, live, occasions, uploaded, moments] = await Promise.all([
+  const [segments, live, occasions, uploaded, moments, commerce] = await Promise.all([
     safeQuery(getVisibleSegments()),
     safeQuery(getLiveProducts({ limit: SHELF_LIMIT })),
     safeQuery(getOccasionsInUse()),
     getUploadedCutouts(),
     getMoments(),
+    getCommerceSettings(),
   ]);
 
   const showSetupBanner = segments === null;
@@ -124,7 +126,7 @@ export default async function Home({ params }: Props) {
   // Campaigns lean on same-day express, which is for flowers in Dhaka.
   const showMoments = scope !== "nationwide" && momentsLive(moments, new Date());
   const bn = locale === "bn";
-  const cutoffLabel = expressCutoffLabel(bn ? "bn" : "en");
+  const cutoffLabel = expressCutoffLabel(bn ? "bn" : "en", commerce.expressCutoffMin);
   const momentTitle = splitEm(bn ? moments.titleBn || moments.titleEn : moments.titleEn);
   const wa = whatsAppUrl();
   const shopHref = segs.length === 1 ? `/shop/${segs[0].id}` : "#shelf";
@@ -168,7 +170,7 @@ export default async function Home({ params }: Props) {
           </div>
           <div className="lh-rest">
             <p className="lh-lede">{t(scopedKey("home.lede", scope, ["dhaka", "mixed"]), { categories: categoryList(segs, locale === "bn" ? "bn" : "en") })}</p>
-            {scope !== "nationwide" && <SameDayLine />}
+            {scope !== "nationwide" && <SameDayLine cutoffMin={commerce.expressCutoffMin} />}
             <div className="lh-btns">
               <Link href={shopHref} className="btn btn-gold" data-magnetic data-cursor-label={t("home.cursorEnter")}>
                 {segs.length === 1

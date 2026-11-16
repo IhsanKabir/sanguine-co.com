@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props) {
 // disagree with what checkout charges or the returns page says.
 function faqGroups(locale: Locale, c: CommerceSettings): FaqGroup[] {
   const delivery = formatBdt(c.shippingDhakaBdt, locale);
-  const express = formatBdt(EXPRESS_FEE_BDT, locale), cutoff = expressCutoffLabel(locale);
+  const express = formatBdt(EXPRESS_FEE_BDT, locale), cutoff = expressCutoffLabel(locale, c.expressCutoffMin);
   const freeOver = c.freeShippingThresholdBdt > 0 ? formatBdt(c.freeShippingThresholdBdt, locale) : null;
   const days = c.returnWindowDays;
 

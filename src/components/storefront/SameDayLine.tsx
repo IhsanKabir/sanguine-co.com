@@ -2,33 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { EXPRESS_CUTOFF_HOUR } from "@/lib/delivery";
+import { minutesToCutoff } from "@/lib/delivery";
 
 const TICK_MS = 30_000;
 
-/** Minutes left today until the express cutoff, in Dhaka time; 0 once it has passed. */
-function minutesToCutoff(now: Date): number {
-  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Dhaka", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(now);
-  const h = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
-  const m = Number(parts.find((p) => p.type === "minute")?.value ?? 0);
-  return Math.max(0, EXPRESS_CUTOFF_HOUR * 60 - (h * 60 + m));
-}
 
 /**
  * "Same-day express: order in the next 2 h 14 m", counting down to the cutoff in Dhaka
  * time; after it, "order now for tomorrow". Worked out in the browser after mount (the
  * page is cached, so a server-made time would be stale); until then it holds its space.
  */
-export default function SameDayLine() {
+/** cutoffMin: the last order time, from Admin, Settings (minutes after midnight, Dhaka). */
+export default function SameDayLine({ cutoffMin }: { cutoffMin: number }) {
   const t = useTranslations("home.sameDay");
   const [left, setLeft] = useState<number | null>(null);
 
   useEffect(() => {
-    const update = () => setLeft(minutesToCutoff(new Date()));
+    const update = () => setLeft(minutesToCutoff(new Date(), cutoffMin));
     update();
     const timer = setInterval(update, TICK_MS);
     return () => clearInterval(timer);
-  }, []);
+  }, [cutoffMin]);
 
   return (
     <div className="sameday" aria-live="polite">

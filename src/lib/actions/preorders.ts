@@ -216,7 +216,7 @@ export async function createProductPreorderRequest(
   if (isDhakaOnlySegment(product.segmentId) && data.deliveryAddress && !isDhakaCity(data.deliveryAddress.city)) {
     return { ok: false as const, error: "Flowers are delivered in Dhaka only. Please give a Dhaka address." };
   }
-  const express = expressCheck(Boolean(data.express), product.segmentId, Boolean(data.deliveryAddress), new Date());
+  const express = expressCheck(Boolean(data.express), product.segmentId, Boolean(data.deliveryAddress), new Date(), (await getCommerceSettings()).expressCutoffMin);
   if (!express.ok) return express;
   const referral = await checkReferralCode(data.referralCode, { email, customerId: user?.id ?? null, phone: data.customerPhone });
   if (!referral.ok) return referral;

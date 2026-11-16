@@ -10,6 +10,7 @@ import { getProductImages } from "@/lib/queries";
 import { priceDisplay, priceDisplayText } from "@/lib/pricing";
 import ProductPreorderForm from "./ProductPreorderForm";
 import { localizeEstimate } from "@/lib/delivery";
+import { getCommerceSettings } from "@/lib/commerce";
 
 export const dynamic = "force-dynamic";
 
@@ -89,6 +90,7 @@ export default async function ProductPreorderPage({ params }: Props) {
           userEmail={user?.email ?? ""}
           prefill={prefill}
           dhakaOnly={isDhakaOnlySegment(product.segmentId)}
+          expressCutoffMin={(await getCommerceSettings()).expressCutoffMin}
           signInHref={`/sign-in?next=/${locale}/preorder/product/${slug}`}
           colors={(product.colors as string[] | null) || []}
           sizes={(product.sizes as string[] | null) || []}
