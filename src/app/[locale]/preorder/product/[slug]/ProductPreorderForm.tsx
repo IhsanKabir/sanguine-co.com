@@ -12,6 +12,7 @@ import { EXPRESS_FEE_BDT, expressCutoffLabel, isExpressOpen } from "@/lib/delive
 import { formatBdt } from "@/lib/utils";
 import { REFERRAL_BDT, REFERRAL_MIN_ORDER_BDT, normalizeReferralCode } from "@/lib/referral";
 import { REF_STORAGE_KEY } from "@/components/storefront/RefCapture";
+import { useTurnstile } from "@/components/storefront/useTurnstile";
 
 const DHAKA = "Dhaka";
 
@@ -88,13 +89,17 @@ export default function ProductPreorderForm({
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [pending, startTransition] = useTransition();
+  const bot = useTurnstile();
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
       try {
+        const turnstileToken = await bot.getToken();
+        bot.reset();
         const result = await createProductPreorderRequest({
+          turnstileToken,
           productId,
           quantity: Math.max(1, Math.min(50, quantity)),
           color: colors.length > 0 ? color || null : null,
@@ -136,6 +141,7 @@ export default function ProductPreorderForm({
 
   return (
     <form onSubmit={onSubmit} style={{ display: "grid", gap: 18 }}>
+      {bot.slot}
       <div aria-hidden="true" style={{ position: "absolute", left: -9999, width: 1, height: 1, overflow: "hidden" }}>
         <label>
           Leave this field empty

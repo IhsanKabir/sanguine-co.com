@@ -28,6 +28,8 @@ import { expressCheck, EXPRESS_ORDER_NOTE, PREORDER_ORDER_PREFIX } from "@/lib/e
 import { preorderMoney, REFERRAL_BDT } from "@/lib/referral";
 import { checkReferralCode, codeForEmail, referralDiscountForQuote, settleReferralAtConversion } from "@/lib/referral-server";
 import { confirmWhatsAppUrl, type ConfirmMessageInput } from "@/lib/quote-message";
+import { BOT_CHECK_ERROR, passesTurnstile } from "@/lib/turnstile";
+import { isBlocked, setBlocked } from "@/lib/blocklist";
 
 const attachmentSchema = z.object({
   url: z.string().url(),
@@ -149,6 +151,8 @@ const productPreorderSchema = z.object({
   }).optional().nullable(),
   /** A friend's referral code (lib/referral.ts): optional, first orders only. */
   referralCode: z.string().trim().max(40).optional().nullable(),
+  /** Cloudflare Turnstile token (lib/turnstile.ts). */
+  turnstileToken: z.string().max(4096).optional().nullable(),
   /** Honeypot: a field people never see. Only scripts fill it in. */
   trap: z.string().max(200).optional().nullable(),
 });
@@ -171,6 +175,7 @@ export async function createProductPreorderRequest(
   // A filled honeypot gets the same answer as a real request, and nothing is
   // stored or emailed, so a script cannot tell it was caught.
   if (data.trap?.trim()) return { ok: true as const, id: "received" };
+  if (!(await passesTurnstile(data.turnstileToken, "preorder"))) return { ok: false as const, error: BOT_CHECK_ERROR };
   if (data.targetDate && !isValidDeliveryDate(data.targetDate, new Date())) {
     return { ok: false as const, error: "Please choose a delivery date from tomorrow onwards." };
   }
@@ -179,6 +184,8 @@ export async function createProductPreorderRequest(
   if (normalizeBdWhatsApp(data.customerPhone).length < 10) {
     return { ok: false as const, error: "Please add a phone number we can reach on WhatsApp." };
   }
+  // Marked as spam in Admin: the same answer as a real request, and nothing stored or sent.
+  if (await isBlocked(email, data.customerPhone)) return { ok: true as const, id: "received" };
 
   const windowStart = new Date(Date.now() - PREORDER_RATE_WINDOW_MIN * 60 * 1000);
   const [recent] = await db.select({ n: sql<number>`count(*)::int` }).from(schema.preorderRequests)
@@ -418,6 +425,23 @@ const rejectSchema = z.object({
   id: z.string().uuid(),
   reason: z.string().min(1).max(1000),
 });
+
+/** Spam: reject the request and block its email and phone from ordering again (or undo that). */
+export async function markPreorderSpam(id: string, spam: boolean) {
+  await requirePermission("preorders");
+  const [req] = await db.select().from(schema.preorderRequests).where(eq(schema.preorderRequests.id, id)).limit(1);
+  if (!req) return { ok: false as const, error: "Request not found" };
+  if (spam && (req.status === "converted" || req.status === "confirmed")) {
+    return { ok: false as const, error: "This request has a deposit or an order: it cannot be marked as spam." };
+  }
+  await setBlocked(req.customerEmail, req.customerPhone, spam);
+  if (spam) {
+    await db.update(schema.preorderRequests).set({ status: "rejected", rejectionReason: "Spam", updatedAt: new Date() })
+      .where(eq(schema.preorderRequests.id, id));
+  }
+  revalidatePath("/[locale]/admin/preorders", "page");
+  return { ok: true as const };
+}
 
 export async function rejectPreorderRequest(input: z.infer<typeof rejectSchema>) {
   await requirePermission("preorders");

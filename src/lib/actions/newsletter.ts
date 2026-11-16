@@ -4,13 +4,17 @@ import { z } from "zod";
 import { sendEmail, addBrevoContact, brevoContactExists } from "@/lib/email/brevo";
 import { newsletterWelcomeEmail } from "@/lib/email/templates";
 import { captureError } from "@/lib/monitoring";
+import { passesTurnstile } from "@/lib/turnstile";
+import { isFormRateLimited } from "@/lib/request-guard";
 
 import { SITE_URL } from "@/lib/site-url";
 
-const schema = z.object({ email: z.string().email().max(200) });
+const schema = z.object({ email: z.string().email().max(200), turnstileToken: z.string().max(4096).optional().nullable() });
 
-export async function subscribeNewsletter(input: { email: string }): Promise<{ ok: boolean }> {
-  const { email } = schema.parse(input);
+export async function subscribeNewsletter(input: { email: string; turnstileToken?: string | null }): Promise<{ ok: boolean }> {
+  const { email, turnstileToken } = schema.parse(input);
+  if (!(await passesTurnstile(turnstileToken, "newsletter"))) return { ok: false };
+  if (await isFormRateLimited("newsletter")) return { ok: false };
 
   const listId = process.env.BREVO_NEWSLETTER_LIST_ID
     ? parseInt(process.env.BREVO_NEWSLETTER_LIST_ID, 10)

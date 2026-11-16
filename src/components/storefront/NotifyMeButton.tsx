@@ -3,6 +3,7 @@
 import { useState, useTransition, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { subscribeBackInStock } from "@/lib/actions/stock-notify";
+import { useTurnstile } from "@/components/storefront/useTurnstile";
 
 type Props = {
   productId: string;
@@ -17,13 +18,16 @@ export default function NotifyMeButton({ productId, productName, defaultEmail = 
   const [done, setDone] = useState<null | "subscribed" | "already">(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const bot = useTurnstile();
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
       try {
-        const result = await subscribeBackInStock({ productId, email: email.trim() });
+        const turnstileToken = await bot.getToken();
+        const result = await subscribeBackInStock({ productId, email: email.trim(), turnstileToken });
+        bot.reset();
         if (result.ok) setDone(result.alreadyRegistered ? "already" : "subscribed");
         else setError(t("notify.error"));
       } catch {
@@ -47,6 +51,7 @@ export default function NotifyMeButton({ productId, productName, defaultEmail = 
 
       {open && !done && (
         <form onSubmit={onSubmit} style={{ padding: 14, background: "#fcfaf6", border: "1px solid var(--line)" }}>
+          {bot.slot}
           <p style={{ fontSize: 13, color: "var(--ink-soft)", margin: "0 0 10px", lineHeight: 1.6 }}>
             {t("notify.intro")}
           </p>

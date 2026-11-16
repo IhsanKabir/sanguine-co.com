@@ -9,6 +9,8 @@ import { validateCoupon, recordCouponRedemption } from "./coupons";
 import { logOrderEvent } from "@/lib/order-events";
 import { checkOptionStock, takeStock } from "@/lib/variant-stock";
 import { getCurrentUser } from "@/lib/auth-utils";
+import { BOT_CHECK_ERROR, passesTurnstile } from "@/lib/turnstile";
+import { isBlocked } from "@/lib/blocklist";
 
 import { SITE_URL } from "@/lib/site-url";
 import { headers } from "next/headers";
@@ -31,6 +33,8 @@ const itemSchema = z.object({
 });
 
 const inputSchema = z.object({
+  /** Cloudflare Turnstile token (lib/turnstile.ts). */
+  turnstileToken: z.string().max(4096).optional().nullable(),
   customer: z.object({
     fullName: z.string().min(2).max(120),
     email: z.string().email(),
@@ -85,6 +89,10 @@ async function placeOrder(input: CreateOrderInput, mode: "cod" | "online") {
     return { ok: false as const, error: "Invalid input", details: parsed.error.flatten() };
   }
   const data = parsed.data;
+  if (!(await passesTurnstile(data.turnstileToken, "checkout"))) return { ok: false as const, error: BOT_CHECK_ERROR };
+  if (await isBlocked(data.customer.email, data.customer.phone)) {
+    return { ok: false as const, error: "We could not place this order. Please message us on WhatsApp." };
+  }
   if (data.deliveryDate && !isValidDeliveryDate(data.deliveryDate, new Date())) {
     return { ok: false as const, error: "Please choose a delivery date from tomorrow onwards." };
   }

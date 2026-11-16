@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import Icon from "./Icon";
+import { useTurnstile } from "./useTurnstile";
 import { subscribeNewsletter } from "@/lib/actions/newsletter";
 
 export default function NewsletterForm() {
@@ -10,12 +11,15 @@ export default function NewsletterForm() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [pending, startTransition] = useTransition();
+  const bot = useTurnstile();
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.includes("@")) return;
     startTransition(async () => {
-      await subscribeNewsletter({ email });
+      const turnstileToken = await bot.getToken();
+      await subscribeNewsletter({ email, turnstileToken });
+      bot.reset();
       setSent(true);
       setEmail("");
     });
@@ -24,6 +28,7 @@ export default function NewsletterForm() {
   return (
     <>
       <form className="letters-form" onSubmit={onSubmit}>
+        {bot.slot}
         <input
           type="email"
           placeholder={t("newsletter.placeholder")}
