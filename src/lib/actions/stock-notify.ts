@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { eq, and, isNull, gte, sql } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { getCurrentUser, requirePermission } from "@/lib/auth-utils";
+import { BOT_CHECK_ERROR, passesTurnstile } from "@/lib/turnstile";
+import { isFormRateLimited } from "@/lib/request-guard";
 import { sendEmail } from "@/lib/email/brevo";
 import { backInStockEmail } from "@/lib/email/templates";
 
@@ -13,6 +15,8 @@ import { SITE_URL } from "@/lib/site-url";
 const subscribeSchema = z.object({
   productId: z.string().min(1).max(120),
   email: z.string().email().max(200),
+  /** Cloudflare Turnstile token (lib/turnstile.ts). */
+  turnstileToken: z.string().max(4096).optional().nullable(),
 });
 
 /**
@@ -23,6 +27,8 @@ const subscribeSchema = z.object({
  */
 export async function subscribeBackInStock(input: z.infer<typeof subscribeSchema>) {
   const data = subscribeSchema.parse(input);
+  if (!(await passesTurnstile(data.turnstileToken, "notify"))) return { ok: false as const, error: BOT_CHECK_ERROR };
+  if (await isFormRateLimited("notify")) return { ok: false as const, error: "Too many requests from your network. Please try again later." };
   const user = await getCurrentUser();
 
   // Soft rate-limit: cap one email at 10 active subscriptions per hour.

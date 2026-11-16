@@ -17,6 +17,7 @@ import { shippingFor } from "@/lib/pricing";
 import { estimatedArrival, formatArrival } from "@/lib/delivery";
 import { useShippingRules } from "@/lib/shipping-rules-context";
 import DeliveryOptionsFields from "@/components/storefront/DeliveryOptionsFields";
+import { useTurnstile } from "@/components/storefront/useTurnstile";
 
 type Prefill = {
   fullName: string;
@@ -48,6 +49,7 @@ export default function CheckoutForm({
   const shippingRules = useShippingRules();
   const [step, setStep] = useState<1 | 2>(1);
   const [pending, startTransition] = useTransition();
+  const bot = useTurnstile();
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -146,8 +148,10 @@ export default function CheckoutForm({
       phoneCode: phoneCode ?? (activeCode ? { id: activeCode.id, code: code.trim() } : null),
     };
     startTransition(async () => {
+      const turnstileToken = await bot.getToken();
+      bot.reset();
       if (method === "online") {
-        const res = await startOnlinePayment(input, locale);
+        const res = await startOnlinePayment({ ...input, turnstileToken }, locale);
         if (!res.ok) { setError(res.error); return; }
         // The bag is kept until the shopper is back on the order page, so a
         // failed or cancelled payment does not lose it (ClearCartOnMount).
@@ -155,7 +159,7 @@ export default function CheckoutForm({
         window.location.assign(res.gatewayUrl);
         return;
       }
-      const res = await createCodOrder(input);
+      const res = await createCodOrder({ ...input, turnstileToken });
       if (!res.ok) {
         if ("needsPhoneCode" in res) { await sendCode(); return; }
         if ("codeError" in res) {
@@ -187,6 +191,7 @@ export default function CheckoutForm({
 
   return (
     <div className="checkout-grid">
+      {bot.slot}
       <div>
         {paymentNotice && (
           <div role="alert" style={{ marginBottom: 18, padding: "12px 16px", background: "#fdf3f0", border: "1px solid #e5b8ab", color: "#7a2e1c", fontSize: 13, lineHeight: 1.6 }}>

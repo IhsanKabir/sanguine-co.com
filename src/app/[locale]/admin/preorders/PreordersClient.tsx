@@ -5,6 +5,7 @@ import {
   setPreorderStatus,
   quotePreorderRequest,
   rejectPreorderRequest,
+  markPreorderSpam,
   convertPreorderToOrder,
   markPreorderDepositReceived,
   getPreorderAttachmentUrls,
@@ -495,6 +496,41 @@ function DetailDrawer({
                   )
                 </button>
               )}
+            </div>
+          )}
+
+          {/* Spam: one tap rejects and blocks the email and phone (lib/blocklist.ts) */}
+          {(request.status === "new" || request.status === "reviewing" || request.status === "quoted") && (
+            <div style={{ marginTop: 16 }}>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                disabled={pending}
+                onClick={() => startTransition(async () => {
+                  const r = await markPreorderSpam(request.id, true);
+                  if (!r.ok) { setError(r.error); return; }
+                  onClose();
+                })}
+              >
+                Spam: reject and block
+              </button>
+              <span style={{ fontSize: 12, color: "var(--ink-soft)", marginLeft: 10 }}>This email and phone can no longer send requests.</span>
+            </div>
+          )}
+          {request.status === "rejected" && request.rejectionReason === "Spam" && (
+            <div style={{ marginTop: 16 }}>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                disabled={pending}
+                onClick={() => startTransition(async () => {
+                  const r = await markPreorderSpam(request.id, false);
+                  if (!r.ok) { setError(r.error); return; }
+                  onClose();
+                })}
+              >
+                Not spam: unblock this customer
+              </button>
             </div>
           )}
 
