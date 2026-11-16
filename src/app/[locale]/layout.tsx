@@ -18,6 +18,7 @@ import CartDrawer from "@/components/storefront/CartDrawer";
 import RouteTransition from "@/components/storefront/RouteTransition";
 import SessionTracker from "@/components/storefront/SessionTracker";
 import FloatingChat from "@/components/storefront/FloatingChat";
+import RefCapture from "@/components/storefront/RefCapture";
 import CookieConsent from "@/components/storefront/CookieConsent";
 
 export function generateStaticParams() {
@@ -62,6 +63,7 @@ export default async function LocaleLayout({
           <Footer />
           <CartDrawer />
           <FloatingChat />
+          <RefCapture />
           <CookieConsent />
         </WishlistProvider>
       </CartProvider>

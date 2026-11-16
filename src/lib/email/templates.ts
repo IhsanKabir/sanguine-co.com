@@ -179,6 +179,31 @@ export function preorderQuoteEmail(
   return { subject, html: SHELL(body) };
 }
 
+/** Sent when the deposit arrives: the order is confirmed, and the customer's referral code (0026). */
+export function preorderConfirmedEmail(d: {
+  customerName: string;
+  productName: string;
+  targetDate: string | null;
+  depositBdt: number;
+  restBdt: number;
+  referralCode: string;
+  referralLink: string;
+  referralBdt: number;
+}) {
+  const subject = `Confirmed · ${d.productName}`;
+  const body = `
+    <p style="font-size:15px;margin:0 0 6px;">Dear ${e(d.customerName.split(" ")[0] || "friend")},</p>
+    <p style="font-size:15px;margin:0 0 24px;">Your ${formatBdt(d.depositBdt)} deposit arrived: your <em>${e(d.productName)}</em> is confirmed${d.targetDate ? ` for ${e(d.targetDate)}` : ""}. ${d.restBdt > 0 ? `The remaining ${formatBdt(d.restBdt)} is paid in cash on delivery.` : "Nothing more to pay on delivery."}</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:0 0 8px;">YOUR REFERRAL CODE</p>
+    <p style="font-family:Georgia,serif;font-size:28px;color:#2a1854;margin:0 0 12px;letter-spacing:.06em;">${e(d.referralCode)}</p>
+    <p style="font-size:14px;color:#3a2a64;line-height:1.7;margin:0 0 16px;">Share it: a friend gets ${formatBdt(d.referralBdt)} off their first bouquet, and you get ${formatBdt(d.referralBdt)} off your next order when theirs is delivered. It comes off your price by itself.</p>
+    <p style="margin:0 0 8px;"><a href="${e(d.referralLink)}" style="display:inline-block;background:#2a1854;color:#fdfbf7;text-decoration:none;padding:12px 22px;font-family:Georgia,serif;font-size:14px;">Share your link</a></p>
+    <p style="font-size:12px;color:#7a6a52;margin:0;word-break:break-all;">${e(d.referralLink)}</p>
+    <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">Sanguine</p>
+  `;
+  return { subject, html: SHELL(body) };
+}
+
 export function preorderAdminNotifyEmail(d: PreorderEmailData & {
   requestId: string;
   customerEmail: string;

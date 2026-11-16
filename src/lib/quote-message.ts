@@ -68,3 +68,38 @@ export function quoteWhatsAppUrl(phone: string, q: QuoteMessageInput): string | 
   if (digits.length < 10) return null;
   return `https://wa.me/${digits}?text=${encodeURIComponent(quoteWhatsAppText(q))}`;
 }
+
+/**
+ * The "order confirmed" WhatsApp message, sent once the deposit arrives: what happens next,
+ * and the customer's own referral code with a link that fills it in (no account needed).
+ */
+export type ConfirmMessageInput = {
+  customerName: string | null;
+  productName: string;
+  /** YYYY-MM-DD, as stored on the request. */
+  targetDate: string | null;
+  depositBdt: number;
+  restBdt: number;
+  referralCode: string;
+  referralLink: string;
+  referralBdt: number;
+};
+
+export function confirmWhatsAppText(c: ConfirmMessageInput): string {
+  const name = c.customerName?.trim() || "";
+  return [
+    `Hello${name ? ` ${name}` : ""},`,
+    `Your ${formatBdt(c.depositBdt, "en")} deposit arrived: your ${c.productName} is confirmed${c.targetDate ? ` for ${formatDay(c.targetDate, "en")}` : ""}.`,
+    c.restBdt > 0 ? `The remaining ${formatBdt(c.restBdt, "en")} is paid in cash on delivery.` : "Nothing more to pay on delivery.",
+    "",
+    `Your referral code: ${c.referralCode}`,
+    `Share it: a friend gets ${formatBdt(c.referralBdt, "en")} off their first bouquet, and you get ${formatBdt(c.referralBdt, "en")} off your next when theirs is delivered.`,
+    c.referralLink,
+  ].join("\n");
+}
+
+export function confirmWhatsAppUrl(phone: string, c: ConfirmMessageInput): string | null {
+  const digits = normalizeBdWhatsApp(phone);
+  if (digits.length < 10) return null;
+  return `https://wa.me/${digits}?text=${encodeURIComponent(confirmWhatsAppText(c))}`;
+}

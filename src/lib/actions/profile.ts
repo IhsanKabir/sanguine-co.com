@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
+import { codeForEmail } from "@/lib/referral-server";
 import { requireUser } from "@/lib/auth-utils";
 
 // ─── Core profile ────────────────────────────────────────────────────────────
@@ -120,9 +121,9 @@ export async function ensureReferralCode(): Promise<string> {
     .from(schema.customerProfiles)
     .where(eq(schema.customerProfiles.id, user.id));
 
-  if (row?.referralCode) return row.referralCode;
-
-  const code = deriveReferralCode(user.id);
+  // Codes belong to the email (0026), so the one on this page is the one in order emails.
+  const code = user.email ? await codeForEmail(user.email, row?.referralCode ?? deriveReferralCode(user.id)) : row?.referralCode ?? deriveReferralCode(user.id);
+  if (row?.referralCode === code) return code;
   await db
     .insert(schema.customerProfiles)
     .values({ id: user.id, referralCode: code })

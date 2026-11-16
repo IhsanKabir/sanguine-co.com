@@ -16,6 +16,7 @@ import { isDhakaOnlySegment, isDhakaCity } from "@/lib/delivery-scope";
 import {
   preorderReceivedEmail,
   preorderQuoteEmail,
+  preorderConfirmedEmail,
   preorderAdminNotifyEmail,
 } from "@/lib/email/templates";
 import { SITE_URL } from "@/lib/site-url";
@@ -24,8 +25,9 @@ import { priceDisplay, effectiveDepositPct, depositForQuote } from "@/lib/pricin
 import { getCommerceSettings } from "@/lib/commerce";
 import { isValidDeliveryDate, GIFT_MESSAGE_MAX, dhakaToday } from "@/lib/delivery";
 import { expressCheck, EXPRESS_ORDER_NOTE, PREORDER_ORDER_PREFIX } from "@/lib/express";
-import { preorderMoney } from "@/lib/referral";
-import { checkReferralCode, referralDiscountForQuote, settleReferralAtConversion } from "@/lib/referral-server";
+import { preorderMoney, REFERRAL_BDT } from "@/lib/referral";
+import { checkReferralCode, codeForEmail, referralDiscountForQuote, settleReferralAtConversion } from "@/lib/referral-server";
+import { confirmWhatsAppUrl, type ConfirmMessageInput } from "@/lib/quote-message";
 
 const attachmentSchema = z.object({
   url: z.string().url(),
@@ -445,8 +447,50 @@ export async function markPreorderDepositReceived(id: string) {
   await db.update(schema.preorderRequests)
     .set({ status: "confirmed", updatedAt: new Date() })
     .where(eq(schema.preorderRequests.id, id));
+  // The order-confirmed message: by email now, and ready for WhatsApp in one tap.
+  const confirm = await confirmationFor({ ...req, status: "confirmed" });
+  if (confirm) {
+    const { subject, html } = preorderConfirmedEmail({ ...confirm, customerName: req.customerName ?? "" });
+    const to = req.customerEmail;
+    runAfterResponse(() => sendEmail({ to, toName: req.customerName ?? undefined, subject, html }));
+  }
   revalidatePath("/[locale]/admin/preorders", "page");
-  return { ok: true as const };
+  return { ok: true as const, whatsAppUrl: confirm && req.customerPhone ? confirmWhatsAppUrl(req.customerPhone, confirm) : null };
+}
+
+/** The order-confirmed message's contents: null when the request is not confirmed or has no quote. */
+async function confirmationFor(req: typeof schema.preorderRequests.$inferSelect): Promise<ConfirmMessageInput | null> {
+  if (req.status !== "confirmed" || !req.quotedPriceBdt) return null;
+  const [product] = req.productId
+    ? await db.select({ name: schema.products.name }).from(schema.products).where(eq(schema.products.id, req.productId)).limit(1)
+    : [];
+  const money = preorderMoney({ ...req, quotedPriceBdt: req.quotedPriceBdt });
+  let referralCode: string;
+  try {
+    referralCode = await codeForEmail(req.customerEmail);
+  } catch (err) {
+    console.error("[preorders] referral code", req.id, err);
+    return null;
+  }
+  return {
+    customerName: req.customerName,
+    productName: product?.name ?? "order",
+    targetDate: req.targetDate ?? null,
+    depositBdt: money.deposit,
+    restBdt: money.rest,
+    referralCode,
+    referralLink: `${SITE_URL}/en?ref=${referralCode}`,
+    referralBdt: REFERRAL_BDT,
+  };
+}
+
+/** For the admin panel: the WhatsApp link for a confirmed request's order-confirmed message. */
+export async function getConfirmationWhatsAppUrl(id: string): Promise<string | null> {
+  await requirePermission("preorders");
+  const [req] = await db.select().from(schema.preorderRequests).where(eq(schema.preorderRequests.id, id)).limit(1);
+  if (!req?.customerPhone) return null;
+  const confirm = await confirmationFor(req);
+  return confirm ? confirmWhatsAppUrl(req.customerPhone, confirm) : null;
 }
 
 const convertSchema = z.object({
