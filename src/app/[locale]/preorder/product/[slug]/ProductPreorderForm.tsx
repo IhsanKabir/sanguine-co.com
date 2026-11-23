@@ -30,6 +30,9 @@ type Props = {
   signInHref: string;
   colors: string[];
   sizes: string[];
+  /** Already chosen on the shop stage; ignored when not one of the options. */
+  initialColor?: string;
+  initialSize?: string;
 };
 
 export default function ProductPreorderForm({
@@ -42,6 +45,8 @@ export default function ProductPreorderForm({
   signInHref,
   colors,
   sizes,
+  initialColor,
+  initialSize,
 }: Props) {
   const t = useTranslations();
   const locale = useLocale() as "en" | "bn";
@@ -53,8 +58,8 @@ export default function ProductPreorderForm({
   const isGuest = !userEmail;
   const contactEmail = userEmail || guestEmail.trim();
   const [quantity, setQuantity] = useState(1);
-  const [color, setColor] = useState(colors[0] ?? "");
-  const [size, setSize] = useState(sizes[0] ?? "");
+  const [color, setColor] = useState(initialColor && colors.includes(initialColor) ? initialColor : colors[0] ?? "");
+  const [size, setSize] = useState(initialSize && sizes.includes(initialSize) ? initialSize : sizes[0] ?? "");
   const [notes, setNotes] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [giftMessage, setGiftMessage] = useState("");

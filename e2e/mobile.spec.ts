@@ -3,8 +3,8 @@ import { skipWithoutDb, KNOWN_PRODUCT_SLUG, KNOWN_SEGMENT_ID } from "./helpers";
 
 /**
  * Phase-4 mobile pins (IMPROVEMENT-PLAN.md): viewport/touch behavior that
- * broke silently before: horizontal overflow, the invisible quick-view
- * overlay hijacking card taps, and PDP thumbs with no resolvable size.
+ * broke silently before: horizontal overflow, layers covering the shop
+ * stage sheet, and PDP thumbs with no resolvable size.
  */
 test.use({ ...devices["iPhone 12"], defaultBrowserType: "chromium" });
 
@@ -17,29 +17,29 @@ test.describe("mobile · 390px touch profile", () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
-  test("tapping the bottom of a product card navigates to the PDP @db", async ({ page }) => {
+  test("tapping a bouquet opens its sheet, and Pre-order is not covered @db", async ({ page }) => {
     skipWithoutDb();
     await page.goto(`/en/shop/${KNOWN_SEGMENT_ID}`);
-    // Dismiss the cookie banner first: it overlays the lower viewport (and
-    // the first failure screenshot showed the tap landing on it, which is
-    // the layer-stacking class of bug this suite exists to catch). Wait for
-    // it to actually leave before computing tap coordinates.
-    // It appears on the first scroll (once hydrated), so scroll until it
-    // shows, then dismiss it.
-    const consent = page.getByRole("button", { name: /essential only/i });
-    await expect(async () => {
-      await page.mouse.wheel(0, 50);
-      await expect(consent).toBeVisible({ timeout: 1_000 });
-    }).toPass({ timeout: 30_000 });
-    await consent.click({ timeout: 10_000 }).catch(() => {});
-    await consent.waitFor({ state: "hidden", timeout: 5_000 }).catch(() => {});
-    const cover = page.locator(".card-cover").first();
-    await cover.scrollIntoViewIfNeeded();
-    const box = await cover.boundingBox();
+    const item = page.locator(".stage-item").first();
+    await item.scrollIntoViewIfNeeded();
+    const box = await item.boundingBox();
     expect(box).not.toBeNull();
-    // The invisible .qv-overlay used to swallow taps on this exact strip.
-    await page.touchscreen.tap(box!.x + box!.width / 2, box!.y + box!.height - 12);
-    await expect(page).toHaveURL(/\/product\//, { timeout: 20_000 });
+    await page.touchscreen.tap(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    const cta = page.locator(".stage-panel .stage-cta");
+    await expect(cta).toBeVisible({ timeout: 20_000 });
+    // The cookie notice and the chat buttons used to sit over the sheet (main is its own
+    // layer): the button must be the top element where a thumb lands on it. Polled, because
+    // the opening motion and the scroll to the stage take a moment to settle.
+    await expect.poll(async () => {
+      const ctaBox = await cta.boundingBox();
+      if (!ctaBox) return false;
+      return page.evaluate(([x, y]) => !!document.elementFromPoint(x, y)?.closest(".stage-cta"),
+        [ctaBox.x + ctaBox.width / 2, ctaBox.y + ctaBox.height / 2]);
+    }, { timeout: 10_000 }).toBe(true);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(1);
   });
 
   test("PDP renders without overflow and thumbs stay thumbnail-sized @db", async ({ page }) => {

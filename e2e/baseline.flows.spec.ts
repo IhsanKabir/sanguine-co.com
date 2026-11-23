@@ -69,14 +69,29 @@ test.describe("baseline · catalogue flows @db", () => {
     }
   });
 
-  test("shop grid renders cards and honors sort URL state", async ({ page }) => {
+  test("shop stage opens a product in place, and Escape, Back and a shared link all work", async ({ page }) => {
     skipWithoutDb();
-    // URL-state rendering path (RSC re-render on filter change) exercised via
-    // direct navigation: click-driven filter UX is redesigned in Phase 3, so
-    // only the URL contract is pinned here.
-    const res = await page.goto(`/en/shop/${KNOWN_SEGMENT_ID}?sort=price-asc`);
+    const res = await page.goto(`/en/shop/${KNOWN_SEGMENT_ID}`);
     expect(res?.status()).toBe(200);
-    expect(await page.locator(".card").count()).toBeGreaterThan(0);
+    // Every product is a real link to its page (crawlers, no JavaScript, new tabs).
+    const item = page.locator(`.stage-item[href="/en/product/${KNOWN_PRODUCT_SLUG}"]`);
+    await expect(item).toBeVisible();
+    await item.click();
+    await expect(page).toHaveURL(new RegExp(`[?&]b=${KNOWN_PRODUCT_SLUG}`));
+    const panel = page.locator(".stage-panel");
+    await expect(panel.getByRole("heading", { level: 2 })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(panel).toHaveCount(0);
+    await expect(page).not.toHaveURL(/[?&]b=/);
+    // Back closes an open panel instead of leaving the shop.
+    await item.click();
+    await expect(panel).toBeVisible();
+    await page.goBack();
+    await expect(panel).toHaveCount(0);
+    await expect(page).toHaveURL(new RegExp(`/en/shop/${KNOWN_SEGMENT_ID}$`));
+    // A shared link opens straight onto the product.
+    await page.goto(`/en/shop/${KNOWN_SEGMENT_ID}?b=${KNOWN_PRODUCT_SLUG}`);
+    await expect(panel).toBeVisible();
   });
 
   test("search API finds a known live product", async ({ request }) => {
