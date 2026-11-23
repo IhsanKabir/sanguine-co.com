@@ -118,7 +118,7 @@ export default async function FaqPage({ params }: Props) {
   };
 
   return (
-    <article className="legal-page">
+    <div className="legal-shell"><article className="legal-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className="legal-kicker">{isBn ? "সাধারণ প্রশ্ন" : "QUESTIONS"}</div>
       <h1>{isBn ? "যা সবাই জানতে চান।" : "What people ask us."}</h1>
@@ -146,6 +146,6 @@ export default async function FaqPage({ params }: Props) {
           <>Our <Link href="/contact">contact page</Link> has WhatsApp, phone and email. See also <Link href="/legal/shipping">delivery</Link> and <Link href="/legal/returns">returns</Link>.</>
         )}
       </p>
-    </article>
+    </article></div>
   );
 }

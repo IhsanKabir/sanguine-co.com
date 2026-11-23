@@ -46,7 +46,9 @@ export default async function OrderConfirmation({ params, searchParams }: Props)
   const awaitingPayment = order.status === "pending_payment";
 
   return (
-    <section className="section order-confirm-section" style={{ maxWidth: 760, textAlign: "center" }}>
+    <section className="card-stage">
+      <div className="stage-ghost" aria-hidden="true">{order.number}</div>
+      <div className="card-stage-card" style={{ maxWidth: 760, textAlign: "center" }}>
       <div style={{ marginBottom: 28 }}>
         <WaxSeal size={180} />
       </div>
@@ -87,6 +89,7 @@ export default async function OrderConfirmation({ params, searchParams }: Props)
         </div>
       )}
       <Link href="/" className="btn btn-primary">{t("checkout.returnHome")}</Link>
+    </div>
     </section>
   );
 }
