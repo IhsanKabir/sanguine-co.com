@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getSegmentBySlug, getLiveProducts, getHeroImagesFor } from "@/lib/queries";
+import { getUploadedCutouts } from "@/lib/cutout-store";
+import { getCommerceSettings } from "@/lib/commerce";
+import { toStageItems } from "@/lib/stage-items";
+import Stage from "@/components/storefront/Stage";
 import { Link } from "@/i18n/routing";
-import { uniqueOptions } from "@/lib/option-labels";
-import ShopGrid from "@/components/storefront/ShopGrid";
 import JsonLd from "@/components/seo/JsonLd";
-import { priceSortValue } from "@/lib/pricing";
 import OccasionChips from "@/components/storefront/OccasionChips";
 import { occasionsInUse } from "@/lib/occasions";
 
@@ -89,20 +89,15 @@ export default async function SegmentPage({ params }: Props) {
   const allItems = showStock
     ? await getLiveProducts({ segmentId: segment }).catch(() => [])
     : [];
-  const heroImages = allItems.length > 0
-    ? await getHeroImagesFor(allItems.map((i) => i.id)).catch(() => new Map())
-    : new Map();
-  const heroImagesObj = Object.fromEntries(heroImages.entries());
-
-  // Distinct values for filter chips.
-  const availableColors = uniqueOptions(allItems.flatMap((p) => (p.colors as string[] | null) ?? []));
-  const availableSizes = uniqueOptions(allItems.flatMap((p) => (p.sizes as string[] | null) ?? []));
-  const availableTags = Array.from(new Set(allItems.map((p) => p.tag).filter((t): t is string => !!t))).sort();
-  // Filter bounds use the effective (quotation-model) price; quote-only pieces
-  // have no comparable price and are excluded from the bounds.
-  const priceValues = allItems.map(priceSortValue).filter((v) => v < Number.MAX_SAFE_INTEGER);
-  const priceMin = priceValues.length > 0 ? Math.min(...priceValues) : 0;
-  const priceMax = priceValues.length > 0 ? Math.max(...priceValues) : 0;
+  const [heroImages, uploaded, commerce] = await Promise.all([
+    allItems.length > 0 ? getHeroImagesFor(allItems.map((i) => i.id)).catch(() => new Map()) : Promise.resolve(new Map()),
+    getUploadedCutouts(),
+    getCommerceSettings(),
+  ]);
+  const stageItems = toStageItems(allItems, {
+    locale, uploaded, photos: heroImages,
+    labels: { madeToOrder: t("pdp.preorderOnly"), priceOnQuote: t("pdp.priceOnQuote") },
+  });
 
   const name = (locale === "bn" && seg.nameBn) || seg.name;
   const displayTag = (locale === "bn" && seg.tagBn) || seg.tag || "";
@@ -135,46 +130,30 @@ export default async function SegmentPage({ params }: Props) {
   return (
     <>
       <JsonLd data={itemListLd ? [breadcrumbLd, itemListLd] : [breadcrumbLd]} />
-      <div className="crumbs">
-        <Link href="/" style={{ cursor: "pointer" }}>{t("nav.maison")}</Link>
-        <span>{t("nav.boutique")}</span>
-        <span className="current">{name}</span>
-      </div>
-      <section className="section" style={{ paddingTop: 28 }} data-cursor={cursor}>
-        <div style={{ marginBottom: 36, paddingBottom: 24, borderBottom: "1px solid var(--line)" }}>
-          <div style={{ fontSize: 11, letterSpacing: ".3em", color: "var(--gold-deep)", marginBottom: 8 }}>
-            {displayTag.toUpperCase()}
+      {showStock && (
+        <Stage
+          items={stageItems}
+          ghost={name}
+          title={name}
+          countLabel={t("stage.count", { count: stageItems.length })}
+          segmentLabel={name}
+          expressCutoffMin={commerce.expressCutoffMin}
+          nav={<OccasionChips ids={occasionsInUse(allItems)} locale={locale} variant="line" allHref={`/shop/${segment}`} />}
+        />
+      )}
+      <section className="section" style={{ paddingTop: showStock ? 48 : 28 }} data-cursor={cursor}>
+        {!showStock && (
+          <div style={{ marginBottom: 36, paddingBottom: 24, borderBottom: "1px solid var(--line)" }}>
+            <div style={{ fontSize: 11, letterSpacing: ".3em", color: "var(--gold-deep)", marginBottom: 8 }}>
+              {displayTag.toUpperCase()}
+            </div>
+            <h1 className="serif segment-h1" style={{ margin: 0, color: "var(--purple-900)", fontWeight: 400 }}>
+              {name}
+            </h1>
+            <p style={{ fontSize: 15, color: "var(--ink-soft)", margin: "12px 0 0", maxWidth: 520 }}>
+              {showPreorder ? t("shop.blurbPreorder", { blurb }) : t("shop.blurbOnly", { blurb })}
+            </p>
           </div>
-          <h1 className="serif segment-h1" style={{ margin: 0, color: "var(--purple-900)", fontWeight: 400 }}>
-            {name}
-          </h1>
-          <p style={{ fontSize: 15, color: "var(--ink-soft)", margin: "12px 0 0", maxWidth: 520 }}>
-            {showStock && showPreorder
-              ? t("shop.blurbBoth", { blurb })
-              : showPreorder
-              ? t("shop.blurbPreorder", { blurb })
-              : showStock
-              ? t("shop.blurbStock", { blurb, count: allItems.length })
-              : t("shop.blurbOnly", { blurb })}
-          </p>
-          <OccasionChips ids={occasionsInUse(allItems)} locale={locale} />
-        </div>
-
-        {showStock && (
-          <Suspense fallback={<div style={{ minHeight: 300 }} />}>
-            <ShopGrid
-              allItems={allItems}
-              heroImages={heroImagesObj}
-              availableColors={availableColors}
-              availableSizes={availableSizes}
-              availableTags={availableTags}
-              priceMin={priceMin}
-              priceMax={priceMax}
-              segmentTag={(locale === "bn" && seg.tagBn) || seg.tag || ""}
-              segmentSlug={segment}
-              showPreorder={showPreorder}
-            />
-          </Suspense>
         )}
 
         {/* Bespoke pre-order CTA */}

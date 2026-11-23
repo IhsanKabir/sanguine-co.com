@@ -785,5 +785,24 @@
     "metaDescription": "{occasion}: flowers and gifts from Sanguine, made fresh to order in Dhaka and paid for on arrival.",
     "blurb": "{count, plural, =0 {Nothing here yet.} one {# piece chosen for this occasion.} other {# pieces chosen for this occasion.}}",
     "empty": "Nothing is chosen for this occasion yet. Browse the shop instead."
+  },
+  "stage": {
+    "count": "{count, plural, one {# piece} other {# pieces}}",
+    "every": "Every occasion",
+    "filter": "Filter",
+    "clear": "Clear",
+    "colour": "Colour",
+    "size": "Size",
+    "close": "Close",
+    "prev": "Previous",
+    "next": "Next",
+    "details": "Full details",
+    "opening": "Opening the form…",
+    "noMatch": "Nothing matches. Clear the filter to see everything.",
+    "giftKicker": "Complete the gift",
+    "giftTitle": "Flowers, a card, and something to share",
+    "giftCard": "The Sanguine card",
+    "giftCardNote": "Comes with your bouquet",
+    "giftBouquetNote": "Made fresh to order"
   }
 }
