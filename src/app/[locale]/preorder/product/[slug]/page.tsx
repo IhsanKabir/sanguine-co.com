@@ -76,7 +76,7 @@ export default async function ProductPreorderPage({ params, searchParams }: Prop
         <span className="current">{t("preorderPage.crumb")}</span>
       </div>
       <section className="pre-stage" aria-labelledby="pre-title">
-        <div className="stage-ghost" aria-hidden="true">{name}</div>
+        <div className="stage-ghost" aria-hidden="true" data-ghost={name} />
         <div className="pre-piece">
           {cutout ? (
             <Image src={cutout.large} width={cutout.width} height={cutout.height} alt="" priority

@@ -26,7 +26,7 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
 
   return (
     <section className="co-stage" aria-labelledby="co-title">
-      <div className="stage-ghost" aria-hidden="true">{t("checkout.title")}</div>
+      <div className="stage-ghost" aria-hidden="true" data-ghost={t("checkout.title")} />
       <div className="co-inner">
         <div className="crumbs" style={{ padding: "0 0 18px", maxWidth: "none" }}>
           <Link href="/">{t("nav.maison")}</Link>

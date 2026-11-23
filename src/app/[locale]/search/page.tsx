@@ -73,7 +73,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
 
   return (
     <section className="search-quiet" aria-labelledby="search-title">
-      <div className="stage-ghost" aria-hidden="true">{q.length >= 2 ? q : t("searchPage.title")}</div>
+      <div className="stage-ghost" aria-hidden="true" data-ghost={q.length >= 2 ? q : t("searchPage.title")} />
       <div className="stage-kicker"><span>01</span><h1 id="search-title">{q.length >= 2 ? t("searchPage.none", { q }) : t("searchPage.title")}</h1></div>
       {form}
       <p className="search-quiet-hint">{q.length >= 2 ? t("searchPage.noneHint") : t("searchPage.prompt")}</p>

@@ -130,7 +130,7 @@ export default async function AccountPage({ params }: Props) {
 
   return (
     <div className="acct-stage">
-    <div className="stage-ghost" aria-hidden="true">{displayName.split(" ")[0]}</div>
+    <div className="stage-ghost" aria-hidden="true" data-ghost={displayName.split(" ")[0]} />
     <div className="acct-wrap">
 
       {/* ─── Email verification banner ──────────────────────────────────── */}

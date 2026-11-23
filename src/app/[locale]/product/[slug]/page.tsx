@@ -278,7 +278,7 @@ export default async function ProductPage({ params }: Props) {
       </div>
       <PdpStateProvider>
       <section className="pdp-stage" aria-labelledby="pdp-title">
-        <div className="stage-ghost" aria-hidden="true">{name}</div>
+        <div className="stage-ghost" aria-hidden="true" data-ghost={name} />
         {cutout || photos.length > 0 ? (
           <PdpFigure
             name={name}

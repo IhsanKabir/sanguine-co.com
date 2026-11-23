@@ -45,7 +45,7 @@ export default function CartPage() {
 
   return (
     <section className="co-stage" aria-labelledby="bag-title">
-      <div className="stage-ghost" aria-hidden="true">{t("cart.title")}</div>
+      <div className="stage-ghost" aria-hidden="true" data-ghost={t("cart.title")} />
       <div className="co-inner">
       <div className="stage-kicker co-kicker"><span>01</span><h1 id="bag-title">{t("cart.title")}</h1><span>{t("stage.count", { count })}</span></div>
       <div className="cart-grid">

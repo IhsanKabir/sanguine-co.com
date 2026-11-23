@@ -157,3 +157,7 @@ html[lang="bn"] .stage-panel h2 { line-height: 1.3; }
 .pdp-panel .stage-heart.heart-tick { right: 14px; }
 .pdp-panel .stage-panel-k { padding-right: 44px; }
 .stage-panel .stage-panel-k { padding-right: 96px; }
+
+/* The faint word is drawn from data-ghost, not written as text: it is decoration, and as text
+   contrast checkers (Lighthouse, axe) judged it as low-contrast content (product page a11y 96). */
+.stage-ghost::before { content: attr(data-ghost); }

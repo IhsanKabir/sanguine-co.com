@@ -26,7 +26,7 @@ export default function WishlistClient({ items, expressCutoffMin }: WishlistClie
   if (list.length === 0) {
     return (
       <section className="search-quiet" aria-labelledby="wish-title">
-        <div className="stage-ghost" aria-hidden="true">{t("wishlist.saved")}</div>
+        <div className="stage-ghost" aria-hidden="true" data-ghost={t("wishlist.saved")} />
         <div className="stage-kicker"><span>01</span><h1 id="wish-title">{t("wishlist.emptyHeading")}</h1></div>
         <p className="search-quiet-hint">{t("wishlist.empty")}</p>
         <Link href="/" className="btn btn-primary">{t("wishlist.wander")}</Link>

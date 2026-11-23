@@ -124,7 +124,7 @@ export default function Stage({ items, ghost, title, countLabel, segmentLabel, e
 
   return (
     <section ref={stage} className={"stage" + (item ? " is-picked" : "")} aria-label={ghost}>
-      <div className="stage-ghost" aria-hidden="true">{ghost}</div>
+      <div className="stage-ghost" aria-hidden="true" data-ghost={ghost} />
       <div className="stage-top">
         <div className="stage-kicker"><span>01</span><h1>{title}</h1><span>{countLabel}</span></div>
         <div className="stage-tools">

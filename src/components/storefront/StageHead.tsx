@@ -23,7 +23,7 @@ interface StageHeadProps {
 export default function StageHead({ ghost, n, kicker, title, lede, children, align = "start" }: StageHeadProps) {
   return (
     <header className={"page-stage" + (align === "center" ? " is-center" : "")}>
-      <div className="stage-ghost" aria-hidden="true">{ghost}</div>
+      <div className="stage-ghost" aria-hidden="true" data-ghost={ghost} />
       <div className="stage-kicker">{n && <span>{n}</span>}{kicker}</div>
       <h1 className="page-stage-title">{title}</h1>
       {lede && <p className="page-stage-lede">{lede}</p>}
