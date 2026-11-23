@@ -5,10 +5,9 @@ import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { formatBdt } from "@/lib/utils";
-import Composition from "@/components/storefront/Composition";
+import BagThumb from "@/components/storefront/BagThumb";
 import Icon from "@/components/storefront/Icon";
 import CouponInput from "@/components/storefront/CouponInput";
-import OceanicBand from "@/components/storefront/OceanicBand";
 
 import { qualifiesForFreeShipping } from "@/lib/pricing";
 import { useShippingRules } from "@/lib/shipping-rules-context";
@@ -16,7 +15,7 @@ import { useShippingRules } from "@/lib/shipping-rules-context";
 export default function CartPage() {
   const t = useTranslations();
   const locale = useLocale() as "en" | "bn";
-  const { items, inc, dec, remove, subtotalBdt, itemKey, hydrated: cartLoaded, coupon } = useCart();
+  const { items, count, inc, dec, remove, subtotalBdt, itemKey, hydrated: cartLoaded, coupon } = useCart();
   // Matches the server's loading markup on the hydration render (see useHydrated).
   const hydrated = useHydrated() && cartLoaded;
   const shippingRules = useShippingRules();
@@ -45,18 +44,17 @@ export default function CartPage() {
   const shippingNote = qualifiesForFreeShipping(shippingRules, subtotalBdt) ? t("cart.shippingFree") : t("cart.calculatedAtCheckout");
 
   return (
-    <section className="section" style={{ maxWidth: 1100 }}>
-      <OceanicBand
-        kicker={t("cart.subtotal")}
-        name={t("cart.title")}
-      />
+    <section className="co-stage" aria-labelledby="bag-title">
+      <div className="stage-ghost" aria-hidden="true">{t("cart.title")}</div>
+      <div className="co-inner">
+      <div className="stage-kicker co-kicker"><span>01</span><h1 id="bag-title">{t("cart.title")}</h1><span>{t("stage.count", { count })}</span></div>
       <div className="cart-grid">
         <div>
           {items.map((i) => {
             const k = itemKey(i);
             return (
-              <div key={k} className="cart-line" style={{ background: "white", padding: 16, marginBottom: 12, border: "1px solid var(--line)" }}>
-                <Composition cat={i.cat} sku={i.sku} name={i.name} small style={{ aspectRatio: "3/4" }} />
+              <div key={k} className="cart-line bag-line">
+                <BagThumb item={i} />
                 <div>
                   <Link href={`/product/${i.slug}`} className="name">{i.name}</Link>
                   <div className="meta">{i.color || ""}{i.size ? ` · ${i.size}` : ""}</div>
@@ -65,7 +63,7 @@ export default function CartPage() {
                     <span>{i.qty}</span>
                     <button onClick={() => inc(k)} aria-label={t("common.increase")}>+</button>
                   </div>
-                  <div className="rm" onClick={() => remove(k)} role="button" tabIndex={0}>{t("cart.remove")}</div>
+                  <button type="button" className="rm" onClick={() => remove(k)}>{t("cart.remove")}</button>
                 </div>
                 <div className="price">{formatBdt(i.priceBdt * i.qty, locale)}</div>
               </div>
@@ -90,6 +88,7 @@ export default function CartPage() {
             {t("cart.checkout")} <Icon name="arrow" size={14} />
           </Link>
         </div>
+      </div>
       </div>
     </section>
   );

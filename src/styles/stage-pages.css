@@ -1,0 +1,48 @@
+/* Group 3 (owner 23 Nov 2026): search, wishlist, cart and checkout on the same warm stage as the
+   shop. Lists of pieces reuse the shop's Stage; these rules only frame the pages around it. */
+
+/* Search: the box sits on the stage's colour above the results. */
+.search-bar { background: var(--purple-50); padding: 18px clamp(16px, 3vw, 40px) 0; }
+.search-bar .search-page-form { max-width: 560px; }
+
+/* Search with nothing to show, and the empty wishlist: a quiet stage with the word behind it. */
+.search-quiet { position: relative; overflow: clip; background: var(--purple-50);
+  min-height: clamp(420px, 62svh, 640px); padding: clamp(28px, 5vw, 72px) clamp(16px, 4vw, 56px);
+  display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+.search-quiet > *:not(.stage-ghost) { position: relative; z-index: 1; }
+.search-quiet .stage-ghost { top: 4%; }
+.search-quiet .stage-kicker h1 { margin: 0; font: inherit; letter-spacing: inherit; color: var(--ink); }
+.search-quiet-hint { margin: 0; max-width: 52ch; font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
+.search-quiet .btn { align-self: flex-start; }
+
+/* A piece's small picture in the bag (drawer, bag page, checkout): the cut-out standing on
+   the cream, or its photo; a plain tile when it has neither (never drawn placeholder art). */
+.bag-thumb { display: grid; place-items: center; overflow: hidden; background: var(--purple-50);
+  border-radius: 12px; aspect-ratio: 3 / 4; }
+.bag-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.bag-thumb.is-cut img { object-fit: contain; padding: 6px; filter: drop-shadow(0 8px 8px rgb(40 20 60 / .14)); }
+.bag-thumb-blank { font: 400 22px/1 var(--serif); color: var(--purple-800); opacity: .5; }
+
+/* The header search's small pictures: a cut-out shows whole, a photo fills the square. */
+.search-row .search-thumb { border-radius: 8px; background: var(--purple-50); }
+.search-row .search-thumb.is-cut img { object-fit: contain; padding: 3px; }
+
+/* The bag page and checkout: the warm stage with the word faint behind, the steps and the
+   summary as cream cards floating on it. Layout and logic are the checkout's own. */
+.co-stage { position: relative; overflow: clip; background: var(--purple-50);
+  padding: clamp(18px, 3vw, 36px) clamp(16px, 4vw, 56px) clamp(48px, 6vw, 88px); min-height: 60svh; }
+.co-stage .stage-ghost { top: 3%; }
+.co-inner { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+.co-stage .panel { background: var(--cream); border: 1px solid var(--line); border-radius: 20px;
+  box-shadow: 0 24px 60px rgb(40 20 60 / .08); }
+.co-stage .bag-line { background: var(--cream); border: 1px solid var(--line); border-radius: 18px;
+  padding: 16px; margin-bottom: 12px; }
+.co-stage .bag-line .bag-thumb { width: 88px; }
+.cart-line button.rm { background: none; border: 0; padding: 0; font: inherit; font-size: 11px; display: block; }
+.checkout-panel .bag-thumb { width: 56px; border-radius: 8px; }
+.drawer .bag-thumb, .cart-drawer .bag-thumb { width: 100%; }
+
+/* Bag and checkout titles: the small numbered line of the other stages (the word behind is the big one). */
+.co-kicker { margin-bottom: 24px; }
+.co-kicker h1 { margin: 0; font: inherit; letter-spacing: inherit; color: var(--ink); }
+.co-stage .stage-ghost { top: 2%; }

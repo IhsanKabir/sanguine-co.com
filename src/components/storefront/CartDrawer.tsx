@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link, useRouter } from "@/i18n/routing";
 import { formatBdt } from "@/lib/utils";
 import { colorLabel, sizeLabel } from "@/lib/option-labels";
-import Composition from "./Composition";
+import BagThumb from "./BagThumb";
 import Icon from "./Icon";
 import CouponInput from "./CouponInput";
 import { useState, useCallback } from "react";
@@ -89,7 +89,7 @@ export default function CartDrawer() {
                 const isLeaving = leaving.has(k);
                 return (
                   <div key={k} className={"cart-line" + (isLeaving ? " removing" : "")}>
-                    <Composition cat={i.cat} sku={i.sku} name={i.name} small style={{ aspectRatio: "3/4" }} />
+                    <BagThumb item={i} />
                     <div>
                       <Link href={`/product/${i.slug}`} className="name" onClick={closeDrawer}>
                         {i.name}
@@ -126,7 +126,7 @@ export default function CartDrawer() {
                 const isLeaving = leaving.has(k);
                 return (
                   <div key={k} className={"cart-line" + (isLeaving ? " removing" : "")} style={{ opacity: 0.85 }}>
-                    <Composition cat={i.cat} sku={i.sku} name={i.name} small style={{ aspectRatio: "3/4" }} />
+                    <BagThumb item={i} />
                     <div>
                       <Link href={`/product/${i.slug}`} className="name" onClick={closeDrawer}>{i.name}</Link>
                       <div className="meta">{i.color ? colorLabel(i.color, locale) : ""}{i.size ? ` · ${sizeLabel(i.size, locale)}` : ""}</div>

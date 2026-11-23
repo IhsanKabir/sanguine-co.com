@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
-import { formatBdt } from "@/lib/utils";
-import Composition from "./Composition";
+import { priceDisplayText, type PriceDisplay } from "@/lib/pricing";
 import Icon from "./Icon";
 
 type SearchHit = {
@@ -13,9 +12,12 @@ type SearchHit = {
   sku: string;
   name: string;
   nameBn: string | null;
-  priceBdt: number;
+  display: PriceDisplay;
+  preorderOnly: boolean;
   cat: string | null;
   img: string | null;
+  /** img is a cut-out (shown whole on the cream), not a photo. */
+  cut: boolean;
 };
 
 export default function SearchDropdown() {
@@ -129,17 +131,16 @@ export default function SearchDropdown() {
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => onPick(p.slug)}
               >
-                {p.img ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- 44px thumbnail; the optimiser adds a round trip for nothing
-                  <span className="search-thumb"><img src={p.img} alt="" loading="lazy" /></span>
-                ) : (
-                  <Composition cat={p.cat || "clothing"} sku={p.sku} name={p.name} small />
-                )}
+                <span className={"search-thumb" + (p.cut ? " is-cut" : "")}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 44px thumbnail; the optimiser adds a round trip for nothing */}
+                  {p.img ? <img src={p.img} alt="" loading="lazy" /> : null}
+                </span>
                 <div>
                   <div className="ct">{p.cat || ""}</div>
                   <div className="nm">{(locale === "bn" && p.nameBn) || p.name}</div>
                 </div>
-                <div className="pr">{formatBdt(p.priceBdt, locale)}</div>
+                <div className="pr">{p.preorderOnly ? t("pdp.preorderOnly")
+                  : p.display.kind === "quote" ? t("pdp.priceOnQuote") : priceDisplayText(p.display, locale)}</div>
               </div>
             ))
           )}

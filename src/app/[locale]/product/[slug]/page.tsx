@@ -7,6 +7,7 @@ import { formatBdt } from "@/lib/utils";
 import { WHATSAPP_NUMBER } from "@/lib/contact";
 import Icon from "@/components/storefront/Icon";
 import PieceRow from "@/components/storefront/PieceRow";
+import WishHeart from "@/components/storefront/WishHeart";
 import { toStageItems } from "@/lib/stage-items";
 import PdpActionsClient from "@/components/storefront/PdpActionsClient";
 import { optionStock } from "@/lib/variant-stock";
@@ -294,6 +295,7 @@ export default async function ProductPage({ params }: Props) {
           />
         )}
         <div className="pdp-panel">
+          <WishHeart productId={p.id} className="stage-heart" />
           <p className="stage-panel-k">{segName || segTag}{(segName || segTag) && " · "}{p.preorderOnly ? t("pdp.preorderOnly") : p.sku}</p>
           <h1 id="pdp-title">{name}</h1>
           {lede && <p className="pdp-lede">{lede}</p>}
@@ -383,6 +385,8 @@ export default async function ProductPage({ params }: Props) {
                   name,
                   priceBdt: p.priceBdt,
                   cat: p.segmentId || "clothing",
+                  image: cutout?.small ?? photos[0]?.url ?? null,
+                  imageIsCut: !!cutout,
                 }}
                 colors={(p.colors as string[] | null) || []}
                 sizes={(p.sizes as string[] | null) || []}
