@@ -803,6 +803,11 @@
     "giftTitle": "ফুল, একটি কার্ড, আর একসাথে খেলার কিছু",
     "giftCard": "স্যাংগুইন কার্ড",
     "giftCardNote": "আপনার তোড়ার সাথেই আসে",
-    "giftBouquetNote": "অর্ডার পেয়ে তাজা বানানো"
+    "giftBouquetNote": "অর্ডার পেয়ে তাজা বানানো",
+    "viewBouquet": "তোড়া",
+    "viewPiece": "পণ্য",
+    "viewPhoto": "ছবি",
+    "views": "ছবিগুলো",
+    "detailsTitle": "এই পণ্য সম্পর্কে"
   }
 }

@@ -43,13 +43,14 @@ test.describe("baseline · cart + checkout shell", () => {
 });
 
 test.describe("baseline · catalogue flows @db", () => {
-  test("preorder-only PDP offers the preorder CTA (never a bare add-to-bag)", async ({ page }) => {
+  test("preorder-only PDP opens the pre-order form in place (never a bare add-to-bag)", async ({ page }) => {
     skipWithoutDb();
     await page.goto(`/en/product/${KNOWN_PRODUCT_SLUG}`);
-    // Every live catalogue product is preorder-only today; the PDP's CTA
-    // branch for that state is the preorder button linking to the request form.
-    const preorderCta = page.locator(`a[href*="/preorder/product/${KNOWN_PRODUCT_SLUG}"]`).first();
-    await expect(preorderCta).toBeVisible();
+    // Every live catalogue product is preorder-only today: the panel's Pre-order
+    // opens the request form right there, with no add-to-bag anywhere.
+    await expect(page.locator(".pdp-panel").getByRole("button", { name: /add to bag/i })).toHaveCount(0);
+    await page.locator(".pdp-panel .stage-cta").click();
+    await expect(page.locator(".pdp-panel form")).toBeVisible({ timeout: 30_000 });
   });
 
   test("preorder request form renders for a preorder-enabled product", async ({ page }) => {

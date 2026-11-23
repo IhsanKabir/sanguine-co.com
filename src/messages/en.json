@@ -803,6 +803,11 @@
     "giftTitle": "Flowers, a card, and something to share",
     "giftCard": "The Sanguine card",
     "giftCardNote": "Comes with your bouquet",
-    "giftBouquetNote": "Made fresh to order"
+    "giftBouquetNote": "Made fresh to order",
+    "viewBouquet": "Bouquet",
+    "viewPiece": "Piece",
+    "viewPhoto": "Photo",
+    "views": "Pictures",
+    "detailsTitle": "About this piece"
   }
 }

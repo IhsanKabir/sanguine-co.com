@@ -1,0 +1,118 @@
+/* The product page's stage (product/[slug], mockups/stage "Product page"): the piece stands cut
+   out on the warm page with its name faint behind it, its views numbered on the left, and the
+   panel floating on the right. Scene 02 below holds what is read rather than chosen. Motion is
+   the existing photo fade (opacity and a hair of scale), off on request. */
+
+.crumbs:has(+ .pdp-stage) { max-width: none; margin: 0; background: var(--purple-50);
+  padding: 18px clamp(16px, 4vw, 56px) 0; }
+
+.pdp-stage { position: relative; overflow: clip; background: var(--purple-50);
+  display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(320px, 440px); align-items: center;
+  gap: clamp(24px, 4vw, 72px); min-height: clamp(600px, calc(100svh - 150px), 880px);
+  padding: clamp(16px, 3vw, 36px) clamp(16px, 4vw, 56px) 48px; }
+.pdp-stage .stage-ghost { left: clamp(16px, 4vw, 56px); right: auto; top: 12%; text-align: left;
+  font-size: clamp(90px, 13vw, 220px); }
+html[lang="bn"] .pdp-stage .stage-ghost { font-size: clamp(70px, 10vw, 170px); }
+.pdp-stage .pdp-gallery { position: relative; z-index: 1; }
+
+.pdp-figure { position: relative; z-index: 1; display: grid; grid-template-columns: auto minmax(0, 1fr);
+  align-items: center; gap: 24px; }
+.pdp-stage:has(.stage-form) { align-items: start; }
+.pdp-stage:has(.stage-form) .pdp-figure { position: sticky; top: 120px; }
+.pdp-figure-main { grid-column: 2; grid-row: 1; display: grid; place-items: center; min-height: min(64vh, 620px); }
+.pdp-cut { display: block; width: auto; max-width: 100%; height: min(64vh, 620px); object-fit: contain;
+  filter: drop-shadow(0 34px 28px rgb(40 20 60 / .18)); }
+.pdp-photo { display: block; width: auto; max-width: 100%; height: min(62vh, 600px); aspect-ratio: 4 / 5;
+  object-fit: cover; border-radius: 18px; box-shadow: 0 30px 60px rgb(40 20 60 / .14); }
+
+.pdp-views { grid-column: 1; grid-row: 1; list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 2px; }
+.pdp-views button { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 2px;
+  background: none; border: 0; font: inherit; font-size: 12.5px; color: var(--ink-soft); cursor: pointer;
+  border-bottom: 1px solid transparent; }
+.pdp-views button span { font-size: 11px; letter-spacing: .1em; color: var(--purple-800); }
+.pdp-views button:hover { color: var(--ink); }
+.pdp-views button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--purple-800); }
+.pdp-views button:focus-visible { outline: 2px solid var(--purple-800); outline-offset: 2px; }
+
+.pdp-panel { position: relative; z-index: 2; background: var(--cream); border: 1px solid var(--line);
+  border-radius: 20px; padding: 30px 30px 26px; box-shadow: 0 30px 70px rgb(40 20 60 / .12); }
+.pdp-panel h1 { font: 400 clamp(34px, 3.2vw, 46px)/1.05 var(--serif); margin: 8px 0 10px; color: var(--ink); }
+html[lang="bn"] .pdp-panel h1 { line-height: 1.3; }
+.pdp-lede { margin: 0 0 14px; font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+.pdp-panel .pdp-price { margin: 6px 0 14px; padding-bottom: 14px; }
+.pdp-panel .pdp-price .now { font-size: 28px; }
+.pdp-panel .pdp-trust { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--line);
+  gap: 6px 14px; font-size: 12px; color: var(--ink-soft); }
+
+.pdp-details { max-width: 1400px; margin: 0 auto; padding: clamp(40px, 6vw, 88px) clamp(16px, 4vw, 56px); }
+.pdp-details .stage-kicker { margin-bottom: 28px; }
+.pdp-details .stage-kicker h2 { margin: 0; font: inherit; letter-spacing: inherit; color: var(--ink); }
+.pdp-details-body { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px 64px; align-items: start; }
+.pdp-details-body > * { grid-column: 1; }
+.pdp-details-body > .pdp-more { grid-column: 2; grid-row: 1 / span 3; margin: 0; }
+.pdp-details-body .pdp-feats { margin-top: 0; }
+.pdp-desc { margin: 0 0 16px; max-width: 38ch; font: 400 clamp(20px, 1.8vw, 26px)/1.45 var(--serif); color: var(--ink); }
+html[lang="bn"] .pdp-desc { font-family: inherit; font-size: 18px; line-height: 1.75; }
+.pdp-model-note { margin: 0 0 16px; font-size: 12px; font-style: italic; color: var(--ink-soft); }
+
+@media (max-width: 900px) {
+  .crumbs:has(+ .pdp-stage) { padding: 12px 16px 0; }
+  .pdp-stage { grid-template-columns: minmax(0, 1fr); min-height: 0; gap: 14px; padding: 8px 16px 28px; }
+  .pdp-stage .stage-ghost { left: 0; top: 4%; font-size: 26vw; }
+  html[lang="bn"] .pdp-stage .stage-ghost { font-size: 19vw; }
+  .pdp-figure { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .pdp-stage:has(.stage-form) .pdp-figure { position: relative; top: auto; }
+  .pdp-figure-main { grid-column: 1; min-height: 0; }
+  .pdp-views { grid-column: 1; grid-row: 2; flex-direction: row; justify-content: center; gap: 18px; }
+  .pdp-cut { height: min(50svh, 420px); }
+  .pdp-photo { height: min(52svh, 440px); }
+  .pdp-panel { padding: 22px 20px; }
+  .pdp-details-body { grid-template-columns: minmax(0, 1fr); }
+  .pdp-details-body > .pdp-more { grid-column: 1; grid-row: auto; }
+}
+
+/* The pre-order page (preorder/product/[slug]): the piece and its name on the left, the form in
+   a card on the right, on the same warm stage. */
+.crumbs:has(+ .pre-stage) { max-width: none; margin: 0; background: var(--purple-50);
+  padding: 18px clamp(16px, 4vw, 56px) 0; }
+.pre-stage { position: relative; overflow: clip; background: var(--purple-50);
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 560px); align-items: start;
+  gap: clamp(24px, 5vw, 88px); padding: clamp(20px, 3vw, 40px) clamp(16px, 4vw, 56px) clamp(40px, 5vw, 72px); }
+.pre-stage .stage-ghost { left: clamp(16px, 4vw, 56px); right: auto; top: 8%; text-align: left;
+  font-size: clamp(80px, 11vw, 190px); }
+html[lang="bn"] .pre-stage .stage-ghost { font-size: clamp(64px, 9vw, 150px); }
+.pre-piece { position: sticky; z-index: 1; top: 96px; }
+.pre-cut { display: block; width: auto; max-width: 100%; height: min(44vh, 420px); margin: 0 0 18px;
+  filter: drop-shadow(0 30px 24px rgb(40 20 60 / .16)); }
+.pre-photo { display: block; width: min(240px, 60%); height: auto; aspect-ratio: 4 / 5; object-fit: cover;
+  margin: 0 0 18px; border-radius: 16px; box-shadow: 0 24px 50px rgb(40 20 60 / .14); }
+.pre-piece h1 { font: 400 clamp(34px, 3.4vw, 50px)/1.05 var(--serif); margin: 10px 0; color: var(--ink); }
+html[lang="bn"] .pre-piece h1 { line-height: 1.3; }
+.pre-price { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); color: var(--ink); }
+.pre-when { margin: 0 0 14px; font-size: 13px; color: var(--purple-800); }
+.pre-intro { margin: 0; max-width: 46ch; font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
+.pre-card { position: relative; z-index: 2; background: var(--cream); border: 1px solid var(--line);
+  border-radius: 20px; padding: clamp(22px, 2.6vw, 34px); box-shadow: 0 30px 70px rgb(40 20 60 / .12); }
+
+@media (max-width: 860px) {
+  .crumbs:has(+ .pre-stage) { padding: 12px 16px 0; }
+  .pre-stage { grid-template-columns: minmax(0, 1fr); padding: 8px 16px 32px; gap: 20px; }
+  .pre-stage .stage-ghost { left: 0; top: 2%; font-size: 24vw; }
+  .pre-piece { position: relative; top: auto; }
+  .pre-cut { height: min(30svh, 260px); }
+  .pre-intro { font-size: 13px; }
+  .pre-card { padding: 20px 16px; }
+}
+
+/* Under the product: reviews, then numbered rows of pieces standing on the page. */
+.pdp-reviews { max-width: 1400px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 56px); }
+.piece-row { max-width: 1400px; margin: 0 auto; padding: clamp(40px, 6vw, 80px) clamp(16px, 4vw, 56px) 0; }
+.piece-row .stage-kicker { margin-bottom: 24px; }
+.piece-row .stage-kicker h2 { margin: 0; font: inherit; letter-spacing: inherit; color: var(--ink); }
+.piece-row-list { list-style: none; margin: 0; padding: 0 0 8px; display: flex; gap: clamp(16px, 3vw, 44px);
+  align-items: end; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+.piece-row-list li { flex: none; scroll-snap-align: start; }
+@media (max-width: 760px) {
+  .piece-row-list .stage-cut { height: 180px; }
+}

@@ -6,10 +6,16 @@ import { Link } from "@/i18n/routing";
 import { formatBdt } from "@/lib/utils";
 import { WHATSAPP_NUMBER } from "@/lib/contact";
 import Icon from "@/components/storefront/Icon";
-import ProductCard from "@/components/storefront/ProductCard";
+import PieceRow from "@/components/storefront/PieceRow";
+import { toStageItems } from "@/lib/stage-items";
 import PdpActionsClient from "@/components/storefront/PdpActionsClient";
 import { optionStock } from "@/lib/variant-stock";
 import PdpGallery from "@/components/storefront/PdpGallery";
+import PdpFigure from "@/components/storefront/PdpFigure";
+import PreorderPicker from "@/components/storefront/PreorderPicker";
+import SameDayLine from "@/components/storefront/SameDayLine";
+import { cutoutFor } from "@/lib/cutouts";
+import { getUploadedCutouts } from "@/lib/cutout-store";
 import { PdpStateProvider } from "@/components/storefront/PdpStateContext";
 import JsonLd from "@/components/seo/JsonLd";
 import ReviewsSection from "@/components/storefront/ReviewsSection";
@@ -111,17 +117,28 @@ export default async function ProductPage({ params }: Props) {
   if (!p) notFound();
   const seg = p.segmentId ? await getSegmentBySlug(p.segmentId).catch(() => null) : null;
   const lookIds = (p.lookProductIds as string[] | null) ?? [];
-  const [related, photos, approvedReviews, currentUser, lookItems, velocity] = await Promise.all([
+  const [related, photos, approvedReviews, currentUser, lookItems, velocity, uploadedCutouts] = await Promise.all([
     p.segmentId ? getRelatedProducts(p.id, p.segmentId).catch(() => []) : Promise.resolve([]),
     getProductImages(p.id).catch(() => []),
     listApprovedReviews(p.id).catch(() => []),
     getCurrentUser().catch(() => null),
     lookIds.length > 0 ? getProductsByIds(lookIds).catch(() => []) : Promise.resolve([]),
     getProductSalesVelocity(p.id).catch(() => 0),
+    getUploadedCutouts().catch(() => ({})),
   ]);
-  const lookHeroImages = lookItems.length > 0
-    ? await getHeroImagesFor(lookItems.map((i) => i.id)).catch(() => new Map())
+  const cutout = cutoutFor(p, uploadedCutouts);
+  const dhakaOnly = isDhakaOnlySegment(p.segmentId);
+  // The scenes under the product (complete the look, more like this): real cut-outs or photos only.
+  const rowItems = [...lookItems, ...related];
+  const rowPhotos = rowItems.length > 0
+    ? await getHeroImagesFor(rowItems.map((i) => i.id)).catch(() => new Map())
     : new Map();
+  const rowOpts = {
+    locale, uploaded: uploadedCutouts, photos: rowPhotos,
+    labels: { madeToOrder: t("pdp.preorderOnly"), priceOnQuote: t("pdp.priceOnQuote") },
+  };
+  const lookStage = toStageItems(lookItems, rowOpts);
+  const relatedStage = toStageItems(related, rowOpts);
 
   // Quotation-driven pricing state (Phase 1): what the customer sees and what
   // structured data may claim both come from the same helper: no surface may
@@ -149,6 +166,8 @@ export default async function ProductPage({ params }: Props) {
   const isBn = locale === "bn";
   const name = (isBn && p.nameBn) || p.name;
   const description = (isBn && p.descriptionBn) || p.description || "";
+  // The panel's one line under the name: the description's first sentence (full text in 02).
+  const lede = description.split(/(?<=[.!?।])\s+/)[0]?.trim() ?? "";
   const segName = seg ? ((isBn && seg.nameBn) || seg.name) : "";
   const segTag = seg ? ((isBn && seg.tagBn) || seg.tag) : "";
   // Optional blocks (0018): each shows only when the admin filled it in. The
@@ -257,19 +276,27 @@ export default async function ProductPage({ params }: Props) {
         <span className="current">{name}</span>
       </div>
       <PdpStateProvider>
-      <section className="pdp" data-cursor="loupe">
-        <PdpGallery
-          photos={photos.map((ph) => ({ url: ph.url, alt: ph.alt }))}
-          fallback={{
-            cat: p.segmentId || "clothing",
-            sku: p.sku,
-            name: p.name,
-            tag: p.tag,
-          }}
-        />
-        <div className="pdp-info">
-          <div className="collection">{(segTag || "").toUpperCase()} · {p.sku}</div>
-          <h1>{name}</h1>
+      <section className="pdp-stage" aria-labelledby="pdp-title">
+        <div className="stage-ghost" aria-hidden="true">{name}</div>
+        {cutout || photos.length > 0 ? (
+          <PdpFigure
+            name={name}
+            cutout={cutout}
+            photos={photos.map((ph) => ({ url: ph.url, alt: ph.alt }))}
+            cutoutLabel={dhakaOnly ? t("stage.viewBouquet") : t("stage.viewPiece")}
+            photoLabel={t("stage.viewPhoto")}
+            listLabel={t("stage.views")}
+          />
+        ) : (
+          <PdpGallery
+            photos={[]}
+            fallback={{ cat: p.segmentId || "clothing", sku: p.sku, name: p.name, tag: p.tag }}
+          />
+        )}
+        <div className="pdp-panel">
+          <p className="stage-panel-k">{segName || segTag}{(segName || segTag) && " · "}{p.preorderOnly ? t("pdp.preorderOnly") : p.sku}</p>
+          <h1 id="pdp-title">{name}</h1>
+          {lede && <p className="pdp-lede">{lede}</p>}
           {/* A "0.0 · 0 reviews" row reads as a damning score: render only with real reviews. */}
           {p.reviewCount > 0 && (
             <div className="pdp-rating">
@@ -282,6 +309,8 @@ export default async function ProductPage({ params }: Props) {
           {velocity > 10 && (
             <div className="pdp-velocity">{t("pdp.velocity", { count: velocity })}</div>
           )}
+          {/* A made-to-order quote needs no price row: the fine print says how it is priced. */}
+          {!(p.preorderOnly && display.kind === "quote") && (
           <div className="pdp-price">
             {display.kind === "quote" ? (
               <span className="now">{t("pdp.priceOnQuote")}</span>
@@ -300,8 +329,19 @@ export default async function ProductPage({ params }: Props) {
               </>
             )}
           </div>
-          {/* Trust line: delivery, payment and returns sit right under the
-              price so they are on the first screen on a phone. */}
+          )}
+          {p.preorderOnly && dhakaOnly && <SameDayLine cutoffMin={commerce.expressCutoffMin} />}
+          {p.preorderOnly && p.preorderEnabled && (
+            <PreorderPicker
+              product={{
+                id: p.id, slug: p.slug, name, dhakaOnly, canPreorder: true,
+                colors: (p.colors as string[] | null) || [],
+                sizes: (p.sizes as string[] | null) || [],
+              }}
+              expressCutoffMin={commerce.expressCutoffMin}
+            />
+          )}
+          {/* Trust line: delivery, payment and returns, on the first screen on a phone. */}
           <ul className="pdp-trust" aria-label={t("pdp.trustLabel")}>
             {sellableNow ? (
               <li><Icon name="arrow" size={13} /><DeliveryEstimate /></li>
@@ -329,14 +369,10 @@ export default async function ProductPage({ params }: Props) {
             </li>
           </ul>
           {p.preorderOnly ? (
-            <PreorderButton
-              slug={p.slug}
-              estimatedDelivery={p.estimatedDelivery}
-              sameDayUsual={isDhakaOnlySegment(p.segmentId)}
-              display={display}
-              depositPct={depositPct}
-              locale={locale}
-            />
+            // Made to order: the picker above takes the order in place.
+            p.preorderEnabled ? null : (
+              <NotifyMeButton productId={p.id} productName={name} defaultEmail={currentUser?.email ?? ""} />
+            )
           ) : p.stock > 0 ? (
             <>
               <PdpActionsClient
@@ -402,20 +438,17 @@ export default async function ProductPage({ params }: Props) {
           {!p.preorderOnly && p.stock === 0 && p.preorderEnabled && (
             <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>{t("pdp.outOfStockPreorder")}</div>
           )}
-          {p.preorderOnly && (
-            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>{t("pdp.preorderOnly")}</div>
-          )}
+        </div>
+      </section>
+      </PdpStateProvider>
 
-          {/* Description after the buy/preorder button: on a phone the
-              button now sits on the first screen with the price. */}
-          <div style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.7, marginTop: 20, marginBottom: p.modelNote ? 12 : 20 }}>
-            {description}
-          </div>
-          {p.modelNote && (
-            <div style={{ fontSize: 12, color: "var(--ink-soft)", fontStyle: "italic", marginBottom: 20 }}>
-              {p.modelNote}
-            </div>
-          )}
+      {/* Scene 02: everything that is read rather than chosen. */}
+      <section className="pdp-details" aria-labelledby="pdp-details-title">
+        <div className="stage-kicker"><span>02</span><h2 id="pdp-details-title">{t("stage.detailsTitle")}</h2></div>
+        <div className="pdp-details-body">
+          <div className="pdp-details-text">
+          {description && <p className="pdp-desc">{description}</p>}
+          {p.modelNote && <p className="pdp-model-note">{p.modelNote}</p>}
 
           {/* Shipping estimate */}
           <div className="pdp-shipping-note">
@@ -430,6 +463,7 @@ export default async function ProductPage({ params }: Props) {
                   dhaka: formatBdt(commerce.shippingDhakaBdt, locale as "en" | "bn"),
                   outside: formatBdt(commerce.shippingOutsideBdt, locale as "en" | "bn"),
                 })}
+          </div>
           </div>
 
           {(sizeGuide || details || care) && (
@@ -471,7 +505,7 @@ export default async function ProductPage({ params }: Props) {
           )}
         </div>
       </section>
-      </PdpStateProvider>
+      <div className="pdp-reviews">
       <ReviewsSection
         productId={p.id}
         reviews={approvedReviews}
@@ -479,37 +513,10 @@ export default async function ProductPage({ params }: Props) {
         signedInButIneligible={signedInButIneligible}
         signInHref={`/${locale}/sign-in?next=${encodeURIComponent(`/${locale}/product/${p.slug}`)}`}
       />
-      {lookItems.length > 0 && (
-        <section className="section">
-          <div className="section-hd">
-            <div>
-              <div className="kicker">{t("pdp.styleKicker")}</div>
-              <h2>{t("pdp.completeLook")}</h2>
-            </div>
-          </div>
-          <div className="grid grid-4">
-            {lookItems.map((item) => (
-              <ProductCard key={item.id} product={item} segmentTag="" heroImage={lookHeroImages.get(item.id) ?? null} quickView={false} />
-            ))}
-          </div>
-        </section>
-      )}
+      </div>
+      <PieceRow n="03" title={t("pdp.completeLook")} items={lookStage} />
+      <PieceRow n={lookStage.length > 0 ? "04" : "03"} title={t("pdp.fromSameHouse")} items={relatedStage} />
       <RecentlyViewedStrip excludeId={p.id} />
-      {related.length > 0 && (
-        <section className="section">
-          <div className="section-hd">
-            <div>
-              <div className="kicker">{t("pdp.alsoLike")}</div>
-              <h2>{t("pdp.fromSameHouse")}</h2>
-            </div>
-          </div>
-          <div className="grid grid-4">
-            {related.map((r) => (
-              <ProductCard key={r.id} product={r} segmentTag={segTag} />
-            ))}
-          </div>
-        </section>
-      )}
     </>
   );
 }

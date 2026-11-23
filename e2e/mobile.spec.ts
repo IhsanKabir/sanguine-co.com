@@ -42,19 +42,22 @@ test.describe("mobile · 390px touch profile", () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
-  test("PDP renders without overflow and thumbs stay thumbnail-sized @db", async ({ page }) => {
+  test("PDP renders without overflow, the picture fits and its views are tappable @db", async ({ page }) => {
     skipWithoutDb();
     await page.goto(`/en/product/${KNOWN_PRODUCT_SLUG}`);
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
     expect(overflow).toBeLessThanOrEqual(1);
-    const thumb = page.locator(".pdp-thumb").first();
-    if (await thumb.count() > 0) {
-      const tb = await thumb.boundingBox();
-      // Pre-fix these blew up to full-width squares (or collapsed to 0).
-      expect(tb!.width).toBeGreaterThan(20);
-      expect(tb!.width).toBeLessThanOrEqual(80);
+    const picture = page.locator(".pdp-figure-main img").first();
+    const pb = await picture.boundingBox();
+    expect(pb).not.toBeNull();
+    expect(pb!.width).toBeGreaterThan(120);
+    expect(pb!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+    const view = page.locator(".pdp-views button").first();
+    if (await view.count() > 0) {
+      const vb = await view.boundingBox();
+      expect(vb!.height).toBeGreaterThanOrEqual(44);   // a thumb-sized target
     }
   });
 });
