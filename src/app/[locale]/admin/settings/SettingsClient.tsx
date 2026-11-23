@@ -1,16 +1,21 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { EXPRESS_CUTOFF_EARLIEST_MIN, EXPRESS_CUTOFF_LATEST_MIN, EXPRESS_CUTOFF_STEP_MIN, expressCutoffLabel } from "@/lib/delivery";
 import { Link } from "@/i18n/routing";
 import { updateCommerceSettings } from "@/lib/actions/admin";
 import type { CommerceSettings } from "@/lib/commerce";
+import ExpressSettings from "./ExpressSettings";
+import type { ExpressOverrides } from "@/lib/express-fee-store";
 
 type Brand = { name: string; tagline?: string; email?: string; announcement?: string };
 
 type Gateway = { connected: boolean; live: boolean };
 
-export default function SettingsClient({ initialBrand, initialCommerce, gateway, smsConnected }: { initialBrand: Brand; initialCommerce: CommerceSettings; gateway: Gateway; smsConnected: boolean }) {
+export default function SettingsClient({ initialBrand, initialCommerce, gateway, smsConnected, personalExpress }: {
+  initialBrand: Brand; initialCommerce: CommerceSettings; gateway: Gateway; smsConnected: boolean;
+  /** Customers with their own express fee; null when this staff member may not see Customers. */
+  personalExpress: ExpressOverrides | null;
+}) {
   const [commerce, setCommerce] = useState({
     preorderDepositPct: String(initialCommerce.preorderDepositPct),
     returnWindowDays: String(initialCommerce.returnWindowDays),
@@ -75,33 +80,24 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
     });
   };
 
-  // Same-day express cutoff (lib/delivery.ts): same commerce row, minutes after midnight in Dhaka.
-  const toTime = (min: number) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
-  const [cutoff, setCutoff] = useState(toTime(initialCommerce.expressCutoffMin));
-  const [cutoffMsg, setCutoffMsg] = useState<string | null>(null);
-  const [cutoffPending, startCutoff] = useTransition();
-  const saveCutoff = () => {
-    const [h, m] = cutoff.split(":").map(Number);
-    const min = h * 60 + m;
-    if (!Number.isInteger(min) || min < EXPRESS_CUTOFF_EARLIEST_MIN || min > EXPRESS_CUTOFF_LATEST_MIN || min % EXPRESS_CUTOFF_STEP_MIN !== 0) {
-      setCutoffMsg(`Choose a time between ${toTime(EXPRESS_CUTOFF_EARLIEST_MIN)} and ${toTime(EXPRESS_CUTOFF_LATEST_MIN)}, on the quarter hour.`);
-      return;
-    }
-    setCutoffMsg(null);
-    startCutoff(async () => {
-      const res = await updateCommerceSettings({ expressCutoffMin: min });
-      setCutoffMsg(res.ok ? `Saved: the site now says "order by ${expressCutoffLabel("en", min)}".` : "Save failed.");
-    });
-  };
-
   return (
     <>
       <h1 className="admin-h1">Settings</h1>
       <p className="admin-sub">Shipping rules, payment methods, locales. Changes apply across the storefront.</p>
+      {/* Jump to a section: the page is long, and each section saves on its own. */}
+      <nav className="admin-jump" aria-label="Settings sections">
+        <a href="#express">Same-day express</a>
+        <a href="#preorders">Preorders &amp; returns</a>
+        <a href="#shipping">Shipping</a>
+        <a href="#cod">Cash on delivery</a>
+        <a href="#payments">Payment methods</a>
+        <a href="#locales">Locales</a>
+        <a href="#house">House details</a>
+      </nav>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
         {/* House details: moved to Editorial */}
-        <div className="panel">
+        <div className="panel" id="house">
           <h3>House details</h3>
           <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 0, lineHeight: 1.6 }}>
             Brand name, tagline, announcement bar and every other customer-facing string now live in
@@ -114,7 +110,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
         </div>
 
         {/* Quotation-driven pricing: the two live levers of the preorder model */}
-        <div className="panel">
+        <div className="panel" id="preorders">
           <h3>Preorders & returns</h3>
           <div className="row">
             <div className="field">
@@ -146,29 +142,11 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
           </div>
         </div>
 
-        {/* Same-day express: the last order time */}
-        <div className="panel">
-          <h3>Same-day express</h3>
-          <div className="row">
-            <div className="field">
-              <label htmlFor="express-cutoff">Last order time (Dhaka)</label>
-              <input id="express-cutoff" type="time" step={EXPRESS_CUTOFF_STEP_MIN * 60} min={toTime(EXPRESS_CUTOFF_EARLIEST_MIN)} max={toTime(EXPRESS_CUTOFF_LATEST_MIN)} value={cutoff} onChange={(e) => setCutoff(e.target.value)} />
-            </div>
-          </div>
-          <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 10, lineHeight: 1.6 }}>
-            Same-day orders close at this time. The home page countdown, the order form, product pages,
-            the FAQ and the delivery page all follow it. Videos and captions already posted still say the old time.
-          </p>
-          <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 8 }}>
-            <button className="btn btn-primary btn-sm" onClick={saveCutoff} disabled={cutoffPending}>
-              {cutoffPending ? "Saving…" : "Save"}
-            </button>
-            {cutoffMsg && <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{cutoffMsg}</span>}
-          </div>
-        </div>
+        {/* Same-day express: fee, free rules and last order time */}
+        <ExpressSettings initial={initialCommerce} personal={personalExpress} />
 
         {/* Shipping: live */}
-        <div className="panel">
+        <div className="panel" id="shipping">
           <h3>Shipping</h3>
           <div className="row">
             <div className="field">
@@ -201,7 +179,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
         </div>
 
         {/* Cash-on-delivery phone check: live */}
-        <div className="panel">
+        <div className="panel" id="cod">
           <h3>Cash on delivery: phone check</h3>
           <label style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 14 }}>
             <input type="checkbox" checked={codCheck.on} onChange={(e) => setCodCheck({ ...codCheck, on: e.target.checked })} />
@@ -236,7 +214,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
         {/* Payment methods: status only. Online methods need a payment
             gateway integration; until then checkout offers COD alone, so no
             switch here may suggest otherwise. */}
-        <div className="panel">
+        <div className="panel" id="payments">
           <h3>Payment methods</h3>
           {([
             ["Cash on Delivery", "Always offered at checkout", true],
@@ -266,7 +244,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
         </div>
 
         {/* Locales */}
-        <div className="panel">
+        <div className="panel" id="locales">
           <h3>Locales</h3>
           <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 0 }}>The storefront serves both English and বাংলা.</p>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid var(--line)" }}>

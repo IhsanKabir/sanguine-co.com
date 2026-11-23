@@ -25,6 +25,7 @@ import { priceDisplay, effectiveDepositPct, depositForQuote } from "@/lib/pricin
 import { getCommerceSettings } from "@/lib/commerce";
 import { isValidDeliveryDate, GIFT_MESSAGE_MAX, dhakaToday } from "@/lib/delivery";
 import { expressCheck, EXPRESS_ORDER_NOTE, PREORDER_ORDER_PREFIX } from "@/lib/express";
+import { expressFeeFor } from "@/lib/express-fee-store";
 import { preorderMoney, REFERRAL_BDT } from "@/lib/referral";
 import { checkReferralCode, codeForEmail, referralDiscountForQuote, settleReferralAtConversion } from "@/lib/referral-server";
 import { confirmWhatsAppUrl, type ConfirmMessageInput } from "@/lib/quote-message";
@@ -216,11 +217,15 @@ export async function createProductPreorderRequest(
   if (isDhakaOnlySegment(product.segmentId) && data.deliveryAddress && !isDhakaCity(data.deliveryAddress.city)) {
     return { ok: false as const, error: "Flowers are delivered in Dhaka only. Please give a Dhaka address." };
   }
-  const express = expressCheck(Boolean(data.express), product.segmentId, Boolean(data.deliveryAddress), new Date(), (await getCommerceSettings()).expressCutoffMin);
+  // This customer's fee (personal, free rules or standard), decided here and stored on the request.
+  const expressFee = data.express ? (await expressFeeFor(email, user?.id ?? null)).feeBdt : 0;
+  const express = expressCheck(Boolean(data.express), product.segmentId, Boolean(data.deliveryAddress), new Date(), (await getCommerceSettings()).expressCutoffMin, expressFee);
   if (!express.ok) return express;
+  // null = standard delivery; 0 = express, free. Never test the fee for truth.
+  const isExpress = express.feeBdt !== null;
   const referral = await checkReferralCode(data.referralCode, { email, customerId: user?.id ?? null, phone: data.customerPhone });
   if (!referral.ok) return referral;
-  const targetDate = express.feeBdt ? dhakaToday(new Date()) : data.targetDate || null;
+  const targetDate = isExpress ? dhakaToday(new Date()) : data.targetDate || null;
 
   // Snapshot what the customer was shown (estimate range + deposit %): the
   // quote may differ after research, but the advertised numbers must be on
@@ -237,7 +242,7 @@ export async function createProductPreorderRequest(
     `Preorder · ${product.name}`,
     data.color ? `Colour: ${data.color}` : null,
     data.size ? `Size: ${data.size}` : null,
-    express.feeBdt ? `${EXPRESS_ORDER_NOTE} (+${express.feeBdt} BDT): deliver today, ${targetDate}` : null,
+    isExpress ? `${EXPRESS_ORDER_NOTE} (${express.feeBdt ? `+${express.feeBdt} BDT` : "free"}): deliver today, ${targetDate}` : null,
     referral.code ? `Referral code: ${referral.code}` : null,
     data.notes ? `Notes: ${data.notes}` : null,
   ].filter(Boolean).join(" · ");
@@ -583,7 +588,8 @@ export async function convertPreorderToOrder(input: z.infer<typeof convertSchema
       notes: [
         `Bespoke pre-order · request ${req.id}`,
         depositPaid > 0 ? `deposit ${depositPaid} BDT prepaid` : null,
-        expressFee > 0 ? `${EXPRESS_ORDER_NOTE} (${expressFee} BDT)` : null,
+        // The marker tells the courier booking it is same-day, free or not (null = standard).
+        req.expressFeeBdt != null ? `${EXPRESS_ORDER_NOTE} (${expressFee > 0 ? `${expressFee} BDT` : "free"})` : null,
         money.discount > 0 ? `referral -${money.discount} BDT` : null,
       ].filter(Boolean).join(" · "),
     }).returning({ id: schema.orders.id });

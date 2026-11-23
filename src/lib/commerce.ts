@@ -2,7 +2,9 @@ import { unstable_cache } from "next/cache";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db, schema } from "./db";
-import { DEFAULT_EXPRESS_CUTOFF_MIN, EXPRESS_CUTOFF_EARLIEST_MIN, EXPRESS_CUTOFF_LATEST_MIN, EXPRESS_CUTOFF_STEP_MIN } from "./delivery";
+import { DEFAULT_EXPRESS_CUTOFF_MIN, DEFAULT_EXPRESS_FEE_BDT, EXPRESS_CUTOFF_EARLIEST_MIN, EXPRESS_CUTOFF_LATEST_MIN, EXPRESS_CUTOFF_STEP_MIN, MAX_EXPRESS_FEE_BDT } from "./delivery";
+import { TIER_NAMES } from "./loyalty";
+import type { ExpressFeeRules } from "./express-fee";
 import {
   DEFAULT_PREORDER_DEPOSIT_PCT,
   DEFAULT_RETURN_WINDOW_DAYS,
@@ -20,6 +22,8 @@ import {
  *                        total uses (lib/pricing.ts#shippingFor)
  *   codPhoneCheck / codPhoneCheckMinBdt
  *                     : SMS code before a COD order at or over the minimum
+ *   expressFeeBdt / expressFreeFromOrder / expressFreeTier
+ *                     : same-day express fee and when it is free (lib/express-fee.ts)
  *
  * Cached with tag-based invalidation exactly like lib/copy.ts: the admin
  * Settings action revalidates COMMERCE_CACHE_TAG after every save. Never
@@ -45,6 +49,13 @@ export const commerceSchema = z.object({
   // Same-day express: last order time, minutes after midnight in Dhaka (lib/delivery.ts).
   expressCutoffMin: z.number().int().min(EXPRESS_CUTOFF_EARLIEST_MIN).max(EXPRESS_CUTOFF_LATEST_MIN)
     .refine((m) => m % EXPRESS_CUTOFF_STEP_MIN === 0, "Use a time on the quarter hour.").default(DEFAULT_EXPRESS_CUTOFF_MIN),
+  // Same-day express fee and its free rules (owner, 23 Nov 2026). Defaults keep the old
+  // behaviour: ৳200, never free automatically.
+  expressFeeBdt: z.number().int().min(0).max(MAX_EXPRESS_FEE_BDT).default(DEFAULT_EXPRESS_FEE_BDT),
+  /** Free on every order from this one on (2 = from the second order); null = off. */
+  expressFreeFromOrder: z.number().int().min(2).max(50).nullable().default(null),
+  /** Free for this tier and above; null = off. */
+  expressFreeTier: z.enum(TIER_NAMES).nullable().default(null),
 });
 
 export type CommerceSettings = z.infer<typeof commerceSchema>;
@@ -56,7 +67,15 @@ export const COMMERCE_DEFAULTS: CommerceSettings = {
   codPhoneCheck: true,
   codPhoneCheckMinBdt: 0,
   expressCutoffMin: DEFAULT_EXPRESS_CUTOFF_MIN,
+  expressFeeBdt: DEFAULT_EXPRESS_FEE_BDT,
+  expressFreeFromOrder: null,
+  expressFreeTier: null,
 };
+
+/** The express fee rules out of the saved settings. */
+export function expressRulesOf(c: CommerceSettings): ExpressFeeRules {
+  return { feeBdt: c.expressFeeBdt, freeFromOrder: c.expressFreeFromOrder, freeFromTier: c.expressFreeTier };
+}
 
 export function shippingRulesOf(c: CommerceSettings): ShippingRules {
   return {

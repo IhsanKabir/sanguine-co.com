@@ -17,25 +17,15 @@ import ReferralCard from "./ReferralCard";
 import RecentlyViewedStrip from "@/components/storefront/RecentlyViewedStrip";
 import EmailVerificationBanner from "./EmailVerificationBanner";
 import SignOutButton from "./SignOutButton";
+import { tierFor } from "@/lib/loyalty";
 
 export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ locale: string }> };
 
 // ─── Loyalty tiers (mirrored from LoyaltyCard for header badge) ──────────────
-const TIER_NAMES = [
-  { min: 0,       name: "Member",     color: "var(--purple-400)" },
-  { min: 10_000,  name: "Insider",      color: "var(--mauve)" },
-  { min: 50_000,  name: "Circle",   color: "var(--gold)" },
-  { min: 150_000, name: "Inner Circle",         color: "oklch(0.78 0.15 78)" },
-];
-
-function getTierName(spend: number) {
-  for (let i = TIER_NAMES.length - 1; i >= 0; i--) {
-    if (spend >= TIER_NAMES[i].min) return TIER_NAMES[i];
-  }
-  return TIER_NAMES[0];
-}
+// Tiers and thresholds: lib/loyalty.ts (shared with Admin and the express fee rules).
+const getTierName = tierFor;
 
 function monogram(name: string | null | undefined, email: string): string {
   if (name?.trim()) {
@@ -275,8 +265,10 @@ export default async function AccountPage({ params }: Props) {
                       {r.referralDiscountBdt ? (
                         <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>{t("accountPage.minusReferral", { amount: formatBdt(r.referralDiscountBdt, loc) })}</div>
                       ) : null}
-                      {r.expressFeeBdt ? (
-                        <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>{t("accountPage.plusExpress", { amount: formatBdt(r.expressFeeBdt, loc) })}</div>
+                      {r.expressFeeBdt != null ? (
+                        <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>
+                          {r.expressFeeBdt > 0 ? t("accountPage.plusExpress", { amount: formatBdt(r.expressFeeBdt, loc) }) : t("accountPage.expressFree")}
+                        </div>
                       ) : null}
                       {r.depositBdt ? (
                         <div style={{ fontSize: 11, color: "var(--gold-deep)" }}>

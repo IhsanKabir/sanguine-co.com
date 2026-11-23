@@ -41,10 +41,13 @@ export function formatArrival(d: Date, locale: "en" | "bn"): string {
 
 /**
  * Same-day express for flowers in Dhaka (owner, 2026-11-15). Bouquets usually
- * go out the same day anyway; express makes it a promise for a fixed fee,
- * collected in advance with the deposit.
+ * go out the same day anyway; express makes it a promise for a fee, collected
+ * in advance with the deposit. The fee and its free rules are set in Admin,
+ * Settings (lib/commerce.ts, lib/express-fee.ts); this is the starting fee.
  */
-export const EXPRESS_FEE_BDT = 200;
+export const DEFAULT_EXPRESS_FEE_BDT = 200;
+/** Highest standard express fee Admin accepts (a guard against a typo like 20000). */
+export const MAX_EXPRESS_FEE_BDT = 5_000;
 /** Express requests close at this hour, Dhaka time (24-hour clock). */
 /**
  * The same-day cutoff, in minutes after midnight in Dhaka. Set in Admin, Settings

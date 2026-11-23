@@ -1,4 +1,4 @@
-import { EXPRESS_FEE_BDT, expressCutoffLabel, isExpressOpen } from "@/lib/delivery";
+import { expressCutoffLabel, isExpressOpen } from "@/lib/delivery";
 import { isDhakaOnlySegment } from "@/lib/delivery-scope";
 
 /** Marks a same-day express order in its notes; the courier booking reads it. */
@@ -18,8 +18,10 @@ export function isExpressOrder(order: { number: string; notes: string | null }):
 /**
  * Same-day express rules: flowers only, before the cutoff, and with an
  * address (there is no time to ask for one). Pure, so it can be tested.
+ * feeBdt is this customer's fee (lib/express-fee.ts). In the result, null
+ * means standard delivery and 0 means express, free: never test it for truth.
  */
-export function expressCheck(wanted: boolean, segmentId: string | null, hasAddress: boolean, now: Date, cutoffMin: number):
+export function expressCheck(wanted: boolean, segmentId: string | null, hasAddress: boolean, now: Date, cutoffMin: number, feeBdt: number):
   { ok: true; feeBdt: number | null } | { ok: false; error: string } {
   if (!wanted) return { ok: true, feeBdt: null };
   if (!isDhakaOnlySegment(segmentId)) return { ok: false, error: "Same-day express is for flowers in Dhaka." };
@@ -27,5 +29,5 @@ export function expressCheck(wanted: boolean, segmentId: string | null, hasAddre
     return { ok: false, error: `Same-day express closes at ${expressCutoffLabel("en", cutoffMin)}. Please choose a delivery day instead.` };
   }
   if (!hasAddress) return { ok: false, error: "Please add the delivery address for same-day express." };
-  return { ok: true, feeBdt: EXPRESS_FEE_BDT };
+  return { ok: true, feeBdt };
 }

@@ -14,6 +14,7 @@ import { localizeEstimate } from "@/lib/delivery";
 import { getCommerceSettings } from "@/lib/commerce";
 import { cutoutFor } from "@/lib/cutouts";
 import { getUploadedCutouts } from "@/lib/cutout-store";
+import { expressFeeFor } from "@/lib/express-fee-store";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,7 @@ export default async function ProductPreorderPage({ params, searchParams }: Prop
 
   // No sign-in wall: guests preorder with their email (0021).
   const user = await getCurrentUser();
-  const [prefill, seg, photos, uploaded, commerce] = await Promise.all([
+  const [prefill, seg, photos, uploaded, commerce, expressFee] = await Promise.all([
     getCustomerPrefill(user),
     product.segmentId
       ? db.select().from(schema.segments).where(eq(schema.segments.id, product.segmentId)).limit(1).then((r) => r[0] ?? null)
@@ -50,6 +51,8 @@ export default async function ProductPreorderPage({ params, searchParams }: Prop
     getProductImages(product.id).catch(() => []),
     getUploadedCutouts().catch(() => ({})),
     getCommerceSettings(),
+    // This visitor's same-day fee: theirs when signed in, the standard one for a guest.
+    expressFeeFor(user?.email ?? null, user?.id ?? null).catch(() => null),
   ]);
 
   const isBn = locale === "bn";
@@ -105,6 +108,7 @@ export default async function ProductPreorderPage({ params, searchParams }: Prop
             prefill={prefill}
             dhakaOnly={dhakaOnly}
             expressCutoffMin={commerce.expressCutoffMin}
+            expressFeeBdt={expressFee?.feeBdt ?? commerce.expressFeeBdt}
             signInHref={`/sign-in?next=/${locale}/preorder/product/${slug}`}
             colors={colors}
             sizes={sizes}

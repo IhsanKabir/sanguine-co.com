@@ -8,7 +8,7 @@ import { colorLabel, sizeLabel } from "@/lib/option-labels";
 import { Link } from "@/i18n/routing";
 import DeliveryOptionsFields from "@/components/storefront/DeliveryOptionsFields";
 import { createProductPreorderRequest } from "@/lib/actions/preorders";
-import { EXPRESS_FEE_BDT, expressCutoffLabel, isExpressOpen } from "@/lib/delivery";
+import { expressCutoffLabel, isExpressOpen } from "@/lib/delivery";
 import { formatBdt } from "@/lib/utils";
 import { REFERRAL_BDT, REFERRAL_MIN_ORDER_BDT, normalizeReferralCode } from "@/lib/referral";
 import { REF_STORAGE_KEY } from "@/components/storefront/RefCapture";
@@ -27,6 +27,10 @@ type Props = {
   dhakaOnly: boolean;
   /** Same-day express: last order time, minutes after midnight in Dhaka (Admin, Settings). */
   expressCutoffMin: number;
+  /** This visitor's same-day express fee as far as known (personal or a free rule when signed
+   *  in, else the standard fee); 0 = free. The server decides the fee charged, and the quote
+   *  states the final price before any payment. */
+  expressFeeBdt: number;
   signInHref: string;
   colors: string[];
   sizes: string[];
@@ -42,6 +46,7 @@ export default function ProductPreorderForm({
   prefill,
   dhakaOnly,
   expressCutoffMin,
+  expressFeeBdt,
   signInHref,
   colors,
   sizes,
@@ -222,7 +227,7 @@ export default function ProductPreorderForm({
             <>
               <label style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 15, color: "var(--purple-900)", cursor: "pointer" }}>
                 <input type="checkbox" checked={express} onChange={(e) => { setExpress(e.target.checked); if (e.target.checked) setDeliveryDate(""); }} />
-                {t("preorderForm.expressLabel", { fee: formatBdt(EXPRESS_FEE_BDT, locale) })}
+                {expressFeeBdt > 0 ? t("preorderForm.expressLabel", { fee: formatBdt(expressFeeBdt, locale) }) : t("preorderForm.expressLabelFree")}
               </label>
               <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 6, lineHeight: 1.6 }}>
                 {t("preorderForm.expressHint", { cutoff: expressCutoffLabel(locale, expressCutoffMin) })}

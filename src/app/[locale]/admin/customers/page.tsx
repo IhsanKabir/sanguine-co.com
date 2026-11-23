@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { formatBdt, formatDate } from "@/lib/utils";
 import { requirePermission } from "@/lib/auth-utils";
 import Link from "next/link";
+import { tierFor as loyaltyTierFor, tierRank } from "@/lib/loyalty";
 
 type CustomerRow = {
   email: string;
@@ -15,15 +16,11 @@ type CustomerRow = {
   lastOrderAt: Date | null;
 };
 
-const TIERS = [
-  { min: 150_000, name: "Grand Élite",       pill: "pill-ok"   },
-  { min: 50_000,  name: "Patron de Maison",   pill: "pill-ok"   },
-  { min: 10_000,  name: "Atelier Guest",       pill: "pill-info" },
-  { min: 0,       name: "Maison Initié",       pill: "pill-warn" },
-] as const;
-
+/** Admin badge colour per tier, lowest first (names and thresholds: lib/loyalty.ts). */
+const TIER_PILLS = ["pill-warn", "pill-info", "pill-ok", "pill-ok"] as const;
 function tierFor(spend: number) {
-  return TIERS.find((t) => spend >= t.min) ?? TIERS[TIERS.length - 1];
+  const tier = loyaltyTierFor(spend);
+  return { ...tier, pill: TIER_PILLS[tierRank(tier.name)] };
 }
 
 async function getCustomers(): Promise<CustomerRow[]> {
