@@ -43,6 +43,18 @@ const nextConfig = {
       },
     ];
   },
+  // A product renamed in Admin gets a new address; its old one keeps working (links already
+  // shared on Facebook and WhatsApp, and search results). Old address first, new second.
+  async redirects() {
+    const renamed = [
+      ["pink-rose-bouquet", "peach-rose-bouquet"], // renamed 23 Nov 2026 (the roses are peach)
+    ];
+    return renamed.flatMap(([from, to]) => ["product", "preorder/product"].map((page) => ({
+      source: `/:locale(en|bn)/${page}/${from}`,
+      destination: `/:locale/${page}/${to}`,
+      permanent: true,
+    })));
+  },
 };
 
 // Sentry build-time options. Source maps are uploaded only when both
