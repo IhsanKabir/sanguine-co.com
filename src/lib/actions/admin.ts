@@ -266,7 +266,9 @@ export async function updateProduct(id: string, patch: Partial<z.infer<typeof pr
     if (safe[k] !== undefined) (update as Record<string, unknown>)[k] = safe[k];
   }
   if (typeof safe.sku === "string") update.sku = safe.sku.toUpperCase();
-  if (typeof safe.name === "string") update.slug = slugify(safe.name);
+  // The address (slug) is set once, when the product is created, and never follows a rename:
+  // a new address broke every link already shared and the built-in cut-out (found by address),
+  // as when Pink Rose became Peach Rose Bouquet (23 Nov 2026). The name can change freely.
 
   // Tracked per option: the stock number is the sum of the options and is
   // only changed through Inventory → Per option, never typed over here.
