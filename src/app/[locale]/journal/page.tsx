@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Ornament from "@/components/storefront/Ornament";
 import { SITE_URL as BASE } from "@/lib/site-url";
+import StageHead from "@/components/storefront/StageHead";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -46,13 +47,7 @@ export default async function JournalPage({ params }: Props) {
 
   return (
     <>
-      <div className="ed-hero">
-        <div className="kicker">{t("journal.kicker")}</div>
-        <h1>{t("journal.title")}</h1>
-        <p className="ed-lede">
-          {t("journal.lede")}
-        </p>
-      </div>
+      <StageHead ghost={t("journal.kicker")} kicker={t("journal.kicker")} title={t("journal.title")} lede={t("journal.lede")} />
 
       <Ornament variant="tide-line" />
 

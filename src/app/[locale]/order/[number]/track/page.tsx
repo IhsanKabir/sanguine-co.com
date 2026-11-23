@@ -89,7 +89,9 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
 
   if (order.status === "cancelled" || order.status === "refunded") {
     return (
-      <section className="section" style={{ maxWidth: 720 }}>
+      <section className="card-stage">
+        <div className="stage-ghost" aria-hidden="true">{number}</div>
+        <div className="card-stage-card" style={{ maxWidth: 720 }}>
         <div className="crumbs"><Link href="/">{t("Home", "হোম")}</Link><span className="current">{t("Order", "অর্ডার")} {number}</span></div>
         <div className="empty-state">
           <Icon name="x" size={36}/>
@@ -99,6 +101,7 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
             "এই অর্ডারটি আর সক্রিয় নয়। প্রশ্ন থাকলে আমাদের লিখুন",
           )} <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>.</p>
         </div>
+      </div>
       </section>
     );
   }
@@ -108,7 +111,9 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
   const courierUrl = courierTrackingUrl(order.shippingCourier, order.shippingTracking);
 
   return (
-    <section className="section" style={{ maxWidth: 760 }}>
+    <section className="card-stage">
+      <div className="stage-ghost" aria-hidden="true">{number}</div>
+      <div className="card-stage-card" style={{ maxWidth: 760 }}>
       <div className="crumbs">
         <Link href="/">{t("Home", "হোম")}</Link>
         <span className="current">{t("Order", "অর্ডার")} {number}</span>
@@ -190,6 +195,7 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
       <p style={{ marginTop: 32, textAlign: "center", color: "var(--ink-soft)", fontSize: 13 }}>
         {t("Questions? Write to", "প্রশ্ন আছে? লিখুন")} <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>.
       </p>
+    </div>
     </section>
   );
 }

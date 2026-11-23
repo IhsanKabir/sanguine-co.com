@@ -129,6 +129,8 @@ export default async function AccountPage({ params }: Props) {
   const referral = user.email ? await referralBalance(user.email) : { earnedBdt: 0, pending: 0 };
 
   return (
+    <div className="acct-stage">
+    <div className="stage-ghost" aria-hidden="true">{displayName.split(" ")[0]}</div>
     <div className="acct-wrap">
 
       {/* ─── Email verification banner ──────────────────────────────────── */}
@@ -344,6 +346,7 @@ export default async function AccountPage({ params }: Props) {
         <RecentlyViewedStrip />
       </div>
 
+    </div>
     </div>
   );
 }

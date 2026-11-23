@@ -76,7 +76,9 @@ function SignInInner() {
   };
 
   return (
-    <section className="section sign-in-section" style={{ maxWidth: 440 }}>
+    <section className="card-stage">
+      <div className="stage-ghost" aria-hidden="true">{t("account.signIn")}</div>
+      <div className="card-stage-card" style={{ maxWidth: 480 }}>
       <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold-deep)", marginBottom: 8, textAlign: "center" }}>{t("signIn.welcome")}</div>
       <h1 className="serif page-h1" style={{ margin: "0 0 8px", color: "var(--purple-900)", fontWeight: 400, textAlign: "center" }}>
         {t("account.signIn")}
@@ -180,6 +182,7 @@ function SignInInner() {
           {t.rich("signIn.guest", { a: (c) => <Link href="/checkout">{c}</Link> })}
         </p>
       </form>
+    </div>
     </section>
   );
 }

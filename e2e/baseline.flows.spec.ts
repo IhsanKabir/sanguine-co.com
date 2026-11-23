@@ -112,7 +112,9 @@ test.describe("baseline · catalogue flows @db", () => {
     // A bouquet's price is hidden: the dropdown says so, and never shows ৳0.
     await expect(page.locator(".search-row .pr").first()).not.toContainText("0");
     await input.press("Enter");
-    await expect(page).toHaveURL(/\/en\/search\?q=rose/);
+    // The address changes once the results page has loaded (in-app navigation): a cold dev
+    // server can take longer than the default 5 s to build it.
+    await expect(page).toHaveURL(/\/en\/search\?q=rose/, { timeout: 30_000 });
     await expect(page.locator(`a[href="/en/product/${KNOWN_PRODUCT_SLUG}"]`).first()).toBeVisible();
   });
 

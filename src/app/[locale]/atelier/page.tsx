@@ -4,6 +4,7 @@ import { Link } from "@/i18n/routing";
 import Ornament from "@/components/storefront/Ornament";
 import JsonLd from "@/components/seo/JsonLd";
 import { SITE_URL as BASE } from "@/lib/site-url";
+import StageHead from "@/components/storefront/StageHead";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -64,13 +65,8 @@ export default async function AtelierPage({ params }: Props) {
     <>
       <JsonLd data={[organizationLd]} />
 
-      <div className="ed-hero">
-        <div className="kicker">{t("atelier.kicker")}</div>
-        <h1>{t("atelier.titleLine1")}<br />{t("atelier.titleLine2")}</h1>
-        <p className="ed-lede">
-          {t("atelier.lede")}
-        </p>
-      </div>
+      <StageHead ghost={t("atelier.titleLine2")} kicker={t("atelier.kicker")}
+        title={<>{t("atelier.titleLine1")}<br />{t("atelier.titleLine2")}</>} lede={t("atelier.lede")} />
 
       <Ornament variant="tide-line" />
 

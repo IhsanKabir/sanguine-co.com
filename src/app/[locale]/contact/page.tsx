@@ -21,7 +21,7 @@ export default async function ContactPage({ params }: Props) {
   const messenger = messengerUrl();
 
   return (
-    <article className="legal-page">
+    <div className="legal-shell"><article className="legal-page">
       <div className="legal-kicker">{isBn ? "যোগাযোগ" : "CONTACT"}</div>
       <h1>{isBn ? "আমাদের সঙ্গে কথা বলুন।" : "Talk to us."}</h1>
       <p className="page-intro">
@@ -80,6 +80,6 @@ export default async function ContactPage({ params }: Props) {
           <><Link href="/faq">Questions</Link>, <Link href="/legal/shipping">delivery</Link> and <Link href="/legal/returns">returns</Link>.</>
         )}
       </p>
-    </article>
+    </article></div>
   );
 }
