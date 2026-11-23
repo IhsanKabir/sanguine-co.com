@@ -31,7 +31,8 @@ const BUILT_IN: Readonly<Record<string, Cutout>> = {
   "the-100-rose-special": cut("the-100-rose-special", 900, 874),
   "multicolor-lily-bouquet": cut("multicolor-lily-bouquet", 753, 900),
   "the-100-lychee-bouquet": cut("the-100-lychee-bouquet", 900, 860),
-  "pink-rose-bouquet": cut("pink-rose-bouquet", 572, 900),
+  // Renamed Pink to Peach Rose Bouquet in Admin (23 Nov 2026): the new address, same picture.
+  "peach-rose-bouquet": cut("pink-rose-bouquet", 572, 900),
   // From the owner's own photo (sunflowers and white lilies, 16 Nov 2026), dark centres filled back in.
   "sunflower-bouquet": cut("sunflower-bouquet", 811, 900),
 };
