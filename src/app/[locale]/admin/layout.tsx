@@ -32,30 +32,33 @@ type AdminPath =
   | "/admin/health"
   | "/admin/users";
 
+// Grouped by job (owner, 23 Nov 2026): what came in, what is for sale, how the site behaves.
+const GROUPS = ["Overview", "Orders & customers", "Catalogue", "Site", "Team"] as const;
+
 const NAV: Array<{
   href: AdminPath;
   name: string;
   icon: string;
-  group: "Overview" | "Commerce" | "House" | "Team";
+  group: (typeof GROUPS)[number];
   perm: Permission;
 }> = [
-  { href: "/admin",           name: "Dashboard", icon: "feather", group: "Overview", perm: "dashboard" },
-  { href: "/admin/analytics", name: "Analytics", icon: "feather", group: "Overview", perm: "analytics" },
-  { href: "/admin/behavior",  name: "Behavior",  icon: "feather", group: "Overview", perm: "behavior"  },
-  { href: "/admin/reports",   name: "Reports",   icon: "feather", group: "Overview", perm: "reports"   },
-  { href: "/admin/orders",    name: "Orders",    icon: "bag",     group: "Commerce", perm: "orders" },
-  { href: "/admin/preorders", name: "Pre-orders", icon: "feather", group: "Commerce", perm: "preorders" },
-  { href: "/admin/products",  name: "Products",  icon: "feather", group: "Commerce", perm: "products" },
-  { href: "/admin/segments",  name: "Segments",  icon: "feather", group: "Commerce", perm: "segments" },
-  { href: "/admin/inventory", name: "Inventory", icon: "feather", group: "Commerce", perm: "inventory" },
-  { href: "/admin/customers", name: "Customers", icon: "user",    group: "Commerce", perm: "customers" },
-  { href: "/admin/reviews",   name: "Reviews",   icon: "feather", group: "Commerce", perm: "reviews" },
-  { href: "/admin/coupons",   name: "Coupons",   icon: "feather", group: "Commerce", perm: "coupons" },
-  { href: "/admin/editorial", name: "Editorial", icon: "feather", group: "House",    perm: "editorial" },
-  { href: "/admin/audio",     name: "Audio",     icon: "feather", group: "House",    perm: "settings" },
-  { href: "/admin/settings",  name: "Settings",  icon: "feather", group: "House",    perm: "settings" },
-  { href: "/admin/health",    name: "Health",    icon: "feather", group: "House",    perm: "settings" },
-  { href: "/admin/users",     name: "Users",     icon: "user",    group: "Team",     perm: "users" },
+  { href: "/admin",           name: "Dashboard",  icon: "feather", group: "Overview",           perm: "dashboard" },
+  { href: "/admin/analytics", name: "Analytics",  icon: "feather", group: "Overview",           perm: "analytics" },
+  { href: "/admin/behavior",  name: "Behavior",   icon: "feather", group: "Overview",           perm: "behavior"  },
+  { href: "/admin/reports",   name: "Reports",    icon: "feather", group: "Overview",           perm: "reports"   },
+  { href: "/admin/orders",    name: "Orders",     icon: "bag",     group: "Orders & customers", perm: "orders" },
+  { href: "/admin/preorders", name: "Pre-orders", icon: "feather", group: "Orders & customers", perm: "preorders" },
+  { href: "/admin/customers", name: "Customers",  icon: "user",    group: "Orders & customers", perm: "customers" },
+  { href: "/admin/coupons",   name: "Coupons",    icon: "feather", group: "Orders & customers", perm: "coupons" },
+  { href: "/admin/reviews",   name: "Reviews",    icon: "feather", group: "Orders & customers", perm: "reviews" },
+  { href: "/admin/products",  name: "Products",   icon: "feather", group: "Catalogue",          perm: "products" },
+  { href: "/admin/segments",  name: "Segments",   icon: "feather", group: "Catalogue",          perm: "segments" },
+  { href: "/admin/inventory", name: "Inventory",  icon: "feather", group: "Catalogue",          perm: "inventory" },
+  { href: "/admin/settings",  name: "Settings",   icon: "feather", group: "Site",               perm: "settings" },
+  { href: "/admin/editorial", name: "Editorial",  icon: "feather", group: "Site",               perm: "editorial" },
+  { href: "/admin/health",    name: "Health",     icon: "feather", group: "Site",               perm: "settings" },
+  { href: "/admin/audio",     name: "Audio",      icon: "feather", group: "Site",               perm: "settings" },
+  { href: "/admin/users",     name: "Users",      icon: "user",    group: "Team",               perm: "users" },
 ];
 
 export default async function AdminLayout({ children, params }: Props) {
@@ -64,7 +67,7 @@ export default async function AdminLayout({ children, params }: Props) {
   const ctx = await requireAdmin();
 
   const visibleNav = NAV.filter((n) => ctx.has(n.perm));
-  const groups = ["Overview", "Commerce", "House", "Team"] as const;
+  const groups = GROUPS;
 
   return (
     <div className="admin-body">

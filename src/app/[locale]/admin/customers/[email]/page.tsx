@@ -6,6 +6,10 @@ import { eq, desc, and, sum, count } from "drizzle-orm";
 import { setRequestLocale } from "next-intl/server";
 import { requirePermission } from "@/lib/auth-utils";
 import { formatBdt, formatDate } from "@/lib/utils";
+import { tierFor as loyaltyTierFor, tierRank } from "@/lib/loyalty";
+import { personalExpressFee } from "@/lib/express-fee-store";
+import { getCommerceSettings } from "@/lib/commerce";
+import { CustomerExpressFee } from "../ExpressFeeEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -16,15 +20,11 @@ export const metadata = {
 
 type Props = { params: Promise<{ email: string; locale: string }> };
 
-const TIERS = [
-  { min: 150_000, name: "Grand Élite",       color: "oklch(0.78 0.15 78)",  pill: "pill-ok"   },
-  { min: 50_000,  name: "Patron de Maison",   color: "var(--gold)",           pill: "pill-ok"   },
-  { min: 10_000,  name: "Atelier Guest",       color: "var(--mauve)",          pill: "pill-info" },
-  { min: 0,       name: "Maison Initié",       color: "var(--purple-400)",     pill: "pill-warn" },
-] as const;
-
+/** Admin badge colour per tier, lowest first (names and thresholds: lib/loyalty.ts). */
+const TIER_PILLS = ["pill-warn", "pill-info", "pill-ok", "pill-ok"] as const;
 function tierFor(spend: number) {
-  return TIERS.find((t) => spend >= t.min) ?? TIERS[TIERS.length - 1];
+  const tier = loyaltyTierFor(spend);
+  return { ...tier, pill: TIER_PILLS[tierRank(tier.name)] };
 }
 
 export default async function AdminCustomerDetailPage({ params }: Props) {
@@ -51,7 +51,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
   // Resolve the auth user ID (may be null for guests who never signed up)
   const customerId = orders.find((o) => o.customerId)?.customerId ?? null;
 
-  const [reviewRows, preorderRows, refundAgg, profileRow, addressRows] = await Promise.all([
+  const [reviewRows, preorderRows, refundAgg, profileRow, addressRows, ownExpressFee, commerce] = await Promise.all([
     db.select().from(schema.reviews)
       .where(and(eq(schema.reviews.customerId, customerId ?? "00000000-0000-0000-0000-000000000000")))
       .orderBy(desc(schema.reviews.createdAt))
@@ -79,6 +79,8 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
           .orderBy(desc(schema.addresses.isDefault))
           .catch(() => [])
       : Promise.resolve([]),
+    personalExpressFee(email).catch(() => null),
+    getCommerceSettings(),
   ]);
 
   const refundTotal = Number(refundAgg[0]?.total ?? 0);
@@ -122,6 +124,9 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
           </div>
         )}
       </div>
+
+      {/* ─── Same-day express: this customer's own fee (wins over the rules in Settings) ── */}
+      <CustomerExpressFee email={email} initialFee={ownExpressFee} standardFee={commerce.expressFeeBdt} />
 
       {/* ─── Customer profile (from customer_profiles) ───────────────────── */}
       {profile && (

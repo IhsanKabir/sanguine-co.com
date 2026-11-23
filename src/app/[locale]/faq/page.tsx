@@ -4,7 +4,7 @@ import { getCommerceSettings, type CommerceSettings } from "@/lib/commerce";
 import { pageMetadata } from "@/lib/page-metadata";
 import { REPLY_HOURS, SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY } from "@/lib/contact";
 import { formatBdt } from "@/lib/utils";
-import { EXPRESS_FEE_BDT, expressCutoffLabel } from "@/lib/delivery";
+import { expressCutoffLabel } from "@/lib/delivery";
 
 type Props = { params: Promise<{ locale: string }> };
 type Locale = "en" | "bn";
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props) {
 // disagree with what checkout charges or the returns page says.
 function faqGroups(locale: Locale, c: CommerceSettings): FaqGroup[] {
   const delivery = formatBdt(c.shippingDhakaBdt, locale);
-  const express = formatBdt(EXPRESS_FEE_BDT, locale), cutoff = expressCutoffLabel(locale, c.expressCutoffMin);
+  const express = formatBdt(c.expressFeeBdt, locale), cutoff = expressCutoffLabel(locale, c.expressCutoffMin);
   const freeOver = c.freeShippingThresholdBdt > 0 ? formatBdt(c.freeShippingThresholdBdt, locale) : null;
   const days = c.returnWindowDays;
 

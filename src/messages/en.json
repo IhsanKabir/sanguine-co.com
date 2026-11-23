@@ -695,7 +695,8 @@
     "minusReferral": "− {amount} referral discount",
     "awaitingQuote": "Awaiting price",
     "yourBrowsing": "Your browsing",
-    "recentlyViewed": "Recently viewed"
+    "recentlyViewed": "Recently viewed",
+    "expressFree": "Same-day express: free"
   },
   "preorderStatus": {
     "new": "Received",
@@ -745,7 +746,8 @@
     "doneBody": "We have your preorder for <em>{product}</em>. We'll email <b>{email}</b> within a day or two to confirm it and send a bKash deposit request.",
     "doneNote": "Nothing has been charged yet. Your piece is secured once the deposit is paid.",
     "guestEmailNote": "We send the price here. Have an account? <a>Sign in</a>.",
-    "phoneWhatsApp": "Phone (WhatsApp)"
+    "phoneWhatsApp": "Phone (WhatsApp)",
+    "expressLabelFree": "Same-day express (free for you): delivered today"
   },
   "preorderPage": {
     "kicker": "PREORDER",

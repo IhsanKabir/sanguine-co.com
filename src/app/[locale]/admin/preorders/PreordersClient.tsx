@@ -334,10 +334,13 @@ function DetailDrawer({
             {request.giftMessage && (
               <div className="field"><label>Card message</label><div style={{ fontSize: 14, whiteSpace: "pre-wrap" }}>{request.giftMessage}</div></div>
             )}
-            {request.expressFeeBdt ? (
+            {/* null = standard delivery; 0 = same-day express given free (a rule or the customer's setting). */}
+            {request.expressFeeBdt != null ? (
               <div className="field">
                 <label>Same-day express</label>
-                <div style={{ fontSize: 14, fontWeight: 600, color: "#b3261e" }}>Deliver {request.targetDate} · fee {formatBdt(request.expressFeeBdt)} (in the deposit)</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#b3261e" }}>
+                  Deliver {request.targetDate} · {request.expressFeeBdt > 0 ? <>fee {formatBdt(request.expressFeeBdt)} (in the deposit)</> : "free for this customer"}
+                </div>
               </div>
             ) : null}
             {request.targetDate && (

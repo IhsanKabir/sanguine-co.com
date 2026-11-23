@@ -5,8 +5,7 @@ import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { colorLabel, sizeLabel } from "@/lib/option-labels";
-import type { CustomerPrefill } from "@/lib/customer-prefill";
-import { getPreorderContact } from "@/lib/actions/preorder-contact";
+import { getPreorderContact, type PreorderContact } from "@/lib/actions/preorder-contact";
 
 // The form is only fetched when someone taps Pre-order: the page stays light.
 const ProductPreorderForm = dynamic(() => import("@/app/[locale]/preorder/product/[slug]/ProductPreorderForm"), {
@@ -33,7 +32,7 @@ interface PreorderPickerProps {
   detailsHref?: string;
 }
 
-type Contact = { email: string; prefill: CustomerPrefill };
+type Contact = PreorderContact;
 
 /** A swatch dot for the common flower colours; anything else shows its name only. */
 const DOTS: Record<string, string> = {
@@ -71,6 +70,7 @@ export default function PreorderPicker({ product, expressCutoffMin, initialColor
           prefill={contact.prefill}
           dhakaOnly={product.dhakaOnly}
           expressCutoffMin={expressCutoffMin}
+          expressFeeBdt={contact.expressFeeBdt}
           signInHref={`/sign-in?next=/${locale}/preorder/product/${product.slug}`}
           colors={product.colors}
           sizes={product.sizes}

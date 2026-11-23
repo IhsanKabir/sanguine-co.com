@@ -1,0 +1,10 @@
+/* Admin navigation helpers (owner 23 Nov 2026: "make the admin easy to navigate").
+   The jump-to index at the top of a long page such as Settings, and room above a section
+   when a jump lands on it, so its title is not hidden under the top bar. */
+.admin-jump { display: flex; flex-wrap: wrap; gap: 6px; margin: -12px 0 24px; }
+.admin-jump a { padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 12.5px;
+  color: var(--purple-900); text-decoration: none; background: #fff; }
+.admin-jump a:hover { border-color: var(--purple-800); background: var(--purple-50); }
+.admin-jump a:focus-visible { outline: 2px solid var(--purple-800); outline-offset: 2px; }
+.panel[id] { scroll-margin-top: 24px; }
+.panel[id]:target { box-shadow: 0 0 0 2px var(--purple-800); }

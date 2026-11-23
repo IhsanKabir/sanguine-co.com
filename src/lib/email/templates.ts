@@ -164,7 +164,7 @@ export function preorderQuoteEmail(
   const parts = [
     d.quantity > 1 ? `${formatBdt(d.quotedPriceBdt)} ${small("each")} × ${d.quantity}` : formatBdt(d.quotedPriceBdt),
     discount > 0 ? `− ${formatBdt(discount)} ${small("referral")}` : null,
-    express ? `+ ${formatBdt(express)} ${small("same-day")}` : null,
+    express ? `+ ${formatBdt(express)} ${small("same-day")}` : d.expressFeeBdt === 0 ? small("same-day express, free for you") : null,
   ].filter(Boolean);
   const priceLine = parts.length > 1 || d.quantity > 1 ? `${parts.join(" ")} = ${formatBdt(total)}` : formatBdt(total);
   const body = `

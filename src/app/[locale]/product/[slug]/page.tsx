@@ -34,7 +34,7 @@ import { and, eq } from "drizzle-orm";
 import { SITE_URL as BASE } from "@/lib/site-url";
 import { priceDisplay, priceDisplayText, schemaOrgOffer, effectiveDepositPct, effectiveReturnWindowDays } from "@/lib/pricing";
 import { getCommerceSettings } from "@/lib/commerce";
-import { localizeEstimate, EXPRESS_FEE_BDT, expressCutoffLabel } from "@/lib/delivery";
+import { localizeEstimate, expressCutoffLabel } from "@/lib/delivery";
 import { isDhakaOnlySegment } from "@/lib/delivery-scope";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
@@ -361,7 +361,7 @@ export default async function ProductPage({ params }: Props) {
             {isDhakaOnlySegment(p.segmentId) && (p.preorderOnly || p.preorderEnabled) && (
               <li>
                 <Icon name="arrow" size={13} />
-                <span>{t("pdp.expressLine", { fee: formatBdt(EXPRESS_FEE_BDT, locale as "en" | "bn"), cutoff: expressCutoffLabel(locale as "en" | "bn", commerce.expressCutoffMin) })}</span>
+                <span>{t("pdp.expressLine", { fee: formatBdt(commerce.expressFeeBdt, locale as "en" | "bn"), cutoff: expressCutoffLabel(locale as "en" | "bn", commerce.expressCutoffMin) })}</span>
               </li>
             )}
             <li><Icon name="check" size={13} /><span>{t("pdp.codTitle")}</span></li>
