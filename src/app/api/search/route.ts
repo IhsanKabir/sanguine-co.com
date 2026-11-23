@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { searchProducts, getHeroImagesFor } from "@/lib/queries";
+import { priceDisplay } from "@/lib/pricing";
+import { cutoutFor } from "@/lib/cutouts";
+import { getUploadedCutouts } from "@/lib/cutout-store";
 import { trackEvent } from "@/lib/events";
 import { captureError } from "@/lib/monitoring";
 
@@ -10,7 +13,10 @@ export async function GET(req: Request) {
   try {
     const results = await searchProducts(q, 8);
     // First photo per hit, so the dropdown shows the piece rather than the drawn placeholder.
-    const photos = await getHeroImagesFor(results.map((p) => p.id)).catch(() => new Map());
+    const [photos, uploaded] = await Promise.all([
+      getHeroImagesFor(results.map((p) => p.id)).catch(() => new Map()),
+      getUploadedCutouts().catch(() => ({})),
+    ]);
     // Fire-and-forget event with zero-result flag for "search insights" report
     trackEvent({
       type: "search",
@@ -24,9 +30,13 @@ export async function GET(req: Request) {
         sku: p.sku,
         name: p.name,
         nameBn: p.nameBn,
-        priceBdt: p.priceBdt,
+        // The shown price follows the shop's rules (a hidden price is never sent as 0).
+        display: priceDisplay(p),
+        preorderOnly: !!p.preorderOnly,
         cat: p.segmentId,
-        img: photos.get(p.id)?.url ?? null,
+        // The cut-out when there is one (it stands on the cream), else the first photo.
+        img: cutoutFor(p, uploaded)?.small ?? photos.get(p.id)?.url ?? null,
+        cut: !!cutoutFor(p, uploaded),
       })),
     });
   } catch (e) {

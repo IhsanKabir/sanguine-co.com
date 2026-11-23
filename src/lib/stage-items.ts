@@ -21,6 +21,8 @@ export interface StageItem {
   dhakaOnly: boolean;
   /** Pieces picked in Admin as "Complete the look" for this one. */
   lookIds: string[];
+  /** Its category's name, for pages that mix categories (search, wishlist). */
+  segmentName?: string;
 }
 
 type Product = Parameters<typeof priceDisplay>[0] & {
@@ -50,6 +52,8 @@ export function toStageItems(
     uploaded: Readonly<Record<string, Cutout>>;
     photos: ReadonlyMap<string, { url: string }>;
     labels: Labels;
+    /** Category names by id: set on pages that mix categories, so each panel names its own. */
+    segmentNames?: ReadonlyMap<string, string>;
   },
 ): StageItem[] {
   const bn = opts.locale === "bn";
@@ -68,6 +72,7 @@ export function toStageItems(
       canPreorder: !!p.preorderEnabled,
       dhakaOnly: isDhakaOnlySegment(p.segmentId),
       lookIds: strings(p.lookProductIds),
+      segmentName: (p.segmentId && opts.segmentNames?.get(p.segmentId)) || undefined,
     };
   });
 }

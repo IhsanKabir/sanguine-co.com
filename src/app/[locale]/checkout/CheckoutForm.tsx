@@ -9,7 +9,7 @@ import { formatBdt } from "@/lib/utils";
 import { colorLabel, sizeLabel } from "@/lib/option-labels";
 import { createCodOrder, requestPhoneCode, startOnlinePayment } from "@/lib/actions/orders";
 import { track } from "@/lib/actions/track";
-import Composition from "@/components/storefront/Composition";
+import BagThumb from "@/components/storefront/BagThumb";
 import Icon from "@/components/storefront/Icon";
 import CouponInput from "@/components/storefront/CouponInput";
 
@@ -191,8 +191,10 @@ export default function CheckoutForm({
 
   return (
     <div className="checkout-grid">
-      {bot.slot}
       <div>
+        {/* The anti-spam widget lives in the form column: as a grid item of its own it took the
+            first column and pushed the form into the summary's place. */}
+        {bot.slot}
         {paymentNotice && (
           <div role="alert" style={{ marginBottom: 18, padding: "12px 16px", background: "#fdf3f0", border: "1px solid #e5b8ab", color: "#7a2e1c", fontSize: 13, lineHeight: 1.6 }}>
             {paymentNotice === "cancelled" ? t("checkout.paymentCancelled") : t("checkout.paymentFailed")}
@@ -366,7 +368,7 @@ export default function CheckoutForm({
           {items.map((i, idx) => (
             <div key={idx} style={{ display: "grid", gridTemplateColumns: "56px 1fr auto", gap: 12, marginBottom: 12, alignItems: "start" }}>
               <div style={{ aspectRatio: "3/4" }}>
-                <Composition cat={i.cat} sku={i.sku} name={i.name} small/>
+                <BagThumb item={i} />
               </div>
               <div>
                 <div className="serif" style={{ fontSize: 15, color: "var(--purple-900)" }}>{i.name}</div>

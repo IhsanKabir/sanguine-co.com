@@ -25,15 +25,16 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
   const prefill = await getCustomerPrefill(user);
 
   return (
-    <div className="section" style={{ maxWidth: 1200 }}>
-      <div className="crumbs" style={{ padding: "0 0 24px", maxWidth: "none" }}>
-        <Link href="/">{t("nav.maison")}</Link>
-        <span className="current">{t("checkout.title")}</span>
+    <section className="co-stage" aria-labelledby="co-title">
+      <div className="stage-ghost" aria-hidden="true">{t("checkout.title")}</div>
+      <div className="co-inner">
+        <div className="crumbs" style={{ padding: "0 0 18px", maxWidth: "none" }}>
+          <Link href="/">{t("nav.maison")}</Link>
+          <span className="current">{t("checkout.title")}</span>
+        </div>
+        <div className="stage-kicker co-kicker"><h1 id="co-title">{t("checkout.title")}</h1></div>
+        <CheckoutForm prefill={prefill} onlinePayment={isOnlinePaymentEnabled()} paymentNotice={paymentNotice} />
       </div>
-      <h1 className="serif page-h1" style={{ margin: "0 0 28px", color: "var(--purple-900)", fontWeight: 400 }}>
-        {t("checkout.title")}
-      </h1>
-      <CheckoutForm prefill={prefill} onlinePayment={isOnlinePaymentEnabled()} paymentNotice={paymentNotice} />
-    </div>
+    </section>
   );
 }

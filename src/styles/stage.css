@@ -148,3 +148,12 @@ html[lang="bn"] .stage-panel h2 { line-height: 1.3; }
 .stage-kicker { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 14px; }
 .stage-kicker h1 { margin: 0; font: inherit; letter-spacing: inherit; color: var(--ink); }
 .stage-kicker span:first-child { color: var(--purple-800); }
+
+/* The wishlist heart in a panel (shop panel and product page): beside the close button, or in
+   the corner where there is none. 44px to tap; the heart itself stays small. */
+.stage-heart.heart-tick { top: 14px; right: 62px; width: 44px; height: 44px; background: none; backdrop-filter: none; }
+.stage-heart.heart-tick:hover { background: var(--purple-100); transform: none; }
+.stage-heart.heart-tick:focus-visible { outline: 2px solid var(--purple-800); outline-offset: 2px; }
+.pdp-panel .stage-heart.heart-tick { right: 14px; }
+.pdp-panel .stage-panel-k { padding-right: 44px; }
+.stage-panel .stage-panel-k { padding-right: 96px; }

@@ -109,9 +109,32 @@ test.describe("baseline · catalogue flows @db", () => {
     const input = page.locator(".nav-search input");
     await input.fill("rose");
     await expect(page.locator(".search-row").first()).toBeVisible();
+    // A bouquet's price is hidden: the dropdown says so, and never shows ৳0.
+    await expect(page.locator(".search-row .pr").first()).not.toContainText("0");
     await input.press("Enter");
     await expect(page).toHaveURL(/\/en\/search\?q=rose/);
     await expect(page.locator(`a[href="/en/product/${KNOWN_PRODUCT_SLUG}"]`).first()).toBeVisible();
+  });
+
+  test("the search API never sends a hidden price as 0", async ({ request }) => {
+    skipWithoutDb();
+    const body = await (await request.get("/api/search?q=rose")).json() as { results: Record<string, unknown>[] };
+    expect(body.results.length).toBeGreaterThan(0);
+    for (const r of body.results) {
+      expect(r).not.toHaveProperty("priceBdt");
+      expect(r).toHaveProperty("display");
+    }
+  });
+
+  test("the heart in the shop panel saves a bouquet to the wishlist page", async ({ page }) => {
+    skipWithoutDb();
+    await page.goto(`/en/shop/${KNOWN_SEGMENT_ID}?b=${KNOWN_PRODUCT_SLUG}`);
+    const heart = page.locator(".stage-panel .stage-heart");
+    await expect(heart).toBeVisible({ timeout: 30_000 });
+    await heart.click();
+    await expect(heart).toHaveAttribute("aria-pressed", "true");
+    await page.goto("/en/wishlist");
+    await expect(page.locator(`.stage-item[href="/en/product/${KNOWN_PRODUCT_SLUG}"]`)).toBeVisible({ timeout: 30_000 });
   });
 
   test("bn PDP renders with lang=bn", async ({ page }) => {

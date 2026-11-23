@@ -5,9 +5,11 @@ import { useTranslations } from "next-intl";
 import type { StageItem } from "@/lib/stage-items";
 import SameDayLine from "./SameDayLine";
 import PreorderPicker from "./PreorderPicker";
+import WishHeart from "./WishHeart";
 
 interface StagePanelProps {
   item: StageItem;
+  /** The panel's small heading when the item carries no category of its own. */
   segmentLabel: string;
   expressCutoffMin: number;
   /** The shop filter's choice, used as the starting option when the piece has it. */
@@ -36,7 +38,8 @@ export default function StagePanel({ item, segmentLabel, expressCutoffMin, initi
   return (
     <div className="stage-panel" role="dialog" aria-modal="false" aria-labelledby={titleId}>
       <button type="button" className="stage-close" aria-label={t("stage.close")} onClick={onClose}>×</button>
-      <p className="stage-panel-k">{segmentLabel} · {item.meta}</p>
+      <WishHeart productId={item.id} className="stage-heart" />
+      <p className="stage-panel-k">{item.segmentName ?? segmentLabel} · {item.meta}</p>
       <h2 id={titleId} ref={heading} tabIndex={-1}>{item.name}</h2>
       {item.dhakaOnly && <SameDayLine cutoffMin={expressCutoffMin} />}
       <PreorderPicker product={item} expressCutoffMin={expressCutoffMin}

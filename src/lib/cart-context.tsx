@@ -12,6 +12,10 @@ export type CartItem = {
   qty: number;
   color?: string | null;
   size?: string | null;
+  /** The piece's picture for the bag: its cut-out (imageIsCut) or first photo. Display only:
+   *  checkout sends the server product, quantity and options, never this. */
+  image?: string | null;
+  imageIsCut?: boolean;
 };
 
 export type AppliedCoupon = {
