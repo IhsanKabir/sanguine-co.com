@@ -77,7 +77,7 @@ function SignInInner() {
 
   return (
     <section className="card-stage">
-      <div className="stage-ghost" aria-hidden="true">{t("account.signIn")}</div>
+      <div className="stage-ghost" aria-hidden="true" data-ghost={t("account.signIn")} />
       <div className="card-stage-card" style={{ maxWidth: 480 }}>
       <div style={{ fontSize: 11, letterSpacing: ".4em", color: "var(--gold-deep)", marginBottom: 8, textAlign: "center" }}>{t("signIn.welcome")}</div>
       <h1 className="serif page-h1" style={{ margin: "0 0 8px", color: "var(--purple-900)", fontWeight: 400, textAlign: "center" }}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition, type FormEvent } from "react";
+import { useEffect, useId, useState, useTransition, type FormEvent } from "react";
 import type { CustomerPrefill } from "@/lib/customer-prefill";
 import { readRememberedContact, rememberContact } from "@/lib/remembered-contact";
 import { useLocale, useTranslations } from "next-intl";
@@ -49,6 +49,8 @@ export default function ProductPreorderForm({
   initialSize,
 }: Props) {
   const t = useTranslations();
+  // Ties each label to its field (the form can appear twice on a page: shop panel and page).
+  const uid = useId();
   const locale = useLocale() as "en" | "bn";
   const [name, setName] = useState(prefill.fullName);
   const [phone, setPhone] = useState(prefill.phone);
@@ -158,19 +160,20 @@ export default function ProductPreorderForm({
       </div>
       <div className="row">
         <div className="field">
-          <label>{t("preorderForm.yourName")}</label>
-          <input name="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required minLength={1} maxLength={120} placeholder={t("preorderForm.namePlaceholder")} />
+          <label htmlFor={`${uid}-name`}>{t("preorderForm.yourName")}</label>
+          <input id={`${uid}-name`} name="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required minLength={1} maxLength={120} placeholder={t("preorderForm.namePlaceholder")} />
         </div>
         <div className="field">
-          <label>{t("preorderForm.phoneWhatsApp")}</label>
-          <input type="tel" name="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required minLength={6} maxLength={40} placeholder="01XXXXXXXXX" />
+          <label htmlFor={`${uid}-tel`}>{t("preorderForm.phoneWhatsApp")}</label>
+          <input id={`${uid}-tel`} type="tel" name="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required minLength={6} maxLength={40} placeholder="01XXXXXXXXX" />
         </div>
       </div>
 
       {isGuest && (
         <div className="field">
-          <label>{t("common.email")}</label>
+          <label htmlFor={`${uid}-email`}>{t("common.email")}</label>
           <input
+            id={`${uid}-email`}
             type="email"
             name="email"
             value={guestEmail}
@@ -190,21 +193,21 @@ export default function ProductPreorderForm({
 
       <div className="row" style={{ gridTemplateColumns: colors.length > 0 && sizes.length > 0 ? "1fr 1fr 1fr" : colors.length > 0 || sizes.length > 0 ? "1fr 1fr" : "1fr" }}>
         <div className="field">
-          <label>{t("common.quantity")}</label>
-          <input type="number" min={1} max={50} value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value) || 1)} />
+          <label htmlFor={`${uid}-qty`}>{t("common.quantity")}</label>
+          <input id={`${uid}-qty`} type="number" min={1} max={50} value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value) || 1)} />
         </div>
         {colors.length > 0 && (
           <div className="field">
-            <label>{t("common.colour")}</label>
-            <select value={color} onChange={(e) => setColor(e.target.value)}>
+            <label htmlFor={`${uid}-colour`}>{t("common.colour")}</label>
+            <select id={`${uid}-colour`} value={color} onChange={(e) => setColor(e.target.value)}>
               {colors.map((c) => <option key={c} value={c}>{colorLabel(c, locale)}</option>)}
             </select>
           </div>
         )}
         {sizes.length > 0 && (
           <div className="field">
-            <label>{t("common.size")}</label>
-            <select value={size} onChange={(e) => setSize(e.target.value)}>
+            <label htmlFor={`${uid}-size`}>{t("common.size")}</label>
+            <select id={`${uid}-size`} value={size} onChange={(e) => setSize(e.target.value)}>
               {sizes.map((s) => <option key={s} value={s}>{sizeLabel(s, locale)}</option>)}
             </select>
           </div>
@@ -232,8 +235,9 @@ export default function ProductPreorderForm({
       )}
 
       <div className="field">
-        <label>{t("preorderForm.notes")}</label>
+        <label htmlFor={`${uid}-notes`}>{t("preorderForm.notes")}</label>
         <textarea
+          id={`${uid}-notes`}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           maxLength={1000}

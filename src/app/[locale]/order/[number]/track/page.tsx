@@ -90,7 +90,7 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
   if (order.status === "cancelled" || order.status === "refunded") {
     return (
       <section className="card-stage">
-        <div className="stage-ghost" aria-hidden="true">{number}</div>
+        <div className="stage-ghost" aria-hidden="true" data-ghost={number} />
         <div className="card-stage-card" style={{ maxWidth: 720 }}>
         <div className="crumbs"><Link href="/">{t("Home", "হোম")}</Link><span className="current">{t("Order", "অর্ডার")} {number}</span></div>
         <div className="empty-state">
@@ -112,7 +112,7 @@ export default async function OrderTrackPage({ params, searchParams }: Props) {
 
   return (
     <section className="card-stage">
-      <div className="stage-ghost" aria-hidden="true">{number}</div>
+      <div className="stage-ghost" aria-hidden="true" data-ghost={number} />
       <div className="card-stage-card" style={{ maxWidth: 760 }}>
       <div className="crumbs">
         <Link href="/">{t("Home", "হোম")}</Link>
