@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { createPreorderRequest } from "@/lib/actions/preorders";
 import Icon from "@/components/storefront/Icon";
+import { trackPixel } from "@/lib/meta-pixel";
 
 type Props = {
   segmentId: string;
@@ -139,8 +140,10 @@ export default function RequestForm({ segmentId, segmentName, userId, userEmail 
             : null,
           attachments: attachments.map(({ fileName: _f, ...rest }) => rest),
         });
-        if (result.ok) setDone(true);
-        else setError(result.error);
+        if (result.ok) {
+          trackPixel("Lead", { contentName: segmentName, contentCategory: "bespoke" });
+          setDone(true);
+        } else setError(result.error);
       } catch (err) {
         setError(err instanceof Error ? err.message : t("common.genericError"));
       }
