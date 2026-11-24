@@ -20,6 +20,7 @@ import SessionTracker from "@/components/storefront/SessionTracker";
 import FloatingChat from "@/components/storefront/FloatingChat";
 import RefCapture from "@/components/storefront/RefCapture";
 import CookieConsent from "@/components/storefront/CookieConsent";
+import MetaPixel from "@/components/storefront/MetaPixel";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -65,6 +66,7 @@ export default async function LocaleLayout({
           <FloatingChat />
           <RefCapture />
           <CookieConsent />
+          <MetaPixel />
         </WishlistProvider>
       </CartProvider>
       </ShippingRulesProvider>

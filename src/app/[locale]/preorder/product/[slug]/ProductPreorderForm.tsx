@@ -13,6 +13,7 @@ import { formatBdt } from "@/lib/utils";
 import { REFERRAL_BDT, REFERRAL_MIN_ORDER_BDT, normalizeReferralCode } from "@/lib/referral";
 import { REF_STORAGE_KEY } from "@/components/storefront/RefCapture";
 import { useTurnstile } from "@/components/storefront/useTurnstile";
+import { trackPixel } from "@/lib/meta-pixel";
 
 const DHAKA = "Dhaka";
 
@@ -134,6 +135,7 @@ export default function ProductPreorderForm({
         });
         if (result.ok) {
           rememberContact({ name, phone, email: guestEmail, line1, area, city, postcode });
+          trackPixel("Lead", { contentName: productName, contentCategory: "product" });
           setDone(true);
         } else setError(result.error);
       } catch (err) {

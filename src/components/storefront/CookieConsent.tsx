@@ -57,9 +57,9 @@ export default function CookieConsent() {
     <div className="cookie-banner" role="dialog" aria-label={isBn ? "কুকি পছন্দ" : "Cookie preferences"}>
       <div className="cb-text">
         {isBn ? (
-          <>আপনার ব্যাগ মনে রাখতে ও ভিজিট গুনতে আমরা কুকি ব্যবহার করি। কোনো বিজ্ঞাপন নেই। <Link href="/legal/privacy">গোপনীয়তা নীতি</Link></>
+          <>আপনার ব্যাগ মনে রাখতে, ভিজিট গুনতে এবং ফেসবুক ও ইনস্টাগ্রামে আমাদের বিজ্ঞাপন কতটা কাজ করছে বুঝতে আমরা কুকি ব্যবহার করি। <Link href="/legal/privacy">গোপনীয়তা নীতি</Link></>
         ) : (
-          <>We use cookies to keep your bag and count visits. No ads. <Link href="/legal/privacy">Privacy policy</Link></>
+          <>We use cookies to keep your bag, count visits and see how our Facebook and Instagram ads do. <Link href="/legal/privacy">Privacy policy</Link></>
         )}
       </div>
       <div className="cb-actions">

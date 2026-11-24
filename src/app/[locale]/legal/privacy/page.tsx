@@ -17,12 +17,12 @@ function EnglishSection() {
     <>
       <div className="legal-kicker">PRIVACY POLICY</div>
       <h1>What we keep, and why we keep it.</h1>
-      <p className="legal-lede">Last updated: 2 May 2026.</p>
+      <p className="legal-lede">Last updated: 24 November 2026.</p>
 
       <h2>What we collect</h2>
       <p>When you place an order with Sanguine, we collect your name, delivery address, phone number, and email so we can send your parcel and tell you where it is. When you create an account, we additionally store an encrypted password (or a record of your Google sign-in) and a record of your past orders.</p>
       <p>When you submit a bespoke pre-order request, we additionally store the description, references (images or films you upload), budget hint, and any other detail you choose to share. These are visible only to Sanguine; they are not shown to anyone else.</p>
-      <p>When you browse, we set a session cookie so your bag is remembered between pages, and a small analytics cookie so we can understand which pieces are most-loved. We do not run advertising trackers and we do not sell our visitor lists.</p>
+      <p>When you browse, we set a session cookie so your bag is remembered between pages, and a small analytics cookie so we can understand which pieces are most-loved. If you tap &ldquo;Accept all&rdquo;, we also load the Meta Pixel, which tells Meta (Facebook and Instagram) which pages you visit here and when you send a pre-order, so we can see which of our ads work and show them to people likely to want them. It does not send your name, phone or address. If you choose &ldquo;Essential only&rdquo;, it never loads. We do not sell our visitor lists.</p>
 
       <h2>What we do with it</h2>
       <p>We use your details to fulfil your order, to answer your questions if you write to us, and (only if you opt in) to send you our newsletter. We never share your information with anyone except:</p>
@@ -31,6 +31,7 @@ function EnglishSection() {
         <li>the payment provider processing your payment, if any (none at present: we collect cash on delivery)</li>
         <li>the email and SMS providers that send you transactional messages (Brevo, SSL Wireless)</li>
         <li>the hosting and database services that operate the website (Vercel, Supabase)</li>
+        <li>Meta, only if you accept all cookies: the pages you visit and that you sent a pre-order, never your contact details</li>
       </ul>
 
       <h2>Where your data lives</h2>
@@ -50,6 +51,7 @@ function EnglishSection() {
         <li><b>ssg-route</b>: last-visited route, for back-button etiquette.</li>
         <li><b>ssg_sid</b>: anonymous session identifier so we can count visits, not visitors. Expires in 30 days.</li>
         <li><b>ssg-cookie-consent-v1</b>: your preference about whether we use the analytics cookie above.</li>
+        <li><b>_fbp</b>: set by the Meta Pixel, only if you accept all cookies, so Meta can tell one visit from another. Expires in 90 days.</li>
         <li><b>sb-*</b>: Supabase Auth session cookies if you are signed in.</li>
       </ul>
 
@@ -64,12 +66,12 @@ function BangleSection() {
     <>
       <div className="legal-kicker">গোপনীয়তা নীতি</div>
       <h1>আমরা কী রাখি, এবং কেন রাখি।</h1>
-      <p className="legal-lede">সর্বশেষ আপডেট: ২ মে ২০২৬।</p>
+      <p className="legal-lede">সর্বশেষ আপডেট: ২৪ নভেম্বর ২০২৬।</p>
 
       <h2>আমরা যা সংগ্রহ করি</h2>
       <p>আপনি যখন সাঙ্গুইনে অর্ডার দেন, তখন আপনার পার্সেল পাঠাতে এবং তার অবস্থান জানাতে আমরা আপনার নাম, ডেলিভারি ঠিকানা, ফোন নম্বর ও ইমেইল সংগ্রহ করি। আপনি যখন একটি অ্যাকাউন্ট খোলেন, তখন এর সঙ্গে এনক্রিপ্টেড পাসওয়ার্ড (বা গুগল সাইন-ইনের একটি রেকর্ড) এবং আপনার পূর্ববর্তী অর্ডারের তালিকাও সংরক্ষণ করি।</p>
       <p>আপনি যখন কোনো বেসপোক প্রি-অর্ডারের অনুরোধ পাঠান, তখন তার বর্ণনা, রেফারেন্স (আপনি আপলোড করা ছবি বা ভিডিও), সম্ভাব্য বাজেট এবং আপনি যা অন্যান্য তথ্য জানাতে চান, সবই সংরক্ষণ করা হয়। এগুলো কেবল সাঙ্গুইনের কাছেই দৃশ্যমান; অন্য কারও সঙ্গে দেখানো হয় না।</p>
-      <p>আপনি যখন সাইটটি ব্রাউজ করেন, পাতায় পাতায় আপনার ব্যাগ মনে রাখার জন্য একটি সেশন কুকি এবং কোন পিসগুলো সবচেয়ে পছন্দ হচ্ছে তা বুঝতে একটি ছোট অ্যানালিটিক্স কুকি স্থাপন করা হয়। আমরা কোনো বিজ্ঞাপন ট্র্যাকার চালাই না এবং আমাদের দর্শকতালিকা কারো কাছে বিক্রি করি না।</p>
+      <p>আপনি যখন সাইটটি ব্রাউজ করেন, পাতায় পাতায় আপনার ব্যাগ মনে রাখার জন্য একটি সেশন কুকি এবং কোন পিসগুলো সবচেয়ে পছন্দ হচ্ছে তা বুঝতে একটি ছোট অ্যানালিটিক্স কুকি স্থাপন করা হয়। আপনি &ldquo;সব গ্রহণ&rdquo; চাপলে আমরা মেটা পিক্সেলও চালু করি, যা মেটাকে (ফেসবুক ও ইনস্টাগ্রাম) জানায় আপনি এখানে কোন পাতাগুলো দেখছেন এবং কখন প্রি-অর্ডার পাঠাচ্ছেন, যাতে আমরা বুঝতে পারি কোন বিজ্ঞাপন কাজ করছে এবং তা আগ্রহী মানুষদের দেখাতে পারি। এটি আপনার নাম, ফোন বা ঠিকানা পাঠায় না। &ldquo;কেবল প্রয়োজনীয়&rdquo; বেছে নিলে এটি কখনও চালু হয় না। আমরা আমাদের দর্শকতালিকা কারো কাছে বিক্রি করি না।</p>
 
       <h2>আমরা যা করি এই তথ্য দিয়ে</h2>
       <p>আপনার তথ্য আমরা ব্যবহার করি আপনার অর্ডার পূরণ করতে, আপনি লিখলে আপনার প্রশ্নের উত্তর দিতে, এবং (কেবল আপনি অনুমতি দিলে) আমাদের নিউজলেটার পাঠাতে। আমরা আপনার তথ্য কখনও কারও সঙ্গে শেয়ার করি না, কেবল নিম্নলিখিত পরিষেবাদাতাদের ব্যতিরেকে:</p>
@@ -78,6 +80,7 @@ function BangleSection() {
         <li>পেমেন্ট প্রসেসর, যদি থাকে (বর্তমানে নেই: আমরা ক্যাশ অন ডেলিভারিতে নিই)</li>
         <li>ট্রানজ্যাকশনাল ইমেইল ও SMS পাঠানো প্রদানকারী (Brevo, SSL Wireless)</li>
         <li>হোস্টিং ও ডাটাবেস পরিষেবা যা ওয়েবসাইটটি চালায় (Vercel, Supabase)</li>
+        <li>মেটা, কেবল আপনি সব কুকি গ্রহণ করলে: আপনি কোন পাতা দেখেছেন এবং প্রি-অর্ডার পাঠিয়েছেন কিনা, আপনার যোগাযোগের তথ্য কখনও নয়</li>
       </ul>
 
       <h2>আপনার তথ্য কোথায় থাকে</h2>
@@ -97,6 +100,7 @@ function BangleSection() {
         <li><b>ssg-route</b>: সর্বশেষ ভিজিট করা রুট, ব্যাক-বাটনের শিষ্টাচারের জন্য।</li>
         <li><b>ssg_sid</b>: বেনামি সেশন আইডেন্টিফায়ার যাতে আমরা ভিজিট গণনা করতে পারি, ভিজিটর নয়। ত্রিশ দিনে মেয়াদ উত্তীর্ণ।</li>
         <li><b>ssg-cookie-consent-v1</b>: উপরোক্ত অ্যানালিটিক্স কুকি ব্যবহারের ব্যাপারে আপনার সম্মতি।</li>
+        <li><b>_fbp</b>: মেটা পিক্সেল এটি রাখে, কেবল আপনি সব কুকি গ্রহণ করলে, যাতে মেটা এক ভিজিট থেকে আরেকটি আলাদা করতে পারে। নব্বই দিনে মেয়াদ উত্তীর্ণ।</li>
         <li><b>sb-*</b>: Supabase Auth সেশন কুকি, যদি আপনি সাইন-ইন থাকেন।</li>
       </ul>
 
