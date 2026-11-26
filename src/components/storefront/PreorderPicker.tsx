@@ -57,7 +57,7 @@ export default function PreorderPicker({ product, expressCutoffMin, initialColor
 
   const startForm = async () => {
     setFormWanted(true);
-    setContact(await getPreorderContact());
+    setContact(await getPreorderContact(product.id));
   };
 
   if (formWanted) {
@@ -71,6 +71,7 @@ export default function PreorderPicker({ product, expressCutoffMin, initialColor
           dhakaOnly={product.dhakaOnly}
           expressCutoffMin={expressCutoffMin}
           expressFeeBdt={contact.expressFeeBdt}
+          depositPct={contact.depositPct}
           signInHref={`/sign-in?next=/${locale}/preorder/product/${product.slug}`}
           colors={product.colors}
           sizes={product.sizes}

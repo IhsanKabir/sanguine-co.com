@@ -103,12 +103,12 @@
     "promise": {
       "kicker": "HOW IT WORKS",
       "title": "Made fresh to order.<br></br>Paid for <em>on arrival</em>.",
-      "body": "Tell us what you'd like and we confirm the price before you pay. A small bKash deposit secures your order, and the rest is paid in cash when it arrives, anywhere in Bangladesh.",
-      "bodyDhaka": "Tell us what you'd like and we confirm the price before you pay. A small bKash deposit secures your order, and the rest is paid in cash when it arrives.",
+      "body": "Tell us what you'd like and we confirm the price before you pay. A bKash deposit secures your order, and the rest is paid in cash when it arrives, anywhere in Bangladesh.",
+      "bodyDhaka": "Tell us what you'd like and we confirm the price before you pay. A bKash deposit secures your order, and the rest is paid in cash when it arrives.",
       "f1Title": "Price confirmed first",
       "f1Sub": "On WhatsApp, before you pay.",
       "f2Title": "Cash on delivery",
-      "f2Sub": "A small bKash deposit, the rest on arrival.",
+      "f2Sub": "A bKash deposit, the rest on arrival.",
       "f3Title": "Nationwide delivery",
       "f3TitleDhaka": "Delivery in Dhaka",
       "f3Sub": "By Pathao and Steadfast.",
@@ -421,6 +421,7 @@
     "estimatedSuffix": " (estimated)",
     "quoteOnly": "Final price confirmed before you pay",
     "deposit": "Reserve it with a {pct}% deposit of the confirmed price",
+    "depositByDate": "bKash deposit: {pct}% of the confirmed price for delivery today or tomorrow, {later}% for a later date",
     "estimatedDelivery": "Estimated delivery · {when}"
   },
   "notify": {
@@ -741,7 +742,7 @@
     "postcodePlaceholder": "Postcode",
     "sending": "Sending…",
     "place": "Place preorder",
-    "payNote": "Nothing is charged now. We'll send you a bKash request for the deposit to confirm your piece.",
+    "payNote": "Nothing is charged now. Once we confirm the price, a {pct}% bKash deposit confirms your order, and the rest is paid in cash on delivery.",
     "doneTitle": "Preorder received.",
     "doneBody": "We have your preorder for <em>{product}</em>. We'll email <b>{email}</b> within a day or two to confirm it and send a bKash deposit request.",
     "doneNote": "Nothing has been charged yet. Your piece is secured once the deposit is paid.",

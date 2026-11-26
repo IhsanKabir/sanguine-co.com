@@ -497,7 +497,7 @@ export default function ProductsClient({ segments, products, trackedIds }: Props
                 <>
                   <div className="row" style={{ marginTop: 10 }}>
                     <div className="field"><label>Estimated delivery</label><input value={editing.estimatedDelivery} onChange={(e) => setEditing({ ...editing, estimatedDelivery: e.target.value })} placeholder="e.g. 4–6 weeks"/></div>
-                    <div className="field"><label>Deposit % (blank = global setting)</label><input type="number" min={1} max={100} value={editing.preorderDepositPct} onChange={(e) => setEditing({ ...editing, preorderDepositPct: e.target.value })} placeholder="e.g. 20"/></div>
+                    <div className="field"><label>Deposit % for today or tomorrow (blank = global setting; later dates 10% at most)</label><input type="number" min={1} max={100} value={editing.preorderDepositPct} onChange={(e) => setEditing({ ...editing, preorderDepositPct: e.target.value })} placeholder="e.g. 30"/></div>
                   </div>
                   <div className="row" style={{ marginTop: 10 }}>
                     <div className="field"><label>Usual price (৳, private)</label><input type="number" min={1} value={editing.preorderPriceBdt} onChange={(e) => setEditing({ ...editing, preorderPriceBdt: e.target.value })} placeholder="e.g. 2500"/></div>

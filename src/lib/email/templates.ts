@@ -138,7 +138,7 @@ export function preorderReceivedEmail(d: PreorderEmailData) {
     </table>
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.2em;color:#a07e2c;margin:24px 0 8px;">YOU WROTE</p>
     <p style="font-size:14px;color:#3a2a64;line-height:1.7;background:#f9f4ec;padding:14px 16px;border-left:2px solid #a07e2c;white-space:pre-wrap;margin:0;">${escapeHtml(d.description)}</p>
-    <p style="font-size:13px;color:#7a6a52;margin:32px 0 0;line-height:1.7;">Nothing is due now. Once you accept the price, a small deposit confirms the order and the rest is paid on delivery.</p>
+    <p style="font-size:13px;color:#7a6a52;margin:32px 0 0;line-height:1.7;">Nothing is due now. Once you accept the price, a bKash deposit confirms the order and the rest is paid on delivery.</p>
     <p style="font-style:italic;font-size:14px;color:#2a1854;margin:24px 0 0;">Sanguine</p>
   `;
   return { subject, html: SHELL(body) };

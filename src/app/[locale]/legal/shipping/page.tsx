@@ -22,10 +22,10 @@ function EnglishSection({ c }: { c: CommerceSettings }) {
     <>
       <div className="legal-kicker">SHIPPING</div>
       <h1>How we deliver, and how long it takes.</h1>
-      <p className="legal-lede">Last updated: 12 November 2026.</p>
+      <p className="legal-lede">Last updated: 26 November 2026.</p>
 
       <h2>Flowers: Dhaka only</h2>
-      <p>Bouquets are made fresh and do not travel well by courier, so for now flowers are delivered in Dhaka only, within 3 days of your order being confirmed and usually the same day. You can choose a later day when you order. Need them today? Order by {expressCutoffLabel("en", c.expressCutoffMin)} and choose same-day express: the fee is {bdt(c.expressFeeBdt)}, paid in advance with the deposit.</p>
+      <p>Bouquets are made fresh and do not travel well by courier, so for now flowers are delivered in Dhaka only, within 2 days of your deposit and usually the same day. You can choose a later day when you order. Need them today? Order by {expressCutoffLabel("en", c.expressCutoffMin)} and choose same-day express: the fee is {bdt(c.expressFeeBdt)}, paid in advance with the deposit.</p>
 
       <h2>Where we ship</h2>
       <p>Everything other than flowers ships nationwide within Bangladesh: sixty-four districts, every upazila served by Pathao or Steadfast. We do not ship internationally at this time; if you are abroad and would like a piece sent within Bangladesh, you may of course place the order and have it delivered to a Bangladeshi address.</p>
@@ -74,10 +74,10 @@ function BangleSection({ c }: { c: CommerceSettings }) {
     <>
       <div className="legal-kicker">শিপিং</div>
       <h1>আমরা কীভাবে পৌঁছে দিই, এবং কতদিন লাগে।</h1>
-      <p className="legal-lede">সর্বশেষ আপডেট: ১২ নভেম্বর ২০২৬।</p>
+      <p className="legal-lede">সর্বশেষ আপডেট: ২৬ নভেম্বর ২০২৬।</p>
 
       <h2>ফুল: শুধু ঢাকায়</h2>
-      <p>তোড়া তাজা ফুলে তৈরি, কুরিয়ারে দূরে পাঠালে ভালো থাকে না। তাই আপাতত ফুল শুধু ঢাকায় ডেলিভারি হয়, অর্ডার নিশ্চিত হওয়ার ৩ দিনের মধ্যে, সাধারণত একই দিনে। অর্ডারের সময় চাইলে পরের কোনো দিন বেছে নিতে পারেন। আজই লাগবে? {expressCutoffLabel("bn", c.expressCutoffMin)}-এর মধ্যে অর্ডার করে একই দিনের এক্সপ্রেস বেছে নিন: ফি {bdt(c.expressFeeBdt)}, অগ্রিমের সঙ্গে আগেই দিতে হয়।</p>
+      <p>তোড়া তাজা ফুলে তৈরি, কুরিয়ারে দূরে পাঠালে ভালো থাকে না। তাই আপাতত ফুল শুধু ঢাকায় ডেলিভারি হয়, অগ্রিম দেওয়ার ২ দিনের মধ্যে, সাধারণত একই দিনে। অর্ডারের সময় চাইলে পরের কোনো দিন বেছে নিতে পারেন। আজই লাগবে? {expressCutoffLabel("bn", c.expressCutoffMin)}-এর মধ্যে অর্ডার করে একই দিনের এক্সপ্রেস বেছে নিন: ফি {bdt(c.expressFeeBdt)}, অগ্রিমের সঙ্গে আগেই দিতে হয়।</p>
 
       <h2>কোথায় পাঠাই</h2>
       <p>ফুল ছাড়া বাকি সবকিছু সাঙ্গুইন বাংলাদেশের সারা দেশে পাঠায়: চৌষট্টি জেলা, Pathao বা Steadfast যেসব উপজেলায় পরিষেবা দেয় সব। বর্তমানে আমরা আন্তর্জাতিক শিপিং করি না; আপনি বিদেশে থেকেও বাংলাদেশের কোনো ঠিকানায় ডেলিভারির জন্য অবশ্যই অর্ডার করতে পারেন।</p>

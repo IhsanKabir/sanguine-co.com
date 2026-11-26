@@ -100,6 +100,11 @@ export function dhakaToday(now: Date): string {
   return dhakaDay(now);
 }
 
+/** Tomorrow's date in Dhaka, "YYYY-MM-DD". */
+export function dhakaTomorrow(now: Date): string {
+  return dhakaDay(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+}
+
 /** Furthest ahead a customer can schedule a delivery. */
 export const MAX_SCHEDULE_DAYS = 60;
 export const GIFT_MESSAGE_MAX = 200;
