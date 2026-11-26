@@ -21,26 +21,32 @@ function EnglishSection({ days }: { days: number }) {
     <>
       <div className="legal-kicker">RETURNS &amp; REFUNDS</div>
       <h1>How returns work, and what cannot be returned.</h1>
-      <p className="legal-lede">Last updated: 12 November 2026.</p>
+      <p className="legal-lede">Last updated: 26 November 2026.</p>
 
       <h2>Stock pieces: {days} {days === 1 ? "day" : "days"}</h2>
       <p>A piece bought from our in-stock collection may be returned within <b>{days} {days === 1 ? "day" : "days"} of delivery</b>, in its original condition (unworn, unwashed, with tags and packaging intact). A piece&rsquo;s own page shows its window if it differs.</p>
       <p>To begin a return, sign in and open <Link href="/account">your account</Link>: each delivered order has a <b>Return</b> button. If you ordered without an account, write to <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a> with your order number (SSG-XXXX) and a sentence about why you are returning. We will book a collection through our courier; Sanguine covers return shipping for any defective or incorrect piece, otherwise return shipping is at the customer&rsquo;s cost (typically ৳60&ndash;120).</p>
       <p>Once the piece arrives back with us and we have checked its condition, we will refund you within seven working days. Refunds for cash-on-delivery orders are made by bKash or bank transfer to a number/account you nominate.</p>
 
-      <h2>Flowers: tell us on delivery</h2>
-      <p>Bouquets are made fresh for your order, so they cannot come back to us later. If you do not like yours when it arrives, tell us then, before the delivery person leaves if you can, or message us the same day. We refund your deposit straight away. We only keep the delivery charge if we need to.</p>
+      <h2>Flowers: our promise</h2>
+      <p>Bouquets are made fresh for your order, so they cannot come back to us. Instead:</p>
+      <ul>
+        <li><b>If we cannot deliver as agreed</b>, we refund everything you paid within 72 hours, to the same bKash number, and we pay any bKash charge. Or choose a new date.</li>
+        <li><b>If the bouquet is wrong, damaged or not fresh</b>, tell us before the delivery person leaves, or send us a photo within 3 hours of delivery. We remake it, or refund you in full: your choice.</li>
+        <li><b>On your first order</b>, if the bouquet is as you ordered but not to your taste, tell us before the delivery person leaves. You pay nothing more, and we return your deposit within 72 hours.</li>
+        <li><b>To cancel</b>, tell us by 8 PM the day before delivery and we refund your deposit in full. After that, and for same-day orders, we have already bought your flowers, so the deposit covers them.</li>
+      </ul>
 
       <h2>Bespoke pieces: defects only</h2>
-      <p>Pieces that were made or sourced specifically for your order (anything that came through our pre-order or bespoke request flow) are not returnable except in the case of a clear defect in the piece itself, or a clear and material deviation from the agreed brief.</p>
-      <p>If you believe the piece has a defect, write to us within forty-eight hours of delivery with photographs. We will respond within two working days. If a defect is confirmed we will, at our option, repair, replace, or refund the piece.</p>
+      <p>Pieces other than bouquets that were made or sourced specifically for your order (anything else that came through our pre-order or bespoke request flow) are not returnable except in the case of a clear defect in the piece itself, or a clear and material deviation from the agreed brief.</p>
+      <p>If you believe the piece has a defect, write to us within forty-eight hours of delivery with photographs. We will reply within 72 hours. If a defect is confirmed we will, at our option, repair, replace, or refund the piece.</p>
       <p>This is unfortunately the universal practice for bespoke work: every piece is made for you specifically and cannot be put back on the shelf. We are sorry for the asymmetry.</p>
 
       <h2>Items not returnable</h2>
       <p>In addition to bespoke pieces, the following are not returnable for reasons of hygiene or fragility:</p>
       <ul>
         <li>Open perfume bottles (sealed, unopened bottles may be returned within the same window)</li>
-        <li>Cut flowers and bouquets after the day of delivery (see &ldquo;Flowers&rdquo; above)</li>
+        <li>Cut flowers and bouquets (see &ldquo;Flowers&rdquo; above for what we do instead)</li>
         <li>Pieces marked &ldquo;final sale&rdquo; at the time of purchase</li>
       </ul>
 
@@ -61,26 +67,32 @@ function BangleSection({ days }: { days: number }) {
     <>
       <div className="legal-kicker">ফেরত ও অর্থ ফেরত</div>
       <h1>ফেরত কীভাবে কাজ করে, এবং কী ফেরত দেওয়া যায় না।</h1>
-      <p className="legal-lede">সর্বশেষ আপডেট: ১২ নভেম্বর ২০২৬।</p>
+      <p className="legal-lede">সর্বশেষ আপডেট: ২৬ নভেম্বর ২০২৬।</p>
 
       <h2>স্টক পিস: {days.toLocaleString("bn-BD")} দিন</h2>
       <p>আমাদের ইন-স্টক সংগ্রহ থেকে কেনা একটি পিস ডেলিভারির <b>{days.toLocaleString("bn-BD")} দিনের মধ্যে</b> মূল অবস্থায় ফেরত দেওয়া যায় (পরা হয়নি, ধোয়া হয়নি, ট্যাগ ও প্যাকেজিং অক্ষত)। কোনো পিসের সময়সীমা ভিন্ন হলে তা সেই পিসের পাতায় লেখা থাকে।</p>
       <p>ফেরত শুরু করতে সাইন ইন করে <Link href="/account">আপনার অ্যাকাউন্ট</Link> খুলুন: ডেলিভারি হওয়া প্রতিটি অর্ডারে <b>রিটার্ন</b> বোতাম আছে। অ্যাকাউন্ট ছাড়া অর্ডার করে থাকলে আপনার অর্ডার নম্বর (SSG-XXXX) এবং কারণসংক্রান্ত একটি সংক্ষিপ্ত বার্তা দিয়ে <a href="mailto:concierge@sanguine-co.com">concierge@sanguine-co.com</a>-এ লিখুন। আমরা আমাদের কুরিয়ারের মাধ্যমে কালেকশন বুক করব; ত্রুটিযুক্ত বা ভুল পিসের ক্ষেত্রে ফেরতের শিপিং সাঙ্গুইন বহন করে, অন্যথায় ফেরতের শিপিং গ্রাহকের খরচে (সাধারণত ৳৬০&ndash;১২০)।</p>
       <p>পিসটি আমাদের কাছে ফিরে আসা ও অবস্থা যাচাই হওয়ার পর সাত কর্মদিবসের মধ্যে আপনাকে অর্থ ফেরত দেওয়া হবে। ক্যাশ অন ডেলিভারি অর্ডারের ফেরত আপনার নির্দেশিত bKash বা ব্যাংক অ্যাকাউন্টে পাঠানো হবে।</p>
 
-      <h2>ফুল: হাতে পেয়েই জানান</h2>
-      <p>তোড়া আপনার অর্ডারের জন্য তাজা ফুলে তৈরি হয়, তাই পরে ফেরত নেওয়া যায় না। হাতে পেয়ে পছন্দ না হলে তখনই জানান, সম্ভব হলে ডেলিভারি দিতে আসা ব্যক্তি থাকতেই, অথবা সেদিনই আমাদের লিখুন। আমরা সঙ্গে সঙ্গে আপনার অগ্রিম ফেরত দিই। প্রয়োজন হলে শুধু ডেলিভারি চার্জটুকু রাখি।</p>
+      <h2>ফুল: আমাদের প্রতিশ্রুতি</h2>
+      <p>তোড়া আপনার অর্ডারের জন্য তাজা ফুলে তৈরি হয়, তাই ফেরত নেওয়া যায় না। তার বদলে:</p>
+      <ul>
+        <li><b>কথামতো ডেলিভারি দিতে না পারলে</b> আপনার দেওয়া সব টাকা ৭২ ঘণ্টার মধ্যে একই বিকাশ নম্বরে ফেরত দিই, খরচ আমাদের। চাইলে নতুন তারিখও বেছে নিতে পারেন।</li>
+        <li><b>তোড়া ভুল, ক্ষতিগ্রস্ত বা তাজা না হলে</b> ডেলিভারি দিতে আসা ব্যক্তি থাকতেই জানান, অথবা ডেলিভারির ৩ ঘণ্টার মধ্যে ছবি পাঠান। আমরা নতুন করে বানিয়ে দিই, অথবা পুরো টাকা ফেরত দিই: আপনি যেটা চান।</li>
+        <li><b>প্রথম অর্ডারে</b> তোড়া ঠিক যেমন অর্ডার করেছিলেন তেমন হলেও পছন্দ না হলে, ডেলিভারি দিতে আসা ব্যক্তি থাকতেই জানান। বাকি টাকা দিতে হবে না, আর আপনার অগ্রিম ৭২ ঘণ্টার মধ্যে ফেরত দিই।</li>
+        <li><b>বাতিল করতে চাইলে</b> ডেলিভারির আগের দিন রাত ৮টার মধ্যে জানান, পুরো অগ্রিম ফেরত পাবেন। এর পরে, এবং একই দিনের অর্ডারে, আমরা আপনার জন্য ফুল কিনে ফেলি, তাই অগ্রিমটুকু ফুলের দামেই যায়।</li>
+      </ul>
 
       <h2>বেসপোক পিস: কেবল ত্রুটিতে</h2>
-      <p>আপনার জন্য বিশেষভাবে তৈরি বা সংগৃহীত পিস (প্রি-অর্ডার বা বেসপোক রিকোয়েস্ট ফ্লোর মাধ্যমে আসা যেকোনো কিছু) পিসে স্পষ্ট ত্রুটি থাকলে কিংবা সম্মত ব্রিফ থেকে স্পষ্ট ও উল্লেখযোগ্য বিচ্যুতি ছাড়া ফেরতযোগ্য নয়।</p>
-      <p>পিসে ত্রুটি আছে মনে হলে ডেলিভারির আটচল্লিশ ঘণ্টার মধ্যে ছবি সহ আমাদের লিখুন। আমরা দুই কর্মদিবসের মধ্যে উত্তর দেব। ত্রুটি নিশ্চিত হলে আমরা মেরামত, প্রতিস্থাপন, কিংবা অর্থ ফেরত: এই বিকল্পগুলোর যেকোনো একটি বেছে নিতে পারি।</p>
+      <p>তোড়া ছাড়া আপনার জন্য বিশেষভাবে তৈরি বা সংগৃহীত পিস (প্রি-অর্ডার বা বেসপোক রিকোয়েস্ট ফ্লোর মাধ্যমে আসা অন্য যেকোনো কিছু) পিসে স্পষ্ট ত্রুটি থাকলে কিংবা সম্মত ব্রিফ থেকে স্পষ্ট ও উল্লেখযোগ্য বিচ্যুতি ছাড়া ফেরতযোগ্য নয়।</p>
+      <p>পিসে ত্রুটি আছে মনে হলে ডেলিভারির আটচল্লিশ ঘণ্টার মধ্যে ছবি সহ আমাদের লিখুন। আমরা ৭২ ঘণ্টার মধ্যে উত্তর দেব। ত্রুটি নিশ্চিত হলে আমরা মেরামত, প্রতিস্থাপন, কিংবা অর্থ ফেরত: এই বিকল্পগুলোর যেকোনো একটি বেছে নিতে পারি।</p>
       <p>এটি বেসপোক কাজের সর্বজনীন রীতি: প্রতিটি পিস আপনার জন্য বিশেষভাবে তৈরি বলে শেলফে ফিরিয়ে রাখা সম্ভব নয়। এই অসামঞ্জস্যের জন্য আমরা দুঃখিত।</p>
 
       <h2>ফেরতযোগ্য নয় এমন আইটেম</h2>
       <p>বেসপোক পিস ছাড়াও, স্বাস্থ্য বা ভঙ্গুরতার কারণে নিম্নলিখিত আইটেম ফেরতযোগ্য নয়:</p>
       <ul>
         <li>খোলা পারফিউম বোতল (বন্ধ, না-খোলা বোতল একই সময়সীমার মধ্যে ফেরত দেওয়া যাবে)</li>
-        <li>ডেলিভারির দিনের পর কাটা ফুল ও ফুলের তোড়া (ওপরে &ldquo;ফুল&rdquo; অংশ দেখুন)</li>
+        <li>কাটা ফুল ও ফুলের তোড়া (তার বদলে আমরা কী করি, ওপরে &ldquo;ফুল&rdquo; অংশে দেখুন)</li>
         <li>কেনার সময় &ldquo;ফাইনাল সেল&rdquo; চিহ্নিত পিস</li>
       </ul>
 

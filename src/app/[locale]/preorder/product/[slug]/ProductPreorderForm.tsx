@@ -10,6 +10,7 @@ import DeliveryOptionsFields from "@/components/storefront/DeliveryOptionsFields
 import { createProductPreorderRequest } from "@/lib/actions/preorders";
 import { expressCutoffLabel, isExpressOpen } from "@/lib/delivery";
 import { formatBdt } from "@/lib/utils";
+import { deliversWithin48h, depositPctFor } from "@/lib/pricing";
 import { REFERRAL_BDT, REFERRAL_MIN_ORDER_BDT, normalizeReferralCode } from "@/lib/referral";
 import { REF_STORAGE_KEY } from "@/components/storefront/RefCapture";
 import { useTurnstile } from "@/components/storefront/useTurnstile";
@@ -32,6 +33,8 @@ type Props = {
    *  in, else the standard fee); 0 = free. The server decides the fee charged, and the quote
    *  states the final price before any payment. */
   expressFeeBdt: number;
+  /** The piece's deposit share for delivery today or tomorrow; a later date is capped at 10%. */
+  depositPct: number;
   signInHref: string;
   colors: string[];
   sizes: string[];
@@ -48,6 +51,7 @@ export default function ProductPreorderForm({
   dhakaOnly,
   expressCutoffMin,
   expressFeeBdt,
+  depositPct,
   signInHref,
   colors,
   sizes,
@@ -101,6 +105,13 @@ export default function ProductPreorderForm({
     setPostcode((v) => v || saved.postcode || "");
     if (!dhakaOnly && !prefill.line1 && saved.city) setCity(saved.city);
   }, [prefill.line1, dhakaOnly]);
+
+  // The deposit for the day chosen so far: for a bouquet, the full share for express, tomorrow or
+  // as soon as possible; 10% for a later date, and for other pieces (clause 3.2.10). The quote
+  // states the final amount.
+  const advancePct = depositPctFor(depositPct, deliversWithin48h(
+    { targetDate: express ? null : deliveryDate || null, express, bouquet: dhakaOnly }, new Date(),
+  ));
 
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
@@ -297,7 +308,7 @@ export default function ProductPreorderForm({
 
       <div style={{ borderTop: "1px solid var(--line)", paddingTop: 18, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
         <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: 0, lineHeight: 1.6 }}>
-          {t("preorderForm.payNote")}
+          {t("preorderForm.payNote", { pct: advancePct })}
         </p>
         <button type="submit" className="btn btn-primary" disabled={pending} style={{ minWidth: 200 }}>
           {pending ? t("preorderForm.sending") : t("preorderForm.place")}

@@ -21,7 +21,7 @@ import {
 } from "@/lib/email/templates";
 import { SITE_URL } from "@/lib/site-url";
 import { normalizeBdWhatsApp } from "@/lib/utils";
-import { priceDisplay, effectiveDepositPct, depositForQuote } from "@/lib/pricing";
+import { priceDisplay, effectiveDepositPct, depositForQuote, depositPctFor, deliversWithin48h } from "@/lib/pricing";
 import { getCommerceSettings } from "@/lib/commerce";
 import { isValidDeliveryDate, GIFT_MESSAGE_MAX, dhakaToday } from "@/lib/delivery";
 import { expressCheck, EXPRESS_ORDER_NOTE, PREORDER_ORDER_PREFIX } from "@/lib/express";
@@ -236,7 +236,16 @@ export async function createProductPreorderRequest(
     : advertised.kind === "estimate" ? advertised.minBdt : null;
   const advertisedMaxBdt = advertised.kind === "fixed" ? advertised.amountBdt
     : advertised.kind === "estimate" ? advertised.maxBdt : null;
-  const advertisedDepositPct = effectiveDepositPct(product.preorderDepositPct, commerce.preorderDepositPct);
+  // The advance the customer is told: the Admin share for today or tomorrow, 10% for a later date.
+  // Worked out as of a few minutes ago, the share the form showed: at midnight a date can turn
+  // into "tomorrow" between the form drawing it and the request arriving.
+  const advertisedDepositPct = depositPctFor(
+    effectiveDepositPct(product.preorderDepositPct, commerce.preorderDepositPct),
+    deliversWithin48h(
+      { targetDate, express: isExpress, bouquet: isDhakaOnlySegment(product.segmentId) },
+      new Date(Date.now() - SHOWN_SHARE_GRACE_MS),
+    ),
+  );
 
   const description = [
     `Preorder · ${product.name}`,
@@ -338,6 +347,9 @@ export async function setPreorderStatus(id: string, status: "reviewing" | "rejec
   return { ok: true as const };
 }
 
+/** How far back the stored share is worked out, so it matches what the form last showed. */
+const SHOWN_SHARE_GRACE_MS = 15 * 60 * 1000;
+
 const quoteSchema = z.object({
   id: z.string().uuid(),
   quotedPriceBdt: z.number().int().min(1).max(10_000_000),
@@ -362,7 +374,16 @@ export async function quotePreorderRequest(input: z.infer<typeof quoteSchema>) {
     return { ok: false as const, error: "Deposit already received on the current quote: convert it, or refund the deposit before re-quoting." };
   }
   const commerce = await getCommerceSettings();
-  const depositPct = existing.advertisedDepositPct ?? effectiveDepositPct(null, commerce.preorderDepositPct);
+  // Never more than the customer was told, and never more than 10% when the piece is not due
+  // within 48 hours of the advance (clause 3.2.10): a date can be days away when the quote goes out.
+  const depositPct = depositPctFor(
+    existing.advertisedDepositPct ?? effectiveDepositPct(null, commerce.preorderDepositPct),
+    deliversWithin48h({
+      targetDate: existing.targetDate ?? null,
+      express: existing.expressFeeBdt != null,
+      bouquet: isDhakaOnlySegment(existing.segmentId),
+    }, new Date()),
+  );
   // Deposit secures the whole commission: pct × (per-unit quote × quantity).
   // Computing it per-unit made the quote email read "deposit ৳2,000 (20%)"
   // under a ৳30,000 three-piece total: 6.7% in reality.

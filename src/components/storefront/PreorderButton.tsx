@@ -10,8 +10,10 @@ type Props = {
   sameDayUsual?: boolean;
   /** Quotation-model price state: fixed / estimate range / quote-only. */
   display: PriceDisplay;
-  /** Effective deposit % (product override ?? global setting). */
+  /** Deposit % when the piece goes out today or tomorrow (product override ?? global setting). */
   depositPct: number;
+  /** Deposit % for a later date, when it is lower (clause 3.2.10 caps it at 10%). */
+  laterDepositPct?: number;
   locale: string;
   variant?: "primary" | "secondary";
 };
@@ -22,6 +24,7 @@ export default function PreorderButton({
   sameDayUsual = false,
   display,
   depositPct,
+  laterDepositPct,
   locale,
   variant = "primary",
 }: Props) {
@@ -48,7 +51,11 @@ export default function PreorderButton({
         ) : (
           <div style={{ color: "var(--gold-deep)", fontWeight: 500 }}>{t("preorder.quoteOnly")}</div>
         )}
-        <div>{t("preorder.deposit", { pct: depositPct })}</div>
+        <div>
+          {laterDepositPct !== undefined && laterDepositPct < depositPct
+            ? t("preorder.depositByDate", { pct: depositPct, later: laterDepositPct })
+            : t("preorder.deposit", { pct: depositPct })}
+        </div>
         {estimatedDelivery && (
           <div>{t("preorder.estimatedDelivery", { when: sameDayUsual
             ? t("pdp.usuallySameDay", { when: localizeEstimate(estimatedDelivery, locale as "en" | "bn") })

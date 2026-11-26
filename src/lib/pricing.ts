@@ -1,4 +1,5 @@
 import { formatBdt } from "./utils";
+import { dhakaTomorrow } from "./delivery";
 
 /**
  * Quotation-driven pricing (IMPROVEMENT-PLAN Phase 1, owner decisions 2026-07-13).
@@ -14,7 +15,15 @@ import { formatBdt } from "./utils";
  * `lib/commerce.ts`.
  */
 
-export const DEFAULT_PREORDER_DEPOSIT_PCT = 20;
+// The advance when the piece goes out today or tomorrow (owner, 26 Nov 2026). Admin → Settings
+// holds the live value; later dates are capped by LATER_DATE_DEPOSIT_CAP_PCT.
+export const DEFAULT_PREORDER_DEPOSIT_PCT = 30;
+/**
+ * Digital Commerce Operation Guidelines 2021, clause 3.2.10 (gazette of 4 July 2021): when a
+ * product cannot be handed to the delivery person within 48 hours of payment, no more than 10%
+ * of its price may be taken in advance. There is no exemption for flowers.
+ */
+export const LATER_DATE_DEPOSIT_CAP_PCT = 10;
 // Fallback only: the window customers see is the Admin → Settings value
 // (products may override it). /legal/returns and the marquee read that value.
 export const DEFAULT_RETURN_WINDOW_DAYS = 3;
@@ -105,9 +114,34 @@ export function effectiveDepositPct(
   return Math.min(100, Math.max(1, Math.round(pct)));
 }
 
-/** Deposit for a per-unit quote, whole BDT. */
+/** When a piece is due: what decides whether it goes out within 48 hours of the advance. */
+export interface DeliveryTiming {
+  /** "YYYY-MM-DD" in Dhaka, as stored on the request; null when none was chosen. */
+  targetDate: string | null;
+  /** Same-day express (flowers only): always within 48 hours. */
+  express: boolean;
+  /** A bouquet: made on the day, so it goes out today, tomorrow, or as soon as the advance
+   *  arrives. Any other made-to-order piece takes longer, whatever date is picked. */
+  bouquet: boolean;
+}
+
+/** True when the piece is handed to delivery within 48 hours of the advance being paid. */
+export function deliversWithin48h(t: DeliveryTiming, now: Date): boolean {
+  if (!t.bouquet) return false;
+  if (t.express || !t.targetDate) return true;
+  // Today or tomorrow in Dhaka (any moment of those two days is under 48 hours away), or a day
+  // already gone: the bouquet is then made as soon as the advance arrives.
+  return t.targetDate <= dhakaTomorrow(now);
+}
+
+/** The advance share: the Admin percentage, capped at 10% for a later date (clause 3.2.10). */
+export function depositPctFor(basePct: number, within48h: boolean): number {
+  return within48h ? basePct : Math.min(basePct, LATER_DATE_DEPOSIT_CAP_PCT);
+}
+
+/** Deposit for a quote, whole BDT, rounded down so it never goes over its share of the price. */
 export function depositForQuote(quotedUnitBdt: number, pct: number): number {
-  return Math.max(1, Math.round((quotedUnitBdt * pct) / 100));
+  return Math.max(1, Math.floor((quotedUnitBdt * pct) / 100));
 }
 
 export function effectiveReturnWindowDays(

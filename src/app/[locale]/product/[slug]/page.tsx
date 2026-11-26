@@ -32,7 +32,7 @@ import { getCurrentUser } from "@/lib/auth-utils";
 import { db, schema } from "@/lib/db";
 import { and, eq } from "drizzle-orm";
 import { SITE_URL as BASE } from "@/lib/site-url";
-import { priceDisplay, priceDisplayText, schemaOrgOffer, effectiveDepositPct, effectiveReturnWindowDays } from "@/lib/pricing";
+import { priceDisplay, priceDisplayText, schemaOrgOffer, effectiveDepositPct, effectiveReturnWindowDays, depositPctFor } from "@/lib/pricing";
 import { getCommerceSettings } from "@/lib/commerce";
 import { localizeEstimate, expressCutoffLabel } from "@/lib/delivery";
 import { isDhakaOnlySegment } from "@/lib/delivery-scope";
@@ -146,7 +146,12 @@ export default async function ProductPage({ params }: Props) {
   // ever render the ৳0 placeholder again.
   const commerce = await getCommerceSettings();
   const display = priceDisplay(p);
-  const depositPct = effectiveDepositPct(p.preorderDepositPct, commerce.preorderDepositPct);
+  // The share for today or tomorrow, and for a later date (capped at 10%, clause 3.2.10). Bouquets
+  // can go out today or tomorrow; other made-to-order pieces are made later, so they always take
+  // the cap (lib/pricing.ts deliversWithin48h), and their page shows only that.
+  const basePct = effectiveDepositPct(p.preorderDepositPct, commerce.preorderDepositPct);
+  const laterDepositPct = depositPctFor(basePct, false);
+  const depositPct = dhakaOnly ? basePct : laterDepositPct;
   const returnDays = effectiveReturnWindowDays(p.returnWindowDays, commerce.returnWindowDays);
   const offer = schemaOrgOffer(p);
 
@@ -400,6 +405,7 @@ export default async function ProductPage({ params }: Props) {
                   sameDayUsual={isDhakaOnlySegment(p.segmentId)}
                   display={display}
                   depositPct={depositPct}
+                  laterDepositPct={laterDepositPct}
                   locale={locale}
                   variant="secondary"
                 />
@@ -413,6 +419,7 @@ export default async function ProductPage({ params }: Props) {
               sameDayUsual={isDhakaOnlySegment(p.segmentId)}
               display={display}
               depositPct={depositPct}
+              laterDepositPct={laterDepositPct}
               locale={locale}
             />
           ) : (

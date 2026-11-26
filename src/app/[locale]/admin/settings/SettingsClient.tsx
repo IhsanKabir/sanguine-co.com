@@ -114,7 +114,7 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
           <h3>Preorders & returns</h3>
           <div className="row">
             <div className="field">
-              <label>Preorder deposit (%)</label>
+              <label>Deposit for delivery today or tomorrow (%)</label>
               <input
                 type="number" min={1} max={100}
                 value={commerce.preorderDepositPct}
@@ -131,8 +131,11 @@ export default function SettingsClient({ initialBrand, initialCommerce, gateway,
             </div>
           </div>
           <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 10, lineHeight: 1.6 }}>
-            The deposit is the percentage of a quoted price the customer prepays to confirm a
-            preorder. Both values can be overridden per product in the product editor.
+            The deposit is the share of a quoted price the customer pays by bKash to confirm a
+            preorder. This share applies when the piece goes out today, tomorrow, or (for a bouquet
+            with no date) as soon as the deposit arrives. A later date takes 10% at most, as clause
+            3.2.10 of the Digital Commerce Operation Guidelines 2021 requires: the site applies the
+            cap by itself. Both values can be overridden per product in the product editor.
           </p>
           <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 8 }}>
             <button className="btn btn-primary btn-sm" onClick={saveCommerce} disabled={commercePending}>

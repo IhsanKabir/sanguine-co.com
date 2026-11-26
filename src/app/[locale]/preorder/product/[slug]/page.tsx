@@ -8,7 +8,7 @@ import { getCurrentUser } from "@/lib/auth-utils";
 import { getCustomerPrefill } from "@/lib/customer-prefill";
 import { isDhakaOnlySegment } from "@/lib/delivery-scope";
 import { getProductImages } from "@/lib/queries";
-import { priceDisplay, priceDisplayText } from "@/lib/pricing";
+import { priceDisplay, priceDisplayText, effectiveDepositPct } from "@/lib/pricing";
 import ProductPreorderForm from "./ProductPreorderForm";
 import { localizeEstimate } from "@/lib/delivery";
 import { getCommerceSettings } from "@/lib/commerce";
@@ -109,6 +109,7 @@ export default async function ProductPreorderPage({ params, searchParams }: Prop
             dhakaOnly={dhakaOnly}
             expressCutoffMin={commerce.expressCutoffMin}
             expressFeeBdt={expressFee?.feeBdt ?? commerce.expressFeeBdt}
+            depositPct={effectiveDepositPct(product.preorderDepositPct, commerce.preorderDepositPct)}
             signInHref={`/sign-in?next=/${locale}/preorder/product/${slug}`}
             colors={colors}
             sizes={sizes}
